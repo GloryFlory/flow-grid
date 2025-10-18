@@ -1,45 +1,129 @@
-# mac-schedule
+﻿# Festival Scheduler 
 
-## Overview
-This is a Next.js project named "mac-schedule". It is designed to provide a scheduling application with a clean and simple interface.
+Transform any festival or workshop event into a beautiful, interactive schedule with booking capabilities.
 
-## Getting Started
+## What This Is
 
-### Prerequisites
-Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
+This is the **business platform version** of the successful MAC Festival schedule app. It's designed to be configurable for any festival or workshop event while maintaining all the powerful features that made the original so popular.
 
-### Installation
-1. Clone the repository:
-   ```
-   git clone <repository-url>
-   ```
-2. Navigate into the project directory:
-   ```
-   cd mac-schedule
-   ```
-3. Install the dependencies:
-   ```
-   npm install
-   ```
+##  Perfect For
 
-### Running the Application
-To start the development server, run:
-```
-npm run dev
-```
-This will start the application on [http://localhost:3000](http://localhost:3000).
+- **Yoga Festivals** - Schedule classes, workshops, and retreats
+- **Dance Festivals** - Organize workshops, performances, and social events  
+- **Art Workshops** - Manage creative sessions and artist meetups
+- **Conferences** - Handle talks, breakouts, and networking sessions
+- **Retreats** - Coordinate activities, meals, and free time
 
-### Project Structure
-- `src/app/globals.css`: Contains global CSS styles for the application.
-- `src/app/layout.js`: Defines the layout structure of the application.
-- `src/app/page.js`: Main page component rendered at the root URL.
-- `public/next.svg`: Branding logo for Next.js.
-- `public/vercel.svg`: Branding logo for Vercel.
-- `package.json`: Configuration file for npm.
-- `next.config.js`: Configuration file for Next.js.
+##  Key Features
 
-### Contributing
-Feel free to submit issues or pull requests for any improvements or features you would like to see.
+### Core Scheduling
+-  **Multi-day schedule** with filtering by day, style, level, teacher
+-  **Smart search** across all sessions
+-  **Mobile-responsive** design that works on any device
+-  **Customizable branding** - colors, logos, styling
 
-### License
-This project is licensed under the MIT License.
+### Advanced Booking (Optional)
+-  **Capacity management** - limit attendees per session
+-  **Multi-person booking** - register groups together
+-  **Real-time conflict detection** - prevents double bookings
+-  **Cross-device sync** via Google Sheets integration
+
+### Special Features  
+-  **Photoshoot booking** - time-slot management for photo sessions
+-  **Event tracking** - participant counts for special events (ceremonies, etc.)
+-  **Google Sheets integration** - easy data management
+-  **Zero-maintenance** - works with simple CSV uploads
+
+##  Quick Start
+
+### 1. Clone & Configure
+\\\ash
+git clone [repository-url]
+cd festival-scheduler
+cp .env.example .env.local
+# Edit .env.local with your event details
+\\\
+
+### 2. Setup Google Sheets (Optional)
+- Create Google Sheet with your schedule
+- Add booking tabs if using reservation features
+- Configure webhook for real-time updates
+
+### 3. Deploy
+\\\ash
+npm install
+npm run build
+npm start
+\\\
+
+##  Project Structure
+
+\\\
+festival-scheduler/
+ src/
+    config/eventConfig.js    # All customization happens here
+    app/page.js             # Main schedule interface  
+    utils/                  # Google Sheets, bookings, etc.
+    data/sessions.json      # Fallback schedule data
+ public/                     # Images, logos, assets
+ .env.example               # Configuration template
+ README.md                  # This file
+\\\
+
+##  Customization
+
+All event-specific settings are in \src/config/eventConfig.js\:
+
+- **Event name, description, logos**
+- **Colors and branding** 
+- **Feature toggles** (enable/disable booking, photoshoot, etc.)
+- **Google Sheets integration**
+- **Contact information**
+
+##  Data Management
+
+### Simple CSV Method
+1. Create schedule in Google Sheets or Excel
+2. Export as CSV  
+3. Upload to replace \data.csv\
+4. Deploy - that's it!
+
+### Advanced Google Sheets Integration
+- Real-time updates from Google Sheets
+- Booking data synced across devices
+- No manual CSV exports needed
+
+##  Business Model
+
+This platform can be used for:
+
+1. **White-label service** - Custom setup for each festival
+2. **SaaS platform** - Multi-tenant with subdomains  
+3. **One-time licensing** - Sell configured instances
+4. **Template marketplace** - Pre-built festival types
+
+##  Proven Success
+
+Built from the MAC Festival schedule app that received overwhelmingly positive feedback:
+- Loved by festival attendees
+- Easy for organizers to manage
+- Works perfectly on mobile devices
+- Handles complex multi-day events
+
+##  Contributing
+
+This started as a custom solution for MAC Festival and evolved into a business platform. We welcome contributions that make it even more flexible and powerful for festival organizers worldwide.
+
+##  Support
+
+For business inquiries, custom setups, or technical support:
+- Email: [your-email]
+- Website: [your-website]
+
+##  License
+
+MIT License - Feel free to use for commercial projects.
+
+---
+
+**Transform your festival into an amazing digital experience! **
