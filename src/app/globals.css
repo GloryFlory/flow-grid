@@ -1,0 +1,2837 @@
+:root {
+  /* MAC 2025 Color Palette */
+  --primary-blue: #0077B6;        /* Mediterranean Blue - Buttons, links, key accents */
+  --secondary-blue: #00B4D8;      /* Aqua Blue - Highlights, hover states */
+  --coral-energy: #FF6F61;        /* Coral Energy - Calls-to-action, buttons */
+  --coral-accent: #FF6F61;        /* Same as coral-energy for consistency */
+  --sand-neutral: #F1E9DA;        /* Sand Neutral - Backgrounds, cards, soft blocks */
+  --deep-navy: #0B1F32;          /* Deep Navy - Headers, footer, strong text */
+  --neutral-white: #F8FAFC;       /* Neutral White - Primary background */
+  --success-green: #2E7D32;       /* Success Green - Confirmations, positive tags */
+  --warning-amber: #F59E0B;       /* Warning Amber - Notes, prerequisites, alerts */
+  
+  /* Additional utility colors */
+  --text-dark: #2d3748;
+  --text-light: #718096;
+  --border-light: #e2e8f0;
+  --shadow: rgba(0, 0, 0, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: var(--neutral-white);
+  color: var(--text-dark);
+  line-height: 1.6;
+}
+
+.schedule-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--neutral-white) 0%, var(--sand-neutral) 100%);
+}
+
+/* Main Content Frame - Desktop framing */
+.main-content-frame {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0;
+  background: white;
+  min-height: calc(100vh - 140px);
+}
+
+/* Desktop framing with shadow */
+@media (min-width: 1024px) {
+  .main-content-frame {
+    margin: 1rem auto;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-light);
+  }
+}
+
+/* Header Styles */
+.header {
+  background: linear-gradient(135deg, var(--deep-navy) 0%, var(--primary-blue) 100%);
+  color: white;
+  padding: 2rem 1rem;
+  box-shadow: 0 4px 20px var(--shadow);
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.mac-logo {
+  height: 80px;
+  width: auto;
+}
+
+.logo-placeholder {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(45deg, var(--secondary-blue), var(--coral-energy));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.4rem;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  border: 3px solid white;
+}
+
+.logo {
+  border-radius: 50%;
+  border: 3px solid var(--secondary-blue);
+  background: white;
+  padding: 0.5rem;
+}
+
+.title-section h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 0;
+  background: linear-gradient(45deg, white, var(--secondary-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.title-section p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.header-info p {
+  font-size: 1.1rem;
+  font-weight: 500;
+  opacity: 0.95;
+}
+
+/* Schedule Tabs */
+.schedule-tabs {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  gap: 0;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px var(--shadow);
+  margin-top: -1rem;
+  position: relative;
+  z-index: 10;
+  margin-bottom: 2rem;
+}
+
+.tab {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  border: none;
+  background: white;
+  color: var(--text-dark);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-right: 1px solid var(--border-light);
+}
+
+.tab:last-child {
+  border-right: none;
+}
+
+.tab:hover {
+  background: var(--sand-neutral);
+  color: var(--primary-blue);
+  transform: translateY(-2px);
+}
+
+.tab.active {
+  background: var(--primary-blue);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 119, 182, 0.3);
+}
+
+/* Filter Bar */
+.filter-container {
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+}
+
+/* Mobile filter toggle button */
+.mobile-filter-toggle {
+  display: none; /* Hidden on desktop */
+}
+
+.filters-toggle-btn {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin: 0 0 1rem 0; /* Remove horizontal margin to prevent spillover */
+  font-weight: 600;
+  color: var(--deep-navy);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.filters-toggle-btn:hover {
+  background: #f8fafc;
+}
+
+.active-indicator {
+  color: var(--primary-blue);
+  margin-left: 0.5rem;
+}
+
+.toggle-arrow {
+  transition: transform 0.2s ease;
+}
+
+.toggle-arrow.open {
+  transform: rotate(180deg);
+}
+
+.filter-bar {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr auto;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px var(--shadow);
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-group label {
+  font-weight: 600;
+  color: var(--deep-navy);
+  font-size: 0.9rem;
+}
+
+.search-input,
+.filter-select {
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border-light);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.search-input:focus,
+.filter-select:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(0, 119, 182, 0.1);
+}
+
+/* Clear filters button */
+.clear-filters-btn {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid var(--border-light);
+  border-radius: 8px;
+  background: white;
+  color: var(--text-light);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  align-self: end;
+  height: 44px; /* Match the height of select elements */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1.75rem; /* Offset for label height to align with inputs */
+}
+
+.clear-filters-btn:hover:not(:disabled) {
+  border-color: var(--coral-accent);
+  color: var(--coral-accent);
+  background: rgba(255, 111, 97, 0.05);
+}
+
+.clear-filters-btn.active {
+  border-color: var(--coral-accent);
+  color: var(--coral-accent);
+  background: rgba(255, 111, 97, 0.1);
+}
+
+.clear-filters-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.search-input::placeholder {
+  color: var(--text-light);
+}
+
+/* Sessions Grid */
+.sessions-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+  padding: 0 1rem 2rem;
+}
+
+/* Day sections for All Days view */
+.day-section {
+  margin-bottom: 3rem;
+}
+
+.day-header {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--primary-blue);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 3px solid var(--secondary-blue);
+  text-align: center;
+}
+
+/* Time slot sections for individual day view */
+.time-slot {
+  margin-bottom: 2rem;
+}
+
+.time-header {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--deep-navy);
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, var(--sand-neutral) 0%, rgba(241, 233, 218, 0.5) 100%);
+  border-left: 4px solid var(--primary-blue);
+  border-radius: 8px;
+}
+
+.day-content {
+  max-width: 100%;
+}
+
+/* Session Cards with uniform background and better spacing */
+.session-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 20px var(--shadow);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border-light);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: var(--card-min-height, 220px);
+}
+
+/* Simplified cards - same background as regular cards */
+.simple-card {
+  background: white;
+  border-left: 3px solid var(--coral-accent);
+}
+
+/* Pool/Relax/Jam card - special styling */
+.pool-relax-card {
+  background: white;
+  border-left: 3px solid var(--light-blue);
+  min-height: auto;
+}
+
+/* Session header with info button */
+.session-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+/* Info button */
+.info-button {
+  background: var(--primary-blue);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.info-button:hover {
+  background: var(--secondary-blue);
+  transform: scale(1.1);
+}
+
+/* Session content with better spacing */
+.session-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+/* Duration-based card heights and styling */
+.session-card.size-small {
+  --card-min-height: 180px;
+  opacity: 0.95;
+}
+
+.session-card.size-medium {
+  --card-min-height: 220px;
+}
+
+.session-card.size-large {
+  --card-min-height: 260px;
+  border-left: 5px solid var(--coral-accent);
+}
+
+.session-card.size-xl {
+  --card-min-height: 300px;
+  border-left: 6px solid var(--primary-blue);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+}
+
+/* Duration indicator */
+.duration-indicator {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: rgba(0, 119, 182, 0.1);
+  color: var(--primary-blue);
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.session-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-blue), var(--secondary-blue));
+}
+
+.session-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 119, 182, 0.15);
+  border-color: var(--primary-blue);
+}
+
+.session-header {
+  margin-bottom: 1rem;
+}
+
+.session-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--deep-navy);
+  margin: 0 0 0.5rem 0;
+  line-height: 1.3;
+}
+
+/* Fixed height for consistent card layout */
+.session-title-fixed-height {
+  min-height: 2.6rem; /* Exactly 2 lines at 1.3 line-height */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.session-time {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary-blue);
+  background: rgba(0, 119, 182, 0.1);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  display: inline-block;
+}
+
+/* New time-location combined styling */
+.session-time-location {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.session-time-location .time {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary-blue);
+  background: rgba(0, 119, 182, 0.1);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+}
+
+.session-time-location .location {
+  font-size: 0.9rem;
+  color: var(--text-light);
+  font-weight: 500;
+  background: var(--sand-neutral);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+}
+
+/* Level styling */
+.session-level {
+  margin-bottom: 1rem;
+}
+
+/* Description styling */
+.session-description {
+  font-size: 0.9rem;
+  color: var(--text-dark);
+  line-height: 1.4;
+  margin-bottom: 1rem;
+  background: rgba(0, 180, 216, 0.05);
+  padding: 0.75rem;
+  border-radius: 8px;
+  border-left: 3px solid var(--secondary-blue);
+}
+
+/* Teachers section with new layout */
+.teachers-section {
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.teachers-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.teachers-names {
+  flex: 1;
+  padding-right: 60px; /* Make space for absolute positioned image */
+}
+
+.teachers-names strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--deep-navy);
+  font-size: 0.9rem;
+}
+
+.teacher-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.teacher-link {
+  color: var(--primary-blue);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.teacher-link:hover {
+  color: var(--secondary-blue);
+  text-decoration: underline;
+}
+
+/* Teacher avatar positioned at bottom right corner of card */
+.teachers-avatar-single {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 2;
+}
+
+.teachers-avatars {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+.teacher-avatar-bottom {
+  position: relative;
+  width: 40px;
+  height: 40px;
+}
+
+.teacher-photo-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--secondary-blue);
+  box-shadow: 0 2px 8px rgba(0, 119, 182, 0.2);
+}
+
+.teacher-placeholder-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 119, 182, 0.2);
+  aspect-ratio: 1 / 1;
+}
+
+.session-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.level-badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.location {
+  font-size: 0.9rem;
+  color: var(--text-light);
+  font-weight: 500;
+  background: var(--sand-neutral);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+}
+
+.teachers {
+  font-size: 0.9rem;
+  color: var(--text-dark);
+  margin-bottom: 0.75rem;
+}
+
+.styles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* New inline layout for styles and teacher photo */
+.styles-and-photo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Photo-only session layout */
+.photo-only-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.photo-only-card .teachers-names {
+  margin-bottom: 0;
+  padding-right: 0;
+}
+
+.teacher-photo-inline {
+  flex-shrink: 0;
+}
+
+.teacher-photo-large {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--secondary-blue);
+  box-shadow: 0 3px 12px rgba(0, 119, 182, 0.25);
+}
+
+/* Specific positioning adjustments for individual teacher photos */
+.teacher-photo-large[src*="svetlana"] {
+  object-position: right center;
+}
+
+.teacher-photo-large[src*="maria-flo"] {
+  object-position: center top;
+}
+
+.teacher-photo-large[src*="caspian-laura"] {
+  object-position: center top;
+}
+
+.teacher-photo-large[src*="daria"] {
+  object-position: center top;
+}
+
+.teacher-placeholder-large {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, var(--secondary-blue), var(--coral-energy));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.8rem;
+  color: white;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  border: 3px solid var(--secondary-blue);
+}
+
+.style-tag {
+  padding: 0.3rem 0.7rem;
+  background: var(--sand-neutral);
+  border: 1px solid var(--secondary-blue);
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--primary-blue);
+  transition: all 0.2s ease;
+}
+
+/* Clickable style tags */
+.style-tag.clickable {
+  cursor: pointer;
+}
+
+.style-tag.clickable:hover {
+  background: var(--primary-blue);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 119, 182, 0.3);
+}
+
+.style-tag:hover {
+  background: var(--secondary-blue);
+  color: white;
+}
+
+.prereqs {
+  font-size: 0.85rem;
+  color: var(--warning-amber);
+  background: rgba(245, 158, 11, 0.1);
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border-left: 3px solid var(--warning-amber);
+}
+
+/* No sessions message */
+.no-sessions {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: var(--sand-neutral);
+  border-radius: 16px;
+  margin: 2rem 0;
+}
+
+.no-sessions p {
+  font-size: 1.1rem;
+  color: var(--text-light);
+  margin: 0;
+}
+
+/* Simple grid layout with workshop highlighting */
+.sessions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+/* Workshop highlighting - make workshops more prominent */
+.session-card.workshop-highlight {
+  background: linear-gradient(135deg, #fefefe 0%, #f8fafc 100%);
+  border: 2px solid #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+  transform: translateY(0);
+  transition: all 0.2s ease;
+}
+
+.session-card.workshop-highlight:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
+}
+
+/* Non-workshop cards - more subdued */
+.session-card.non-workshop {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  opacity: 0.85;
+}
+
+/* Simultaneous workshop grouping */
+.simultaneous-workshops {
+  grid-column: 1 / -1; /* Span full width */
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 2px solid #3b82f6;
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 0.5rem 0;
+}
+
+.workshop-time-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.workshop-time {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1d4ed8;
+}
+
+.workshop-count {
+  font-size: 0.875rem;
+  color: #3730a3;
+  background: rgba(59, 130, 246, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 1rem;
+}
+
+.workshop-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+/* Mobile responsiveness for workshop groups */
+@media (max-width: 768px) {
+  .simultaneous-workshops {
+    grid-column: 1;
+  }
+  
+  .workshop-group {
+    grid-template-columns: 1fr;
+  }
+  
+  .workshop-time-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+  
+  /* Compact simplified cards on mobile */
+  .session-card.simple-card {
+    min-height: auto;
+    padding: 0.75rem;
+  }
+  
+  .session-card.simple-card .session-content {
+    gap: 0.25rem;
+  }
+  
+  .session-card.simple-card .session-time {
+    font-size: 0.75rem;
+    margin-bottom: 0.125rem;
+  }
+  
+  .session-card.simple-card .session-teachers {
+    font-size: 0.75rem;
+    margin-bottom: 0.125rem;
+  }
+  
+  .session-card.simple-card .session-level,
+  .session-card.simple-card .session-prerequisites {
+    font-size: 0.75rem;
+    line-height: 1.2;
+  }
+  
+  /* Mobile adjustments - revert to simpler working approach */
+  .level-and-tags {
+    margin-right: 60px; /* Space for photo */
+  }
+  
+  .session-prerequisites {
+    margin-right: 60px; /* Space for photo */
+  }
+  
+  .session-room {
+    margin-right: 60px; /* Space for photo */
+  }
+  
+  /* Simple mobile photo styling - use same as desktop */
+  @media (max-width: 768px) {
+    /* Mobile: reduce prereqs width to prevent overlap with photo */
+    .prereqs-compact {
+      width: 70% !important;
+      margin-right: 0 !important;
+    }
+    
+    .level-and-tags {
+      margin-right: 90px !important; /* Less margin needed on mobile */
+    }
+    
+    .session-card {
+      position: relative; /* Ensure positioning context */
+    }
+  }
+}
+
+/* Density-based grouping - add extra margin to first card of each time period */
+.session-card.first-of-period {
+  margin-top: 1.5rem;
+}
+
+/* Exception: don't add margin to the very first card */
+.session-card.first-of-period:first-child {
+  margin-top: 0;
+}
+
+/* Subtle time-based visual cues */
+.time-early-morning {
+  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.1);
+  border-left: 2px solid rgba(59, 130, 246, 0.3);
+}
+
+.time-morning {
+  box-shadow: 0 1px 3px rgba(16, 185, 129, 0.1);
+  border-left: 2px solid rgba(16, 185, 129, 0.3);
+}
+
+.time-lunch-time {
+  box-shadow: 0 1px 3px rgba(245, 158, 11, 0.1);
+  border-left: 2px solid rgba(245, 158, 11, 0.3);
+}
+
+.time-afternoon {
+  box-shadow: 0 1px 3px rgba(239, 68, 68, 0.1);
+  border-left: 2px solid rgba(239, 68, 68, 0.3);
+}
+
+.time-evening {
+  box-shadow: 0 1px 3px rgba(139, 92, 246, 0.1);
+  border-left: 2px solid rgba(139, 92, 246, 0.3);
+}
+
+.time-night {
+  box-shadow: 0 1px 3px rgba(75, 85, 99, 0.1);
+  border-left: 2px solid rgba(75, 85, 99, 0.3);
+}
+
+/* Compact layout for session cards */
+.teachers-names-compact {
+  margin: 0;
+}
+
+.teachers-names-compact .teacher-link {
+  color: var(--primary-blue);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.teachers-names-compact .teacher-link:hover {
+  color: var(--secondary-blue);
+  text-decoration: underline;
+}
+
+.teacher-photo-bottom-right {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 10;
+  border-radius: 50%;
+  overflow: hidden; /* Ensure photo content stays within bounds */
+}
+
+/* Mobile inline photo for full cards */
+.teacher-photo-mobile-inline {
+  display: none; /* No longer used - keeping for backward compatibility */
+}
+
+/* Ensure all session cards are positioned and contained properly */
+.session-card {
+  position: relative;
+  overflow: hidden; /* Prevent content spillover */
+}
+
+.level-and-tags {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-right: 130px; /* Further increased space for teacher photo */
+  margin-bottom: 0.5rem; /* Add bottom margin to prevent overlap */
+  line-height: 1.2;
+}
+
+/* Ensure prerequisites and tags don't overlap with photo - limit width to 75% */
+/* Prerequisites styling consolidated below to avoid conflicts */
+
+/* Better spacing for multi-line titles */
+.session-title {
+  margin-bottom: 0.75rem; /* Increased from default to provide more space */
+  line-height: 1.3;
+}
+
+/* Room positioning - ensure it doesn't clash with photo */
+.session-room {
+  margin-right: 130px;
+  margin-bottom: 0.25rem;
+}
+
+.level-badge-compact {
+  padding: 0.25rem 0.5rem;
+  border-radius: 10px;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.styles-compact {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.style-tag-compact {
+  background: var(--light-blue);
+  color: var(--primary-blue);
+  padding: 0.25rem 0.5rem;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.prereqs-compact {
+  font-size: 0.8rem;
+  color: var(--text-light);
+  line-height: 1.4; /* Improved line height for better readability */
+  margin-right: 130px; /* Consistent space for teacher photo */
+  margin-bottom: 0.5rem;
+  width: 70%; /* Reduced width to ensure no overlap with photo */
+  word-wrap: break-word; /* Allow long words to break */
+  overflow-wrap: break-word; /* Modern browsers */
+  hyphens: auto; /* Add hyphenation for better breaks */
+}
+
+.prereqs-compact strong {
+  color: var(--deep-navy);
+  font-weight: 600;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(11, 31, 50, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  background: white;
+  border-radius: 24px;
+  max-width: 700px;
+  width: 100%;
+  max-height: 95vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+  position: relative;
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-header {
+  background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+  color: white;
+  padding: 2rem;
+  border-radius: 24px 24px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+}
+
+.modal-title-section {
+  flex: 1;
+  padding-right: 1rem;
+}
+
+.modal-header h2 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.modal-quick-info {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.modal-time, .modal-day, .modal-location {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.4rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+}
+
+.close-button {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.75rem;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.close-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+.modal-body {
+  padding: 2.5rem;
+}
+
+.session-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.detail-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.detail-row strong {
+  color: var(--deep-navy);
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Teachers Section */
+.teachers-section {
+  background: linear-gradient(135deg, rgba(0, 180, 216, 0.05), rgba(0, 119, 182, 0.03));
+  padding: 1.5rem;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 180, 216, 0.1);
+}
+
+.teachers-grid {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.teacher-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: white;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.teacher-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.teacher-photo-modal {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.teacher-photo-modal img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.teacher-initials-modal {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.teacher-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.teacher-name {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--deep-navy);
+}
+
+.teacher-bio-link {
+  color: var(--primary-blue);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.teacher-bio-link:hover {
+  color: var(--secondary-blue);
+  text-decoration: underline;
+}
+
+/* Level Section */
+.level-section {
+  background: rgba(241, 233, 218, 0.3);
+  padding: 1.5rem;
+  border-radius: 16px;
+  border-left: 4px solid var(--sand-neutral);
+}
+
+.level-display {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.level-badge-modal-enhanced {
+  padding: 0.6rem 1.2rem;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.duration-info {
+  background: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--deep-navy);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Description Section */
+.description-section {
+  background: linear-gradient(135deg, rgba(0, 180, 216, 0.03), rgba(255, 255, 255, 0.5));
+  padding: 1.5rem;
+  border-radius: 16px;
+  border-left: 4px solid var(--secondary-blue);
+}
+
+.description-text-enhanced {
+  background: white;
+  padding: 1.25rem;
+  border-radius: 12px;
+  border-left: 3px solid var(--primary-blue);
+  line-height: 1.6;
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text-dark);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Prerequisites Section */
+.prereqs-section {
+  background: rgba(255, 111, 97, 0.05);
+  padding: 1.5rem;
+  border-radius: 16px;
+  border-left: 4px solid var(--coral-accent);
+}
+
+.prereqs-badge {
+  background: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: 20px;
+  font-weight: 600;
+  color: var(--deep-navy);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  display: inline-block;
+}
+
+/* Styles Section */
+.styles-section {
+  background: linear-gradient(135deg, rgba(122, 74, 221, 0.05), rgba(255, 255, 255, 0.5));
+  padding: 1.5rem;
+  border-radius: 16px;
+  border-left: 4px solid var(--accent-purple);
+}
+
+.styles-list-modal {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.style-tag-modal {
+  background: linear-gradient(135deg, var(--accent-purple), #9333ea);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 3px 10px rgba(122, 74, 221, 0.3);
+}
+
+.style-tag-modal:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(122, 74, 221, 0.4);
+}
+
+/* Teacher Photo Section - Full Width */
+.modal-teacher-section {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(0, 180, 216, 0.03), rgba(255, 255, 255, 0.5));
+  border-bottom: 1px solid rgba(0, 180, 216, 0.1);
+}
+
+.modal-teacher-photo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+.modal-teacher-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.modal-teacher-initials {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.modal-teacher-info {
+  flex: 1;
+}
+
+.modal-teacher-names {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--deep-navy);
+}
+
+.modal-teacher-link {
+  color: var(--primary-blue);
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.modal-teacher-link:hover {
+  color: var(--secondary-blue);
+  text-decoration: underline;
+}
+
+/* Description Section - Highlighted */
+.modal-description-section {
+  background: linear-gradient(135deg, rgba(0, 180, 216, 0.05), rgba(255, 255, 255, 0.8));
+  padding: 2rem;
+  border-radius: 16px;
+  border-left: 4px solid var(--primary-blue);
+}
+
+.modal-description-section h4 {
+  margin: 0 0 1rem 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--deep-navy);
+}
+
+.modal-description-text {
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--text-dark);
+}
+
+/* Details Grid */
+.modal-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Ensure consistent sizing for cards */
+.modal-detail-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  border: 1px solid rgba(0, 180, 216, 0.1);
+  min-width: 200px; /* Ensure minimum width consistency */
+}
+
+.modal-detail-card h5 {
+  margin: 0 0 1rem 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.modal-level-badge {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.modal-duration {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--deep-navy);
+}
+
+.modal-prereqs-card {
+  text-align: left;
+  /* Removed grid-column: 1 / -1 to allow normal grid flow */
+}
+
+.modal-prereqs {
+  font-size: 1rem;
+  color: var(--text-dark);
+  line-height: 1.5;
+}
+
+/* Styles Section */
+.modal-styles-section {
+  background: rgba(241, 233, 218, 0.3);
+  padding: 1.5rem;
+  border-radius: 16px;
+}
+
+.modal-styles-section h4 {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--deep-navy);
+}
+
+.modal-styles-list {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.modal-style-tag {
+  background: white;
+  color: var(--deep-navy);
+  border: 2px solid var(--accent-purple);
+  padding: 0.6rem 1.2rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(122, 74, 221, 0.15);
+  transition: all 0.2s ease;
+}
+
+/* Flex row for time, day, location in modal */
+.detail-row-flex {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 120px;
+}
+
+.detail-item strong {
+  color: var(--deep-navy);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.detail-row strong {
+  color: var(--deep-navy);
+  font-weight: 600;
+}
+
+/* Modal-specific level badge */
+.level-badge-modal {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Description text styling */
+.description-text {
+  background: rgba(0, 180, 216, 0.05);
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 3px solid var(--secondary-blue);
+  line-height: 1.5;
+  margin: 0.5rem 0 0 0;
+}
+
+.styles-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.prereqs-text {
+  background: rgba(245, 158, 11, 0.1);
+  padding: 0.75rem;
+  border-radius: 8px;
+  border-left: 3px solid var(--warning-amber);
+  color: var(--warning-amber);
+  font-weight: 500;
+  margin: 0;
+}
+
+/* No Sessions State */
+.no-sessions {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px var(--shadow);
+  color: var(--text-light);
+}
+
+.no-sessions p {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* Mobile Responsive Improvements */
+@media (max-width: 768px) {
+  .header {
+    padding: 1.5rem 1rem;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .title-section h1 {
+    font-size: 2rem;
+  }
+  
+  .title-section p {
+    font-size: 0.9rem;
+  }
+  
+  .sessions-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0 0.75rem 1rem;
+  }
+  
+  .session-card {
+    padding: 1rem;
+  }
+  
+  .session-title-fixed-height {
+    font-size: 1.1rem;
+  }
+  
+  .teachers-list {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .teachers-content {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .teachers-names {
+    padding-right: 0;
+    padding-bottom: 0;
+  }
+  
+  .styles-and-photo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    position: relative;
+  }
+  
+  .styles-and-photo .styles {
+    width: 100%;
+    margin-bottom: 60px; /* Make space for photo at bottom right */
+  }
+  
+  .styles-and-photo .teacher-photo-inline {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }
+  
+  .teacher-photo-large {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .teacher-placeholder-large {
+    width: 100px;
+    height: 100px;
+    font-size: 1.5rem;
+  }
+  
+  .teachers-avatar-single {
+    bottom: 15px;
+    right: 15px;
+  }
+  
+  .teachers-avatars {
+    bottom: 15px;
+    right: 15px;
+  }
+  
+  .detail-row-flex {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .teacher-avatar-bottom {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .teacher-photo-circle,
+  .teacher-placeholder-circle {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .teacher-item {
+    justify-content: flex-start;
+  }
+  
+  .time-header {
+    font-size: 1.1rem;
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .day-header {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .session-time-location {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .styles-and-photo {
+    gap: 0.5rem;
+  }
+  
+  .teacher-photo-large {
+    width: 90px;
+    height: 90px;
+  }
+  
+  .teacher-placeholder-large {
+    width: 90px;
+    height: 90px;
+    font-size: 1.3rem;
+  }
+  
+  .teachers-list {
+    gap: 0.25rem;
+  }
+  
+  .teachers-content {
+    gap: 0.5rem;
+  }
+  
+  .teachers-names {
+    padding-bottom: 45px; /* Slightly less space on very small screens */
+  }
+  
+  .teachers-avatar-single {
+    bottom: 12px;
+    right: 12px;
+  }
+  
+  .teachers-avatars {
+    bottom: 12px;
+    right: 12px;
+  }
+  
+  .teacher-avatar-bottom {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .teacher-photo-circle,
+  .teacher-placeholder-circle {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .teacher-item {
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .teacher-avatar, .teacher-photo, .teacher-placeholder {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .teacher-name {
+    font-size: 0.8rem;
+  }
+}
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .title-section h1 {
+    font-size: 2rem;
+  }
+  
+  .schedule-tabs {
+    margin: 0 1rem;
+    margin-top: -1rem;
+    margin-bottom: 2rem;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    flex-wrap: nowrap; /* Prevent wrapping */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    scrollbar-width: none; /* Hide scrollbar on Firefox */
+    -ms-overflow-style: none; /* Hide scrollbar on IE */
+    /* Ensure all tabs are visible and scrollable */
+    white-space: nowrap;
+    display: flex;
+  }
+  
+  /* Hide scrollbar on Webkit browsers */
+  .schedule-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .tab {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    flex: none !important; /* Force override flex: 1 to allow natural width */
+    flex-shrink: 0; /* Prevent tabs from shrinking */
+    min-width: 100px; /* Minimum width to ensure visibility */
+    white-space: nowrap; /* Prevent text wrapping */
+    display: inline-block; /* Ensure proper display */
+    width: auto !important; /* Override any fixed width */
+  }
+  
+  .filter-container {
+    margin: 0 0 1rem;
+    padding: 0 1rem; /* Add horizontal padding to container instead */
+  }
+  
+  /* Show mobile filter toggle */
+  .mobile-filter-toggle {
+    display: block !important;
+  }
+  
+  .filter-bar {
+    display: none; /* Hidden by default on mobile */
+    grid-template-columns: 1fr;
+    margin: 0 1rem 1rem;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Show filters when mobile-open class is added */
+  .filter-bar.mobile-open {
+    display: grid !important;
+  }
+  
+  .filter-group {
+    margin-bottom: 0; /* Remove extra margin */
+  }
+  
+  .filter-group label {
+    font-size: 0.875rem; /* Smaller labels */
+    margin-bottom: 0.25rem;
+  }
+  
+  .filter-select {
+    padding: 0.5rem; /* Reduced padding */
+    font-size: 0.875rem; /* Smaller text */
+  }
+  
+  .clear-filters-btn {
+    align-self: stretch;
+    padding: 0.5rem; /* Reduced padding */
+    font-size: 0.875rem; /* Smaller text */
+  }
+  
+  .session-card {
+    padding: 1rem;
+    position: relative; /* Ensure relative positioning for absolute photo */
+    padding-bottom: 3rem; /* Extra bottom padding for photo */
+  }
+  
+  .session-header {
+    margin-bottom: 1rem;
+  }
+  
+  .session-content {
+    gap: 1rem;
+  }
+  
+  .sessions-grid {
+    grid-template-columns: 1fr;
+    padding: 0 1rem 2rem;
+  }
+  
+  /* Mobile cards - simple styling */
+  .session-card {
+    padding: 1rem;
+  }
+  
+  .session-title {
+    font-size: 1.2rem;
+  }
+  
+  /* Enhanced Mobile Modal Styles */
+  .modal-content {
+    margin: 0.5rem;
+    max-height: 95vh;
+    border-radius: 20px;
+  }
+  
+  .modal-header {
+    padding: 1.5rem;
+    border-radius: 20px 20px 0 0;
+  }
+  
+  .modal-header h2 {
+    font-size: 1.4rem;
+    line-height: 1.3;
+  }
+  
+  .modal-quick-info {
+    gap: 0.5rem;
+  }
+  
+  .modal-time, .modal-day, .modal-location {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+  }
+  
+  /* Mobile Teacher Section */
+  .modal-teacher-section {
+    padding: 1.5rem;
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .modal-teacher-photo {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .modal-teacher-names {
+    font-size: 1.2rem;
+  }
+  
+  .modal-teacher-link {
+    font-size: 0.9rem;
+  }
+  
+  .modal-body {
+    padding: 1.5rem;
+  }
+  
+  .session-details {
+    gap: 1.5rem;
+  }
+  
+  /* Mobile Description */
+  .modal-description-section {
+    padding: 1.5rem;
+  }
+  
+  .modal-description-section h4 {
+    font-size: 1.1rem;
+  }
+  
+  .modal-description-text {
+    font-size: 1rem;
+  }
+  
+  /* Mobile Details Grid */
+  .modal-details-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .modal-detail-card {
+    padding: 1rem;
+  }
+  
+  .modal-prereqs-card {
+    grid-column: 1;
+  }
+  
+  /* Mobile Styles Section */
+  .modal-styles-section {
+    padding: 1rem;
+  }
+  
+  .modal-styles-list {
+    gap: 0.5rem;
+  }
+  
+  .modal-style-tag {
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+    border-width: 1px;
+  }
+}
+
+/* Photoshoot Booking Styles */
+.photoshoot-booking-inline {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-light);
+}
+
+.book-photoshoot-btn-compact {
+  background: linear-gradient(135deg, var(--coral-energy), #ff8a75);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-shadow: 0 2px 8px rgba(255, 111, 97, 0.3);
+}
+
+.book-photoshoot-btn-compact:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 111, 97, 0.4);
+}
+
+.photoshoot-booking-section {
+  background: linear-gradient(135deg, #fff7f0, #fff2e6);
+  border: 2px solid var(--coral-energy);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.photoshoot-booking-section h4 {
+  color: var(--coral-energy);
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.photoshoot-description {
+  color: var(--text-dark);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.book-photoshoot-btn-main {
+  background: linear-gradient(135deg, var(--coral-energy), #ff8a75);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(255, 111, 97, 0.3);
+  min-width: 200px;
+}
+
+.book-photoshoot-btn-main:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(255, 111, 97, 0.4);
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .photoshoot-booking-section {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .book-photoshoot-btn-main {
+    width: 100%;
+    padding: 0.875rem 1.5rem;
+  }
+}
+
+/* Photoshoot Booking Modal Styles */
+.photoshoot-modal-content {
+  background: white;
+  border-radius: 16px;
+  max-width: 900px;
+  width: 95%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.booking-info {
+  font-size: 0.9rem;
+  color: var(--deep-navy);
+  font-weight: 500;
+  margin-top: 0.5rem;
+  background: rgba(0, 119, 182, 0.1);
+  padding: 0.5rem;
+  border-radius: 6px;
+  border-left: 3px solid var(--primary-blue);
+}
+
+.photoshoot-modal-body {
+  padding: 1.5rem;
+}
+
+.time-slots-section h3,
+.booking-form-section h3 {
+  color: var(--coral-energy);
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.time-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.time-slot {
+  border: 2px solid var(--border-light);
+  border-radius: 8px;
+  padding: 0.75rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+
+.time-slot.available {
+  background: white;
+  border-color: var(--primary-blue);
+}
+
+.time-slot.available:hover {
+  background: #f0f9ff;
+  border-color: var(--secondary-blue);
+  transform: translateY(-2px);
+}
+
+.time-slot.selected {
+  background: var(--secondary-blue);
+  border-color: var(--primary-blue);
+  color: var(--deep-navy);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 180, 216, 0.3);
+}
+
+.time-slot.selected .slot-time {
+  color: var(--deep-navy);
+  font-weight: 700;
+}
+
+.time-slot.booked {
+  background: #fef3f2;
+  border-color: var(--coral-energy);
+  cursor: default;
+}
+
+.time-slot.user-booking {
+  background: linear-gradient(135deg, #e0f2fe, #f0f9ff);
+  border-color: var(--primary-blue);
+  border-width: 2px;
+  position: relative;
+}
+
+.time-slot.user-booking::before {
+  content: "👤";
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  font-size: 0.7rem;
+}
+
+.slot-time {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.slot-status {
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+
+.slot-booking {
+  position: relative;
+}
+
+.booked-names {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--coral-energy);
+  line-height: 1.2;
+}
+
+.user-booking-indicator {
+  font-size: 0.65rem;
+  color: var(--primary-blue);
+  margin-top: 2px;
+  opacity: 0.8;
+}
+
+.user-booking {
+  cursor: pointer;
+  border-color: var(--primary-blue) !important;
+}
+
+.user-booking:hover {
+  background: rgba(59, 130, 246, 0.1);
+  transform: scale(1.02);
+}
+
+.delete-booking-btn {
+  background: #dc2626; /* Red color to distinguish from update button */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.delete-booking-btn:hover {
+  background: #b91c1c; /* Darker red on hover */
+  transform: translateY(-1px);
+}
+
+/* Photoshoot booking hint on main card */
+.photoshoot-booking-hint {
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: rgba(255, 111, 97, 0.1); /* Light coral background */
+  border: 1px solid var(--coral-energy);
+  border-radius: 4px;
+  text-align: center;
+}
+
+.booking-hint-text {
+  font-size: 0.75rem;
+  color: var(--coral-energy);
+  font-weight: 500;
+}
+
+/* Participant tracking hint on main card */
+.participant-tracking-hint {
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: rgba(46, 125, 50, 0.1); /* Light green background */
+  border: 1px solid var(--success-green);
+  border-radius: 4px;
+  text-align: center;
+}
+
+.participant-hint-text {
+  font-size: 0.75rem;
+  color: var(--success-green);
+  font-weight: 500;
+}
+
+/* Participant tracking section */
+.participant-tracking-section {
+  background: rgba(46, 125, 50, 0.1); /* Light green background */
+  border: 1px solid var(--success-green);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+.participant-tracking-section h4 {
+  margin: 0 0 0.5rem 0;
+  color: var(--success-green);
+  font-size: 1.1rem;
+}
+
+.participant-description {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  font-style: italic;
+}
+
+.participant-count {
+  margin: 0.5rem 0 1rem 0;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  font-weight: 500;
+}
+
+.participant-btn {
+  background: var(--success-green);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.participant-btn:hover {
+  background: #1B5E20;
+  transform: translateY(-1px);
+}
+
+.participant-btn.participating {
+  background: var(--success-green);
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+}
+
+.participant-btn.not-participating {
+  background: #E8F5E8;
+  color: var(--success-green);
+  border: 2px solid var(--success-green);
+}
+
+.participant-btn.not-participating:hover {
+  background: var(--success-green);
+  color: white;
+}
+
+/* Capacity booking section */
+.capacity-booking-section {
+  background: rgba(0, 119, 182, 0.1); /* Light blue background */
+  border: 1px solid var(--primary-blue);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+.capacity-booking-section h4 {
+  margin: 0 0 0.5rem 0;
+  color: var(--primary-blue);
+  font-size: 1.1rem;
+}
+
+.booking-description {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  font-style: italic;
+}
+
+.booking-count {
+  margin: 0.5rem 0 1rem 0;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  font-weight: 500;
+}
+
+.booking-btn {
+  background: var(--primary-blue);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.booking-btn:hover:not(:disabled) {
+  background: #0066CC;
+  transform: translateY(-1px);
+}
+
+.booking-btn.booked {
+  background: var(--success-green);
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+}
+
+.booking-btn.not-booked {
+  background: #E3F2FD;
+  color: var(--primary-blue);
+  border: 2px solid var(--primary-blue);
+}
+
+.booking-btn.not-booked:hover {
+  background: var(--primary-blue);
+  color: white;
+}
+
+.booking-btn.full {
+  background: #FFEBEE;
+  color: var(--coral-energy);
+  border: 2px solid var(--coral-energy);
+  cursor: not-allowed;
+}
+
+.booking-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Capacity booking hint for main cards */
+.capacity-booking-hint {
+  background: rgba(0, 119, 182, 0.1);
+  border: 1px solid var(--primary-blue);
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.capacity-booking-hint .booking-hint-text {
+  font-size: 0.8rem;
+  color: var(--primary-blue);
+  font-weight: 600;
+}
+
+/* Booking form styles */
+.booking-form {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.booking-form h5 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  color: var(--text-dark);
+}
+
+.name-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.name-input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.name-input:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 2px rgba(0, 119, 182, 0.1);
+}
+
+.remove-name-btn {
+  background: var(--coral-energy);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remove-name-btn:hover {
+  background: #e55347;
+}
+
+.booking-form-actions {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+.add-name-btn {
+  background: #f8f9fa;
+  color: var(--primary-blue);
+  border: 1px solid var(--primary-blue);
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+
+.add-name-btn:hover:not(:disabled) {
+  background: var(--primary-blue);
+  color: white;
+}
+
+.add-name-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.booking-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.cancel-booking-btn {
+  background: #f8f9fa;
+  color: var(--text-dark);
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.cancel-booking-btn:hover {
+  background: #e9ecef;
+}
+
+.confirm-booking-btn {
+  background: var(--primary-blue);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.confirm-booking-btn:hover:not(:disabled) {
+  background: #0066CC;
+}
+
+.confirm-booking-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sync-status {
+  font-size: 0.85rem;
+  color: var(--primary-blue);
+  margin-top: 4px;
+  opacity: 0.9;
+}
+
+.cancel-booking-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--coral-energy);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cancel-booking-btn:hover {
+  background: #e55347;
+}
+
+.booking-form-section {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.names-input-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.name-input-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.name-input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 2px solid var(--border-light);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.name-input:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+}
+
+.remove-name-btn {
+  background: var(--coral-energy);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-name-btn {
+  background: var(--success-green);
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.add-name-btn:hover {
+  background: #1e5e23;
+}
+
+.booking-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.book-slot-btn {
+  background: linear-gradient(135deg, var(--coral-energy), #ff8a75);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+}
+
+.book-slot-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 111, 97, 0.4);
+}
+
+.book-slot-btn:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+}
+
+.cancel-selection-btn {
+  background: #6b7280;
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.cancel-selection-btn:hover {
+  background: #4b5563;
+}
+
+/* Booking Form Overlay Styles */
+.booking-form-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+  background: rgba(0, 0, 0, 0.5);
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.booking-form-overlay .booking-form-card {
+  background: white;
+  border: 3px solid var(--primary-blue);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease-out;
+  max-width: 400px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.booking-form-overlay .booking-form-card h4 {
+  color: var(--primary-blue);
+  margin-bottom: 1.5rem;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.booking-form-overlay .names-input-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.booking-form-overlay .booking-actions {
+  margin-top: 1.5rem;
+  gap: 0.75rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.booking-form-overlay .book-slot-btn,
+.booking-form-overlay .cancel-selection-btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  width: 100%;
+}
+
+/* Mobile responsive adjustments for booking modal */
+@media (max-width: 768px) {
+  .photoshoot-modal-content {
+    width: 98%;
+    max-height: 95vh;
+  }
+  
+  .time-slots-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.5rem;
+  }
+  
+  .booking-form-overlay .booking-form-card {
+    padding: 1.5rem;
+    margin: 1rem;
+    max-width: none;
+    width: calc(100% - 2rem);
+  }
+  
+  .booking-form-overlay .booking-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .booking-actions {
+    flex-direction: column;
+  }
+  
+  .photoshoot-modal-body {
+    padding: 1rem;
+  }
+}
