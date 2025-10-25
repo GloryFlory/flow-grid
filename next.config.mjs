@@ -1,11 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Performance optimizations
-  experimental: {
-    turbo: {
-      useSwcCss: true,
-    },
-  },
+  // Output standalone for Vercel
+  output: 'standalone',
   
   // Optimize bundle splitting
   webpack: (config, { dev, isServer }) => {
