@@ -1,34 +1,83 @@
-﻿{
-  "name": "festival-scheduler",
-  "version": "1.0.0",
-  "description": "Configurable festival schedule platform - Create beautiful, interactive schedules for any festival or workshop event",
+{
+  "name": "flow-grid",
+  "version": "2.0.0",
+  "description": "Flow Grid - Multi-tenant SaaS platform for creating beautiful, interactive schedules for festivals, workshops, and events.",
   "main": "index.js",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
-    "template:generate": "node scripts/generate-template.js"
+    "lint": "next lint",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "postinstall": "prisma generate"
   },
   "keywords": [
+    "flow-grid",
     "festival",
-    "schedule", 
+    "schedule",
     "workshop",
     "booking",
     "event-management",
     "next.js",
-    "saas"
+    "saas",
+    "multi-tenant",
+    "prisma",
+    "supabase",
+    "stripe"
   ],
-  "author": "Festival Scheduler",
+  "author": "Flow Grid",
   "license": "MIT",
   "dependencies": {
-    "next": "latest",
-    "react": "latest", 
-    "react-dom": "latest"
+    "@auth/prisma-adapter": "^2.11.0",
+    "@hookform/resolvers": "^3.9.0",
+    "@next-auth/prisma-adapter": "^1.0.7",
+    "@prisma/client": "^5.22.0",
+    "@radix-ui/react-dialog": "^1.1.2",
+    "@radix-ui/react-dropdown-menu": "^2.1.2",
+    "@radix-ui/react-select": "^2.1.2",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-toast": "^1.2.2",
+    "@stripe/stripe-js": "^4.8.0",
+    "@supabase/supabase-js": "^2.76.1",
+    "@types/papaparse": "^5.3.16",
+    "bcryptjs": "^3.0.2",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "lucide-react": "^0.460.0",
+    "next": "15.5.4",
+    "next-auth": "^4.24.11",
+    "papaparse": "^5.5.3",
+    "prisma": "^5.22.0",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "react-easy-crop": "^5.5.3",
+    "react-hook-form": "^7.53.0",
+    "resend": "^4.0.0",
+    "sonner": "^1.7.0",
+    "stripe": "^16.12.0",
+    "tailwind-merge": "^2.5.0",
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.25.76"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.11.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "autoprefixer": "^10.4.0",
+    "eslint": "^8.56.0",
+    "eslint-config-next": "^14.1.0",
+    "postcss": "^8.4.0",
+    "tailwindcss": "^3.4.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.3.0"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/festival-scheduler.git"
+    "url": "https://github.com/GloryFlory/flow-grid.git"
   },
-  "homepage": "https://festivalscheduler.com"
+  "homepage": "https://flowgrid.com"
 }

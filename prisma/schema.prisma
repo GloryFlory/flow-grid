@@ -1,0 +1,208 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  name         String?
+  avatar       String?
+  password     String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  role         UserRole      @default(USER)
+  accounts     Account[]
+  festivals    Festival[]
+  sessions     Session[]
+  subscription Subscription?
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Festival {
+  id             String            @id @default(cuid())
+  name           String
+  slug           String            @unique
+  description    String?
+  location       String?
+  startDate      DateTime
+  endDate        DateTime
+  timezone       String            @default("UTC")
+  logo           String?
+  primaryColor   String            @default("#4a90e2")
+  secondaryColor String            @default("#7b68ee")
+  accentColor    String            @default("#ff6b6b")
+  isPublished    Boolean           @default(false)
+  customDomain   String?           @unique
+  userId         String
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  analytics      Analytics[]
+  bookings       Booking[]
+  sessions       FestivalSession[]
+  teachers       Teacher[]
+  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("festivals")
+}
+
+model FestivalSession {
+  id            String    @id @default(cuid())
+  title         String
+  description   String?
+  day           String
+  startTime     String
+  endTime       String
+  location      String?
+  level         String?
+  styles        String[]
+  prerequisites String?
+  capacity      Int?
+  teachers      String[]
+  teacherBios   String[]
+  cardType      String    @default("full")
+  festivalId    String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  bookings      Booking[]
+  festival      Festival  @relation(fields: [festivalId], references: [id], onDelete: Cascade)
+
+  @@map("festival_sessions")
+}
+
+model Booking {
+  id         String          @id @default(cuid())
+  names      String[]
+  email      String?
+  deviceId   String
+  sessionId  String
+  festivalId String
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  festival   Festival        @relation(fields: [festivalId], references: [id], onDelete: Cascade)
+  session    FestivalSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, deviceId])
+  @@map("bookings")
+}
+
+model Subscription {
+  id                     String             @id @default(cuid())
+  userId                 String             @unique
+  stripeCustomerId       String?            @unique
+  stripeSubscriptionId   String?            @unique
+  stripePriceId          String?
+  stripeCurrentPeriodEnd DateTime?
+  plan                   PlanType           @default(FREE)
+  status                 SubscriptionStatus @default(ACTIVE)
+  festivalsUsed          Int                @default(0)
+  festivalsLimit         Int                @default(1)
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+  user                   User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+model TeacherPhoto {
+  id          String   @id @default(cuid())
+  filename    String   @unique
+  teacherName String
+  filePath    String
+  fileSize    Int
+  mimeType    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("teacher_photos")
+}
+
+model Teacher {
+  id         String   @id @default(cuid())
+  festivalId String
+  name       String
+  url        String?
+  isGroup    Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  festival   Festival @relation(fields: [festivalId], references: [id], onDelete: Cascade)
+
+  @@unique([festivalId, name])
+  @@map("teachers")
+}
+
+model Analytics {
+  id         String    @id @default(cuid())
+  event      String
+  properties Json?
+  deviceId   String?
+  userId     String?
+  festivalId String?
+  timestamp  DateTime  @default(now())
+  festival   Festival? @relation(fields: [festivalId], references: [id], onDelete: Cascade)
+
+  @@map("analytics")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum PlanType {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  UNPAID
+}

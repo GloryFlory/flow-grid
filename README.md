@@ -1,6 +1,12 @@
-﻿# Festival Scheduler 
+﻿# Flow Grid
 
-Transform any festival or workshop event into a beautiful, interactive schedule with booking capabilities.
+Transform any festival or### 1. Clone & Configure
+\\\ash
+git clone [repository-url]
+cd flow-grid
+cp .env.example .env.local
+# Edit .env.local with your event details
+\\\op event into a beautiful, interactive schedule with booking capabilities.
 
 ## What This Is
 
@@ -59,7 +65,7 @@ npm start
 ##  Project Structure
 
 \\\
-festival-scheduler/
+flow-grid/
  src/
     config/eventConfig.js    # All customization happens here
     app/page.js             # Main schedule interface  

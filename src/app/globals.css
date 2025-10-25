@@ -1,16 +1,44 @@
-:root {
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
+  }
+}
+
+/* Preserve MAC Festival styles for legacy schedule pages */
+.mac-schedule {
   /* MAC 2025 Color Palette */
-  --primary-blue: #0077B6;        /* Mediterranean Blue - Buttons, links, key accents */
-  --secondary-blue: #00B4D8;      /* Aqua Blue - Highlights, hover states */
-  --coral-energy: #FF6F61;        /* Coral Energy - Calls-to-action, buttons */
-  --coral-accent: #FF6F61;        /* Same as coral-energy for consistency */
-  --sand-neutral: #F1E9DA;        /* Sand Neutral - Backgrounds, cards, soft blocks */
-  --deep-navy: #0B1F32;          /* Deep Navy - Headers, footer, strong text */
-  --neutral-white: #F8FAFC;       /* Neutral White - Primary background */
-  --success-green: #2E7D32;       /* Success Green - Confirmations, positive tags */
-  --warning-amber: #F59E0B;       /* Warning Amber - Notes, prerequisites, alerts */
-  
-  /* Additional utility colors */
+  --primary-blue: #0077B6;
+  --secondary-blue: #00B4D8;
+  --coral-energy: #FF6F61;
+  --coral-accent: #FF6F61;
+  --sand-neutral: #F1E9DA;
+  --deep-navy: #0B1F32;
+  --neutral-white: #F8FAFC;
+  --success-green: #2E7D32;
+  --warning-amber: #F59E0B;
   --text-dark: #2d3748;
   --text-light: #718096;
   --border-light: #e2e8f0;
@@ -59,7 +87,7 @@ body {
 
 /* Header Styles */
 .header {
-  background: linear-gradient(135deg, var(--deep-navy) 0%, var(--primary-blue) 100%);
+  background: linear-gradient(135deg, var(--deep-navy) 0%, var(--primary-color, var(--primary-blue)) 100%);
   color: white;
   padding: 2rem 1rem;
   box-shadow: 0 4px 20px var(--shadow);
@@ -81,6 +109,13 @@ body {
   gap: 1rem;
 }
 
+.festival-logo {
+  height: 80px;
+  width: auto;
+  max-width: 120px;
+  object-fit: contain;
+}
+
 .logo-container {
   display: flex;
   align-items: center;
@@ -94,7 +129,7 @@ body {
 .logo-placeholder {
   width: 80px;
   height: 80px;
-  background: linear-gradient(45deg, var(--secondary-blue), var(--coral-energy));
+  background: linear-gradient(45deg, var(--secondary-color, var(--secondary-blue)), var(--accent-color, var(--coral-energy)));
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -108,7 +143,7 @@ body {
 
 .logo {
   border-radius: 50%;
-  border: 3px solid var(--secondary-blue);
+  border: 3px solid var(--primary-color, var(--secondary-blue));
   background: white;
   padding: 0.5rem;
 }
@@ -117,7 +152,7 @@ body {
   font-size: 2.5rem;
   font-weight: 800;
   margin: 0;
-  background: linear-gradient(45deg, white, var(--secondary-blue));
+  background: linear-gradient(45deg, white, var(--secondary-color, var(--secondary-blue)));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -127,6 +162,15 @@ body {
   font-size: 1.1rem;
   opacity: 0.9;
   margin: 0;
+}
+
+.location-subtitle {
+  font-size: 1.2rem !important;
+  font-weight: 500 !important;
+  opacity: 0.85 !important;
+  margin-top: 0.25rem !important;
+  margin-bottom: 0 !important;
+  color: var(--text-light) !important;
 }
 
 .header-info p {
@@ -170,12 +214,12 @@ body {
 
 .tab:hover {
   background: var(--sand-neutral);
-  color: var(--primary-blue);
+  color: var(--primary-color, var(--primary-blue));
   transform: translateY(-2px);
 }
 
 .tab.active {
-  background: var(--primary-blue);
+  background: var(--primary-color, var(--primary-blue));
   color: white;
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(0, 119, 182, 0.3);
@@ -213,7 +257,7 @@ body {
 }
 
 .active-indicator {
-  color: var(--primary-blue);
+  color: var(--primary-color, var(--primary-blue));
   margin-left: 0.5rem;
 }
 
@@ -260,7 +304,7 @@ body {
 .search-input:focus,
 .filter-select:focus {
   outline: none;
-  border-color: var(--primary-blue);
+  border-color: var(--primary-color, var(--primary-blue));
   box-shadow: 0 0 0 3px rgba(0, 119, 182, 0.1);
 }
 
@@ -285,14 +329,14 @@ body {
 }
 
 .clear-filters-btn:hover:not(:disabled) {
-  border-color: var(--coral-accent);
-  color: var(--coral-accent);
+  border-color: var(--accent-color, var(--coral-accent));
+  color: var(--accent-color, var(--coral-accent));
   background: rgba(255, 111, 97, 0.05);
 }
 
 .clear-filters-btn.active {
-  border-color: var(--coral-accent);
-  color: var(--coral-accent);
+  border-color: var(--accent-color, var(--coral-accent));
+  color: var(--accent-color, var(--coral-accent));
   background: rgba(255, 111, 97, 0.1);
 }
 
@@ -323,10 +367,10 @@ body {
 .day-header {
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--primary-blue);
+  color: var(--primary-color, var(--primary-blue));
   margin-bottom: 1.5rem;
   padding-bottom: 0.75rem;
-  border-bottom: 3px solid var(--secondary-blue);
+  border-bottom: 3px solid var(--secondary-color, var(--secondary-blue));
   text-align: center;
 }
 
@@ -342,7 +386,7 @@ body {
   margin-bottom: 1rem;
   padding: 0.75rem 1rem;
   background: linear-gradient(135deg, var(--sand-neutral) 0%, rgba(241, 233, 218, 0.5) 100%);
-  border-left: 4px solid var(--primary-blue);
+  border-left: 4px solid var(--primary-color, var(--primary-blue));
   border-radius: 8px;
 }
 
@@ -391,7 +435,7 @@ body {
 
 /* Info button */
 .info-button {
-  background: var(--primary-blue);
+  background: var(--primary-color, var(--primary-blue));
   color: white;
   border: none;
   border-radius: 50%;
@@ -408,7 +452,7 @@ body {
 }
 
 .info-button:hover {
-  background: var(--secondary-blue);
+  background: var(--secondary-color, var(--secondary-blue));
   transform: scale(1.1);
 }
 
@@ -432,7 +476,7 @@ body {
 
 .session-card.size-large {
   --card-min-height: 260px;
-  border-left: 5px solid var(--coral-accent);
+  border-left: 5px solid var(--accent-color, var(--coral-accent));
 }
 
 .session-card.size-xl {
@@ -461,13 +505,13 @@ body {
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, var(--primary-blue), var(--secondary-blue));
+  background: linear-gradient(90deg, var(--primary-color, var(--primary-blue)), var(--secondary-color, var(--secondary-blue)));
 }
 
 .session-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 30px rgba(0, 119, 182, 0.15);
-  border-color: var(--primary-blue);
+  border-color: var(--primary-color, var(--primary-blue));
 }
 
 .session-header {
@@ -495,7 +539,7 @@ body {
 .session-time {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--primary-blue);
+  color: var(--primary-color, var(--primary-blue));
   background: rgba(0, 119, 182, 0.1);
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
@@ -544,7 +588,7 @@ body {
   background: rgba(0, 180, 216, 0.05);
   padding: 0.75rem;
   border-radius: 8px;
-  border-left: 3px solid var(--secondary-blue);
+  border-left: 3px solid var(--secondary-color, var(--secondary-blue));
 }
 
 /* Teachers section with new layout */
@@ -579,7 +623,7 @@ body {
 }
 
 .teacher-link {
-  color: var(--primary-blue);
+  color: var(--primary-color, var(--primary-blue));
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 500;
@@ -589,6 +633,25 @@ body {
 .teacher-link:hover {
   color: var(--secondary-blue);
   text-decoration: underline;
+}
+
+/* Inline teachers display */
+.teachers-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.teacher-name {
+  display: flex;
+  align-items: center;
+}
+
+.teacher-separator {
+  color: var(--text-muted);
+  font-weight: normal;
 }
 
 /* Teacher avatar positioned at bottom right corner of card */
@@ -621,7 +684,7 @@ body {
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--secondary-blue);
+  border: 2px solid var(--secondary-color, var(--secondary-blue));
   box-shadow: 0 2px 8px rgba(0, 119, 182, 0.2);
 }
 
@@ -629,7 +692,7 @@ body {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+  background: linear-gradient(135deg, var(--primary-color, var(--primary-blue)), var(--secondary-color, var(--secondary-blue)));
   color: white;
   display: flex;
   align-items: center;
@@ -679,13 +742,44 @@ body {
   gap: 0.5rem;
 }
 
-/* New inline layout for styles and teacher photo */
+/* Smart layout for tags and teacher photo */
 .styles-and-photo {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 1rem;
   margin-bottom: 0.75rem;
+  min-height: 60px; /* Reserve space for photo */
+}
+
+/* Tags container with smart wrapping */
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  flex: 1;
+  margin-right: 130px; /* Leave space for teacher photo */
+  align-items: flex-start;
+}
+
+/* Level tag styling */
+.level-tag {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  border: none;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.level-tag:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
 }
 
 /* Photo-only session layout */
@@ -697,6 +791,9 @@ body {
   margin-top: 1rem;
 }
 
+.photo-only-card {
+  min-height: 260px;
+}
 .photo-only-card .teachers-names {
   margin-bottom: 0;
   padding-right: 0;
@@ -711,7 +808,7 @@ body {
   height: 120px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid var(--secondary-blue);
+  border: 3px solid var(--accent-color, var(--coral-accent));
   box-shadow: 0 3px 12px rgba(0, 119, 182, 0.25);
 }
 
@@ -736,7 +833,7 @@ body {
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background: linear-gradient(45deg, var(--secondary-blue), var(--coral-energy));
+  background: linear-gradient(45deg, var(--secondary-color, var(--secondary-blue)), var(--accent-color, var(--coral-energy)));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -744,17 +841,17 @@ body {
   font-size: 1.8rem;
   color: white;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  border: 3px solid var(--secondary-blue);
+  border: 3px solid var(--accent-color, var(--coral-accent));
 }
 
 .style-tag {
   padding: 0.3rem 0.7rem;
   background: var(--sand-neutral);
-  border: 1px solid var(--secondary-blue);
+  border: 1px solid var(--secondary-color, var(--secondary-blue));
   border-radius: 15px;
   font-size: 0.8rem;
   font-weight: 500;
-  color: var(--primary-blue);
+  color: var(--primary-color, var(--primary-blue));
   transition: all 0.2s ease;
 }
 
@@ -764,14 +861,14 @@ body {
 }
 
 .style-tag.clickable:hover {
-  background: var(--primary-blue);
+  background: var(--primary-color, var(--primary-blue));
   color: white;
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 119, 182, 0.3);
 }
 
 .style-tag:hover {
-  background: var(--secondary-blue);
+  background: var(--secondary-color, var(--secondary-blue));
   color: white;
 }
 
@@ -809,7 +906,7 @@ body {
 /* Workshop highlighting - make workshops more prominent */
 .session-card.workshop-highlight {
   background: linear-gradient(135deg, #fefefe 0%, #f8fafc 100%);
-  border: 2px solid #3b82f6;
+  border: 2px solid var(--accent-color, #3b82f6);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
   transform: translateY(0);
   transition: all 0.2s ease;
@@ -1018,6 +1115,12 @@ body {
   overflow: hidden; /* Prevent content spillover */
 }
 
+/* Add bottom padding to cards with photos to prevent overlap */
+.session-card.photo-only-card,
+.session-card.detailed-card {
+  padding-bottom: 110px; /* Space for 80px photo + spacing */
+}
+
 .level-and-tags {
   display: flex;
   align-items: flex-start;
@@ -1078,12 +1181,13 @@ body {
   font-size: 0.8rem;
   color: var(--text-light);
   line-height: 1.4; /* Improved line height for better readability */
-  margin-right: 130px; /* Consistent space for teacher photo */
+  margin-right: 140px; /* Increased space for teacher photo */
   margin-bottom: 0.5rem;
-  width: 70%; /* Reduced width to ensure no overlap with photo */
+  width: 60%; /* Reduced width as requested while maintaining photo clearance */
   word-wrap: break-word; /* Allow long words to break */
   overflow-wrap: break-word; /* Modern browsers */
   hyphens: auto; /* Add hyphenation for better breaks */
+  padding-right: 0.5rem; /* Additional padding for visual breathing room */
 }
 
 .prereqs-compact strong {
@@ -1137,7 +1241,7 @@ body {
 }
 
 .modal-header {
-  background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+  background: linear-gradient(135deg, var(--primary-color, var(--primary-blue)), var(--secondary-color, var(--secondary-blue)));
   color: white;
   padding: 2rem;
   border-radius: 24px 24px 0 0;
@@ -1153,26 +1257,28 @@ body {
 }
 
 .modal-header h2 {
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 1rem 0;
   font-size: 1.75rem;
   font-weight: 700;
   line-height: 1.3;
 }
 
-.modal-quick-info {
+/* Meta tags for time, day, location in header */
+.modal-meta-tags {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
 }
 
-.modal-time, .modal-day, .modal-location {
-  background: rgba(255, 255, 255, 0.2);
-  padding: 0.4rem 0.8rem;
+.modal-meta-tag {
+  background: rgba(255, 255, 255, 0.25);
+  padding: 0.5rem 1rem;
   border-radius: 12px;
   font-size: 0.9rem;
   font-weight: 500;
   backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .close-button {
@@ -1194,103 +1300,105 @@ body {
 
 .modal-body {
   padding: 2.5rem;
-}
-
-.session-details {
   display: flex;
   flex-direction: column;
   gap: 2rem;
 }
 
-.detail-row {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.detail-row strong {
-  color: var(--deep-navy);
-  font-weight: 700;
-  font-size: 1.1rem;
+/* Teachers Section - Clean design */
+.modal-teachers-section {
   margin-bottom: 0.5rem;
 }
 
-/* Teachers Section */
-.teachers-section {
-  background: linear-gradient(135deg, rgba(0, 180, 216, 0.05), rgba(0, 119, 182, 0.03));
-  padding: 1.5rem;
-  border-radius: 16px;
-  border: 1px solid rgba(0, 180, 216, 0.1);
-}
-
-.teachers-grid {
+.modal-teachers-list {
   display: flex;
-  gap: 1.5rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 0;
 }
 
-.teacher-card {
+.modal-teacher-item {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  background: white;
-  padding: 1rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  gap: 1.5rem;
+  padding: 0;
 }
 
-.teacher-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+.modal-teacher-photo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .teacher-photo-modal {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  overflow: hidden;
-  position: relative;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.teacher-photo-modal img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.teacher-initials-modal {
+.teacher-placeholder-modal {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+  background: linear-gradient(135deg, var(--primary-color, var(--primary-blue)), var(--secondary-color, var(--secondary-blue)));
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
 }
 
-.teacher-info {
+.modal-teacher-info {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
 }
 
-.teacher-name {
+.modal-teacher-name {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: var(--deep-navy);
 }
 
-.teacher-bio-link {
-  color: var(--primary-blue);
+.modal-teacher-bio-link {
+  color: var(--primary-color, var(--primary-blue));
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 500;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.modal-teacher-bio-link:hover {
+  color: var(--secondary-color, var(--secondary-blue));
+  text-decoration: underline;
+}
+
+/* About This Workshop Section - Clean with blue left border */
+.modal-about-section {
+  padding-left: 1.5rem;
+  border-left: 4px solid var(--primary-color, var(--primary-blue));
+  margin: 1rem 0;
+}
+
+.modal-section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--deep-navy);
+  margin: 0 0 1rem 0;
+  letter-spacing: -0.02em;
+}
+
+.modal-about-text {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-dark);
+  margin: 0;
 }
 
 .teacher-bio-link:hover {
@@ -1490,39 +1598,37 @@ body {
 /* Details Grid */
 .modal-details-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1.5rem;
+  margin: 1.5rem 0;
 }
 
 /* Ensure consistent sizing for cards */
 .modal-detail-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  background: #f8f9fa;
+  padding: 1.25rem;
+  border-radius: 8px;
   text-align: center;
-  border: 1px solid rgba(0, 180, 216, 0.1);
-  min-width: 200px; /* Ensure minimum width consistency */
+  border: 1px solid #e9ecef;
 }
 
 .modal-detail-card h5 {
-  margin: 0 0 1rem 0;
-  font-size: 0.9rem;
+  margin: 0 0 0.75rem 0;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-light);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
 }
 
 .modal-level-badge {
   display: inline-block;
-  padding: 0.6rem 1.2rem;
-  border-radius: 25px;
-  font-size: 1rem;
-  font-weight: 700;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
   color: white;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .modal-duration {
@@ -1532,46 +1638,44 @@ body {
 }
 
 .modal-prereqs-card {
+  grid-column: 1 / -1;
   text-align: left;
-  /* Removed grid-column: 1 / -1 to allow normal grid flow */
 }
 
 .modal-prereqs {
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: var(--text-dark);
   line-height: 1.5;
 }
 
-/* Styles Section */
-.modal-styles-section {
-  background: rgba(241, 233, 218, 0.3);
-  padding: 1.5rem;
-  border-radius: 16px;
-}
-
-.modal-styles-section h4 {
-  margin: 0 0 1rem 0;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--deep-navy);
+/* Workshop Types Section - More spacing */
+.modal-workshop-types-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e9ecef;
 }
 
 .modal-styles-list {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
+  margin-top: 1rem;
 }
 
 .modal-style-tag {
   background: white;
-  color: var(--deep-navy);
-  border: 2px solid var(--accent-purple);
-  padding: 0.6rem 1.2rem;
+  color: var(--primary-color, var(--primary-blue));
+  border: 1px solid var(--primary-color, var(--primary-blue));
+  padding: 0.5rem 1rem;
   border-radius: 20px;
   font-size: 0.9rem;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(122, 74, 221, 0.15);
+  font-weight: 500;
   transition: all 0.2s ease;
+}
+
+.modal-style-tag:hover {
+  background: var(--primary-color, var(--primary-blue));
+  color: white;
 }
 
 /* Flex row for time, day, location in modal */
@@ -1722,19 +1826,30 @@ body {
   }
   
   .teacher-photo-large {
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
   }
   
   .teacher-placeholder-large {
-    width: 100px;
-    height: 100px;
-    font-size: 1.5rem;
+    width: 80px;
+    height: 80px;
+    font-size: 1.25rem;
   }
   
   .teachers-avatar-single {
-    bottom: 15px;
-    right: 15px;
+    bottom: 12px;
+    right: 12px;
+  }
+  
+  /* Reduce padding-bottom for photo cards on mobile */
+  .session-card.photo-only-card,
+  .session-card.detailed-card {
+    padding-bottom: 90px; /* Reduced from 110px for mobile */
+  }
+  
+  /* Smaller min-height for photo-only cards on mobile */
+  .photo-only-card {
+    min-height: 220px; /* Reduced from 260px */
   }
   
   .teachers-avatars {
@@ -2834,4 +2949,38 @@ body {
   .photoshoot-modal-body {
     padding: 1rem;
   }
+}
+
+/* Image Cropper Slider Styling */
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input[type="range"]::-webkit-slider-track {
+  background: #e5e7eb;
+  border-radius: 4px;
+  height: 8px;
+}
+
+input[type="range"]::-moz-range-track {
+  background: #e5e7eb;
+  border-radius: 4px;
+  height: 8px;
 }
