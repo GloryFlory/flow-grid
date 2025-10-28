@@ -59,16 +59,10 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ user, token }) {
-      if (user) {
-        token.uid = user.id
-      }
-      return token
-    },
-    async session({ session, token }) {
-      // Include user ID in session from JWT token
-      if (session?.user && token?.uid) {
-        (session.user as any).id = token.uid
+    async session({ session, user }) {
+      // Include user ID in session from database user
+      if (session?.user && user) {
+        (session.user as any).id = user.id
       }
       return session
     },
@@ -78,7 +72,7 @@ export const authOptions: NextAuthOptions = {
     error: '/auth/error',
   },
   session: {
-    strategy: 'jwt',
+    strategy: 'database',
   },
 }
 
