@@ -19,8 +19,12 @@ export default function SignInPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    e.stopPropagation() // Prevent any event bubbling
+    
     setIsLoading(true)
     setError('')
+
+    console.log('Form submitted, starting login...')
 
     try {
       const result = await signIn('credentials', {
@@ -29,16 +33,25 @@ export default function SignInPage() {
         redirect: false,
       })
 
+      console.log('SignIn result:', result)
+
       if (result?.error) {
+        console.log('SignIn error:', result.error)
         setError('Invalid email or password')
+        setIsLoading(false)
+      } else if (result?.ok) {
+        console.log('SignIn successful, redirecting...')
+        // Force immediate redirect without waiting
+        window.location.replace('/dashboard')
+        return // Don't set loading to false, we're navigating away
       } else {
-        // Redirect to dashboard
-        router.push('/dashboard')
-        router.refresh()
+        console.log('Unexpected result:', result)
+        setError('An unexpected error occurred')
+        setIsLoading(false)
       }
     } catch (error) {
+      console.log('SignIn catch error:', error)
       setError('An error occurred. Please try again.')
-    } finally {
       setIsLoading(false)
     }
   }
@@ -125,6 +138,48 @@ export default function SignInPage() {
                 Forgot your password?
               </Link>
             </div>
+
+            {/* Test button for debugging */}
+            <Button 
+              type="button" 
+              onClick={async () => {
+                console.log('🧪 Direct test login starting...')
+                setIsLoading(true)
+                setError('')
+                
+                try {
+                  const result = await signIn('credentials', {
+                    email: 'test@test.com',
+                    password: 'password123',
+                    redirect: false,
+                  })
+
+                  console.log('🧪 Direct test result:', result)
+
+                  if (result?.error) {
+                    console.log('🧪 Direct test error:', result.error)
+                    setError('Direct test failed: ' + result.error)
+                  } else if (result?.ok) {
+                    console.log('🧪 Direct test successful, redirecting...')
+                    window.location.replace('/dashboard')
+                    return
+                  } else {
+                    console.log('🧪 Unexpected direct test result:', result)
+                    setError('Unexpected direct test result')
+                  }
+                } catch (error) {
+                  console.log('🧪 Direct test catch error:', error)
+                  setError('Direct test exception: ' + error)
+                } finally {
+                  setIsLoading(false)
+                }
+              }}
+              className="w-full mb-2"
+              variant="outline"
+              disabled={isLoading}
+            >
+              🔧 Direct Test Login
+            </Button>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? (

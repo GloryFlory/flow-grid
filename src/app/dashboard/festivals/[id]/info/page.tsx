@@ -251,7 +251,7 @@ export default function FestivalInformation() {
                   </label>
                   <div className="flex items-center">
                     <span className="inline-flex items-center px-3 py-2 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-                      flowgrid.com/
+                      tryflowgrid.com/
                     </span>
                     <input
                       type="text"
@@ -430,7 +430,7 @@ export default function FestivalInformation() {
                       target="_blank"
                       className="text-xs text-blue-600 hover:text-blue-700 break-all"
                     >
-                      flowgrid.com/{formData.slug}/schedule
+                      tryflowgrid.com/{formData.slug}/schedule
                     </Link>
                   </div>
                 )}

@@ -33,12 +33,9 @@ export async function GET(request: NextRequest) {
     const currentPlan = user.subscription?.plan || 'FREE'
     const festivalsUsed = user.festivals.length
     
-    let festivalsLimit = 1 // FREE default
-    if (currentPlan === 'PRO') festivalsLimit = 10
-    if (currentPlan === 'ENTERPRISE') festivalsLimit = -1 // unlimited
-    if (isAdmin) festivalsLimit = -1 // unlimited for admins
-
-    const canCreateMore = isAdmin || festivalsLimit === -1 || festivalsUsed < festivalsLimit
+    // All users now have unlimited access
+    const festivalsLimit = -1 // unlimited for everyone
+    const canCreateMore = true // everyone can create more
 
     return NextResponse.json({
       currentPlan,

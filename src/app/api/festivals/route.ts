@@ -75,50 +75,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Admins have unlimited access
-    if (user.role !== 'ADMIN') {
-      if (!user.subscription) {
-        return NextResponse.json(
-          { 
-            error: 'No active subscription found',
-            code: 'NO_SUBSCRIPTION',
-            upgradeUrl: '/pricing'
-          },
-          { status: 403 }
-        )
-      }
-
-      // Check festival limits based on plan
-      const { subscription, festivals } = user
-      
-      if (subscription.plan === 'FREE' && festivals.length >= 1) {
-        return NextResponse.json(
-          { 
-            error: 'Free plan is limited to 1 festival. Please upgrade to create more.',
-            code: 'PLAN_LIMIT_EXCEEDED',
-            currentPlan: 'FREE',
-            currentCount: festivals.length,
-            limit: 1,
-            upgradeUrl: '/pricing'
-          },
-          { status: 403 }
-        )
-      }
-      
-      if (subscription.plan === 'PRO' && festivals.length >= 10) {
-        return NextResponse.json(
-          { 
-            error: 'Pro plan is limited to 10 festivals. Please upgrade to Enterprise for unlimited festivals.',
-            code: 'PLAN_LIMIT_EXCEEDED',
-            currentPlan: 'PRO',
-            currentCount: festivals.length,
-            limit: 10,
-            upgradeUrl: '/pricing'
-          },
-          { status: 403 }
-        )
-      }
-    }
+    // All users now have unlimited access
 
     // Create festival
     const festival = await prisma.festival.create({

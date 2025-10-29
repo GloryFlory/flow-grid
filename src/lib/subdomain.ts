@@ -12,7 +12,7 @@ export function getSubdomain(req: NextRequest): string | null {
   const hostname = host.split(':')[0]
   
   // Handle localhost and main domain
-  if (hostname === 'localhost' || hostname === 'flowgrid.com' || hostname === 'www.flowgrid.com') {
+  if (hostname === 'localhost' || hostname === 'tryflowgrid.com' || hostname === 'www.tryflowgrid.com') {
     return null
   }
 
@@ -20,7 +20,7 @@ export function getSubdomain(req: NextRequest): string | null {
   const parts = hostname.split('.')
   if (parts.length < 2) return null
 
-  // For *.flowgrid.com -> return subdomain
+  // For *.tryflowgrid.com -> return subdomain
   if (parts.length >= 3 && parts[parts.length - 2] === 'flowgrid') {
     return parts[0]
   }
@@ -88,7 +88,7 @@ export function getFestivalSlug(req: NextRequest): string | null {
 export const urls = {
   marketing: (path: string = '') => `${process.env.NEXT_PUBLIC_MARKETING_URL}${path}`,
   dashboard: (path: string = '') => `${process.env.NEXT_PUBLIC_APP_URL}/dashboard${path}`,
-  festival: (slug: string, path: string = '') => `https://${slug}.flowgrid.com${path}`,
+  festival: (slug: string, path: string = '') => `https://${slug}.tryflowgrid.com${path}`,
   api: (path: string) => `${process.env.NEXT_PUBLIC_APP_URL}/api${path}`,
 }
 
@@ -101,7 +101,7 @@ export function rewritePath(req: NextRequest): string {
 
   switch (type) {
     case 'marketing':
-      return `/marketing${pathname === '/' ? '' : pathname}`
+      return `${pathname === '/' ? '' : pathname}`
 
     case 'dashboard':
       // Remove /dashboard prefix if it exists in the pathname

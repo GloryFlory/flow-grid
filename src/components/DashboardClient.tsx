@@ -62,11 +62,6 @@ export function DashboardClient({ user }: { user: User }) {
   }
 
   const handleCreateFestival = () => {
-    if (!limits?.canCreateMore && !limits?.isAdmin) {
-      // Show upgrade modal or redirect to pricing
-      alert('You\'ve reached your plan limit. Please upgrade to create more festivals.')
-      return
-    }
     window.location.href = '/dashboard/create-festival'
   }
 
@@ -115,15 +110,6 @@ export function DashboardClient({ user }: { user: User }) {
               {!limits.isAdmin && limits.currentPlan === 'ENTERPRISE' && <Crown className="w-4 h-4" />}
               {limits.isAdmin ? 'Admin' : limits.currentPlan} Plan
             </div>
-          )}
-          
-          {!limits?.isAdmin && (
-            <Link href="/dashboard/subscription">
-              <Button variant="outline" size="sm">
-                <Crown className="w-4 h-4 mr-2" />
-                Upgrade
-              </Button>
-            </Link>
           )}
         </div>
       </div>
@@ -196,9 +182,9 @@ export function DashboardClient({ user }: { user: User }) {
               </Button>
             </Link>
           )}
-          <Button onClick={handleCreateFestival} disabled={!limits?.canCreateMore && !limits?.isAdmin}>
+          <Button onClick={handleCreateFestival}>
             <Plus className="w-4 h-4 mr-2" />
-            {!limits?.canCreateMore && !limits?.isAdmin ? 'Upgrade to Create' : 'Create Festival'}
+            Create Festival
           </Button>
         </div>
       </div>
@@ -219,10 +205,9 @@ export function DashboardClient({ user }: { user: User }) {
             <Button 
               size="lg" 
               onClick={handleCreateFestival}
-              disabled={!limits?.canCreateMore && !limits?.isAdmin}
             >
               <Plus className="w-5 h-5 mr-2" />
-              {!limits?.canCreateMore && !limits?.isAdmin ? 'Upgrade to Create Festival' : 'Create Your First Festival'}
+              Create Your First Festival
             </Button>
           </CardContent>
         </Card>

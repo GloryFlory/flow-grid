@@ -6,14 +6,14 @@ export async function POST() {
     // First, let's create a test user if one doesn't exist
     let testUser = await prisma.user.findFirst({
       where: {
-        email: 'admin@flowgrid.com'
+        email: 'admin@tryflowgrid.com'
       }
     })
 
     if (!testUser) {
       testUser = await prisma.user.create({
         data: {
-          email: 'admin@flowgrid.com',
+          email: 'admin@tryflowgrid.com',
           name: 'Flow Grid Admin',
           role: 'ADMIN'
         }
