@@ -226,54 +226,45 @@ export default function GlossaryPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
-        <header className="mb-12 flex items-center justify-between bg-white rounded-lg shadow-sm p-6">
-          <div className="flex items-center">
-            <Image src="/flow-grid-logo.png" alt="Flow Grid Logo" width={40} height={40} className="h-10 w-auto" />
-            <div className="ml-4">
-              <h1 className="text-3xl font-bold text-gray-900">Flow Grid Glossary</h1>
-              <p className="text-gray-600">Complete reference for all Flow Grid terms and features</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Link href="/help"><Button variant="outline">Help Center</Button></Link>
-            <Link href="/auth/signin"><Button variant="outline">Sign In</Button></Link>
-            <Link href="/auth/signup"><Button>Get Started</Button></Link>
-          </div>
-        </header>
-
-        {/* Introduction */}
-        <div className="mb-12 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-8 border border-blue-200">
-          <div className="flex items-start space-x-4">
-            <Search className="w-8 h-8 text-blue-600 mt-1 flex-shrink-0" />
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">How to Use This Glossary</h2>
-              <p className="text-lg text-gray-700 mb-4">
-                This comprehensive glossary covers all terminology used in Flow Grid. Use your browser's search (Ctrl/Cmd + F) 
-                to quickly find specific terms, or browse by category below.
-              </p>
-              <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
-                <div>
-                  <strong className="text-gray-800">Quick Search Tips:</strong>
-                  <ul className="mt-2 space-y-1">
-                    <li>• Use Ctrl/Cmd + F to search this page</li>
-                    <li>• All terms are indexed for search engines</li>
-                    <li>• Click on categories to jump to sections</li>
-                  </ul>
-                </div>
-                <div>
-                  <strong className="text-gray-800">Can't Find Something?</strong>
-                  <ul className="mt-2 space-y-1">
-                    <li>• Check our <Link href="/help" className="text-blue-600 hover:text-blue-500">Help Center</Link></li>
-                    <li>• <Link href="/contact" className="text-blue-600 hover:text-blue-500">Contact us</Link> to suggest additions</li>
-                    <li>• Browse <Link href="/about" className="text-blue-600 hover:text-blue-500">About</Link> for more context</li>
-                  </ul>
-                </div>
+      {/* Navigation */}
+      <nav className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            <div className="flex items-center">
+              <div className="flex-shrink-0 flex items-center">
+                <Image 
+                  src="/flow-grid-logo.png" 
+                  alt="Flow Grid Logo" 
+                  width={40} 
+                  height={40}
+                  className="h-10 w-auto"
+                  priority
+                />
+                <span className="ml-3 text-2xl font-bold text-gray-900">Flow Grid</span>
               </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Link href="/auth/signin">
+                <Button variant="outline">Sign In</Button>
+              </Link>
+              <Link href="/auth/signup">
+                <Button>Get Started</Button>
+              </Link>
             </div>
           </div>
         </div>
+      </nav>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Page Header */}
+        <div className="mb-12 bg-white rounded-lg shadow-sm p-8">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">Flow Grid Glossary</h1>
+            <p className="text-xl text-gray-600">Complete reference for all Flow Grid terms and features</p>
+          </div>
+        </div>
+
+
 
         {/* Table of Contents */}
         <div className="mb-12 bg-white rounded-lg shadow-sm p-6">

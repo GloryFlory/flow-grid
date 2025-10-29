@@ -1,23 +1,41 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Mail, MessageCircle, Clock, MapPin, HelpCircle } from 'lucide-react'
+import ContactForm from '@/components/ContactForm'
 
 export default function ContactPage() {
   return (
     <div className="min-h-screen bg-white">
+      {/* Navigation */}
+      <nav className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            <div className="flex items-center">
+              <div className="flex-shrink-0 flex items-center">
+                <img 
+                  src="/flow-grid-logo.png" 
+                  alt="Flow Grid Logo" 
+                  className="h-10 w-auto"
+                />
+                <span className="ml-3 text-2xl font-bold text-gray-900">Flow Grid</span>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Link href="/auth/signin">
+                <Button variant="outline">Sign In</Button>
+              </Link>
+              <Link href="/auth/signup">
+                <Button>Get Started</Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
-        <header className="mb-8 flex items-center justify-between">
-          <div className="flex items-center">
-            <img src="/flow-grid-logo.png" alt="Flow Grid Logo" className="h-10 w-auto" />
-            <h1 className="ml-3 text-2xl font-bold">Contact Flow Grid</h1>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Link href="/auth/signin"><Button variant="outline">Sign In</Button></Link>
-            <Link href="/auth/signup"><Button>Get Started</Button></Link>
-          </div>
-        </header>
-        <div className="mb-4">
+        {/* Page Header */}
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Contact Us</h1>
           <p className="text-xl text-gray-600">
             Get in touch with our team — we're here to help with your festival scheduling needs.
           </p>
@@ -78,122 +96,7 @@ export default function ContactPage() {
           <div>
             <h2 className="text-2xl font-semibold text-gray-900 mb-6">Send Us a Message</h2>
             
-            <form id="contact-form" className="space-y-6" onSubmit={async (e) => {
-              e.preventDefault()
-              const form = e.currentTarget as HTMLFormElement
-              const fd = new FormData(form)
-              const payload = Object.fromEntries(fd.entries())
-
-              // Submit to the API route
-              try {
-                const res = await fetch('/api/contact', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(payload)
-                })
-
-                if (res.ok) {
-                  alert('Message sent — thank you! We will respond as soon as possible.')
-                  form.reset()
-                } else {
-                  const data = await res.json()
-                  console.error('Contact API error:', data)
-                  alert('There was a problem sending your message. Please try again later.')
-                }
-              } catch (err) {
-                console.error('Contact submit error', err)
-                alert('There was a problem sending your message. Please try again later.')
-              }
-            }}>
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                  Name *
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Your full name"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                  Email *
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="your.email@example.com"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
-                  Subject *
-                </label>
-                <select
-                  id="subject"
-                  name="subject"
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">Choose a subject...</option>
-                  <option value="technical-support">Technical Support</option>
-                  <option value="feature-request">Feature Request</option>
-                  <option value="bug-report">Bug Report</option>
-                  <option value="account-help">Account Help</option>
-                  <option value="business-inquiry">Business Inquiry</option>
-                  <option value="feedback">General Feedback</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="festival-url" className="block text-sm font-medium text-gray-700 mb-2">
-                  Festival URL (if applicable)
-                </label>
-                <input
-                  type="url"
-                  id="festival-url"
-                  name="festival-url"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="https://yourfestival.tryflowgrid.com"
-                />
-                <p className="text-sm text-gray-500 mt-1">
-                  Include this if your question is about a specific festival
-                </p>
-              </div>
-
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                  Message *
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  required
-                  rows={6}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Please describe your question or issue in detail. The more information you provide, the better we can help you."
-                />
-              </div>
-
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <p className="text-sm text-yellow-800">
-                  <strong>Note:</strong> Messages submitted via this form will be forwarded to the site owner for now.
-                </p>
-              </div>
-
-              <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-                Send Message
-              </Button>
-            </form>
+            <ContactForm />
 
             <div className="mt-8 p-6 bg-gray-50 border border-gray-200 rounded-lg">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">
