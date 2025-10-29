@@ -21,7 +21,7 @@ export function getSubdomain(req: NextRequest): string | null {
   if (parts.length < 2) return null
 
   // For *.tryflowgrid.com -> return subdomain
-  if (parts.length >= 3 && parts[parts.length - 2] === 'flowgrid') {
+  if (parts.length >= 3 && parts[parts.length - 2] === 'tryflowgrid') {
     return parts[0]
   }
 
