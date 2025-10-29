@@ -228,7 +228,7 @@ export default function FestivalSettings() {
           <CardContent>
             <div className="flex items-center gap-2 mb-2">
               <code className="text-sm bg-gray-100 px-3 py-2 rounded border">
-                flowgrid.com/{festival.slug}/schedule
+                tryflowgrid.com/{festival.slug}/schedule
               </code>
             </div>
             <p className="text-xs text-gray-500">

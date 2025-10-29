@@ -670,7 +670,7 @@ export default function CreateFestivalPage() {
                     required
                   />
                   <span className="inline-flex items-center px-3 rounded-r-md border border-l-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-                    .flowgrid.com
+                    .tryflowgrid.com
                   </span>
                 </div>
                 <div className="flex items-center justify-between mt-1">
@@ -944,7 +944,7 @@ export default function CreateFestivalPage() {
                   </div>
                   <div>
                     <span className="font-medium text-gray-700">URL:</span>
-                    <span className="ml-2 text-gray-900">https://{festivalData.slug}.flowgrid.com</span>
+                    <span className="ml-2 text-gray-900">https://{festivalData.slug}.tryflowgrid.com</span>
                   </div>
                   <div>
                     <span className="font-medium text-gray-700">Dates:</span>
