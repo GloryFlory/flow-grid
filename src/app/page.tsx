@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import Footer from '@/components/Footer'
 import { 
   Calendar, 
   Users, 
@@ -21,15 +22,19 @@ export default function HomePage() {
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
-                <Image 
-                  src="/flow-grid-logo.png" 
-                  alt="Flow Grid Logo" 
-                  width={40} 
-                  height={40}
-                  className="h-10 w-auto"
-                  priority
-                />
-                <span className="ml-3 text-2xl font-bold text-gray-900">Flow Grid</span>
+                <Link href="/">
+                  <Image 
+                    src="/flow-grid-logo.png" 
+                    alt="Flow Grid Logo" 
+                    width={40} 
+                    height={40}
+                    className="h-10 w-auto cursor-pointer"
+                    priority
+                  />
+                </Link>
+                <Link href="/">
+                  <span className="ml-3 text-2xl font-bold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors">Flow Grid</span>
+                </Link>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -190,60 +195,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center mb-4">
-                <Image 
-                  src="/flow-grid-logo.png" 
-                  alt="Flow Grid" 
-                  width={32} 
-                  height={32}
-                  className="h-8 w-auto"
-                />
-                <span className="ml-3 text-xl font-bold text-white">Flow Grid</span>
-              </div>
-              <p className="text-gray-400">
-                The complete solution for festival and retreat scheduling.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-white font-semibold mb-4">Product</h3>
-              <ul className="space-y-2">
-                <li><Link href="/flow-grid-demo/schedule" className="hover:text-white transition-colors">View Demo</Link></li>
-                <li><Link href="/glossary" className="hover:text-white transition-colors">Glossary</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-white font-semibold mb-4">Support</h3>
-              <ul className="space-y-2">
-                <li><Link href="/glossary" className="hover:text-white transition-colors">Glossary</Link></li>
-                <li><Link href="/help" className="hover:text-white transition-colors">Help Center</Link></li>
-                <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
-                <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-white font-semibold mb-4">Company</h3>
-              <ul className="space-y-2">
-                <li><Link href="/about" className="hover:text-white transition-colors">About</Link></li>
-                <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 mt-12 pt-8 text-center">
-            <div className="flex flex-col sm:flex-row justify-between items-center">
-              <p>&copy; 2025 Flow Grid. All rights reserved.</p>
-              <div className="flex space-x-6 mt-4 sm:mt-0">
-                <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-                <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

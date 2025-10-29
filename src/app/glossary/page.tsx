@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import Footer from '@/components/Footer'
 import { 
   Search, 
   Tag, 
@@ -232,15 +233,19 @@ export default function GlossaryPage() {
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
-                <Image 
-                  src="/flow-grid-logo.png" 
-                  alt="Flow Grid Logo" 
-                  width={40} 
-                  height={40}
-                  className="h-10 w-auto"
-                  priority
-                />
-                <span className="ml-3 text-2xl font-bold text-gray-900">Flow Grid</span>
+                <Link href="/">
+                  <Image 
+                    src="/flow-grid-logo.png" 
+                    alt="Flow Grid Logo" 
+                    width={40} 
+                    height={40}
+                    className="h-10 w-auto cursor-pointer"
+                    priority
+                  />
+                </Link>
+                <Link href="/">
+                  <span className="ml-3 text-2xl font-bold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors">Flow Grid</span>
+                </Link>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -400,6 +405,9 @@ export default function GlossaryPage() {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }

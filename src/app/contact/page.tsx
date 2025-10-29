@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Mail, MessageCircle, Clock, MapPin, HelpCircle } from 'lucide-react'
 import ContactForm from '@/components/ContactForm'
+import Footer from '@/components/Footer'
 
 export default function ContactPage() {
   return (
@@ -12,12 +13,16 @@ export default function ContactPage() {
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
-                <img 
-                  src="/flow-grid-logo.png" 
-                  alt="Flow Grid Logo" 
-                  className="h-10 w-auto"
-                />
-                <span className="ml-3 text-2xl font-bold text-gray-900">Flow Grid</span>
+                <Link href="/">
+                  <img 
+                    src="/flow-grid-logo.png" 
+                    alt="Flow Grid Logo" 
+                    className="h-10 w-auto cursor-pointer"
+                  />
+                </Link>
+                <Link href="/">
+                  <span className="ml-3 text-2xl font-bold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors">Flow Grid</span>
+                </Link>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -171,6 +176,9 @@ export default function ContactPage() {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }
