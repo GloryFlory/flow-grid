@@ -17,6 +17,14 @@ export const authOptions: NextAuthOptions = {
           access_type: "offline",
           response_type: "code"
         }
+      },
+      profile(profile) {
+        return {
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+          avatar: profile.picture, // Map Google's 'picture' to our 'avatar' field
+        }
       }
     }),
     CredentialsProvider({
@@ -53,7 +61,7 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           name: user.name,
-          image: user.avatar,
+          avatar: user.avatar,
         }
       }
     }),
