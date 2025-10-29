@@ -9,8 +9,12 @@ export default function TermsOfServicePage() {
         {/* Header */}
         <header className="mb-8 flex items-center justify-between">
           <div className="flex items-center">
-            <img src="/flow-grid-logo.png" alt="Flow Grid Logo" className="h-10 w-auto" />
-            <h1 className="ml-3 text-2xl font-bold">Terms of Service</h1>
+            <Link href="/">
+              <img src="/flow-grid-logo.png" alt="Flow Grid Logo" className="h-10 w-auto cursor-pointer" />
+            </Link>
+            <Link href="/">
+              <h1 className="ml-3 text-2xl font-bold cursor-pointer hover:text-blue-600 transition-colors">Terms of Service</h1>
+            </Link>
           </div>
           <div className="flex items-center space-x-4">
             <Link href="/auth/signin"><Button variant="outline">Sign In</Button></Link>
