@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
+import Footer from '@/components/Footer'
 
 export default function TermsOfServicePage() {
   return (
@@ -180,6 +181,9 @@ export default function TermsOfServicePage() {
           </p>
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }
