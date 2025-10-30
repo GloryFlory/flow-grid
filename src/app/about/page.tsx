@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Heart, Users, Globe, Lightbulb, Target, Calendar } from 'lucide-react'
+import Footer from '@/components/Footer'
 
 export default function AboutPage() {
   return (
@@ -261,12 +262,15 @@ export default function AboutPage() {
           {/* Footer Note */}
           <div className="mt-12 pt-8 border-t border-gray-200 text-center">
             <p className="text-gray-600">
-              Flow Grid is proudly made in Sliema, Malta ��<br />
+              Flow Grid is proudly made in Sliema, Malta 🇲🇹<br />
               With love for the global festival community ❤️
             </p>
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }

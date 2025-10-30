@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Search, HelpCircle, Calendar, Users, Settings, Globe } from 'lucide-react'
+import Footer from '@/components/Footer'
 
 export default function HelpCenterPage() {
   return (
@@ -363,6 +364,9 @@ export default function HelpCenterPage() {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }

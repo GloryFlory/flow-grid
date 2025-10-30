@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
+import Footer from '@/components/Footer'
 
 export default function PrivacyPolicyPage() {
   return (
@@ -163,6 +164,9 @@ export default function PrivacyPolicyPage() {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }

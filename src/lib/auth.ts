@@ -19,6 +19,13 @@ export const authOptions: NextAuthOptions = {
         }
       },
       profile(profile) {
+        console.log('🔍 Google profile data:', {
+          sub: profile.sub,
+          email: profile.email,
+          name: profile.name,
+          picture: profile.picture
+        })
+        
         return {
           id: profile.sub,
           name: profile.name,
@@ -81,12 +88,23 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async signIn({ user, account, profile, email, credentials }) {
+      console.log('🚪 SignIn callback:', {
+        provider: account?.provider,
+        userEmail: user?.email,
+        profileEmail: (profile as any)?.email,
+        accountId: account?.id,
+        userId: user?.id
+      })
+      return true
+    },
     async session({ session, token }) {
       console.log('🎫 Session callback called (JWT):', { 
         hasSession: !!session, 
         hasToken: !!token,
         tokenSub: token?.sub,
-        sessionUserId: (session?.user as any)?.id
+        sessionUserId: (session?.user as any)?.id,
+        sessionEmail: session?.user?.email
       })
       
       // Include user ID in session from JWT token
@@ -98,12 +116,16 @@ export const authOptions: NextAuthOptions = {
       console.log('🎫 Final session:', session)
       return session
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       console.log('🔑 JWT callback called:', {
         hasToken: !!token,
         hasUser: !!user,
+        hasAccount: !!account,
+        provider: account?.provider,
         userId: user?.id,
-        tokenSub: token?.sub
+        userEmail: user?.email,
+        tokenSub: token?.sub,
+        tokenEmail: token?.email
       })
       
       // Persist the user ID to the token right after signin
