@@ -168,13 +168,15 @@ export default function SignInPage() {
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="flex items-center justify-center mb-4">
-              <Image 
-                src="/flow-grid-logo.png" 
-                alt="Flow Grid" 
-                width={242} 
-                height={60}
-                className="h-15 w-auto"
-              />
+              <Link href="/">
+                <Image 
+                  src="/flow-grid-logo.png" 
+                  alt="Flow Grid" 
+                  width={242} 
+                  height={60}
+                  className="h-15 w-auto cursor-pointer hover:opacity-80 transition-opacity"
+                />
+              </Link>
             </div>
             <div className="flex justify-center mb-4">
               <CheckCircle className="w-16 h-16 text-green-500" />
@@ -209,13 +211,15 @@ export default function SignInPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex items-center justify-center mb-4">
-            <Image 
-              src="/flow-grid-logo.png" 
-              alt="Flow Grid" 
-              width={242} 
-              height={60}
-              className="h-15 w-auto"
-            />
+            <Link href="/">
+              <Image 
+                src="/flow-grid-logo.png" 
+                alt="Flow Grid" 
+                width={242} 
+                height={60}
+                className="h-15 w-auto cursor-pointer hover:opacity-80 transition-opacity"
+              />
+            </Link>
           </div>
           <CardTitle className="text-2xl">Sign in to Flow Grid</CardTitle>
           <p className="text-gray-600 mt-2">
