@@ -207,15 +207,15 @@ export default function CreateFestivalPage() {
 
   const downloadCsvTemplate = () => {
     const csvContent = `id,day,start,end,title,level,capacity,types,CardType,teachers,location,Description,Prerequisites
-1,Friday,08:00,09:00,Registration & Check-in,,50,Admin,minimal,,Main Entrance,"Welcome and registration desk","Event ticket required"
+1,Friday,08:00,09:00,Registration & Check-in,,50,Logistics,minimal,,Main Entrance,"Welcome and registration desk","Event ticket required"
 2,Friday,09:00,10:30,Opening Keynote,,200,Presentation,photo,Dr. Sarah Chen,Main Auditorium,"Welcome address and festival overview",""
 3,Friday,11:00,12:30,Workshop: Creative Writing,Beginner,25,Workshop,detailed,Alex Rivera,Room 101,"Hands-on writing workshop exploring narrative techniques","Notebook and pen recommended"
-4,Friday,13:00,14:00,Lunch Break,,,,Meal,minimal,,Garden Terrace,"Catered lunch and networking time",""
+4,Friday,13:00,14:00,Lunch Break,,80,Break,minimal,,Garden Terrace,"Catered lunch and networking time",""
 5,Friday,14:30,16:00,Panel Discussion,Intermediate,40,Panel,photo,"Maria Lopez & John Smith",Conference Room,"Industry experts discuss current trends","Basic familiarity with topic helpful"
 6,Friday,16:30,17:30,Networking Session,,60,Social,minimal,,Lobby,"Informal networking and refreshments",""
 7,Saturday,08:30,09:30,Morning Meditation,,30,Wellness,photo,Emma Thompson,Quiet Room,"Guided meditation to start the day","Comfortable clothing suggested"
 8,Saturday,10:00,12:00,Advanced Masterclass,Advanced,15,Masterclass,detailed,Prof. David Kim,Studio,"Deep dive into advanced techniques","Previous experience required"
-9,Saturday,13:00,14:00,Lunch,,,50,Meal,minimal,,Dining Hall,"Lunch and informal discussions",""
+9,Saturday,13:00,14:00,Lunch Break,,80,Break,minimal,,Dining Hall,"Lunch and informal discussions",""
 10,Saturday,15:00,16:00,Closing Ceremony,,100,Community,minimal,,Main Hall,"Wrap-up and thank you remarks",""`
 
     const blob = new Blob([csvContent], { type: 'text/csv' })
@@ -711,78 +711,147 @@ export default function CreateFestivalPage() {
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
                 <div className="flex items-start gap-3">
                   <Info className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
-                  <div>
-                    <h3 className="font-semibold text-blue-900 mb-2">CSV Template & Instructions</h3>
-                    <div className="text-blue-800 space-y-3">
-                      <p>
-                        Upload a CSV file to create your festival schedule. Only a few fields are required - 
-                        the rest are optional and will enhance your schedule display when provided.
-                      </p>
-                      
-                      <div className="grid md:grid-cols-2 gap-4 mt-4">
-                        <div>
-                          <h4 className="font-medium mb-2 flex items-center gap-2">
-                            <FileText className="w-4 h-4" />
-                            CSV Columns:
-                          </h4>
-                          <div className="text-sm space-y-2">
-                            <div>
-                              <p className="font-medium text-blue-900 mb-1">Required Fields:</p>
-                              <ul className="space-y-1 list-disc list-inside">
-                                <li><strong>title:</strong> Session/event name</li>
-                                <li><strong>day:</strong> Day name (Friday, Saturday, Sunday, etc.)</li>
-                                <li><strong>start/end:</strong> Time in 24-hour format (09:00, 13:30, 16:45)</li>
-                              </ul>
-                            </div>
-                            
-                            <div>
-                              <p className="font-medium text-blue-900 mb-1">Optional Fields:</p>
-                              <ul className="space-y-1 list-disc list-inside">
-                                <li><strong>id:</strong> Unique identifier (auto-generated if empty)</li>
-                                <li><strong>level:</strong> Difficulty/experience level (any text)</li>
-                                <li><strong>capacity:</strong> Max participants (defaults to 20)</li>
-                                <li><strong>types:</strong> Category/tags for filtering</li>
-                                <li><strong>teachers:</strong> Instructor/facilitator names</li>
-                                <li><strong>location:</strong> Room, venue, or area name</li>
-                                <li><strong>Description:</strong> Detailed session information</li>
-                                <li><strong>Prerequisites:</strong> Requirements or preparation needed</li>
-                              </ul>
-                            </div>
-                            
-                            <div>
-                              <p className="font-medium text-blue-900 mb-1">Display Style (CardType):</p>
-                              <ul className="space-y-1 list-disc list-inside ml-4">
-                                <li><strong>"minimal":</strong> Simple card - title, time, location only</li>
-                                <li><strong>"photo":</strong> Medium card - includes teacher photo space</li>
-                                <li><strong>"detailed":</strong> Full card - all details and descriptions (default)</li>
-                              </ul>
-                              <p className="text-xs text-blue-700 mt-2">
-                                ⚠️ CardType must be exactly "minimal", "photo", or "detailed" (case-insensitive). 
-                                If left empty, defaults to "detailed".
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                  <div className="w-full">
+                    <h3 className="font-semibold text-blue-900 mb-3">CSV Template & Instructions</h3>
+                    
+                    <p className="text-blue-800 mb-6">
+                      Upload your schedule CSV to create your festival program. 
+                      Only a few columns are required — the rest simply make your schedule more visual and interactive.
+                    </p>
 
-                      <div className="bg-blue-100 rounded-lg p-4 mt-4">
-                        <h4 className="font-medium mb-2 flex items-center gap-2">
-                          <ExternalLink className="w-4 h-4" />
-                          Live Example:
-                        </h4>
-                        <p className="text-sm">
-                          See a festival schedule in action: 
-                          <a 
-                            href="https://mac-five-iota.vercel.app/" 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="ml-1 underline hover:no-underline font-medium"
-                          >
-                            mac-five-iota.vercel.app
-                          </a>
-                        </p>
-                        <p className="text-xs mt-1">This demonstrates how different card types and fields appear on your schedule.</p>
+                    {/* Required Columns */}
+                    <div className="mb-6">
+                      <h4 className="text-sm font-semibold text-slate-700 mb-3">Required Columns</h4>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm border-collapse">
+                          <thead>
+                            <tr className="border-b border-blue-200">
+                              <th className="text-left py-2 px-3 font-semibold text-blue-900">Column</th>
+                              <th className="text-left py-2 px-3 font-semibold text-blue-900">Description</th>
+                              <th className="text-left py-2 px-3 font-semibold text-blue-900">Example</th>
+                            </tr>
+                          </thead>
+                          <tbody className="text-blue-800">
+                            <tr className="border-b border-blue-100">
+                              <td className="py-2 px-3 font-medium">title</td>
+                              <td className="py-2 px-3">Name of the session or event</td>
+                              <td className="py-2 px-3 text-blue-600">Morning Yoga</td>
+                            </tr>
+                            <tr className="border-b border-blue-100">
+                              <td className="py-2 px-3 font-medium">day</td>
+                              <td className="py-2 px-3">Day of the festival</td>
+                              <td className="py-2 px-3 text-blue-600">Friday</td>
+                            </tr>
+                            <tr>
+                              <td className="py-2 px-3 font-medium">start / end</td>
+                              <td className="py-2 px-3">Start and end time (24h format)</td>
+                              <td className="py-2 px-3 text-blue-600">09:00 / 10:30</td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
+                    </div>
+
+                    {/* Optional Columns */}
+                    <div className="mb-6">
+                      <h4 className="text-sm font-semibold text-slate-700 mb-3">Optional Columns</h4>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm border-collapse">
+                          <thead>
+                            <tr className="border-b border-blue-200">
+                              <th className="text-left py-2 px-3 font-semibold text-blue-900">Column</th>
+                              <th className="text-left py-2 px-3 font-semibold text-blue-900">Description</th>
+                              <th className="text-left py-2 px-3 font-semibold text-blue-900">Example</th>
+                            </tr>
+                          </thead>
+                          <tbody className="text-blue-800">
+                            <tr className="border-b border-blue-100">
+                              <td className="py-2 px-3 font-medium">id</td>
+                              <td className="py-2 px-3">Unique identifier (auto-generated if empty)</td>
+                              <td className="py-2 px-3 text-blue-600">001</td>
+                            </tr>
+                            <tr className="border-b border-blue-100">
+                              <td className="py-2 px-3 font-medium">level</td>
+                              <td className="py-2 px-3">Difficulty or experience level</td>
+                              <td className="py-2 px-3 text-blue-600">Beginner</td>
+                            </tr>
+                            <tr className="border-b border-blue-100">
+                              <td className="py-2 px-3 font-medium">capacity</td>
+                              <td className="py-2 px-3">Max participants (defaults to 20)</td>
+                              <td className="py-2 px-3 text-blue-600">25</td>
+                            </tr>
+                            <tr className="border-b border-blue-100">
+                              <td className="py-2 px-3 font-medium">types</td>
+                              <td className="py-2 px-3">Tags or categories for filtering</td>
+                              <td className="py-2 px-3 text-blue-600">Yoga, Breathwork</td>
+                            </tr>
+                            <tr className="border-b border-blue-100">
+                              <td className="py-2 px-3 font-medium">teachers</td>
+                              <td className="py-2 px-3">Facilitator or instructor names</td>
+                              <td className="py-2 px-3 text-blue-600">Maria & Flo</td>
+                            </tr>
+                            <tr className="border-b border-blue-100">
+                              <td className="py-2 px-3 font-medium">location</td>
+                              <td className="py-2 px-3">Room or area name</td>
+                              <td className="py-2 px-3 text-blue-600">Main Hall</td>
+                            </tr>
+                            <tr className="border-b border-blue-100">
+                              <td className="py-2 px-3 font-medium">description</td>
+                              <td className="py-2 px-3">Details about the session</td>
+                              <td className="py-2 px-3 text-blue-600">Grounding flow with breath focus</td>
+                            </tr>
+                            <tr>
+                              <td className="py-2 px-3 font-medium">prerequisites</td>
+                              <td className="py-2 px-3">Preparation or requirements</td>
+                              <td className="py-2 px-3 text-blue-600">Bring your mat and water bottle</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    {/* Display Style */}
+                    <div className="mb-6">
+                      <h4 className="text-sm font-semibold text-slate-700 mb-3">Display Style (CardType)</h4>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm border-collapse">
+                          <thead>
+                            <tr className="border-b border-blue-200">
+                              <th className="text-left py-2 px-3 font-semibold text-blue-900">Type</th>
+                              <th className="text-left py-2 px-3 font-semibold text-blue-900">Layout</th>
+                              <th className="text-left py-2 px-3 font-semibold text-blue-900">Description</th>
+                            </tr>
+                          </thead>
+                          <tbody className="text-blue-800">
+                            <tr className="border-b border-blue-100">
+                              <td className="py-2 px-3 font-medium">minimal</td>
+                              <td className="py-2 px-3">Simple</td>
+                              <td className="py-2 px-3">Title, time, and location only</td>
+                            </tr>
+                            <tr className="border-b border-blue-100">
+                              <td className="py-2 px-3 font-medium">photo</td>
+                              <td className="py-2 px-3">Photo</td>
+                              <td className="py-2 px-3">Adds teacher photo space</td>
+                            </tr>
+                            <tr>
+                              <td className="py-2 px-3 font-medium">detailed (default)</td>
+                              <td className="py-2 px-3">Full</td>
+                              <td className="py-2 px-3">Includes all info and descriptions</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div className="mt-3 space-y-1 text-xs text-blue-700">
+                        <p>• CardType must be one of: "minimal", "photo", or "detailed" (not case-sensitive).</p>
+                        <p>• If you leave CardType empty, it defaults to "detailed".</p>
+                      </div>
+                    </div>
+
+                    {/* Hint */}
+                    <div className="bg-blue-100 border border-blue-300 rounded-lg p-4">
+                      <p className="text-sm text-blue-800">
+                        💡 <strong>Not sure where to start?</strong> Download the CSV template — it's pre-filled with examples you can edit.
+                      </p>
                     </div>
                   </div>
                 </div>
