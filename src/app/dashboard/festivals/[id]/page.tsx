@@ -328,8 +328,8 @@ export default function FestivalManagement() {
                   <div className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all cursor-pointer">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="font-semibold text-gray-900">Teacher Info and Photos</h3>
-                        <p className="text-sm text-gray-600">Manage teacher profiles and photos</p>
+                        <h3 className="font-semibold text-gray-900">Facilitator Info and Photos</h3>
+                        <p className="text-sm text-gray-600">Manage facilitator profiles and photos</p>
                       </div>
                       <ImageIcon className="w-5 h-5 text-gray-400" />
                     </div>

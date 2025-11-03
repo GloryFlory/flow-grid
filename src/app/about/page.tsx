@@ -6,23 +6,40 @@ import Footer from '@/components/Footer'
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-white">
+      {/* Navigation */}
+      <nav className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            <div className="flex items-center">
+              <div className="flex-shrink-0 flex items-center">
+                <Link href="/">
+                  <img 
+                    src="/flow-grid-logo.png" 
+                    alt="Flow Grid Logo" 
+                    className="h-10 w-auto cursor-pointer"
+                  />
+                </Link>
+                <Link href="/">
+                  <span className="ml-3 text-2xl font-bold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors">Flow Grid</span>
+                </Link>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Link href="/auth/signin">
+                <Button variant="outline">Sign In</Button>
+              </Link>
+              <Link href="/auth/signup">
+                <Button>Get Started</Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
-        <header className="mb-8 flex items-center justify-between">
-          <div className="flex items-center">
-            <Link href="/">
-              <img src="/flow-grid-logo.png" alt="Flow Grid Logo" className="h-10 w-auto cursor-pointer" />
-            </Link>
-            <Link href="/">
-              <h1 className="ml-3 text-2xl font-bold cursor-pointer hover:text-blue-600 transition-colors">About Flow Grid</h1>
-            </Link>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Link href="/auth/signin"><Button variant="outline">Sign In</Button></Link>
-            <Link href="/auth/signup"><Button>Get Started</Button></Link>
-          </div>
-        </header>
-        <div className="mb-6">
+        {/* Page Header */}
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">About Flow Grid</h1>
           <p className="text-xl text-gray-600">
             Empowering festival organizers to create beautiful, professional schedules with ease
           </p>

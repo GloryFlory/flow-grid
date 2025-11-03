@@ -903,25 +903,64 @@ body {
   gap: 1rem;
 }
 
-/* Workshop highlighting - make workshops more prominent */
+/* Gradient frame container */
 .session-card.workshop-highlight {
-  background: linear-gradient(135deg, #fefefe 0%, #f8fafc 100%);
-  border: 2px solid var(--accent-color, #3b82f6);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+  /* thickness of the frame = this padding */
+  --frame-thickness: 2px;
+  --radius: 16px;
+
+  background: linear-gradient(
+    135deg,
+    var(--primary-color, var(--primary-blue)),
+    var(--secondary-color, var(--secondary-blue)),
+    var(--accent-color, #3b82f6)
+  );
+  padding: var(--frame-thickness);
+  border-radius: var(--radius);
+  /* optional subtle lift */
+  box-shadow: 0 4px 12px rgba(59,130,246,0.15);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
   transform: translateY(0);
-  transition: all 0.2s ease;
 }
 
+/* Inner white card */
+.session-card.workshop-highlight .session-card__inner {
+  background: #fff;
+  border-radius: calc(var(--radius) - 2px); /* keeps corners crisp */
+  padding: 1.25rem; /* your existing inner padding */
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Optional hover polish */
 .session-card.workshop-highlight:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
 }
 
-/* Non-workshop cards - more subdued */
+/* Non-workshop cards - more subdued with enhanced top gradient */
 .session-card.non-workshop {
-  background: #f9fafb;
+  border-radius: 16px;
+  background: #fff;
+  overflow: hidden;
+  position: relative;
   border: 1px solid #e5e7eb;
   opacity: 0.85;
+}
+
+/* Enhanced top gradient for photo and minimal cards */
+.session-card.non-workshop::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;     /* top edge only */
+  height: 5px;
+  background: linear-gradient(90deg,
+    var(--primary-color, var(--primary-blue)),
+    var(--secondary-color, var(--secondary-blue)),
+    var(--accent-color, #3b82f6)
+  );
 }
 
 /* Simultaneous workshop grouping */

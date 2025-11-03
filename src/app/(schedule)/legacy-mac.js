@@ -388,10 +388,12 @@ const sortDays = (days) => {
           </div>
         </div>
         
-        {/* Line 5: Prerequisites */}
-        <div className="prereqs-compact">
-          <strong>Pre-Reqs:</strong> {session.prereqs && session.prereqs !== "" && session.prereqs !== "TBD" ? session.prereqs : "None"}
-        </div>
+        {/* Line 5: Prerequisites - only show if they exist */}
+        {session.prereqs && session.prereqs !== "" && session.prereqs !== "TBD" && (
+          <div className="prereqs-compact">
+            <strong>Pre-Reqs:</strong> {session.prereqs}
+          </div>
+        )}
         
         {/* Teacher Photo - same positioning for both mobile and desktop */}
         {session.teachers && session.teachers.length > 0 && (
@@ -715,13 +717,12 @@ const SessionModal = ({ session, onClose, setShowPhotoshootBooking }) => {
                 <span className="modal-duration">{Math.round(getDuration(session.start, session.end))} minutes</span>
               </div>
               
-              {/* Prerequisites - Show for simplified sessions AND complex sessions (but not photo-only or photoshoot) */}
-              {((isSimplified && session.prereqs && session.prereqs !== "" && session.prereqs !== "TBD") || 
-                (!isSimplified && !isPhotoOnly && !isPhotoshoot)) && (
+              {/* Prerequisites - only show if they exist */}
+              {session.prereqs && session.prereqs !== "" && session.prereqs !== "TBD" && (
                 <div className="modal-detail-card modal-prereqs-card">
                   <h5>Prerequisites</h5>
                   <span className="modal-prereqs">
-                    {session.prereqs && session.prereqs !== "" && session.prereqs !== "TBD" ? session.prereqs : "None"}
+                    {session.prereqs}
                   </span>
                 </div>
               )}

@@ -9,21 +9,22 @@ datasource db {
 }
 
 model User {
-  id               String        @id @default(cuid())
-  email            String        @unique
-  emailVerified    DateTime?
-  name             String?
-  avatar           String?
-  password         String?
-  resetToken       String?
-  resetTokenExpiry DateTime?
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-  role             UserRole      @default(USER)
-  accounts         Account[]
-  festivals        Festival[]
-  sessions         Session[]
-  subscription     Subscription?
+  id                    String                 @id @default(cuid())
+  email                 String                 @unique
+  emailVerified         DateTime?
+  name                  String?
+  avatar                String?
+  password              String? // legacy only
+  resetToken            String?
+  resetTokenExpiry      DateTime?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  role                  UserRole               @default(USER)
+  accounts              Account[]
+  festivals             Festival[]
+  sessions              Session[]
+  subscription          Subscription?
+  webAuthnCredentials   WebAuthnCredential[]
 
   @@map("users")
 }
@@ -190,6 +191,21 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+
+model WebAuthnCredential {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  credentialId String   @unique
+  publicKey    Bytes
+  counter      BigInt
+  transports   String?
+  createdAt    DateTime @default(now())
+  lastUsedAt   DateTime @default(now())
+
+  @@index([userId])
+  @@map("webauthn_credentials")
 }
 
 enum UserRole {

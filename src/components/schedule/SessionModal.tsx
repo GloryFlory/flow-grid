@@ -154,13 +154,12 @@ export function SessionModal({ session, onClose }: SessionModalProps) {
               <span className="modal-duration">{Math.round(getDuration(session.start, session.end))} minutes</span>
             </div>
             
-            {/* Prerequisites */}
-            {((isSimplified && session.prereqs && session.prereqs !== "" && session.prereqs !== "TBD") || 
-              (!isSimplified && !isPhotoOnly && !isPhotoshoot)) && (
+            {/* Prerequisites - only show if they exist */}
+            {session.prereqs && session.prereqs !== "" && session.prereqs !== "TBD" && (
               <div className="modal-detail-card modal-prereqs-card">
                 <h5>PREREQUISITES</h5>
                 <span className="modal-prereqs">
-                  {session.prereqs && session.prereqs !== "" && session.prereqs !== "TBD" ? session.prereqs : "None"}
+                  {session.prereqs}
                 </span>
               </div>
             )}

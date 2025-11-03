@@ -254,13 +254,13 @@ export default function FestivalTeacherPhotos() {
                 </Button>
               </Link>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Teacher Info and Photos</h1>
-                <p className="text-gray-600">Manage teacher profiles and photos for {festival.name}</p>
+                <h1 className="text-3xl font-bold text-gray-900">Facilitator Info and Photos</h1>
+                <p className="text-gray-600">Manage facilitator profiles and photos for {festival.name}</p>
               </div>
             </div>
             <div className="text-right">
               <p className="text-sm text-gray-600">
-                {teachersWithPhotos.length} of {teachers.length} teachers have photos
+                {teachersWithPhotos.length} of {teachers.length} facilitators have photos
               </p>
               <div className="w-48 bg-gray-200 rounded-full h-2 mt-1">
                 <div 
@@ -285,7 +285,7 @@ export default function FestivalTeacherPhotos() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
                   type="text"
-                  placeholder="Search teachers..."
+                  placeholder="Search facilitators..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -299,7 +299,7 @@ export default function FestivalTeacherPhotos() {
                 className="flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" />
-                Add Teacher
+                Add Facilitator
               </Button>
             </div>
 
@@ -312,7 +312,7 @@ export default function FestivalTeacherPhotos() {
                       <Check className="w-5 h-5 text-green-600" />
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600">Teachers with Photos</p>
+                      <p className="text-sm text-gray-600">Facilitators with Photos</p>
                       <p className="text-2xl font-bold text-green-600">{teachersWithPhotos.length}</p>
                     </div>
                   </div>
@@ -334,13 +334,13 @@ export default function FestivalTeacherPhotos() {
               </Card>
             </div>
 
-            {/* Teachers without Photos */}
+            {/* Facilitators without Photos */}
             {teachersWithoutPhotos.length > 0 && (
               <Card className="border-orange-200">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-orange-700">
                     <AlertCircle className="w-5 h-5" />
-                    Teachers Missing Photos ({teachersWithoutPhotos.length})
+                    Facilitators Missing Photos ({teachersWithoutPhotos.length})
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -402,13 +402,13 @@ export default function FestivalTeacherPhotos() {
               </Card>
             )}
 
-            {/* Teachers with Photos */}
+            {/* Facilitators with Photos */}
             {teachersWithPhotos.length > 0 && (
               <Card className="border-green-200">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-green-700">
                     <Check className="w-5 h-5" />
-                    Teachers with Photos ({teachersWithPhotos.length})
+                    Facilitators with Photos ({teachersWithPhotos.length})
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
