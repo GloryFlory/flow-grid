@@ -36,7 +36,7 @@ export default function MarketingPage() {
               <Link href="/auth/signin">
                 <Button variant="outline">Sign In</Button>
               </Link>
-              <Link href="/auth/signup">
+              <Link href="/auth/signin">
                 <Button>Get Started</Button>
               </Link>
             </div>
@@ -67,7 +67,7 @@ export default function MarketingPage() {
               Flow Grid helps festivals, retreats, and events create beautiful schedules and manage their event details with professional-grade tools.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/auth/signup">
+              <Link href="/auth/signin">
                 <Button size="lg" className="text-lg px-8 py-3 bg-[#ff7119] hover:bg-[#b40225] text-white">
                   Get Started <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
@@ -181,7 +181,7 @@ export default function MarketingPage() {
           <p className="text-xl text-blue-100 mb-8">
             Join event organizers who use Flow Grid to create beautiful festival schedules.
           </p>
-          <Link href="/auth/signup">
+          <Link href="/auth/signin">
             <Button size="lg" className="bg-[#ff7119] hover:bg-[#b40225] text-white text-lg px-8 py-3">
               Create Your Account
             </Button>

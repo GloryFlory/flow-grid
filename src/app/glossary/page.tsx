@@ -252,7 +252,7 @@ export default function GlossaryPage() {
               <Link href="/auth/signin">
                 <Button variant="outline">Sign In</Button>
               </Link>
-              <Link href="/auth/signup">
+              <Link href="/auth/signin">
                 <Button>Get Started</Button>
               </Link>
             </div>
@@ -369,7 +369,7 @@ export default function GlossaryPage() {
               <p className="text-gray-600 mb-4">
                 Get your festival up and running in minutes with our guided setup.
               </p>
-              <Link href="/auth/signup">
+              <Link href="/auth/signin">
                 <Button size="sm" className="bg-green-600 hover:bg-green-700">
                   Start Creating
                 </Button>
