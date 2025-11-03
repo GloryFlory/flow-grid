@@ -1,7 +1,7 @@
 'use client'
 
 // Updated: 2025-11-03 - Force rebuild with magic link auth
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo, Suspense } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -12,7 +12,7 @@ import { Loader2, Mail, Chrome, Key, CheckCircle, Info, AlertCircle, X } from 'l
 import { useConditionalPasskey } from '@/hooks/useConditionalPasskey'
 import { getAuthenticatorName } from '@/lib/passkeys'
 
-export default function SignInPage() {
+function SignInContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
@@ -355,5 +355,21 @@ export default function SignInPage() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="p-6 flex justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+          </CardContent>
+        </Card>
+      </div>
+    }>
+      <SignInContent />
+    </Suspense>
   )
 }
