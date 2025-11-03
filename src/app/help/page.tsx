@@ -28,7 +28,7 @@ export default function HelpCenterPage() {
               <Link href="/auth/signin">
                 <Button variant="outline">Sign In</Button>
               </Link>
-              <Link href="/auth/signup">
+              <Link href="/auth/signin">
                 <Button>Get Started</Button>
               </Link>
             </div>

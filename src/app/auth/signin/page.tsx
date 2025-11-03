@@ -339,11 +339,8 @@ function SignInContent() {
             )}
           </Button>
 
-          <p className="text-center text-sm text-gray-600">
-            Don't have an account?{' '}
-            <Link href="/auth/signup" className="text-blue-600 hover:text-blue-500 font-medium">
-              Sign up
-            </Link>
+          <p className="text-center text-sm text-gray-600 mt-6">
+            New to Flow Grid? Just enter your email above and we'll send you a magic link to get started!
           </p>
 
           <p className="text-center text-xs text-gray-500 mt-4">

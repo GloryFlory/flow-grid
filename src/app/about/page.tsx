@@ -28,7 +28,7 @@ export default function AboutPage() {
               <Link href="/auth/signin">
                 <Button variant="outline">Sign In</Button>
               </Link>
-              <Link href="/auth/signup">
+              <Link href="/auth/signin">
                 <Button>Get Started</Button>
               </Link>
             </div>
@@ -263,7 +263,7 @@ export default function AboutPage() {
               we're here to help you create an online presence that matches the quality of your event.
             </p>
             <div className="space-x-4">
-              <Link href="/auth/signup">
+              <Link href="/auth/signin">
                 <Button className="bg-blue-600 hover:bg-blue-700">
                   Start Your Festival
                 </Button>
