@@ -280,6 +280,7 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
                         session={session}
                         onClick={setSelectedSession}
                         onStyleClick={setStyleFilter}
+                        onLevelClick={setLevelFilter}
                       />
                     ))}
                   </div>
@@ -299,6 +300,7 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
                     session={session}
                     onClick={setSelectedSession}
                     onStyleClick={setStyleFilter}
+                    onLevelClick={setLevelFilter}
                   />
                 ))}
             </div>
