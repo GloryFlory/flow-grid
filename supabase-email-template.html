@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Your Password - {{ .SiteName }}</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #374151;
+            background-color: #f9fafb;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #ffffff;
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            margin: 8px 0 0 0;
+            font-size: 16px;
+            font-weight: 400;
+        }
+        
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .greeting {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0 0 20px 0;
+        }
+        
+        .message {
+            font-size: 16px;
+            color: #4b5563;
+            margin: 0 0 30px 0;
+            line-height: 1.7;
+        }
+        
+        .cta-container {
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 4px 14px 0 rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px 0 rgba(102, 126, 234, 0.5);
+        }
+        
+        .security-notice {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 16px 20px;
+            margin: 30px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .security-notice .title {
+            font-weight: 600;
+            color: #92400e;
+            margin: 0 0 8px 0;
+            font-size: 14px;
+        }
+        
+        .security-notice .text {
+            color: #b45309;
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .footer {
+            background-color: #f3f4f6;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .footer-text {
+            color: #6b7280;
+            font-size: 14px;
+            margin: 0 0 16px 0;
+            line-height: 1.5;
+        }
+        
+        .footer-link {
+            color: #667eea;
+            text-decoration: none;
+            word-break: break-all;
+            font-size: 12px;
+        }
+        
+        .divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #e5e7eb, transparent);
+            margin: 30px 0;
+        }
+        
+        @media only screen and (max-width: 600px) {
+            .container {
+                margin: 0;
+                box-shadow: none;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .content {
+                padding: 30px 20px;
+            }
+            
+            .footer {
+                padding: 20px;
+            }
+            
+            .cta-button {
+                padding: 14px 28px;
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>{{ .SiteName }}</h1>
+            <p class="subtitle">Festival Scheduler Platform</p>
+        </div>
+        
+        <div class="content">
+            <div class="greeting">
+                Password Reset Request
+            </div>
+            
+            <div class="message">
+                We received a request to reset the password for your {{ .SiteName }} account. If you made this request, click the button below to create a new password.
+            </div>
+            
+            <div class="cta-container">
+                <a href="{{ .ConfirmationURL }}" class="cta-button">
+                    Reset My Password
+                </a>
+            </div>
+            
+            <div class="security-notice">
+                <div class="title">🔒 Security Notice</div>
+                <div class="text">
+                    This link will expire in 1 hour for your security. If you didn't request this password reset, you can safely ignore this email.
+                </div>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="message">
+                If you're having trouble with the button above, copy and paste the following link into your browser:
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div class="footer-text">
+                This email was sent by {{ .SiteName }}<br>
+                Need help? Contact our support team.
+            </div>
+            <a href="{{ .ConfirmationURL }}" class="footer-link">{{ .ConfirmationURL }}</a>
+        </div>
+    </div>
+</body>
+</html>

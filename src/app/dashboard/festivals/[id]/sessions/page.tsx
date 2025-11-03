@@ -38,7 +38,7 @@ interface FestivalSession {
   capacity?: number
   teachers: string[]
   teacherBios: string[]
-  cardType: 'simplified' | 'photo-only' | 'full'
+  cardType: 'minimal' | 'photo' | 'detailed'
 }
 
 interface Festival {
@@ -285,7 +285,7 @@ export default function SessionsManagement() {
       location: session.location || '',
       capacity: session.capacity,
       prerequisites: session.prerequisites || '',
-      cardType: session.cardType as 'full' | 'simplified' | 'photo-only'
+      cardType: session.cardType as 'detailed' | 'minimal' | 'photo'
     }
   }
 

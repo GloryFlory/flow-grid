@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
             startTime: new Date(session.startTime).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }),
             endTime: new Date(session.endTime).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }),
             location: session.location || '',
-            level: session.level || 'All Levels',
+            level: session.level || '',
             styles: session.sessionTypes ? [session.sessionTypes] : [],
             prerequisites: session.requirements || '',
             capacity: session.maxParticipants,

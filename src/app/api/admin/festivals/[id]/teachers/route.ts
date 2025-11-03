@@ -15,7 +15,7 @@ export async function GET(
       )
     }
 
-    // Get all unique teachers from sessions for this festival
+    // Get all unique facilitators from sessions for this festival
     const sessions = await prisma.festivalSession.findMany({
       where: {
         festivalId: festivalId
@@ -25,20 +25,21 @@ export async function GET(
       }
     })
 
-    // Count sessions per teacher
-    const sessionCountMap = new Map<string, number>()
+    // Extract all unique facilitator names and count sessions per facilitator
+    const facilitatorMap = new Map<string, number>()
     
     sessions.forEach(session => {
       session.teachers.forEach(teacher => {
-        if (teacher) {
-          const current = sessionCountMap.get(teacher.toLowerCase().trim()) || 0
-          sessionCountMap.set(teacher.toLowerCase().trim(), current + 1)
+        if (teacher && teacher.trim()) {
+          const normalizedName = teacher.trim()
+          const current = facilitatorMap.get(normalizedName) || 0
+          facilitatorMap.set(normalizedName, current + 1)
         }
       })
     })
 
-    // Get ALL teacher records for this festival
-    const allTeacherRecords = await prisma.teacher.findMany({
+    // Get ALL facilitator records for this festival
+    const allFacilitatorRecords = await prisma.teacher.findMany({
       where: {
         festivalId: festivalId
       },
@@ -60,24 +61,50 @@ export async function GET(
       photoMap.get(key)!.push(photo)
     })
 
-    // Convert teacher records to the expected format
-    const teachers = allTeacherRecords.map(record => {
-      const nameKey = record.name.toLowerCase().trim()
+    // Create a map of existing facilitator records by name (case-insensitive)
+    const recordMap = new Map<string, typeof allFacilitatorRecords[0]>()
+    allFacilitatorRecords.forEach(record => {
+      recordMap.set(record.name.toLowerCase().trim(), record)
+    })
+
+    // Build the complete list: facilitators from sessions + existing records
+    const allFacilitators = new Set<string>()
+    
+    // Add all facilitators from sessions
+    facilitatorMap.forEach((count, name) => {
+      allFacilitators.add(name)
+    })
+    
+    // Add any facilitators from records that might not be in sessions anymore
+    allFacilitatorRecords.forEach(record => {
+      allFacilitators.add(record.name)
+    })
+
+    // Convert to the expected format
+    const teachers = Array.from(allFacilitators).map(name => {
+      const nameKey = name.toLowerCase().trim()
       const photos = photoMap.get(nameKey) || []
-      const sessionCount = sessionCountMap.get(nameKey) || 0
+      const sessionCount = facilitatorMap.get(name) || 0
+      const record = recordMap.get(nameKey)
       
       return {
-        name: record.name,
+        name: name,
         sessionCount,
         hasPhoto: photos.length > 0,
-        teacherRecord: {
+        teacherRecord: record ? {
           id: record.id,
           name: record.name,
           url: record.url || undefined,
           isGroup: record.isGroup,
           photos: photos.map(p => ({ id: p.id, filePath: p.filePath }))
-        }
+        } : undefined
       }
+    }).sort((a, b) => {
+      // Sort by session count (desc), then by name (asc)
+      if (a.sessionCount !== b.sessionCount) {
+        return b.sessionCount - a.sessionCount
+      }
+      return a.name.localeCompare(b.name)
     })
 
     return NextResponse.json(
@@ -90,7 +117,7 @@ export async function GET(
       }
     )
   } catch (error) {
-    console.error('Error fetching teachers:', error)
+    console.error('Error fetching facilitators:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

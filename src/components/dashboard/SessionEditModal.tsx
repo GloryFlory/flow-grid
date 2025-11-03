@@ -16,7 +16,7 @@ interface Session {
   location?: string
   capacity?: number
   prerequisites?: string
-  cardType: 'full' | 'simplified' | 'photo-only'
+  cardType: 'detailed' | 'minimal' | 'photo'
 }
 
 interface SessionEditModalProps {
@@ -30,9 +30,9 @@ interface SessionEditModalProps {
 }
 
 const CARD_TYPES = [
-  { value: 'full', label: 'Full', description: 'Complete session details with all info' },
-  { value: 'simplified', label: 'Simplified', description: 'Clean minimal layout' },
-  { value: 'photo-only', label: 'Photo Only', description: 'Focus on teacher photos' }
+  { value: 'detailed', label: 'Detailed', description: 'Complete session with all details and descriptions' },
+  { value: 'minimal', label: 'Minimal', description: 'Simple card with title, time, and location only' },
+  { value: 'photo', label: 'Photo', description: 'Medium card with facilitator photo and basic info' }
 ]
 
 const LEVEL_OPTIONS = [
@@ -78,7 +78,7 @@ export default function SessionEditModal({
     location: '',
     capacity: undefined,
     prerequisites: '',
-    cardType: 'full'
+    cardType: 'detailed'
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -110,7 +110,7 @@ export default function SessionEditModal({
           location: '',
           capacity: undefined,
           prerequisites: '',
-          cardType: 'full'
+          cardType: 'detailed'
         })
         setShowAdvanced(false)
       }
@@ -150,7 +150,7 @@ export default function SessionEditModal({
     }
 
     if (!formData.teachers.trim()) {
-      newErrors.teachers = 'At least one teacher is required'
+      newErrors.teachers = 'At least one facilitator is required'
     }
 
     if (!formData.levels.trim()) {
@@ -329,7 +329,7 @@ export default function SessionEditModal({
               {/* Teachers */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Teachers *
+                  Presenters / Facilitators *
                 </label>
                 <input
                   type="text"
@@ -347,7 +347,7 @@ export default function SessionEditModal({
                   </p>
                 )}
                 <p className="text-xs text-gray-500 mt-1">
-                  Separate multiple teachers with commas
+                  Separate multiple presenters with commas
                 </p>
               </div>
             </div>

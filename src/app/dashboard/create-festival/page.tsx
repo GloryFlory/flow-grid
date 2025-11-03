@@ -169,9 +169,9 @@ export default function CreateFestivalPage() {
           }
 
           // Validate CardType
-          const cardType = row.CardType?.toLowerCase()
-          if (cardType && !['minimal', 'photo', 'detailed'].includes(cardType)) {
-            errors.push(`Row ${index + 1}: Invalid CardType "${row.CardType}". Must be "minimal", "photo", or "detailed"`)
+          const cardType = row.CardType?.toLowerCase().trim()
+          if (cardType && !['minimal', 'photo', 'detailed', ''].includes(cardType)) {
+            errors.push(`Row ${index + 1}: Invalid CardType "${row.CardType}". Must be "minimal", "photo", or "detailed" (or leave empty for default "detailed")`)
           }
 
           parsedSessions.push({
@@ -207,16 +207,16 @@ export default function CreateFestivalPage() {
 
   const downloadCsvTemplate = () => {
     const csvContent = `id,day,start,end,title,level,capacity,types,CardType,teachers,location,Description,Prerequisites
-1,Friday,08:00,09:00,Registration,All Levels,50,Admin,minimal,,Main Entrance,"Check-in and welcome packets","Pre-registration required"
-2,Friday,09:00,10:30,Morning Hatha Yoga,Beginner,25,Yoga,photo,Sarah Johnson,Studio A,"Gentle yoga flow focusing on breath and alignment","No experience required"
-3,Friday,11:00,13:00,Acro Foundations,Beginner,20,Acrobatics,detailed,Mike Chen & Lisa Wang,Studio B,"Learn fundamental acrobatic skills including basic lifts and balances","Comfortable with basic movement patterns"
-4,Friday,13:00,14:00,Lunch Break,All Levels,,Meal,minimal,,Garden Terrace,"Organic vegetarian lunch with local ingredients",""
-5,Friday,14:30,16:00,Aerial Yoga,Intermediate,15,Yoga,photo,Emma Rodriguez,Studio C,"Explore traditional yoga poses using silk hammocks for support","Previous yoga experience recommended"
-6,Friday,16:30,17:30,Contact Improv Jam,All Levels,30,Movement,minimal,,Dance Studio,"Open movement exploration session","Open mind and willingness to explore"
-7,Saturday,08:00,09:30,Vinyasa Flow,Intermediate,20,Yoga,photo,David Kim,Studio A,"Dynamic linking of breath and movement","6+ months regular yoga practice"
-8,Saturday,10:00,12:00,Partner Acrobatics,Advanced,12,Acrobatics,detailed,Mike Chen & Lisa Wang,Studio B,"Advanced partner balancing and dynamic movements","2+ years acro experience required"
-9,Saturday,13:00,14:00,Lunch,All Levels,,Meal,minimal,,Dining Hall,"Healthy community lunch",""
-10,Saturday,15:00,16:00,Closing Circle,All Levels,50,Community,minimal,,Main Hall,"Reflection and community sharing","Open heart and gratitude"`
+1,Friday,08:00,09:00,Registration & Check-in,,50,Admin,minimal,,Main Entrance,"Welcome and registration desk","Event ticket required"
+2,Friday,09:00,10:30,Opening Keynote,,200,Presentation,photo,Dr. Sarah Chen,Main Auditorium,"Welcome address and festival overview",""
+3,Friday,11:00,12:30,Workshop: Creative Writing,Beginner,25,Workshop,detailed,Alex Rivera,Room 101,"Hands-on writing workshop exploring narrative techniques","Notebook and pen recommended"
+4,Friday,13:00,14:00,Lunch Break,,,,Meal,minimal,,Garden Terrace,"Catered lunch and networking time",""
+5,Friday,14:30,16:00,Panel Discussion,Intermediate,40,Panel,photo,"Maria Lopez & John Smith",Conference Room,"Industry experts discuss current trends","Basic familiarity with topic helpful"
+6,Friday,16:30,17:30,Networking Session,,60,Social,minimal,,Lobby,"Informal networking and refreshments",""
+7,Saturday,08:30,09:30,Morning Meditation,,30,Wellness,photo,Emma Thompson,Quiet Room,"Guided meditation to start the day","Comfortable clothing suggested"
+8,Saturday,10:00,12:00,Advanced Masterclass,Advanced,15,Masterclass,detailed,Prof. David Kim,Studio,"Deep dive into advanced techniques","Previous experience required"
+9,Saturday,13:00,14:00,Lunch,,,50,Meal,minimal,,Dining Hall,"Lunch and informal discussions",""
+10,Saturday,15:00,16:00,Closing Ceremony,,100,Community,minimal,,Main Hall,"Wrap-up and thank you remarks",""`
 
     const blob = new Blob([csvContent], { type: 'text/csv' })
     const url = window.URL.createObjectURL(blob)
@@ -316,7 +316,7 @@ export default function CreateFestivalPage() {
             startTime: `${sessionDate.toISOString().split('T')[0]}T${session.start}:00`,
             endTime: `${sessionDate.toISOString().split('T')[0]}T${session.end}:00`,
             duration: calculateDuration(session.start, session.end),
-            level: session.level || 'All Levels',
+            level: session.level || '',
             maxParticipants: session.capacity || 20,
             currentBookings: 0,
             location: session.location || '',
@@ -360,7 +360,7 @@ export default function CreateFestivalPage() {
               startTime: `${sessionDate.toISOString().split('T')[0]}T${session.start}:00`,
               endTime: `${sessionDate.toISOString().split('T')[0]}T${session.end}:00`,
               duration: calculateDuration(session.start, session.end),
-              level: session.level || 'All Levels',
+              level: session.level || '',
               maxParticipants: session.capacity || 20,
               currentBookings: 0,
               location: session.location || '',
@@ -438,7 +438,7 @@ export default function CreateFestivalPage() {
             startTime: `${sessionDate.toISOString().split('T')[0]}T${session.start}:00`,
             endTime: `${sessionDate.toISOString().split('T')[0]}T${session.end}:00`,
             duration: calculateDuration(session.start, session.end),
-            level: session.level || 'All Levels',
+            level: session.level || '',
             maxParticipants: session.capacity || 20,
             currentBookings: 0,
             location: session.location || '',
@@ -546,34 +546,41 @@ export default function CreateFestivalPage() {
       </div>
 
       {/* Progress Steps */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
+      <div className="mb-12">
+        <div className="grid grid-cols-3 gap-8 max-w-4xl mx-auto">
           {steps.map((step, index) => (
-            <div key={step.id} className="flex items-center flex-1">
-              <div className={`flex items-center justify-center w-10 h-10 rounded-full ${
-                index <= currentStepIndex ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
-              }`}>
+            <div key={step.id} className="text-center">
+              <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center ${
+                index <= currentStepIndex 
+                  ? 'bg-blue-600 text-white shadow-lg' 
+                  : 'bg-gray-100 text-gray-400 border-2 border-gray-200'
+              } transition-all duration-200`}>
                 {index < currentStepIndex ? (
-                  <Check className="w-5 h-5" />
+                  <Check className="w-8 h-8" />
                 ) : (
-                  <span>{index + 1}</span>
+                  <span className="text-2xl font-bold">{index + 1}</span>
                 )}
               </div>
-              <div className="ml-3 flex-1">
-                <p className={`text-sm font-medium ${
-                  index <= currentStepIndex ? 'text-blue-600' : 'text-gray-500'
-                }`}>
-                  {step.title}
-                </p>
-                <p className="text-xs text-gray-500">{step.description}</p>
-              </div>
-              {index < steps.length - 1 && (
-                <div className={`flex-1 h-px mx-4 ${
-                  index < currentStepIndex ? 'bg-blue-600' : 'bg-gray-200'
-                }`} />
-              )}
+              <h3 className={`text-lg font-semibold mb-2 ${
+                index <= currentStepIndex ? 'text-gray-900' : 'text-gray-500'
+              }`}>
+                {step.title}
+              </h3>
+              <p className="text-sm text-gray-500 leading-relaxed max-w-xs mx-auto">
+                {step.description}
+              </p>
             </div>
           ))}
+        </div>
+        
+        {/* Progress Bar */}
+        <div className="mt-8 max-w-2xl mx-auto">
+          <div className="bg-gray-200 rounded-full h-2 overflow-hidden">
+            <div 
+              className="bg-blue-600 h-full rounded-full transition-all duration-300 ease-in-out"
+              style={{ width: `${((currentStepIndex + 1) / steps.length) * 100}%` }}
+            />
+          </div>
         </div>
       </div>
 
@@ -708,44 +715,63 @@ export default function CreateFestivalPage() {
                     <h3 className="font-semibold text-blue-900 mb-2">CSV Template & Instructions</h3>
                     <div className="text-blue-800 space-y-3">
                       <p>
-                        To create your festival schedule, download our CSV template and fill it out with your session details. 
-                        This will allow you to import all sessions quickly and maintain consistency.
+                        Upload a CSV file to create your festival schedule. Only a few fields are required - 
+                        the rest are optional and will enhance your schedule display when provided.
                       </p>
                       
                       <div className="grid md:grid-cols-2 gap-4 mt-4">
                         <div>
                           <h4 className="font-medium mb-2 flex items-center gap-2">
                             <FileText className="w-4 h-4" />
-                            Required CSV Columns:
+                            CSV Columns:
                           </h4>
-                          <ul className="text-sm space-y-1 list-disc list-inside">
-                            <li><strong>id:</strong> Unique identifier (1, 2, 3...)</li>
-                            <li><strong>day:</strong> Day name (Friday, Saturday, Sunday)</li>
-                            <li><strong>start/end:</strong> 24-hour format (09:00, 13:30, 16:45)</li>
-                            <li><strong>title:</strong> Session name</li>
-                            <li><strong>level:</strong> Beginner | Intermediate | Advanced | All Levels</li>
-                            <li><strong>capacity:</strong> Max participants (15, 20, 25, 30)</li>
-                            <li><strong>types:</strong> Yoga | Acrobatics | Movement | Dance | Wellness | Community | Admin | Meal</li>
-                            <li><strong>CardType:</strong> Display style:
-                              <ul className="list-disc list-inside ml-4 mt-1 space-y-1">
-                                <li><strong>"minimal":</strong> Breaks, meals, admin → title, time, location only</li>
-                                <li><strong>"photo":</strong> Yoga, simple classes → teacher photo + basic info</li>
-                                <li><strong>"detailed":</strong> Workshops, complex sessions → full descriptions</li>
+                          <div className="text-sm space-y-2">
+                            <div>
+                              <p className="font-medium text-blue-900 mb-1">Required Fields:</p>
+                              <ul className="space-y-1 list-disc list-inside">
+                                <li><strong>title:</strong> Session/event name</li>
+                                <li><strong>day:</strong> Day name (Friday, Saturday, Sunday, etc.)</li>
+                                <li><strong>start/end:</strong> Time in 24-hour format (09:00, 13:30, 16:45)</li>
                               </ul>
-                            </li>
-                            <li><strong>teachers:</strong> Instructor names (use & for partnerships: "John & Mary")</li>
-                            <li><strong>location:</strong> Studio A | Studio B | Main Hall | Garden | Dining Hall</li>
-                          </ul>
+                            </div>
+                            
+                            <div>
+                              <p className="font-medium text-blue-900 mb-1">Optional Fields:</p>
+                              <ul className="space-y-1 list-disc list-inside">
+                                <li><strong>id:</strong> Unique identifier (auto-generated if empty)</li>
+                                <li><strong>level:</strong> Difficulty/experience level (any text)</li>
+                                <li><strong>capacity:</strong> Max participants (defaults to 20)</li>
+                                <li><strong>types:</strong> Category/tags for filtering</li>
+                                <li><strong>teachers:</strong> Instructor/facilitator names</li>
+                                <li><strong>location:</strong> Room, venue, or area name</li>
+                                <li><strong>Description:</strong> Detailed session information</li>
+                                <li><strong>Prerequisites:</strong> Requirements or preparation needed</li>
+                              </ul>
+                            </div>
+                            
+                            <div>
+                              <p className="font-medium text-blue-900 mb-1">Display Style (CardType):</p>
+                              <ul className="space-y-1 list-disc list-inside ml-4">
+                                <li><strong>"minimal":</strong> Simple card - title, time, location only</li>
+                                <li><strong>"photo":</strong> Medium card - includes teacher photo space</li>
+                                <li><strong>"detailed":</strong> Full card - all details and descriptions (default)</li>
+                              </ul>
+                              <p className="text-xs text-blue-700 mt-2">
+                                ⚠️ CardType must be exactly "minimal", "photo", or "detailed" (case-insensitive). 
+                                If left empty, defaults to "detailed".
+                              </p>
+                            </div>
+                          </div>
                         </div>
                       </div>
 
                       <div className="bg-blue-100 rounded-lg p-4 mt-4">
                         <h4 className="font-medium mb-2 flex items-center gap-2">
                           <ExternalLink className="w-4 h-4" />
-                          Live Demo Example:
+                          Live Example:
                         </h4>
                         <p className="text-sm">
-                          See the Mediterranean Acro Convention schedule in action: 
+                          See a festival schedule in action: 
                           <a 
                             href="https://mac-five-iota.vercel.app/" 
                             target="_blank" 
@@ -755,7 +781,7 @@ export default function CreateFestivalPage() {
                             mac-five-iota.vercel.app
                           </a>
                         </p>
-                        <p className="text-xs mt-1">This shows how your festival will look with different card types.</p>
+                        <p className="text-xs mt-1">This demonstrates how different card types and fields appear on your schedule.</p>
                       </div>
                     </div>
                   </div>
@@ -773,7 +799,7 @@ export default function CreateFestivalPage() {
                   Download CSV Template
                 </Button>
                 <p className="text-sm text-gray-600 mt-2">
-                  Pre-filled with example data from MAC festival
+                  Pre-filled with sample event data to get you started
                 </p>
               </div>
 

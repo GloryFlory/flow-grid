@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { randomBytes } from 'crypto'
+import { sendPasswordResetEmail } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,14 +14,37 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if user exists
+    // Check if user exists in our database
     const user = await prisma.user.findUnique({
-      where: { email: email.toLowerCase() }
+      where: { email: email.toLowerCase() },
+      include: {
+        accounts: {
+          select: {
+            provider: true
+          }
+        }
+      }
     })
 
-    // Always return success to prevent email enumeration
-    // But only send email if user actually exists
-    if (user && user.password) { // Only for users with password (not OAuth-only)
+    console.log(`🔍 User lookup for ${email.toLowerCase()}:`, {
+      found: !!user,
+      hasPassword: !!user?.password,
+      userId: user?.id,
+      oauthProviders: user?.accounts.map(a => a.provider)
+    })
+
+    // Check if user exists but only uses OAuth (no password)
+    if (user && !user.password && user.accounts.length > 0) {
+      const providers = user.accounts.map(a => a.provider).join(', ')
+      console.log(`⚠️ User ${email} only uses OAuth (${providers}), cannot reset password`)
+      return NextResponse.json({
+        error: `This account uses ${providers} sign-in. Please sign in with ${providers} instead of using a password.`,
+        isOAuthOnly: true
+      }, { status: 400 })
+    }
+
+    // Only send email if user exists with password
+    if (user && user.password) {
       // Generate reset token
       const resetToken = randomBytes(32).toString('hex')
       const resetTokenExpiry = new Date(Date.now() + 3600000) // 1 hour from now
@@ -34,24 +58,29 @@ export async function POST(request: NextRequest) {
         }
       })
 
-      // TODO: Send email with reset link
-      // For now, we'll just log it (you'll need to implement email sending)
       const resetUrl = `${process.env.NEXTAUTH_URL}/auth/reset-password?token=${resetToken}`
-      console.log(`Password reset requested for ${email}`)
-      console.log(`Reset URL: ${resetUrl}`)
+      console.log(`📧 Password reset requested for ${email}`)
+      console.log(`🔗 Reset URL: ${resetUrl}`)
       
-      // In production, you would send an email here using Resend, SendGrid, etc.
-      /*
-      const emailService = new ResendService() // or your email service
-      await emailService.sendPasswordReset({
-        to: email,
-        resetUrl,
-        userName: user.name || 'User'
-      })
-      */
+      try {
+        // Send password reset email via Resend
+        await sendPasswordResetEmail({
+          to: email,
+          resetUrl,
+          userName: user.name || undefined
+        })
+        console.log(`✅ Password reset email sent to ${email}`)
+      } catch (emailError) {
+        console.error('❌ Failed to send password reset email:', emailError)
+        return NextResponse.json({
+          error: 'Failed to send reset email. Please try again later.'
+        }, { status: 500 })
+      }
+    } else if (!user) {
+      console.log(`⚠️ Password reset requested for ${email} but user not found`)
     }
 
-    // Always return success (security best practice)
+    // Return success for users with passwords
     return NextResponse.json({
       message: 'If an account with that email exists, we sent a password reset link'
     })

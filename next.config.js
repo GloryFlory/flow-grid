@@ -5,13 +5,32 @@ const nextConfig = {
   // Enable experimental app directory features
   experimental: {
     serverActions: {
-      allowedOrigins: ['localhost:3000', '*.flowgrid.com'],
+      allowedOrigins: ['localhost:3000', 'tryflowgrid.com', '*.tryflowgrid.com', '*.vercel.app'],
     },
   },
 
   // Image optimization
   images: {
-    domains: ['flowgrid.com', 'supabase.co'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'rfpoqcliiduvotlfzopv.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'tryflowgrid.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.tryflowgrid.com',
+      },
+    ],
   },
 
   // Redirects for legacy URLs
