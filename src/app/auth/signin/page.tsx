@@ -1,5 +1,6 @@
 'use client'
 
+// Updated: 2025-11-03 - Force rebuild with magic link auth
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
