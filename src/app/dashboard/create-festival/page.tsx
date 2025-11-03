@@ -538,35 +538,35 @@ export default function CreateFestivalPage() {
 
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto px-4 py-6 sm:py-8 max-w-4xl">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Create New Festival</h1>
-        <p className="text-gray-600">Set up your festival in just a few steps</p>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Create New Festival</h1>
+        <p className="text-sm sm:text-base text-gray-600">Set up your festival in just a few steps</p>
       </div>
 
       {/* Progress Steps */}
-      <div className="mb-12">
-        <div className="grid grid-cols-3 gap-8 max-w-4xl mx-auto">
+      <div className="mb-8 sm:mb-12">
+        <div className="grid grid-cols-3 gap-3 sm:gap-8 max-w-4xl mx-auto">
           {steps.map((step, index) => (
             <div key={step.id} className="text-center">
-              <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center ${
+              <div className={`w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 sm:mb-4 rounded-2xl flex items-center justify-center ${
                 index <= currentStepIndex 
                   ? 'bg-blue-600 text-white shadow-lg' 
                   : 'bg-gray-100 text-gray-400 border-2 border-gray-200'
               } transition-all duration-200`}>
                 {index < currentStepIndex ? (
-                  <Check className="w-8 h-8" />
+                  <Check className="w-5 h-5 sm:w-8 sm:h-8" />
                 ) : (
-                  <span className="text-2xl font-bold">{index + 1}</span>
+                  <span className="text-lg sm:text-2xl font-bold">{index + 1}</span>
                 )}
               </div>
-              <h3 className={`text-lg font-semibold mb-2 ${
+              <h3 className={`text-sm sm:text-lg font-semibold mb-1 sm:mb-2 ${
                 index <= currentStepIndex ? 'text-gray-900' : 'text-gray-500'
               }`}>
                 {step.title}
               </h3>
-              <p className="text-sm text-gray-500 leading-relaxed max-w-xs mx-auto">
+              <p className="text-xs sm:text-sm text-gray-500 leading-relaxed max-w-xs mx-auto hidden sm:block">
                 {step.description}
               </p>
             </div>
@@ -574,7 +574,7 @@ export default function CreateFestivalPage() {
         </div>
         
         {/* Progress Bar */}
-        <div className="mt-8 max-w-2xl mx-auto">
+        <div className="mt-6 sm:mt-8 max-w-2xl mx-auto">
           <div className="bg-gray-200 rounded-full h-2 overflow-hidden">
             <div 
               className="bg-blue-600 h-full rounded-full transition-all duration-300 ease-in-out"
@@ -586,8 +586,8 @@ export default function CreateFestivalPage() {
 
       {/* Step Content */}
       <Card>
-        <CardHeader>
-          <CardTitle>{steps[currentStepIndex].title}</CardTitle>
+        <CardHeader className="pb-4 sm:pb-6">
+          <CardTitle className="text-lg sm:text-xl">{steps[currentStepIndex].title}</CardTitle>
         </CardHeader>
         <CardContent>
           {currentStep === 'basic' && (
