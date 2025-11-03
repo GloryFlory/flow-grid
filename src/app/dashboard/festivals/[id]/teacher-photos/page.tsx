@@ -427,7 +427,7 @@ export default function FestivalTeacherPhotos() {
                               <div className="relative">
                                 <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg">
                                   <img 
-                                    src={photoUrl} 
+                                    src={`${photoUrl}?t=${Date.now()}`} 
                                     alt={teacher.name}
                                     className="w-full h-full object-cover"
                                   />
