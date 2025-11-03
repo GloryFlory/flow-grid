@@ -124,6 +124,9 @@ export function useConditionalPasskey({
         allowCredentials: options.allowCredentials?.map((cred) => ({
           ...cred,
           id: base64ToBuffer(cred.id as unknown as string),
+          // Remove transports to prevent Chrome from asking for Bluetooth/USB keys
+          // Platform authenticators (Touch ID/Face ID) don't need transports specified
+          transports: undefined,
         })),
       };
 
@@ -195,6 +198,9 @@ export function useConditionalPasskey({
         allowCredentials: options.allowCredentials?.map((cred) => ({
           ...cred,
           id: base64ToBuffer(cred.id as unknown as string),
+          // Remove transports to prevent Chrome from asking for Bluetooth/USB keys
+          // Platform authenticators (Touch ID/Face ID) don't need transports specified
+          transports: undefined,
         })),
       };
 
