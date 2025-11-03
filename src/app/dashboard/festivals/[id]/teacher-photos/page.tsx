@@ -244,25 +244,39 @@ export default function FestivalTeacherPhotos() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center space-x-4">
-              <Link href={`/dashboard/festivals/${festival.id}`}>
-                <Button variant="outline" size="sm">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Festival
-                </Button>
-              </Link>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Facilitator Info and Photos</h1>
-                <p className="text-gray-600">Manage facilitator profiles and photos for {festival.name}</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+          {/* Mobile: Back button on its own row */}
+          <div className="mb-3 sm:hidden">
+            <Link href={`/dashboard/festivals/${festival.id}`}>
+              <Button variant="outline" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Festival
+              </Button>
+            </Link>
+          </div>
+          
+          {/* Main header content */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+            <div className="flex items-start gap-4 min-w-0 flex-1">
+              <div className="hidden sm:block flex-shrink-0">
+                <Link href={`/dashboard/festivals/${festival.id}`}>
+                  <Button variant="outline" size="sm">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to Festival
+                  </Button>
+                </Link>
+              </div>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 break-words">Facilitator Info & Photos</h1>
+                <p className="text-sm sm:text-base text-gray-600 mt-1 hidden sm:block">Manage facilitator profiles for {festival.name}</p>
               </div>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-gray-600">
-                {teachersWithPhotos.length} of {teachers.length} facilitators have photos
+            
+            <div className="text-left sm:text-right flex-shrink-0">
+              <p className="text-xs sm:text-sm text-gray-600">
+                {teachersWithPhotos.length} of {teachers.length} have photos
               </p>
-              <div className="w-48 bg-gray-200 rounded-full h-2 mt-1">
+              <div className="w-full sm:w-48 bg-gray-200 rounded-full h-2 mt-1">
                 <div 
                   className="bg-green-600 h-2 rounded-full transition-all duration-300"
                   style={{ 
@@ -275,7 +289,7 @@ export default function FestivalTeacherPhotos() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Teachers & Photos Management */}
           <div className="lg:col-span-3 space-y-6">

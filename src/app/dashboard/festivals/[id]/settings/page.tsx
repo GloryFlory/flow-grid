@@ -126,25 +126,36 @@ export default function FestivalSettings() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-6">
-            <div className="flex items-center space-x-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+          {/* Mobile: Back button on its own row */}
+          <div className="mb-3 sm:hidden">
+            <Link href={`/dashboard/festivals/${festival.id}`}>
+              <Button variant="outline" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Festival
+              </Button>
+            </Link>
+          </div>
+          
+          {/* Main header content */}
+          <div className="flex items-start gap-4 min-w-0">
+            <div className="hidden sm:block flex-shrink-0">
               <Link href={`/dashboard/festivals/${festival.id}`}>
                 <Button variant="outline" size="sm">
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Back to Festival
                 </Button>
               </Link>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Festival Settings</h1>
-                <p className="text-gray-600">{festival.name}</p>
-              </div>
+            </div>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 break-words">Festival Settings</h1>
+              <p className="text-sm sm:text-base text-gray-600 mt-1 truncate">{festival.name}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Message Banner */}
         {message && (
           <div className={`mb-6 p-4 rounded-lg ${

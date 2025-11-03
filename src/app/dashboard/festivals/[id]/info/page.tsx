@@ -183,26 +183,40 @@ export default function FestivalInformation() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center space-x-4">
-              <Link href={`/dashboard/festivals/${festival.id}`}>
-                <Button variant="outline" size="sm">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Festival
-                </Button>
-              </Link>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Festival Information</h1>
-                <p className="text-gray-600">Basic details and settings for your festival</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+          {/* Mobile: Back button on its own row */}
+          <div className="mb-3 sm:hidden">
+            <Link href={`/dashboard/festivals/${festival.id}`}>
+              <Button variant="outline" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Festival
+              </Button>
+            </Link>
+          </div>
+          
+          {/* Desktop: Back button inline */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+            <div className="flex items-start gap-4 min-w-0 flex-1">
+              <div className="hidden sm:block flex-shrink-0">
+                <Link href={`/dashboard/festivals/${festival.id}`}>
+                  <Button variant="outline" size="sm">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to Festival
+                  </Button>
+                </Link>
+              </div>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 break-words">Festival Information</h1>
+                <p className="text-sm sm:text-base text-gray-600 mt-1">Basic details and settings</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
               {festival.isPublished && (
                 <Link href={`/${festival.slug}/schedule`} target="_blank">
-                  <Button variant="outline">
-                    <Eye className="w-4 h-4 mr-2" />
-                    View Public Schedule
+                  <Button variant="outline" size="sm">
+                    <Eye className="w-4 h-4 sm:mr-2" />
+                    <span className="hidden sm:inline">View</span>
                   </Button>
                 </Link>
               )}
@@ -210,16 +224,18 @@ export default function FestivalInformation() {
                 onClick={saveFestival} 
                 disabled={!hasChanges || isSaving}
                 className="bg-blue-600 hover:bg-blue-700"
+                size="sm"
               >
-                <Save className="w-4 h-4 mr-2" />
-                {isSaving ? 'Saving...' : 'Save Changes'}
+                <Save className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">{isSaving ? 'Saving...' : 'Save Changes'}</span>
+                <span className="sm:hidden">{isSaving ? '...' : 'Save'}</span>
               </Button>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Form */}
           <div className="lg:col-span-2 space-y-6">
@@ -250,8 +266,9 @@ export default function FestivalInformation() {
                     URL Slug *
                   </label>
                   <div className="flex items-center">
-                    <span className="inline-flex items-center px-3 py-2 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-                      tryflowgrid.com/
+                    <span className="inline-flex items-center px-2 sm:px-3 py-2 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-xs sm:text-sm whitespace-nowrap">
+                      <span className="hidden sm:inline">tryflowgrid.com/</span>
+                      <span className="sm:hidden">...com/</span>
                     </span>
                     <input
                       type="text"

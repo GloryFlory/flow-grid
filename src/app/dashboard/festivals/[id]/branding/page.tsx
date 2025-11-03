@@ -195,31 +195,47 @@ export default function FestivalBranding() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center space-x-4">
-              <Link href={`/dashboard/festivals/${festival.id}`}>
-                <Button variant="outline" size="sm">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Festival
-                </Button>
-              </Link>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Festival Branding</h1>
-                <p className="text-gray-600">Customize logo and brand colors for {festival.name}</p>
-              </div>
-            </div>
-            <Link href={`/${festival.slug}/schedule`} target="_blank">
-              <Button variant="outline">
-                <Eye className="w-4 h-4 mr-2" />
-                Preview Schedule
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+          {/* Mobile: Back button on its own row */}
+          <div className="mb-3 sm:hidden">
+            <Link href={`/dashboard/festivals/${festival.id}`}>
+              <Button variant="outline" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Festival
               </Button>
             </Link>
+          </div>
+          
+          {/* Main header content */}
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-3">
+            <div className="flex items-start gap-4 min-w-0 flex-1">
+              <div className="hidden sm:block flex-shrink-0">
+                <Link href={`/dashboard/festivals/${festival.id}`}>
+                  <Button variant="outline" size="sm">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to Festival
+                  </Button>
+                </Link>
+              </div>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 break-words">Festival Branding</h1>
+                <p className="text-sm sm:text-base text-gray-600 mt-1 truncate">Customize logo and colors</p>
+              </div>
+            </div>
+            
+            <div className="flex-shrink-0">
+              <Link href={`/${festival.slug}/schedule`} target="_blank">
+                <Button variant="outline" size="sm">
+                  <Eye className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Preview Schedule</span>
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Logo Upload & Color Customization */}
           <div className="space-y-6">
