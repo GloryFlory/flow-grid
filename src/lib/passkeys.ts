@@ -35,7 +35,6 @@ export const conditionalMediationAvailable = async (): Promise<boolean> => {
   if (!('PublicKeyCredential' in window)) return false;
   
   try {
-    // @ts-expect-error - experimental API not in all TypeScript defs yet
     const available = await PublicKeyCredential.isConditionalMediationAvailable?.();
     return Boolean(available);
   } catch {
