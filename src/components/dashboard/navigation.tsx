@@ -10,7 +10,8 @@ import {
   Settings, 
   LogOut,
   User,
-  BarChart3
+  BarChart3,
+  Shield
 } from 'lucide-react'
 import Image from 'next/image'
 
@@ -24,6 +25,13 @@ export function DashboardNavigation() {
     { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
   ]
+
+  // Add Platform link for admins
+  const adminNavigation = session?.user?.role === 'ADMIN' 
+    ? [{ name: 'Platform', href: '/dashboard/platform', icon: Shield }]
+    : []
+
+  const allNavigation = [...navigation, ...adminNavigation]
 
   return (
     <div className="bg-white shadow-sm border-b">
@@ -45,7 +53,7 @@ export function DashboardNavigation() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            {navigation.map((item) => {
+            {allNavigation.map((item) => {
               const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
               return (
                 <Link
@@ -97,8 +105,8 @@ export function DashboardNavigation() {
       {/* Mobile Navigation */}
       <div className="md:hidden border-t bg-gray-50">
         <div className="px-2 py-2">
-          <div className="grid grid-cols-4 gap-1">
-            {navigation.map((item) => {
+          <div className={`grid ${allNavigation.length > 4 ? 'grid-cols-5' : 'grid-cols-4'} gap-1`}>
+            {allNavigation.map((item) => {
               const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
               return (
                 <Link

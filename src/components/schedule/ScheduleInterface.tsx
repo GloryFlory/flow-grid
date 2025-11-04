@@ -1,5 +1,6 @@
 'use client'
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
+import { Share2, Link as LinkIcon, Facebook, Twitter, Check } from 'lucide-react'
 import { SessionCard } from './SessionCard'
 import { FilterBar } from './FilterBar'
 import { ScheduleTabs } from './ScheduleTabs'
@@ -82,6 +83,87 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
   const [teacherFilter, setTeacherFilter] = useState('')
   const [selectedSession, setSelectedSession] = useState<Session | null>(null)
   const [activeDay, setActiveDay] = useState('All Days')
+  const [showShareMenu, setShowShareMenu] = useState(false)
+  const [copiedLink, setCopiedLink] = useState(false)
+
+  // Track schedule view on mount
+  useEffect(() => {
+    const trackView = async () => {
+      try {
+        await fetch('/api/track/view', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            festivalId: festival.id
+          })
+        })
+      } catch (error) {
+        console.error('Failed to track view:', error)
+      }
+    }
+
+    trackView()
+  }, [festival.id])
+
+  // Share functionality
+  const scheduleUrl = typeof window !== 'undefined' 
+    ? window.location.href 
+    : `https://tryflowgrid.com/${festival.slug}/schedule`
+
+  const handleShare = async (method: string) => {
+    // Track the share event
+    try {
+      await fetch('/api/track/share', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          festivalId: festival.id,
+          method
+        })
+      })
+    } catch (error) {
+      console.error('Failed to track share:', error)
+    }
+
+    // Perform the share action
+    if (method === 'copy') {
+      try {
+        await navigator.clipboard.writeText(scheduleUrl)
+        setCopiedLink(true)
+        setTimeout(() => setCopiedLink(false), 2000)
+      } catch (error) {
+        console.error('Failed to copy link:', error)
+      }
+    } else if (method === 'native') {
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: festival.name,
+            text: festival.description || `Check out the schedule for ${festival.name}!`,
+            url: scheduleUrl
+          })
+        } catch (error) {
+          // User cancelled or error occurred
+          console.log('Share cancelled or failed:', error)
+        }
+      }
+    } else if (method === 'facebook') {
+      window.open(
+        `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(scheduleUrl)}`,
+        '_blank',
+        'width=600,height=400'
+      )
+    } else if (method === 'twitter') {
+      const text = `Check out the schedule for ${festival.name}!`
+      window.open(
+        `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(scheduleUrl)}`,
+        '_blank',
+        'width=600,height=400'
+      )
+    }
+
+    setShowShareMenu(false)
+  }
 
   // Generate day order based on festival dates
   const festivalDayOrder = useMemo(() => {
@@ -219,6 +301,72 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
           </div>
           <div className="header-info">
             <p>{formatDateRange(festival.startDate, festival.endDate)}</p>
+            
+            {/* Share Button */}
+            <div className="relative">
+              <button
+                onClick={() => setShowShareMenu(!showShareMenu)}
+                className="share-button"
+                aria-label="Share schedule"
+              >
+                <Share2 className="w-5 h-5" />
+                <span className="ml-2 hidden sm:inline">Share</span>
+              </button>
+
+              {/* Share Menu Dropdown */}
+              {showShareMenu && (
+                <div className="share-menu">
+                  <div className="share-menu-content">
+                    {/* Native Share (mobile) */}
+                    {typeof window !== 'undefined' && 'share' in navigator && (
+                      <button
+                        onClick={() => handleShare('native')}
+                        className="share-option"
+                      >
+                        <Share2 className="w-4 h-4" />
+                        <span>Share...</span>
+                      </button>
+                    )}
+
+                    {/* Copy Link */}
+                    <button
+                      onClick={() => handleShare('copy')}
+                      className="share-option"
+                    >
+                      {copiedLink ? (
+                        <>
+                          <Check className="w-4 h-4 text-green-600" />
+                          <span className="text-green-600">Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <LinkIcon className="w-4 h-4" />
+                          <span>Copy Link</span>
+                        </>
+                      )}
+                    </button>
+
+                    {/* Facebook */}
+                    <button
+                      onClick={() => handleShare('facebook')}
+                      className="share-option"
+                    >
+                      <Facebook className="w-4 h-4" />
+                      <span>Facebook</span>
+                    </button>
+
+                    {/* Twitter */}
+                    <button
+                      onClick={() => handleShare('twitter')}
+                      className="share-option"
+                    >
+                      <Twitter className="w-4 h-4" />
+                      <span>Twitter</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>
