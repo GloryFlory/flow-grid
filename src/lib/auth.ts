@@ -193,22 +193,39 @@ export const authOptions: NextAuthOptions = {
       return true
     },
   async session({ session, token }) {
-      // Include user ID in session from JWT token
-      if (session?.user && token?.sub) {
-        (session.user as any).id = token.sub
+      // Include user ID and role in session from JWT token
+      if (session?.user && token) {
+        (session.user as any).id = token.sub || token.uid;
+        (session.user as any).role = token.role;
       }
-      return session
+      return session;
     },
-  async jwt({ token, user }) {
-      // Persist the user ID to the token right after signin
+  async jwt({ token, user, trigger }) {
+      // Persist the user ID and role to the token right after signin
       if (user) {
-        token.sub = user.id
+        // Don't overwrite sub - it's managed by NextAuth
+        token.uid = user.id;
         if (user.email) {
           token.email = normalizeEmail(user.email);
         }
+        // Fetch role from database
+        const dbUser = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { role: true }
+        });
+        token.role = dbUser?.role || 'USER';
       }
       
-      return token
+      // Refresh role from database if session is updated
+      if (trigger === 'update' && token.uid) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.uid as string },
+          select: { role: true }
+        });
+        token.role = dbUser?.role || 'USER';
+      }
+      
+      return token;
     },
   },
   pages: {
