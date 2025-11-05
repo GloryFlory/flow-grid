@@ -21,8 +21,8 @@ export async function GET(
       where: {
         festivalId: festivalId
       },
-      // Don't order by day alphabetically - sessions page will handle proper ordering
       orderBy: [
+        { displayOrder: 'asc' },
         { startTime: 'asc' }
       ]
     })
@@ -49,13 +49,27 @@ export async function POST(
     const data = await request.json()
 
     // Validate required fields
-    if (!data.title || !data.day || !data.startTime || !data.endTime || !data.teachers || !data.levels || !data.styles) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    const missingFields = []
+    if (!data.title) missingFields.push('title')
+    if (!data.day) missingFields.push('day')
+    if (!data.startTime) missingFields.push('startTime')
+    if (!data.endTime) missingFields.push('endTime')
+    if (!data.teachers) missingFields.push('teachers')
+    if (!data.levels) missingFields.push('levels')
+    if (!data.styles) missingFields.push('styles')
+    
+    if (missingFields.length > 0) {
+      return NextResponse.json({ 
+        error: `Missing required fields: ${missingFields.join(', ')}` 
+      }, { status: 400 })
     }
 
     // Convert comma-separated strings to arrays
     const teachersArray = data.teachers.split(',').map((t: string) => t.trim()).filter(Boolean)
     const stylesArray = data.styles.split(',').map((s: string) => s.trim()).filter(Boolean)
+
+    // Parse displayOrder as decimal (optional, defaults to 0)
+    const displayOrder = data.displayOrder ? parseFloat(data.displayOrder) : 0
 
     // Create new session
     const newSession = await prisma.festivalSession.create({
@@ -73,7 +87,8 @@ export async function POST(
         capacity: data.capacity ? parseInt(data.capacity) : null,
         teachers: teachersArray,
         teacherBios: [], // Initialize empty
-        cardType: data.cardType || 'full'
+        cardType: data.cardType || 'full',
+        displayOrder: displayOrder
       }
     })
 

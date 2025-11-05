@@ -17,6 +17,7 @@ interface Session {
   capacity?: number
   prerequisites?: string
   cardType: 'detailed' | 'minimal' | 'photo'
+  displayOrder?: number
 }
 
 interface SessionEditModalProps {
@@ -78,7 +79,8 @@ export default function SessionEditModal({
     location: '',
     capacity: undefined,
     prerequisites: '',
-    cardType: 'detailed'
+    cardType: 'detailed',
+    displayOrder: undefined
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})

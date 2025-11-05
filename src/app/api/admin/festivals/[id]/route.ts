@@ -88,6 +88,10 @@ export async function PATCH(
     if (body.endDate !== undefined) updateData.endDate = new Date(body.endDate)
     if (body.timezone !== undefined) updateData.timezone = body.timezone
     if (body.isPublished !== undefined) updateData.isPublished = body.isPublished
+    if (body.whatsappLink !== undefined) updateData.whatsappLink = body.whatsappLink
+    if (body.telegramLink !== undefined) updateData.telegramLink = body.telegramLink
+    if (body.facebookLink !== undefined) updateData.facebookLink = body.facebookLink
+    if (body.instagramLink !== undefined) updateData.instagramLink = body.instagramLink
 
     const festival = await prisma.festival.update({
       where: {

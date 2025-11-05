@@ -18,13 +18,27 @@ export async function PUT(
     const data = await request.json()
 
     // Validate required fields
-    if (!data.title || !data.day || !data.startTime || !data.endTime || !data.teachers || !data.levels || !data.styles) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    const missingFields = []
+    if (!data.title) missingFields.push('title')
+    if (!data.day) missingFields.push('day')
+    if (!data.startTime) missingFields.push('startTime')
+    if (!data.endTime) missingFields.push('endTime')
+    if (!data.teachers) missingFields.push('teachers')
+    if (!data.levels) missingFields.push('levels')
+    if (!data.styles) missingFields.push('styles')
+    
+    if (missingFields.length > 0) {
+      return NextResponse.json({ 
+        error: `Missing required fields: ${missingFields.join(', ')}` 
+      }, { status: 400 })
     }
 
     // Convert comma-separated strings to arrays
     const teachersArray = data.teachers.split(',').map((t: string) => t.trim()).filter(Boolean)
     const stylesArray = data.styles.split(',').map((s: string) => s.trim()).filter(Boolean)
+
+    // Parse displayOrder as decimal (optional, keep existing if not provided)
+    const displayOrder = data.displayOrder !== undefined ? parseFloat(data.displayOrder) : undefined
 
     // Update the session
     const updatedSession = await prisma.festivalSession.update({
@@ -44,7 +58,8 @@ export async function PUT(
         prerequisites: data.prerequisites || null,
         capacity: data.capacity ? parseInt(data.capacity) : null,
         teachers: teachersArray,
-        cardType: data.cardType || 'full'
+        cardType: data.cardType || 'full',
+        ...(displayOrder !== undefined && { displayOrder })
       }
     })
 

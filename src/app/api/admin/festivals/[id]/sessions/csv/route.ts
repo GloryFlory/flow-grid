@@ -144,7 +144,8 @@ export async function POST(
       return result
     }
     
-    for (const line of dataLines) {
+    for (let rowIndex = 0; rowIndex < dataLines.length; rowIndex++) {
+      const line = dataLines[rowIndex]
       const fields = parseCSVLine(line)
       
       if (fields.length < 10) continue // Skip invalid rows
@@ -180,6 +181,7 @@ export async function POST(
           if (['detailed', 'full'].includes(cleanCardType)) return 'full'
           return 'full' // default
         })(),
+        displayOrder: rowIndex + 1, // Auto-assign row number as display order (1, 2, 3...)
         festivalId
       })
     }
