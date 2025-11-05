@@ -86,6 +86,22 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
   const [showShareMenu, setShowShareMenu] = useState(false)
   const [copiedLink, setCopiedLink] = useState(false)
 
+  // Smart day detection: Set active day to today if festival is currently running
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD format
+    const festivalStart = new Date(festival.startDate).toISOString().split('T')[0]
+    const festivalEnd = new Date(festival.endDate).toISOString().split('T')[0]
+    
+    // Check if today is within festival dates
+    if (today >= festivalStart && today <= festivalEnd) {
+      // Find the matching day in sessions
+      const todayDay = sessions.find(s => s.day === today)
+      if (todayDay) {
+        setActiveDay(today)
+      }
+    }
+  }, [festival.startDate, festival.endDate, sessions])
+
   // Track schedule view on mount
   useEffect(() => {
     const trackView = async () => {
