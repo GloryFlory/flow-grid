@@ -344,7 +344,7 @@ export default function FestivalTeacherPhotos() {
                     <li>• Name files with teacher names for auto-matching</li>
                     <li>• Supported formats: JPG, PNG, WebP</li>
                     <li>• Recommended size: 400x400px minimum</li>
-                    <li>• Max file size: 5MB per photo</li>
+                    <li>• Max file size: 20MB per photo</li>
                   </ul>
                 </div>
               </CardContent>
