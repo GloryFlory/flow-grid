@@ -100,9 +100,9 @@ export default function TeacherModal({ open, onClose, onSave, initial }: Teacher
     setError('');
     
     if (file) {
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setError('Image must be less than 5MB');
+      // Validate file size (max 20MB)
+      if (file.size > 20 * 1024 * 1024) {
+        setError('Image must be less than 20MB');
         return;
       }
       
@@ -352,7 +352,7 @@ export default function TeacherModal({ open, onClose, onSave, initial }: Teacher
                     disabled={isSubmitting}
                   />
                   <p className="text-xs text-gray-500 mt-1.5">
-                    JPG, PNG or WEBP. Max 5MB. Photo will be displayed in a circle.
+                    JPG, PNG or WEBP. Max 20MB. Photo will be displayed in a circle.
                   </p>
                 </div>
               </div>

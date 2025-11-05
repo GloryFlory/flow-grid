@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate file size (10MB max)
-    const maxSize = 10 * 1024 * 1024 // 10MB
+    const maxSize = 20 * 1024 * 1024 // 20MB
     if (file.size > maxSize) {
       return NextResponse.json(
         { error: 'File size must be less than 10MB' },
