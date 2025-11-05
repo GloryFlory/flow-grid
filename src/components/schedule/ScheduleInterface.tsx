@@ -105,6 +105,26 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
     trackView()
   }, [festival.id])
 
+  // Handle session click with tracking
+  const handleSessionClick = async (session: Session) => {
+    setSelectedSession(session)
+    
+    // Track the session click
+    try {
+      await fetch('/api/track/session-click', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          festivalId: festival.id,
+          sessionId: session.id,
+          sessionTitle: session.title
+        })
+      })
+    } catch (error) {
+      console.error('Failed to track session click:', error)
+    }
+  }
+
   // Share functionality
   const scheduleUrl = typeof window !== 'undefined' 
     ? window.location.href 
@@ -426,7 +446,7 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
                       <SessionCard
                         key={session.id}
                         session={session}
-                        onClick={setSelectedSession}
+                        onClick={handleSessionClick}
                         onStyleClick={setStyleFilter}
                         onLevelClick={setLevelFilter}
                       />
@@ -446,7 +466,7 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
                   <SessionCard
                     key={session.id}
                     session={session}
-                    onClick={setSelectedSession}
+                    onClick={handleSessionClick}
                     onStyleClick={setStyleFilter}
                     onLevelClick={setLevelFilter}
                   />

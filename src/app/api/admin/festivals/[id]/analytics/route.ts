@@ -86,13 +86,13 @@ export async function GET(
       .slice(0, 3)
       .map(([title, clicks]) => ({ title, clicks }))
 
-    // Calculate average session time (placeholder for now - would need start/end tracking)
-    const avgSessionTime = '2:34'
+    // Total session clicks
+    const totalSessionClicks = sessionClickEvents.length
 
     return NextResponse.json({
       totalViews,
       uniqueVisitors: uniqueDeviceIds.size,
-      avgSessionTime,
+      totalSessionClicks,
       topSessions,
     })
   } catch (error) {

@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { ArrowLeft, BarChart3, Eye, Users, Clock, TrendingUp } from 'lucide-react'
+import { ArrowLeft, BarChart3, Eye, Users, TrendingUp } from 'lucide-react'
 
 interface Festival {
   id: string
@@ -16,7 +16,7 @@ interface Festival {
 interface AnalyticsData {
   totalViews: number
   uniqueVisitors: number
-  avgSessionTime: string
+  totalSessionClicks: number
   topSessions: Array<{
     title: string
     clicks: number
@@ -57,7 +57,7 @@ export default function FestivalAnalytics() {
         setAnalytics({
           totalViews: 0,
           uniqueVisitors: 0,
-          avgSessionTime: '0:00',
+          totalSessionClicks: 0,
           topSessions: []
         })
       }
@@ -66,7 +66,7 @@ export default function FestivalAnalytics() {
       setAnalytics({
         totalViews: 0,
         uniqueVisitors: 0,
-        avgSessionTime: '0:00',
+        totalSessionClicks: 0,
         topSessions: []
       })
     } finally {
@@ -155,11 +155,11 @@ export default function FestivalAnalytics() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Avg. Time</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">{analytics?.avgSessionTime || '0:00'}</p>
+                  <p className="text-sm font-medium text-gray-600">Session Clicks</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-2">{analytics?.totalSessionClicks || 0}</p>
                 </div>
-                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-orange-600" />
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <BarChart3 className="w-6 h-6 text-purple-600" />
                 </div>
               </div>
             </CardContent>
