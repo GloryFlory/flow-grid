@@ -15,37 +15,22 @@ export async function GET(
       )
     }
 
-    // Get teachers that are used in this festival's sessions
-    const sessions = await prisma.festivalSession.findMany({
+    // Get teachers for this festival with their photos
+    const teachers = await prisma.teacher.findMany({
       where: {
         festivalId: festivalId
       },
-      select: {
-        teachers: true
+      include: {
+        photos: {
+          orderBy: {
+            createdAt: 'desc'
+          }
+        }
       }
     })
 
-    // Get all unique teacher names for this festival
-    const festivalTeachers = new Set<string>()
-    sessions.forEach(session => {
-      session.teachers.forEach(teacher => {
-        if (teacher) {
-          festivalTeachers.add(teacher)
-        }
-      })
-    })
-
-    // Get photos for teachers who are in this festival (using old teacherName field)
-    const photos = await prisma.teacherPhoto.findMany({
-      where: {
-        teacherName: {
-          in: Array.from(festivalTeachers)
-        }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
-    })
+    // Flatten photos from all teachers (only for this festival)
+    const photos = teachers.flatMap(teacher => teacher.photos)
 
     return NextResponse.json(
       { photos },
@@ -112,10 +97,28 @@ export async function POST(
       // In production, you'd upload to Supabase Storage here
       
       try {
+        // Find or create teacher for this festival
+        let teacher = await prisma.teacher.findFirst({
+          where: {
+            festivalId,
+            name: teacherName
+          }
+        })
+
+        if (!teacher) {
+          teacher = await prisma.teacher.create({
+            data: {
+              festivalId,
+              name: teacherName
+            }
+          })
+        }
+
         const photo = await prisma.teacherPhoto.create({
           data: {
             filename,
-            teacherName,
+            teacherName,     // Keep for backward compatibility
+            teacherId: teacher.id,  // NEW: Link to specific teacher
             filePath,
             fileSize: file.size,
             mimeType: file.type,

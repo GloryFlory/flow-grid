@@ -147,26 +147,30 @@ model Subscription {
 model TeacherPhoto {
   id          String   @id @default(cuid())
   filename    String   @unique
-  teacherName String
+  teacherName String   // Legacy: kept for backward compatibility
+  teacherId   String?  // New: link to Teacher record
   filePath    String
   fileSize    Int
   mimeType    String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  teacher     Teacher? @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
   @@map("teacher_photos")
 }
 
 model Teacher {
-  id         String   @id @default(cuid())
+  id         String          @id @default(cuid())
   festivalId String
   name       String
   url        String?
-  isGroup    Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  isGroup    Boolean         @default(false)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
 
-  festival   Festival @relation(fields: [festivalId], references: [id], onDelete: Cascade)
+  festival   Festival        @relation(fields: [festivalId], references: [id], onDelete: Cascade)
+  photos     TeacherPhoto[]
 
   @@unique([festivalId, name])
   @@map("teachers")

@@ -47,6 +47,19 @@ export async function GET(
           orderBy: [
             { startTime: 'asc' }
           ]
+        },
+        teachers: {
+          select: {
+            id: true,
+            name: true,
+            url: true,
+            photos: {
+              select: {
+                filePath: true
+              },
+              take: 1 // Only get the first photo per teacher
+            }
+          }
         }
       }
     })
@@ -58,18 +71,16 @@ export async function GET(
       )
     }
 
-    // Get all teacher photos and URLs for efficient lookup
-    const teacherPhotos = await prisma.teacherPhoto.findMany()
-    const teacherPhotoMap = teacherPhotos.reduce((acc: Record<string, string>, photo) => {
-      acc[photo.teacherName.toLowerCase().trim()] = photo.filePath
+    // Create maps for ONLY this festival's teachers (privacy fix!)
+    const teacherPhotoMap = festival.teachers.reduce((acc: Record<string, string>, teacher) => {
+      const teacherKey = teacher.name.toLowerCase().trim()
+      if (teacher.photos && teacher.photos.length > 0) {
+        acc[teacherKey] = teacher.photos[0].filePath
+      }
       return acc
     }, {})
 
-    // Get all teachers for this festival with their URLs
-    const teachers = await prisma.teacher.findMany({
-      where: { festivalId: festival.id }
-    })
-    const teacherUrlMap = teachers.reduce((acc: Record<string, string | null>, teacher) => {
+    const teacherUrlMap = festival.teachers.reduce((acc: Record<string, string | null>, teacher) => {
       acc[teacher.name.toLowerCase().trim()] = teacher.url
       return acc
     }, {})
