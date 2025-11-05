@@ -149,17 +149,7 @@ export default function SessionEditModal({
       newErrors.endTime = 'End time must be after start time'
     }
 
-    if (!formData.teachers.trim()) {
-      newErrors.teachers = 'At least one facilitator is required'
-    }
-
-    if (!formData.levels.trim()) {
-      newErrors.levels = 'Level is required'
-    }
-
-    if (!formData.styles.trim()) {
-      newErrors.styles = 'Style is required'
-    }
+    // Teachers, levels, and styles are now optional - removed validation
 
     if (formData.capacity && formData.capacity < 1) {
       newErrors.capacity = 'Capacity must be at least 1'
@@ -329,23 +319,15 @@ export default function SessionEditModal({
               {/* Teachers */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Presenters / Facilitators *
+                  Presenters / Facilitators
                 </label>
                 <input
                   type="text"
                   value={formData.teachers}
                   onChange={(e) => handleInputChange('teachers', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                    errors.teachers ? 'border-red-300' : 'border-gray-300'
-                  }`}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="e.g., John Smith, Jane Doe"
                 />
-                {errors.teachers && (
-                  <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.teachers}
-                  </p>
-                )}
                 <p className="text-xs text-gray-500 mt-1">
                   Separate multiple presenters with commas
                 </p>
@@ -357,23 +339,15 @@ export default function SessionEditModal({
               {/* Levels */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Levels *
+                  Levels
                 </label>
                 <input
                   type="text"
                   value={formData.levels}
                   onChange={(e) => handleInputChange('levels', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                    errors.levels ? 'border-red-300' : 'border-gray-300'
-                  }`}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="e.g., Beginner, Intermediate"
                 />
-                {errors.levels && (
-                  <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.levels}
-                  </p>
-                )}
                 <div className="flex flex-wrap gap-1 mt-2">
                   {LEVEL_OPTIONS.map(level => (
                     <button
@@ -392,23 +366,15 @@ export default function SessionEditModal({
               {/* Styles */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Styles *
+                  Styles
                 </label>
                 <input
                   type="text"
                   value={formData.styles}
                   onChange={(e) => handleInputChange('styles', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                    errors.styles ? 'border-red-300' : 'border-gray-300'
-                  }`}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="e.g., Workshop, Acro Yoga, Social Dance (separate multiple with commas)"
                 />
-                {errors.styles && (
-                  <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.styles}
-                  </p>
-                )}
                 <p className="text-xs text-gray-500 mt-1">
                   Add any session types or activities - separate multiple with commas
                 </p>
@@ -519,7 +485,7 @@ export default function SessionEditModal({
         {/* Footer */}
         <div className="flex items-center justify-between p-6 bg-gray-50 border-t border-gray-200">
           <div className="text-sm text-gray-600">
-            * Required fields
+            * Required fields: Title, Day, Start Time, End Time
           </div>
           <div className="flex gap-3">
             <Button
