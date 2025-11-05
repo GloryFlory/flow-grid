@@ -158,18 +158,29 @@ export default function FestivalTeacherPhotos() {
       const response = await fetch(`/api/admin/festivals/${festivalId}/teacher-photos`, {
         method: 'POST',
         body: formData,
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
       })
 
       if (response.ok) {
         const data = await response.json()
-        setPhotos(prev => [...prev, ...data.photos])
         setSelectedFiles(null)
-        fetchTeachers() // Refresh teacher status
         
         // Reset file input
         if (fileInputRef.current) {
           fileInputRef.current.value = ''
         }
+        
+        // Force refresh with no-cache
+        await Promise.all([
+          fetch(`/api/admin/festivals/${festivalId}/teachers`, {
+            headers: { 'Cache-Control': 'no-cache' }
+          }).then(r => r.ok && r.json()).then(data => setTeachers(data.teachers || [])),
+          fetch(`/api/admin/festivals/${festivalId}/teacher-photos`, {
+            headers: { 'Cache-Control': 'no-cache' }
+          }).then(r => r.ok && r.json()).then(data => setPhotos(data.photos || []))
+        ])
       }
     } catch (error) {
       console.error('Error uploading photos:', error)
@@ -179,14 +190,26 @@ export default function FestivalTeacherPhotos() {
   }
 
   const deletePhoto = async (photoId: string) => {
+    if (!confirm('Are you sure you want to delete this photo?')) return
+    
     try {
       const response = await fetch(`/api/admin/teacher-photos/${photoId}`, {
         method: 'DELETE',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
       })
 
       if (response.ok) {
-        setPhotos(prev => prev.filter(p => p.id !== photoId))
-        fetchTeachers() // Refresh teacher status
+        // Force refresh with no-cache
+        await Promise.all([
+          fetch(`/api/admin/festivals/${festivalId}/teachers`, {
+            headers: { 'Cache-Control': 'no-cache' }
+          }).then(r => r.ok && r.json()).then(data => setTeachers(data.teachers || [])),
+          fetch(`/api/admin/festivals/${festivalId}/teacher-photos`, {
+            headers: { 'Cache-Control': 'no-cache' }
+          }).then(r => r.ok && r.json()).then(data => setPhotos(data.photos || []))
+        ])
       } else {
         console.error('Failed to delete photo:', await response.text())
         alert('Failed to delete photo')
@@ -440,7 +463,8 @@ export default function FestivalTeacherPhotos() {
                       // ONLY get photo from teacherRecord.photos (festival-scoped)
                       // DO NOT fallback to global teacherName lookup
                       const teacherPhoto = teacher.teacherRecord?.photos?.[0]
-                      const photoUrl = teacherPhoto?.filePath
+                      // Add timestamp for cache busting
+                      const photoUrl = teacherPhoto?.filePath ? `${teacherPhoto.filePath}?v=${teacherPhoto.id.slice(-8)}` : null
                       
                       return (
                         <div key={teacher.name} className="bg-green-50 rounded-lg border border-green-100 overflow-hidden">
@@ -450,9 +474,10 @@ export default function FestivalTeacherPhotos() {
                               <div className="relative">
                                 <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg">
                                   <img 
-                                    src={`${photoUrl}?t=${Date.now()}`} 
+                                    src={photoUrl}
                                     alt={teacher.name}
                                     className="w-full h-full object-cover"
+                                    key={photoUrl} // Force re-render when URL changes
                                   />
                                 </div>
                                 <div className="absolute top-0 right-0 flex gap-1">
@@ -557,14 +582,28 @@ export default function FestivalTeacherPhotos() {
               ? `/api/admin/teachers/${editingTeacher.teacherRecord.id}` 
               : '/api/admin/teachers'
             
-            const res = await fetch(path, { method, body: fd })
+            const res = await fetch(path, { 
+              method, 
+              body: fd,
+              // Force no-cache to prevent stale data
+              headers: {
+                'Cache-Control': 'no-cache'
+              }
+            })
             
             if (res.ok) {
               setModalOpen(false)
               setEditingTeacher(null)
-              // Refresh data
-              fetchTeachers()
-              fetchPhotos()
+              
+              // Force refresh with no-cache headers
+              await Promise.all([
+                fetch(`/api/admin/festivals/${festivalId}/teachers`, {
+                  headers: { 'Cache-Control': 'no-cache' }
+                }).then(r => r.ok && r.json()).then(data => setTeachers(data.teachers || [])),
+                fetch(`/api/admin/festivals/${festivalId}/teacher-photos`, {
+                  headers: { 'Cache-Control': 'no-cache' }
+                }).then(r => r.ok && r.json()).then(data => setPhotos(data.photos || []))
+              ])
             } else {
               const errorData = await res.json()
               const errorMessage = errorData.error || 'Unknown error occurred'
