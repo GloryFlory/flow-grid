@@ -38,27 +38,24 @@ export async function GET(
       })
     })
 
-    // Get ALL facilitator records for this festival
+    // Get ALL facilitator records for this festival WITH their photos
     const allFacilitatorRecords = await prisma.teacher.findMany({
       where: {
         festivalId: festivalId
+      },
+      include: {
+        photos: true // Get photos linked to this teacher
       },
       orderBy: {
         name: 'asc'
       }
     })
 
-    // Get all photos
-    const allPhotos = await prisma.teacherPhoto.findMany()
-
-    // Create photo map (case-insensitive)
-    const photoMap = new Map<string, typeof allPhotos[0][]>()
-    allPhotos.forEach(photo => {
-      const key = photo.teacherName.toLowerCase().trim()
-      if (!photoMap.has(key)) {
-        photoMap.set(key, [])
-      }
-      photoMap.get(key)!.push(photo)
+    // Create photo map from teacher records (festival-scoped only!)
+    const photoMap = new Map<string, typeof allFacilitatorRecords[0]['photos']>()
+    allFacilitatorRecords.forEach(record => {
+      const key = record.name.toLowerCase().trim()
+      photoMap.set(key, record.photos)
     })
 
     // Create a map of existing facilitator records by name (case-insensitive)

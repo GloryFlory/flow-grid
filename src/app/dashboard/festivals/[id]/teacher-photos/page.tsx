@@ -17,7 +17,8 @@ import {
   Edit,
   Link as LinkIcon,
   Users,
-  User as UserIcon
+  User as UserIcon,
+  Eye
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -294,7 +295,7 @@ export default function FestivalTeacherPhotos() {
           {/* Teachers & Photos Management */}
           <div className="lg:col-span-3 space-y-6">
             {/* Header Actions */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
@@ -305,16 +306,24 @@ export default function FestivalTeacherPhotos() {
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-              <Button
-                onClick={() => {
-                  setEditingTeacher(null)
-                  setModalOpen(true)
-                }}
-                className="flex items-center gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                Add Facilitator
-              </Button>
+              <div className="flex gap-2">
+                <Link href={`/${festival.slug}/schedule`} target="_blank" className="flex-1 sm:flex-none">
+                  <Button variant="outline" className="w-full">
+                    <Eye className="w-4 h-4 mr-2" />
+                    View Live Schedule
+                  </Button>
+                </Link>
+                <Button
+                  onClick={() => {
+                    setEditingTeacher(null)
+                    setModalOpen(true)
+                  }}
+                  className="flex items-center gap-2 flex-1 sm:flex-none"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Facilitator
+                </Button>
+              </div>
             </div>
 
             {/* Teacher Status Overview */}

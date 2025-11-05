@@ -435,7 +435,7 @@ export default function SessionsManagement() {
               <Link href={`/${festival.slug}/schedule`} target="_blank" rel="noopener noreferrer">
                 <Button variant="outline" size="sm">
                   <Eye className="w-4 h-4 sm:mr-2" />
-                  <span className="hidden sm:inline">View Live</span>
+                  <span className="hidden sm:inline">View Live Schedule</span>
                 </Button>
               </Link>
               <Button onClick={exportCSV} variant="outline" size="sm">

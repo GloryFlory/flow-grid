@@ -191,7 +191,7 @@ export default function FestivalSettings() {
                   <Link href={`/${festival.slug}/schedule`} target="_blank">
                     <Button variant="outline" size="sm">
                       <Globe className="w-4 h-4 mr-2" />
-                      View Public Schedule
+                      View Live Schedule
                     </Button>
                   </Link>
                 )}
