@@ -15,14 +15,11 @@ interface Festival {
 
 interface AnalyticsData {
   totalViews: number
-  sessionClicks: number
   uniqueVisitors: number
   avgSessionTime: string
-  recentEvents: Array<{
-    id: string
-    event: string
-    timestamp: Date
-    properties?: any
+  topSessions: Array<{
+    title: string
+    clicks: number
   }>
 }
 
@@ -59,20 +56,18 @@ export default function FestivalAnalytics() {
         // Set default empty analytics if endpoint doesn't exist
         setAnalytics({
           totalViews: 0,
-          sessionClicks: 0,
           uniqueVisitors: 0,
           avgSessionTime: '0:00',
-          recentEvents: []
+          topSessions: []
         })
       }
     } catch (error) {
       console.error('Error fetching data:', error)
       setAnalytics({
         totalViews: 0,
-        sessionClicks: 0,
         uniqueVisitors: 0,
         avgSessionTime: '0:00',
-        recentEvents: []
+        topSessions: []
       })
     } finally {
       setIsLoading(false)
@@ -127,7 +122,7 @@ export default function FestivalAnalytics() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -137,20 +132,6 @@ export default function FestivalAnalytics() {
                 </div>
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                   <Eye className="w-6 h-6 text-blue-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Session Clicks</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">{analytics?.sessionClicks || 0}</p>
-                </div>
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <BarChart3 className="w-6 h-6 text-purple-600" />
                 </div>
               </div>
             </CardContent>
@@ -185,34 +166,38 @@ export default function FestivalAnalytics() {
           </Card>
         </div>
 
-        {/* Recent Activity */}
-        <Card>
+        {/* Top Sessions */}
+        <Card className="mb-8">
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="w-5 h-5" />
+              Most Popular Sessions
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            {analytics?.recentEvents && analytics.recentEvents.length > 0 ? (
-              <div className="space-y-3">
-                {analytics.recentEvents.map((event) => (
-                  <div key={event.id} className="flex items-start gap-4 p-3 rounded-lg hover:bg-gray-50">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-900">{event.event}</span>
-                      </div>
-                      <div className="text-xs text-gray-500 mt-1">
-                        {new Date(event.timestamp).toLocaleString()}
-                      </div>
+            {analytics?.topSessions && analytics.topSessions.length > 0 ? (
+              <div className="space-y-4">
+                {analytics.topSessions.map((session, index) => (
+                  <div key={index} className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50/50 transition-colors">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-sm">
+                      {index + 1}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 truncate">{session.title}</p>
+                      <p className="text-sm text-gray-500">{session.clicks} {session.clicks === 1 ? 'click' : 'clicks'}</p>
+                    </div>
+                    <div className="flex-shrink-0">
+                      <BarChart3 className="w-5 h-5 text-gray-400" />
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="text-center py-12">
-                <TrendingUp className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">No activity recorded yet</p>
+                <BarChart3 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600">No session clicks recorded yet</p>
                 <p className="text-sm text-gray-500 mt-2">
-                  Analytics will appear here once people start viewing your schedule
+                  Session popularity will appear here once people start clicking on sessions
                 </p>
               </div>
             )}
@@ -220,17 +205,18 @@ export default function FestivalAnalytics() {
         </Card>
 
         {/* Coming Soon */}
-        <Card className="mt-8 bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200">
+        <Card className="bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200">
           <CardContent className="p-8">
             <div className="text-center">
               <h3 className="text-xl font-semibold text-blue-900 mb-3">
                 Advanced Analytics Coming Soon
               </h3>
               <ul className="text-blue-700 space-y-2 max-w-2xl mx-auto">
-                <li>• Session popularity rankings</li>
-                <li>• Teacher click-through rates</li>
-                <li>• Peak viewing times</li>
+                <li>• Peak viewing times (hourly breakdown)</li>
+                <li>• Day-by-day view trends</li>
+                <li>• Teacher profile click-through rates</li>
                 <li>• Filter usage patterns</li>
+                <li>• Session view duration tracking</li>
                 <li>• Booking conversion rates (when booking system launches)</li>
               </ul>
             </div>
