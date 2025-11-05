@@ -1,5 +1,6 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import SimpleSelect from '@/components/ui/SimpleSelect'
 
 interface FilterBarProps {
   levelFilter: string
@@ -28,7 +29,16 @@ export function FilterBar({
   availableStyles,
   availableTeachers
 }: FilterBarProps) {
-  const [filtersOpen, setFiltersOpen] = useState(true) // Changed: Open by default for better discoverability
+  const [filtersOpen, setFiltersOpen] = useState(true) // Open by default for better discoverability
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 768px)')
+    const apply = () => setIsMobile(mql.matches)
+    apply()
+    mql.addEventListener('change', apply)
+    return () => mql.removeEventListener('change', apply)
+  }, [])
   
   const clearAllFilters = () => {
     setLevelFilter('')
@@ -68,44 +78,74 @@ export function FilterBar({
         
         <div className="filter-group">
           <label>Level:</label>
-          <select 
-            value={levelFilter} 
-            onChange={(e) => setLevelFilter(e.target.value)}
-            className="filter-select"
-          >
-            <option value="">All Levels</option>
-            {availableLevels.map(level => (
-              <option key={level} value={level}>{level}</option>
-            ))}
-          </select>
+          {isMobile ? (
+            <SimpleSelect
+              ariaLabel="Level"
+              value={levelFilter}
+              onChange={setLevelFilter}
+              options={availableLevels}
+              placeholder="All Levels"
+            />
+          ) : (
+            <select 
+              value={levelFilter} 
+              onChange={(e) => setLevelFilter(e.target.value)}
+              className="filter-select"
+            >
+              <option value="">All Levels</option>
+              {availableLevels.map(level => (
+                <option key={level} value={level}>{level}</option>
+              ))}
+            </select>
+          )}
         </div>
         
         <div className="filter-group">
           <label>Style:</label>
-          <select 
-            value={styleFilter} 
-            onChange={(e) => setStyleFilter(e.target.value)}
-            className="filter-select"
-          >
-            <option value="">All Styles</option>
-            {availableStyles.map(style => (
-              <option key={style} value={style}>{style}</option>
-            ))}
-          </select>
+          {isMobile ? (
+            <SimpleSelect
+              ariaLabel="Style"
+              value={styleFilter}
+              onChange={setStyleFilter}
+              options={availableStyles}
+              placeholder="All Styles"
+            />
+          ) : (
+            <select 
+              value={styleFilter} 
+              onChange={(e) => setStyleFilter(e.target.value)}
+              className="filter-select"
+            >
+              <option value="">All Styles</option>
+              {availableStyles.map(style => (
+                <option key={style} value={style}>{style}</option>
+              ))}
+            </select>
+          )}
         </div>
         
         <div className="filter-group">
           <label>Teacher:</label>
-          <select 
-            value={teacherFilter} 
-            onChange={(e) => setTeacherFilter(e.target.value)}
-            className="filter-select"
-          >
-            <option value="">All Teachers</option>
-            {availableTeachers.map(teacher => (
-              <option key={teacher} value={teacher}>{teacher}</option>
-            ))}
-          </select>
+          {isMobile ? (
+            <SimpleSelect
+              ariaLabel="Teacher"
+              value={teacherFilter}
+              onChange={setTeacherFilter}
+              options={availableTeachers}
+              placeholder="All Teachers"
+            />
+          ) : (
+            <select 
+              value={teacherFilter} 
+              onChange={(e) => setTeacherFilter(e.target.value)}
+              className="filter-select"
+            >
+              <option value="">All Teachers</option>
+              {availableTeachers.map(teacher => (
+                <option key={teacher} value={teacher}>{teacher}</option>
+              ))}
+            </select>
+          )}
         </div>
         
         <div className="filter-group">

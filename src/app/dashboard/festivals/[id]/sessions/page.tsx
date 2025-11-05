@@ -39,6 +39,7 @@ interface FestivalSession {
   teachers: string[]
   teacherBios: string[]
   cardType: 'minimal' | 'photo' | 'detailed'
+  displayOrder?: number
 }
 
 interface Festival {
@@ -222,9 +223,18 @@ export default function SessionsManagement() {
           setFestival(data.festival)
         }
       } else {
-        const error = await response.json()
-        console.error('Error saving session:', error)
-        alert(`Failed to save session: ${error.error || 'Unknown error'}`)
+        // Better error handling
+        let errorMessage = 'Unknown error'
+        try {
+          const errorData = await response.json()
+          console.error('Error saving session (status ' + response.status + '):', errorData)
+          errorMessage = errorData.error || errorMessage
+        } catch (parseError) {
+          console.error('Failed to parse error response:', parseError)
+          console.error('Response status:', response.status, 'Status text:', response.statusText)
+          errorMessage = `Server error (${response.status}): ${response.statusText}`
+        }
+        alert(`Failed to save session: ${errorMessage}`)
       }
     } catch (error) {
       console.error('Error saving session:', error)
@@ -295,7 +305,8 @@ export default function SessionsManagement() {
       location: session.location || '',
       capacity: session.capacity,
       prerequisites: session.prerequisites || '',
-      cardType: session.cardType as 'detailed' | 'minimal' | 'photo'
+      cardType: session.cardType as 'detailed' | 'minimal' | 'photo',
+      displayOrder: session.displayOrder
     }
   }
 
@@ -326,11 +337,20 @@ export default function SessionsManagement() {
       return matchesSearch && matchesDay
     })
     
-    // Sort by festival day order, then by time
+    // Sort by festival day order, then by time, then by display order, then by title
     return filtered.sort((a, b) => {
       const dayComparison = festivalDayOrder.indexOf(a.day) - festivalDayOrder.indexOf(b.day)
       if (dayComparison !== 0) return dayComparison
-      return a.startTime.localeCompare(b.startTime)
+      
+      const timeComparison = a.startTime.localeCompare(b.startTime)
+      if (timeComparison !== 0) return timeComparison
+      
+      const displayOrderA = a.displayOrder || 0
+      const displayOrderB = b.displayOrder || 0
+      const orderComparison = displayOrderA - displayOrderB
+      if (orderComparison !== 0) return orderComparison
+      
+      return a.title.localeCompare(b.title)
     })
   }, [sessions, searchTerm, selectedDay, festival])
 

@@ -74,6 +74,10 @@ model Festival {
   accentColor    String            @default("#ff6b6b")
   isPublished    Boolean           @default(false)
   customDomain   String?           @unique
+  whatsappLink   String?
+  telegramLink   String?
+  facebookLink   String?
+  instagramLink  String?
   userId         String
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
@@ -101,6 +105,7 @@ model FestivalSession {
   teachers      String[]
   teacherBios   String[]
   cardType      String    @default("full")
+  displayOrder  Decimal   @default(0)
   festivalId    String
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

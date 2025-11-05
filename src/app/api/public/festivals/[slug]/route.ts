@@ -27,6 +27,10 @@ export async function GET(
         startDate: true,
         endDate: true,
         timezone: true,
+        whatsappLink: true,
+        telegramLink: true,
+        facebookLink: true,
+        instagramLink: true,
         sessions: {
           select: {
             id: true,
@@ -42,9 +46,10 @@ export async function GET(
             prerequisites: true,
             capacity: true,
             cardType: true,
+            displayOrder: true,
           },
-          // Don't order by day here - let the client sort by festival date order
           orderBy: [
+            { displayOrder: 'asc' },
             { startTime: 'asc' }
           ]
         },
@@ -59,7 +64,7 @@ export async function GET(
               },
               take: 1 // Only get the first photo per teacher
             }
-          }
+          } as any
         }
       }
     })
@@ -72,7 +77,8 @@ export async function GET(
     }
 
     // Create maps for ONLY this festival's teachers (privacy fix!)
-    const teacherPhotoMap = festival.teachers.reduce((acc: Record<string, string>, teacher) => {
+    const f: any = festival as any
+    const teacherPhotoMap = (f.teachers as any[]).reduce((acc: Record<string, string>, teacher: any) => {
       const teacherKey = teacher.name.toLowerCase().trim()
       if (teacher.photos && teacher.photos.length > 0) {
         acc[teacherKey] = teacher.photos[0].filePath
@@ -80,7 +86,7 @@ export async function GET(
       return acc
     }, {})
 
-    const teacherUrlMap = festival.teachers.reduce((acc: Record<string, string | null>, teacher) => {
+    const teacherUrlMap = (f.teachers as any[]).reduce((acc: Record<string, string | null>, teacher: any) => {
       acc[teacher.name.toLowerCase().trim()] = teacher.url
       return acc
     }, {})
@@ -155,7 +161,7 @@ export async function GET(
     }
 
     // Streamlined transformation
-    const transformedSessions = festival.sessions.map(session => ({
+    const transformedSessions = (f.sessions as any[]).map((session: any) => ({
       id: session.id,
       title: session.title,
       description: session.description || '',
@@ -172,7 +178,8 @@ export async function GET(
       prereqs: session.prerequisites || '',
       capacity: session.capacity || 20,
       currentBookings: 0, // TODO: Implement booking system
-      cardType: session.cardType || 'detailed'
+      cardType: session.cardType || 'detailed',
+      displayOrder: session.displayOrder || 0
     }))
 
     const response = {
@@ -188,7 +195,11 @@ export async function GET(
         accentColor: festival.accentColor,
         startDate: festival.startDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
         endDate: festival.endDate.toISOString().split('T')[0],
-        timezone: festival.timezone
+        timezone: festival.timezone,
+        whatsappLink: (festival as any).whatsappLink,
+        telegramLink: (festival as any).telegramLink,
+        facebookLink: (festival as any).facebookLink,
+        instagramLink: (festival as any).instagramLink
       },
       sessions: transformedSessions
     }

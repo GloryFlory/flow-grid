@@ -33,6 +33,10 @@ interface Festival {
   startDate: Date
   endDate: Date
   timezone: string
+  whatsappLink?: string
+  telegramLink?: string
+  facebookLink?: string
+  instagramLink?: string
 }
 
 // This page will render the public schedule for any festival

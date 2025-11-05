@@ -201,6 +201,28 @@ body {
   transform: translateY(-1px);
 }
 
+/* Social Media Icon Buttons */
+.social-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 0.5rem;
+}
+
+.social-icon-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: translateY(-1px) scale(1.05);
+}
+
 .share-menu {
   position: absolute;
   top: 100%;
@@ -378,6 +400,62 @@ body {
   background: white;
 }
 
+/* SimpleSelect (mobile custom dropdown) */
+.simple-select {
+  position: relative;
+}
+
+.simple-select-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.625rem 0.875rem;
+  border: 2px solid var(--border-light);
+  border-radius: 8px;
+  background: white;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.simple-select-value.placeholder {
+  color: var(--text-light);
+}
+
+.simple-select-chevron {
+  margin-left: 0.5rem;
+  opacity: 0.8;
+}
+
+.simple-select-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  max-height: 50vh;
+  overflow: auto;
+  background: white;
+  border: 2px solid var(--border-light);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  z-index: 50; /* Above tabs and cards */
+}
+
+.simple-select-option {
+  padding: 0.75rem 0.875rem;
+  font-size: 1rem;
+  line-height: 1.3;
+  cursor: pointer;
+}
+
+.simple-select-option:hover {
+  background: #f8fafc;
+}
+
+.simple-select-option.selected {
+  background: rgba(0, 119, 182, 0.08);
+}
+
 .search-input:focus,
 .filter-select:focus {
   outline: none;
@@ -413,8 +491,10 @@ body {
 
 .clear-filters-btn.active {
   border-color: var(--accent-color, var(--coral-accent));
-  color: var(--accent-color, var(--coral-accent));
-  background: rgba(255, 111, 97, 0.1);
+  color: white;
+  background: var(--accent-color, var(--coral-accent));
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(255, 111, 97, 0.3);
 }
 
 .clear-filters-btn:disabled {
@@ -873,8 +953,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem;
-  margin-top: 1rem;
+  gap: 0.75rem; /* Reduced from 1rem */
+  margin-top: 0.5rem; /* Reduced from 1rem */
 }
 
 .photo-only-card {
@@ -1104,36 +1184,29 @@ body {
     align-items: flex-start;
   }
   
+  /* Reduce gap between title and content for ALL cards on mobile */
+  .session-card .session-header {
+    margin-bottom: 0.35rem;
+  }
+  
   /* Compact simplified cards on mobile */
   .session-card.simple-card {
     min-height: auto;
-    padding: 0.5rem 0.75rem; /* Reduced vertical padding */
+    padding: 0.75rem;
+  }
+  
+  .session-card.simple-card .session-header {
+    margin-bottom: 0.1rem; /* Minimal gap between title and time/location */
   }
   
   .session-card.simple-card .session-content {
-    gap: 0.2rem; /* Tighter spacing */
-  }
-  
-  .session-card.simple-card .session-time {
-    font-size: 0.7rem; /* Smaller text */
-    margin-bottom: 0.1rem;
-  }
-  
-  .session-card.simple-card .session-teachers {
-    font-size: 0.7rem;
-    margin-bottom: 0.1rem;
+    gap: 0.05rem; /* Even tighter spacing between elements */
   }
   
   .session-card.simple-card .session-level,
   .session-card.simple-card .session-prerequisites {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     line-height: 1.1;
-  }
-  
-  .session-card.simple-card .session-title {
-    font-size: 0.85rem; /* Smaller title */
-    line-height: 1.2;
-    margin-bottom: 0.25rem;
   }
   
   /* Mobile adjustments - revert to simpler working approach */
@@ -2042,26 +2115,51 @@ body {
   /* Reduce padding-bottom for photo cards on mobile */
   .session-card.photo-only-card,
   .session-card.detailed-card {
-    padding: 0.75rem; /* Reduced padding */
-    padding-bottom: 75px; /* Reduced from 90px for more compression */
+    padding: 0.75rem;
+    padding-bottom: 0.75rem; /* Match top padding - photo will overlap */
+    position: relative; /* Enable absolute positioning for photo */
   }
   
   /* Smaller min-height for photo-only cards on mobile */
   .photo-only-card {
-    min-height: 180px; /* Reduced from 220px for tighter mobile view */
+    min-height: 120px; /* Reduced significantly - photo overlaps */
   }
   
-  .photo-only-card .session-title {
-    font-size: 0.9rem; /* Smaller title */
-    line-height: 1.2;
+  .photo-only-card .session-header {
+    margin-bottom: 0.1rem; /* Minimal gap between title and time/location */
   }
   
   .photo-only-card .session-time-location {
-    font-size: 0.7rem; /* Smaller metadata */
+    margin-bottom: 0.1rem; /* Minimal spacing */
   }
   
   .photo-only-card .teachers-names {
-    font-size: 0.75rem; /* Smaller teacher names */
+    margin-bottom: 0;
+    padding-right: 0; /* Remove padding, photo overlaps */
+  }
+  
+  .photo-only-card .photo-only-section {
+    margin-top: 0.2rem; /* Minimal gap between location and teachers/photo */
+    gap: 0.3rem; /* Tight gap */
+    position: relative; /* Enable positioning */
+  }
+  
+  /* Make photo overlap with location area on mobile */
+  .photo-only-card .teacher-photo-inline {
+    position: absolute;
+    right: 0.75rem; /* Align with card padding */
+    bottom: 0.5rem; /* Slide up to overlap */
+  }
+  
+  .photo-only-card .teacher-photo-large {
+    width: 70px; /* Smaller on mobile */
+    height: 70px;
+  }
+  
+  .photo-only-card .teacher-placeholder-large {
+    width: 70px;
+    height: 70px;
+    font-size: 1rem;
   }
   
   .teachers-avatars {
@@ -2211,6 +2309,7 @@ body {
   .filter-container {
     margin: 0 0 1rem;
     padding: 0 1rem; /* Add horizontal padding to container instead */
+    overflow: visible; /* Ensure dropdowns can overflow */
   }
   
   /* Show mobile filter toggle */
@@ -2227,31 +2326,42 @@ body {
     background: #f8fafc;
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: visible; /* Critical: allow iOS picker to show properly */
+    position: relative;
+    z-index: 20; /* Higher than schedule-tabs (z-index: 10) */
   }
   
   /* Show filters when mobile-open class is added */
   .filter-bar.mobile-open {
     display: grid !important;
+    overflow: visible !important; /* Ensure picker can overflow */
+    z-index: 20; /* Maintain higher z-index when open */
   }
   
   .filter-group {
     margin-bottom: 0; /* Remove extra margin */
+    overflow: visible; /* Allow select picker to overflow */
   }
   
   .filter-group label {
     font-size: 0.875rem; /* Smaller labels */
     margin-bottom: 0.25rem;
+    display: block;
   }
   
   .filter-select {
-    padding: 0.5rem; /* Reduced padding */
-    font-size: 0.875rem; /* Smaller text */
+    padding: 0.625rem; /* Slightly larger for easier tapping */
+    font-size: 1rem; /* Full size for readability */
+    min-height: 44px; /* Touch-friendly size */
+    width: 100%; /* Full width */
+    /* Keep native iOS select styling - works better on mobile */
   }
   
   .clear-filters-btn {
     align-self: stretch;
-    padding: 0.5rem; /* Reduced padding */
-    font-size: 0.875rem; /* Smaller text */
+    padding: 0.625rem;
+    font-size: 1rem; /* Full size for readability */
+    min-height: 44px; /* Touch-friendly size */
   }
   
   .session-card {
