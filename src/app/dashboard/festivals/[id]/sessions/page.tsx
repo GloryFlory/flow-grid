@@ -202,23 +202,33 @@ export default function SessionsManagement() {
         method,
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache'
         },
         body: JSON.stringify(sessionData),
       })
 
       if (response.ok) {
-        // Refresh the festival data to show updated sessions
-        await fetchFestival()
+        // Close modal first for better UX
         setShowEditModal(false)
         setEditingSession(null)
+        
+        // Force refresh the festival data with no-cache
+        const festivalResponse = await fetch(`/api/admin/festivals/${festivalId}`, {
+          headers: { 'Cache-Control': 'no-cache' }
+        })
+        
+        if (festivalResponse.ok) {
+          const data = await festivalResponse.json()
+          setFestival(data.festival)
+        }
       } else {
         const error = await response.json()
         console.error('Error saving session:', error)
-        // TODO: Show error toast
+        alert(`Failed to save session: ${error.error || 'Unknown error'}`)
       }
     } catch (error) {
       console.error('Error saving session:', error)
-      // TODO: Show error toast
+      alert('Error saving session. Please try again.')
     }
   }
 
