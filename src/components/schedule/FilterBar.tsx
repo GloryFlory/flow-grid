@@ -28,7 +28,7 @@ export function FilterBar({
   availableStyles,
   availableTeachers
 }: FilterBarProps) {
-  const [filtersOpen, setFiltersOpen] = useState(false)
+  const [filtersOpen, setFiltersOpen] = useState(true) // Changed: Open by default for better discoverability
   
   const clearAllFilters = () => {
     setLevelFilter('')
