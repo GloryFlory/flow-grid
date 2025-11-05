@@ -29,7 +29,7 @@ export async function GET(
 
     // Convert to CSV format matching import template order
     // Using semicolon (;) delimiter for Windows Excel compatibility
-    const csvHeader = 'id;day;start;end;title;level;capacity;types;CardType;teachers;location;Description;Prerequisites\n'
+    const csvHeader = 'id;day;start;end;title;level;capacity;styles;CardType;teachers;location;Description;Prerequisites\n'
     
     const csvRows = sessions.map((session, index) => {
       const fields = [
@@ -40,7 +40,7 @@ export async function GET(
         session.title, // title
         session.level || '', // level
         session.capacity || '', // capacity
-        session.styles.join(', '), // types
+        session.styles.join(', '), // styles
         session.cardType, // CardType
         session.teachers.join(' & '), // teachers (using & separator as in template)
         session.location || '', // location
@@ -149,8 +149,8 @@ export async function POST(
       
       if (fields.length < 10) continue // Skip invalid rows
       
-      // Match the CSV template column order: id,day,start,end,title,level,capacity,types,CardType,teachers,location,Description,Prerequisites
-      const [id, day, start, end, title, level, capacity, types, cardType, teachers, location, description, prerequisites] = fields
+      // Match the CSV template column order: id,day,start,end,title,level,capacity,styles,CardType,teachers,location,Description,Prerequisites
+      const [id, day, start, end, title, level, capacity, styles, cardType, teachers, location, description, prerequisites] = fields
       
       if (!title || !day || !start || !end) continue // Skip rows missing required fields
       
@@ -168,7 +168,7 @@ export async function POST(
         endTime: end.replace(/^"|"$/g, '').trim(),
         location: location ? location.replace(/^"|"$/g, '').trim() : null,
         level: level ? level.replace(/^"|"$/g, '').trim() : null,
-        styles: parseCommaSeparated(types?.replace(/^"|"$/g, '') || ''),
+        styles: parseCommaSeparated(styles?.replace(/^"|"$/g, '') || ''),
         prerequisites: prerequisites ? prerequisites.replace(/^"|"$/g, '').trim() : null,
         capacity: capacity ? parseInt(capacity.replace(/^"|"$/g, '').trim()) || null : null,
         teachers: parseCommaSeparated(teachers?.replace(/^"|"$/g, '') || ''),
