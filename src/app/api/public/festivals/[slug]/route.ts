@@ -58,10 +58,19 @@ export async function GET(
       )
     }
 
-    // Get all teacher photos for efficient lookup
+    // Get all teacher photos and URLs for efficient lookup
     const teacherPhotos = await prisma.teacherPhoto.findMany()
     const teacherPhotoMap = teacherPhotos.reduce((acc: Record<string, string>, photo) => {
       acc[photo.teacherName.toLowerCase().trim()] = photo.filePath
+      return acc
+    }, {})
+
+    // Get all teachers for this festival with their URLs
+    const teachers = await prisma.teacher.findMany({
+      where: { festivalId: festival.id }
+    })
+    const teacherUrlMap = teachers.reduce((acc: Record<string, string | null>, teacher) => {
+      acc[teacher.name.toLowerCase().trim()] = teacher.url
       return acc
     }, {})
 
@@ -78,6 +87,26 @@ export async function GET(
       }
       
       return null
+    }
+
+    // Helper function to get all teacher photos for a session
+    const getTeacherPhotos = (teachers: string[]) => {
+      if (!teachers || teachers.length === 0) return []
+      
+      return teachers.map(teacher => {
+        const teacherKey = teacher.toLowerCase().trim()
+        return teacherPhotoMap[teacherKey] || null
+      })
+    }
+
+    // Helper function to get teacher URLs for a session
+    const getTeacherUrls = (teachers: string[]) => {
+      if (!teachers || teachers.length === 0) return []
+      
+      return teachers.map(teacher => {
+        const teacherKey = teacher.toLowerCase().trim()
+        return teacherUrlMap[teacherKey] || null
+      })
     }
 
     // Helper function to convert date string to day name
@@ -126,7 +155,9 @@ export async function GET(
       level: session.level || 'All Levels',
       styles: session.styles || [],
       teachers: session.teachers || [],
-      teacherPhoto: getTeacherPhoto(session.teachers || []),
+      teacherPhoto: getTeacherPhoto(session.teachers || []), // Single photo for backward compatibility
+      teacherPhotos: getTeacherPhotos(session.teachers || []), // Array of photos for each teacher
+      teacherUrls: getTeacherUrls(session.teachers || []),
       prereqs: session.prerequisites || '',
       capacity: session.capacity || 20,
       currentBookings: 0, // TODO: Implement booking system

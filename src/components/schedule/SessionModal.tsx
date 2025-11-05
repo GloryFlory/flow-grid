@@ -12,6 +12,8 @@ interface Session {
   level: string
   styles: string[]
   teachers: string[]
+  teacherPhotos?: (string | null)[]
+  teacherUrls?: (string | null)[]
   prereqs: string
   capacity: number
   currentBookings: number
@@ -25,7 +27,9 @@ interface SessionModalProps {
 
 // Helper functions
 const timeRange = (start: string, end: string) => {
-  return `${start} - ${end}`
+  // Format as HH:MM (no seconds)
+  const format = (t: string) => t.slice(0, 5)
+  return `${format(start)} - ${format(end)}`
 }
 
 const getDuration = (start: string, end: string) => {
@@ -47,20 +51,20 @@ const getLevelColor = (level: string) => {
   }
 }
 
-const getTeacherImageSrc = (session: any, teacher?: string) => {
-  // Use the teacherPhoto from the API if available
-  if (session.teacherPhoto) {
-    return session.teacherPhoto
+const getTeacherImageSrc = (session: Session, teacher: string, index: number) => {
+  // Use the individual teacher's photo from the teacherPhotos array if available
+  if (session.teacherPhotos && session.teacherPhotos[index]) {
+    return session.teacherPhotos[index]
   }
   
   // Fallback to placeholder if no photo is available
   return '/teachers/placeholder.jpg'
 }
 
-const getTeacherLink = (teachers: string[]) => {
-  if (!teachers || teachers.length === 0) return '#'
-  // For now, return a placeholder - this could link to teacher profiles
-  return '#'
+const getTeacherLink = (teachers: string[], index: number, session: Session) => {
+  if (!teachers || teachers.length === 0) return null
+  if (!session.teacherUrls || !session.teacherUrls[index]) return null
+  return session.teacherUrls[index]
 }
 
 export function SessionModal({ session, onClose }: SessionModalProps) {
@@ -92,35 +96,42 @@ export function SessionModal({ session, onClose }: SessionModalProps) {
           {session.teachers && session.teachers.length > 0 && (
             <div className="modal-teachers-section">
               <div className="modal-teachers-list">
-                {session.teachers.map((teacher, index) => (
-                  <div key={index} className="modal-teacher-item">
-                    <div className="modal-teacher-photo">
-                      <img 
-                        src={getTeacherImageSrc(session, teacher)}
-                        alt={teacher}
-                        className="teacher-photo-modal"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement
-                          target.style.display = 'none'
-                          const nextElement = target.nextElementSibling as HTMLElement
-                          if (nextElement) nextElement.style.display = 'flex'
-                        }}
-                      />
-                      <div className="teacher-placeholder-modal" style={{ display: 'none' }}>
-                        {teacher.split(' ').map(n => n[0]).join('').toUpperCase()}
+                {session.teachers.map((teacher, index) => {
+                  const teacherUrl = getTeacherLink(session.teachers, index, session)
+                  return (
+                    <div key={index} className="modal-teacher-item">
+                      <div className="modal-teacher-photo">
+                        <img 
+                          src={getTeacherImageSrc(session, teacher, index)}
+                          alt={teacher}
+                          className="teacher-photo-modal"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement
+                            target.style.display = 'none'
+                            const nextElement = target.nextElementSibling as HTMLElement
+                            if (nextElement) nextElement.style.display = 'flex'
+                          }}
+                        />
+                        <div className="teacher-placeholder-modal" style={{ display: 'none' }}>
+                          {teacher.split(' ').map(n => n[0]).join('').toUpperCase()}
+                        </div>
+                      </div>
+                      <div className="modal-teacher-info">
+                        <h3 className="modal-teacher-name">{teacher}</h3>
+                        {teacherUrl && (
+                          <a 
+                            href={teacherUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="modal-teacher-bio-link"
+                          >
+                            View Teacher Bio →
+                          </a>
+                        )}
                       </div>
                     </div>
-                    <div className="modal-teacher-info">
-                      <h3 className="modal-teacher-name">{teacher}</h3>
-                      <a 
-                        href={getTeacherLink([teacher])}
-                        className="modal-teacher-bio-link"
-                      >
-                        View Teacher Bio →
-                      </a>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           )}
