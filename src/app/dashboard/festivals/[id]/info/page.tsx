@@ -216,7 +216,7 @@ export default function FestivalInformation() {
                 <Link href={`/${festival.slug}/schedule`} target="_blank">
                   <Button variant="outline" size="sm">
                     <Eye className="w-4 h-4 sm:mr-2" />
-                    <span className="hidden sm:inline">View</span>
+                    <span className="hidden sm:inline">View Live Schedule</span>
                   </Button>
                 </Link>
               )}
