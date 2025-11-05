@@ -1107,27 +1107,33 @@ body {
   /* Compact simplified cards on mobile */
   .session-card.simple-card {
     min-height: auto;
-    padding: 0.75rem;
+    padding: 0.5rem 0.75rem; /* Reduced vertical padding */
   }
   
   .session-card.simple-card .session-content {
-    gap: 0.25rem;
+    gap: 0.2rem; /* Tighter spacing */
   }
   
   .session-card.simple-card .session-time {
-    font-size: 0.75rem;
-    margin-bottom: 0.125rem;
+    font-size: 0.7rem; /* Smaller text */
+    margin-bottom: 0.1rem;
   }
   
   .session-card.simple-card .session-teachers {
-    font-size: 0.75rem;
-    margin-bottom: 0.125rem;
+    font-size: 0.7rem;
+    margin-bottom: 0.1rem;
   }
   
   .session-card.simple-card .session-level,
   .session-card.simple-card .session-prerequisites {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
+    line-height: 1.1;
+  }
+  
+  .session-card.simple-card .session-title {
+    font-size: 0.85rem; /* Smaller title */
     line-height: 1.2;
+    margin-bottom: 0.25rem;
   }
   
   /* Mobile adjustments - revert to simpler working approach */
@@ -2036,12 +2042,26 @@ body {
   /* Reduce padding-bottom for photo cards on mobile */
   .session-card.photo-only-card,
   .session-card.detailed-card {
-    padding-bottom: 90px; /* Reduced from 110px for mobile */
+    padding: 0.75rem; /* Reduced padding */
+    padding-bottom: 75px; /* Reduced from 90px for more compression */
   }
   
   /* Smaller min-height for photo-only cards on mobile */
   .photo-only-card {
-    min-height: 220px; /* Reduced from 260px */
+    min-height: 180px; /* Reduced from 220px for tighter mobile view */
+  }
+  
+  .photo-only-card .session-title {
+    font-size: 0.9rem; /* Smaller title */
+    line-height: 1.2;
+  }
+  
+  .photo-only-card .session-time-location {
+    font-size: 0.7rem; /* Smaller metadata */
+  }
+  
+  .photo-only-card .teachers-names {
+    font-size: 0.75rem; /* Smaller teacher names */
   }
   
   .teachers-avatars {
