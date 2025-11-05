@@ -428,9 +428,9 @@ export default function FestivalTeacherPhotos() {
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {teachersWithPhotos.map((teacher) => {
-                      // Get photo from either teacherRecord.photos or by matching teacherName from all photos
-                      const teacherPhoto = teacher.teacherRecord?.photos?.[0] || 
-                                          photos.find(p => p.teacherName.toLowerCase() === teacher.name.toLowerCase())
+                      // ONLY get photo from teacherRecord.photos (festival-scoped)
+                      // DO NOT fallback to global teacherName lookup
+                      const teacherPhoto = teacher.teacherRecord?.photos?.[0]
                       const photoUrl = teacherPhoto?.filePath
                       
                       return (
