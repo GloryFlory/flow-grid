@@ -76,11 +76,12 @@ export async function POST(req: Request) {
           // Get public URL
           const { data: { publicUrl } } = supabase.storage.from('teachers').getPublicUrl(filename)
 
-          // Create photo record with teacherName for backward compatibility
+          // Create photo record linked to teacher
           await prisma.teacherPhoto.create({
             data: {
               filename,
-              teacherName: teacher.name,
+              teacherName: teacher.name, // Keep for backward compatibility
+              teacherId: teacher.id,     // NEW: Link to specific teacher
               filePath: publicUrl,
               fileSize: buffer.length,
               mimeType: (file as any).type || 'application/octet-stream',
