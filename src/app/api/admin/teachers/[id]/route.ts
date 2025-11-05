@@ -71,11 +71,34 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         } else {
           const { data: { publicUrl } } = supabase.storage.from('teachers').getPublicUrl(filename)
           
-          // Create photo record with teacherName for backward compatibility
+          // Delete old photos for this teacher
+          const oldPhotos = await prisma.teacherPhoto.findMany({
+            where: { teacherId: teacher.id }
+          })
+          
+          if (oldPhotos.length > 0) {
+            // Delete from Supabase Storage
+            for (const oldPhoto of oldPhotos) {
+              try {
+                const oldFilename = oldPhoto.filename
+                await supabase.storage.from('teachers').remove([oldFilename])
+              } catch (err) {
+                console.warn('Could not delete old photo from storage:', err)
+              }
+            }
+            
+            // Delete from database
+            await prisma.teacherPhoto.deleteMany({
+              where: { teacherId: teacher.id }
+            })
+          }
+          
+          // Create new photo record linked to this teacher
           await prisma.teacherPhoto.create({
             data: {
               filename,
-              teacherName: teacher.name,
+              teacherName: teacher.name,   // Keep for backward compatibility
+              teacherId: teacher.id,        // Link to specific teacher
               filePath: publicUrl,
               fileSize: buffer.length,
               mimeType: (file as any).type || 'application/octet-stream',
