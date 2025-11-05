@@ -157,6 +157,7 @@ export default function CreateFestivalPage() {
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
+      delimiter: '', // Auto-detect delimiter (supports both comma and semicolon)
       complete: (results) => {
         const errors: string[] = []
         const parsedSessions: ParsedSession[] = []
@@ -206,19 +207,25 @@ export default function CreateFestivalPage() {
   }
 
   const downloadCsvTemplate = () => {
-    const csvContent = `id,day,start,end,title,level,capacity,types,CardType,teachers,location,Description,Prerequisites
-1,Friday,08:00,09:00,Registration & Check-in,,50,Logistics,minimal,,Main Entrance,"Welcome and registration desk","Event ticket required"
-2,Friday,09:00,10:30,Opening Keynote,,200,Presentation,photo,Dr. Sarah Chen,Main Auditorium,"Welcome address and festival overview",""
-3,Friday,11:00,12:30,Workshop: Creative Writing,Beginner,25,Workshop,detailed,Alex Rivera,Room 101,"Hands-on writing workshop exploring narrative techniques","Notebook and pen recommended"
-4,Friday,13:00,14:00,Lunch Break,,80,Break,minimal,,Garden Terrace,"Catered lunch and networking time",""
-5,Friday,14:30,16:00,Panel Discussion,Intermediate,40,Panel,photo,"Maria Lopez & John Smith",Conference Room,"Industry experts discuss current trends","Basic familiarity with topic helpful"
-6,Friday,16:30,17:30,Networking Session,,60,Social,minimal,,Lobby,"Informal networking and refreshments",""
-7,Saturday,08:30,09:30,Morning Meditation,,30,Wellness,photo,Emma Thompson,Quiet Room,"Guided meditation to start the day","Comfortable clothing suggested"
-8,Saturday,10:00,12:00,Advanced Masterclass,Advanced,15,Masterclass,detailed,Prof. David Kim,Studio,"Deep dive into advanced techniques","Previous experience required"
-9,Saturday,13:00,14:00,Lunch Break,,80,Break,minimal,,Dining Hall,"Lunch and informal discussions",""
-10,Saturday,15:00,16:00,Closing Ceremony,,100,Community,minimal,,Main Hall,"Wrap-up and thank you remarks",""`
+    // Use semicolon delimiter for Windows Excel compatibility
+    // Note: Using semicolon (;) instead of comma (,) because Excel on Windows expects this format
+    const csvContent = `id;day;start;end;title;level;capacity;types;CardType;teachers;location;Description;Prerequisites
+1;Friday;08:00;09:00;Registration & Check-in;;50;Logistics;minimal;;Main Entrance;Welcome and registration desk;Event ticket required
+2;Friday;09:00;10:30;Opening Keynote;;200;Presentation;photo;Dr. Sarah Chen;Main Auditorium;Welcome address and festival overview;
+3;Friday;11:00;12:30;Workshop: Creative Writing;Beginner;25;Workshop;detailed;Alex Rivera;Room 101;Hands-on writing workshop exploring narrative techniques;Notebook and pen recommended
+4;Friday;13:00;14:00;Lunch Break;;80;Break;minimal;;Garden Terrace;Catered lunch and networking time;
+5;Friday;14:30;16:00;Panel Discussion;Intermediate;40;Panel;photo;Maria Lopez & John Smith;Conference Room;Industry experts discuss current trends;Basic familiarity with topic helpful
+6;Friday;16:30;17:30;Networking Session;;60;Social;minimal;;Lobby;Informal networking and refreshments;
+7;Saturday;08:30;09:30;Morning Meditation;;30;Wellness;photo;Emma Thompson;Quiet Room;Guided meditation to start the day;Comfortable clothing suggested
+8;Saturday;10:00;12:00;Advanced Masterclass;Advanced;15;Masterclass;detailed;Prof. David Kim;Studio;Deep dive into advanced techniques;Previous experience required
+9;Saturday;13:00;14:00;Lunch Break;;80;Break;minimal;;Dining Hall;Lunch and informal discussions;
+10;Saturday;15:00;16:00;Closing Ceremony;;100;Community;minimal;;Main Hall;Wrap-up and thank you remarks;`
 
-    const blob = new Blob([csvContent], { type: 'text/csv' })
+    // Add UTF-8 BOM for Excel compatibility (helps Excel recognize UTF-8 encoding)
+    const BOM = '\uFEFF'
+    const csvWithBom = BOM + csvContent
+
+    const blob = new Blob([csvWithBom], { type: 'text/csv;charset=utf-8;' })
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url

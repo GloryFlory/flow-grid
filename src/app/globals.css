@@ -1219,6 +1219,63 @@ body {
   overflow: hidden; /* Ensure photo content stays within bounds */
 }
 
+/* New: Multiple teacher photos layout */
+.teacher-photos-bottom-right {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 10;
+}
+
+.teacher-photo-single {
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.teacher-photos-multiple {
+  display: flex;
+  flex-direction: row-reverse; /* Stack from right to left */
+  align-items: center;
+  gap: 0; /* No gap, we'll use negative margin for overlap */
+}
+
+.teacher-avatar-small {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  margin-left: -15px; /* Overlap the avatars */
+}
+
+.teacher-avatar-small:last-child {
+  margin-left: 0; /* First avatar (rightmost) has no overlap */
+}
+
+.teacher-avatar-more {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.teacher-photo-small {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.teacher-placeholder-small {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--primary-color, var(--primary-blue)), var(--secondary-color, var(--secondary-blue)));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
 /* Mobile inline photo for full cards */
 .teacher-photo-mobile-inline {
   display: none; /* No longer used - keeping for backward compatibility */
@@ -1427,15 +1484,20 @@ body {
 
 .modal-teachers-list {
   display: flex;
-  flex-direction: column;
-  gap: 0;
+  flex-direction: row;
+  gap: 2rem;
+  flex-wrap: wrap;
+  align-items: flex-start;
 }
 
 .modal-teacher-item {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
+  gap: 0.75rem;
   padding: 0;
+  text-align: center;
+  max-width: 150px;
 }
 
 .modal-teacher-photo {
@@ -1469,24 +1531,29 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  align-items: center;
+  width: 100%;
 }
 
 .modal-teacher-name {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: var(--deep-navy);
+  word-wrap: break-word;
+  width: 100%;
 }
 
 .modal-teacher-bio-link {
   color: var(--primary-color, var(--primary-blue));
   text-decoration: none;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   font-weight: 500;
   transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
+  white-space: nowrap;
 }
 
 .modal-teacher-bio-link:hover {

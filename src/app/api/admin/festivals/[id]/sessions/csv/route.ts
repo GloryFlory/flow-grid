@@ -28,32 +28,44 @@ export async function GET(
     })
 
     // Convert to CSV format matching import template order
-    const csvHeader = 'id,day,start,end,title,level,capacity,types,CardType,teachers,location,Description,Prerequisites\n'
+    // Using semicolon (;) delimiter for Windows Excel compatibility
+    const csvHeader = 'id;day;start;end;title;level;capacity;types;CardType;teachers;location;Description;Prerequisites\n'
     
     const csvRows = sessions.map((session, index) => {
       const fields = [
-        `"${index + 1}"`, // id
-        `"${session.day}"`, // day
-        `"${session.startTime}"`, // start
-        `"${session.endTime}"`, // end
-        `"${session.title}"`, // title
-        `"${session.level || ''}"`, // level
-        `"${session.capacity || ''}"`, // capacity
-        `"${session.styles.join(', ')}"`, // types
-        `"${session.cardType}"`, // CardType
-        `"${session.teachers.join(' & ')}"`, // teachers (using & separator as in template)
-        `"${session.location || ''}"`, // location
-        `"${session.description || ''}"`, // Description
-        `"${session.prerequisites || ''}"` // Prerequisites
+        index + 1, // id
+        session.day, // day
+        session.startTime, // start
+        session.endTime, // end
+        session.title, // title
+        session.level || '', // level
+        session.capacity || '', // capacity
+        session.styles.join(', '), // types
+        session.cardType, // CardType
+        session.teachers.join(' & '), // teachers (using & separator as in template)
+        session.location || '', // location
+        session.description || '', // Description
+        session.prerequisites || '' // Prerequisites
       ]
-      return fields.join(',')
+      
+      // Escape fields that contain semicolons, quotes, or newlines
+      return fields.map(field => {
+        const fieldStr = String(field)
+        if (fieldStr.includes(';') || fieldStr.includes('"') || fieldStr.includes('\n') || fieldStr.includes('\r')) {
+          // Wrap in quotes and escape any existing quotes
+          return `"${fieldStr.replace(/"/g, '""')}"`
+        }
+        return fieldStr
+      }).join(';') // Use semicolon as delimiter
     }).join('\n')
 
-    const csvContent = csvHeader + csvRows
+    // Add UTF-8 BOM for Excel compatibility (helps Excel recognize UTF-8 encoding)
+    const BOM = '\uFEFF'
+    const csvContent = BOM + csvHeader + csvRows
 
     return new NextResponse(csvContent, {
       headers: {
-        'Content-Type': 'text/csv',
+        'Content-Type': 'text/csv;charset=utf-8;',
         'Content-Disposition': 'attachment; filename="festival-sessions.csv"'
       }
     })
@@ -89,12 +101,18 @@ export async function POST(
       return NextResponse.json({ error: 'CSV file must contain headers and at least one row' }, { status: 400 })
     }
 
+    // Auto-detect delimiter (semicolon or comma)
+    // Remove BOM if present
+    const firstLine = lines[0].replace(/^\uFEFF/, '')
+    const delimiter = firstLine.includes(';') ? ';' : ','
+    console.log(`CSV import: detected delimiter = "${delimiter}"`)
+
     // Skip header row
     const dataLines = lines.slice(1).filter(line => line.trim())
     
     const sessionsToCreate = []
     
-    // Proper CSV parsing function that handles quoted fields and commas within fields
+    // Proper CSV parsing function that handles quoted fields and delimiter within fields
     const parseCSVLine = (line: string): string[] => {
       const result: string[] = []
       let current = ''
@@ -112,7 +130,7 @@ export async function POST(
             // Toggle quote state
             inQuotes = !inQuotes
           }
-        } else if (char === ',' && !inQuotes) {
+        } else if (char === delimiter && !inQuotes) {
           // End of field
           result.push(current.trim())
           current = ''
