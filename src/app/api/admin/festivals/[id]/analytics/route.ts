@@ -28,47 +28,72 @@ export async function GET(
     }
 
     // Fetch analytics data
-    const [totalViews, recentEvents] = await Promise.all([
+    const [
+      totalViews,
+      allEvents,
+      sessionClickEvents
+    ] = await Promise.all([
+      // Count total schedule views
       prisma.analytics.count({
         where: {
           festivalId: festivalId,
+          event: 'schedule_viewed',
         },
       }),
+      // Get all events for unique visitor calculation
       prisma.analytics.findMany({
         where: {
           festivalId: festivalId,
         },
-        orderBy: {
-          timestamp: 'desc',
+        select: {
+          deviceId: true,
+          event: true,
         },
-        take: 20,
+      }),
+      // Get session clicks
+      prisma.analytics.findMany({
+        where: {
+          festivalId: festivalId,
+          event: 'session_clicked',
+        },
+        select: {
+          properties: true,
+        },
       }),
     ])
 
-    // Calculate session clicks
-    const sessionClicks = recentEvents.filter(
-      (e) => e.event === 'session_click' || e.event === 'session_view'
-    ).length
-
-    // Calculate unique visitors (simplified - based on unique deviceIds)
+    // Calculate unique visitors (based on all events, not just recent 20)
     const uniqueDeviceIds = new Set(
-      recentEvents.map((e) => e.deviceId).filter(Boolean)
+      allEvents.map((e) => e.deviceId).filter(Boolean)
     )
 
-    // Calculate average session time (placeholder)
+    // Calculate top sessions by click count
+    const sessionClickCounts = new Map<string, number>()
+    sessionClickEvents.forEach((event) => {
+      const props = event.properties as any
+      const sessionTitle = props?.sessionTitle || props?.title
+      if (sessionTitle && typeof sessionTitle === 'string') {
+        sessionClickCounts.set(
+          sessionTitle, 
+          (sessionClickCounts.get(sessionTitle) || 0) + 1
+        )
+      }
+    })
+
+    // Get top 3 sessions
+    const topSessions = Array.from(sessionClickCounts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([title, clicks]) => ({ title, clicks }))
+
+    // Calculate average session time (placeholder for now - would need start/end tracking)
     const avgSessionTime = '2:34'
 
     return NextResponse.json({
       totalViews,
-      sessionClicks,
       uniqueVisitors: uniqueDeviceIds.size,
       avgSessionTime,
-      recentEvents: recentEvents.map((e) => ({
-        id: e.id,
-        event: e.event,
-        timestamp: e.timestamp,
-        properties: e.properties,
-      })),
+      topSessions,
     })
   } catch (error) {
     console.error('Analytics fetch error:', error)
