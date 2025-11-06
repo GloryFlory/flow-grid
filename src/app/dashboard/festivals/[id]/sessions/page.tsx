@@ -19,10 +19,28 @@ import {
   X,
   Check,
   AlertCircle,
-  Eye
+  Eye,
+  GripVertical
 } from 'lucide-react'
 import Link from 'next/link'
 import SessionEditModal from '@/components/dashboard/SessionEditModal'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 interface FestivalSession {
   id: string
@@ -51,6 +69,116 @@ interface Festival {
   sessions: FestivalSession[]
 }
 
+// Sortable Row Component
+function SortableSessionRow({ 
+  session, 
+  onEdit, 
+  onDelete 
+}: { 
+  session: FestivalSession
+  onEdit: (session: FestivalSession) => void
+  onDelete: (id: string) => void
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: session.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <tr 
+      ref={setNodeRef} 
+      style={style}
+      className="border-b border-gray-100 hover:bg-gray-50"
+    >
+      <td className="py-3 px-2 cursor-grab active:cursor-grabbing">
+        <div {...attributes} {...listeners} className="text-gray-400 hover:text-gray-600">
+          <GripVertical className="w-5 h-5" />
+        </div>
+      </td>
+      <td className="py-3 px-4">
+        <div>
+          <h3 className="font-medium text-gray-900">{session.title}</h3>
+          {session.location && (
+            <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
+              <MapPin className="w-3 h-3" />
+              {session.location}
+            </div>
+          )}
+        </div>
+      </td>
+      <td className="py-3 px-4">
+        <div className="text-sm">
+          <div className="font-medium text-gray-900">
+            {session.day}
+          </div>
+          <div className="flex items-center gap-1 text-gray-500">
+            <Clock className="w-3 h-3" />
+            {session.startTime?.substring(0, 5)} - {session.endTime?.substring(0, 5)}
+          </div>
+        </div>
+      </td>
+      <td className="py-3 px-4">
+        <div className="text-sm text-gray-900">
+          {session.teachers.join(', ')}
+        </div>
+      </td>
+      <td className="py-3 px-4">
+        {session.level && (
+          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            {session.level}
+          </span>
+        )}
+      </td>
+      <td className="py-3 px-4">
+        <div className="flex flex-wrap gap-1">
+          {session.styles.slice(0, 2).map((style, index) => (
+            <span 
+              key={index}
+              className="inline-flex items-center px-2 py-1 rounded text-xs bg-gray-100 text-gray-700"
+            >
+              {style}
+            </span>
+          ))}
+          {session.styles.length > 2 && (
+            <span className="text-xs text-gray-500">
+              +{session.styles.length - 2} more
+            </span>
+          )}
+        </div>
+      </td>
+      <td className="py-3 px-4 text-right">
+        <div className="flex items-center justify-end gap-2">
+          <Button
+            onClick={() => onEdit(session)}
+            size="sm"
+            variant="outline"
+          >
+            <Edit className="w-3 h-3" />
+          </Button>
+          <Button
+            onClick={() => onDelete(session.id)}
+            size="sm"
+            variant="outline"
+            className="text-red-600 hover:text-red-700 hover:border-red-300"
+          >
+            <Trash2 className="w-3 h-3" />
+          </Button>
+        </div>
+      </td>
+    </tr>
+  )
+}
+
 export default function SessionsManagement() {
   const params = useParams()
   const festivalId = params.id as string
@@ -66,6 +194,14 @@ export default function SessionsManagement() {
   const [editingSession, setEditingSession] = useState<FestivalSession | null>(null)
   const [dragActive, setDragActive] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
 
   useEffect(() => {
     if (festivalId) {
@@ -183,6 +319,61 @@ export default function SessionsManagement() {
       }
     } catch (error) {
       console.error('Error deleting session:', error)
+    }
+  }
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (!over || active.id === over.id) {
+      return
+    }
+
+    const oldIndex = filteredSessions.findIndex((s) => s.id === active.id)
+    const newIndex = filteredSessions.findIndex((s) => s.id === over.id)
+
+    if (oldIndex === -1 || newIndex === -1) {
+      return
+    }
+
+    // Optimistically update UI
+    const reorderedSessions = arrayMove(filteredSessions, oldIndex, newIndex)
+    
+    // Update display order values
+    const updatedSessions = reorderedSessions.map((session, index) => ({
+      ...session,
+      displayOrder: index
+    }))
+
+    // Update local state
+    setSessions(prevSessions => {
+      const newSessions = [...prevSessions]
+      // Find and update the reordered sessions
+      updatedSessions.forEach(updatedSession => {
+        const idx = newSessions.findIndex(s => s.id === updatedSession.id)
+        if (idx !== -1) {
+          newSessions[idx] = updatedSession
+        }
+      })
+      return newSessions
+    })
+
+    // Save to backend
+    try {
+      await fetch(`/api/admin/festivals/${festivalId}/sessions/reorder`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessions: updatedSessions.map((s, index) => ({
+            id: s.id,
+            displayOrder: index
+          }))
+        })
+      })
+    } catch (error) {
+      console.error('Error saving order:', error)
+      // Optionally revert on error
+      fetchFestival()
     }
   }
 
@@ -671,96 +862,42 @@ export default function SessionsManagement() {
                     )}
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-gray-200">
-                          <th className="text-left py-3 px-4 font-medium text-gray-900">Session</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-900">Day & Time</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-900">Teachers</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-900">Level</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-900">Styles</th>
-                          <th className="text-right py-3 px-4 font-medium text-gray-900">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredSessions.map((session) => (
-                          <tr key={session.id} className="border-b border-gray-100 hover:bg-gray-50">
-                            <td className="py-3 px-4">
-                              <div>
-                                <h3 className="font-medium text-gray-900">{session.title}</h3>
-                                {session.location && (
-                                  <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
-                                    <MapPin className="w-3 h-3" />
-                                    {session.location}
-                                  </div>
-                                )}
-                              </div>
-                            </td>
-                            <td className="py-3 px-4">
-                              <div className="text-sm">
-                                <div className="font-medium text-gray-900">
-                                  {session.day}
-                                </div>
-                                <div className="flex items-center gap-1 text-gray-500">
-                                  <Clock className="w-3 h-3" />
-                                  {session.startTime?.substring(0, 5)} - {session.endTime?.substring(0, 5)}
-                                </div>
-                              </div>
-                            </td>
-                            <td className="py-3 px-4">
-                              <div className="text-sm text-gray-900">
-                                {session.teachers.join(', ')}
-                              </div>
-                            </td>
-                            <td className="py-3 px-4">
-                              {session.level && (
-                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                  {session.level}
-                                </span>
-                              )}
-                            </td>
-                            <td className="py-3 px-4">
-                              <div className="flex flex-wrap gap-1">
-                                {session.styles.slice(0, 2).map((style, index) => (
-                                  <span 
-                                    key={index}
-                                    className="inline-flex items-center px-2 py-1 rounded text-xs bg-gray-100 text-gray-700"
-                                  >
-                                    {style}
-                                  </span>
-                                ))}
-                                {session.styles.length > 2 && (
-                                  <span className="text-xs text-gray-500">
-                                    +{session.styles.length - 2} more
-                                  </span>
-                                )}
-                              </div>
-                            </td>
-                            <td className="py-3 px-4 text-right">
-                              <div className="flex items-center justify-end gap-2">
-                                <Button
-                                  onClick={() => openEditModal(session)}
-                                  size="sm"
-                                  variant="outline"
-                                >
-                                  <Edit className="w-3 h-3" />
-                                </Button>
-                                <Button
-                                  onClick={() => deleteSession(session.id)}
-                                  size="sm"
-                                  variant="outline"
-                                  className="text-red-600 hover:text-red-700 hover:border-red-300"
-                                >
-                                  <Trash2 className="w-3 h-3" />
-                                </Button>
-                              </div>
-                            </td>
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-gray-200">
+                            <th className="w-8"></th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-900">Session</th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-900">Day & Time</th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-900">Teachers</th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-900">Level</th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-900">Styles</th>
+                            <th className="text-right py-3 px-4 font-medium text-gray-900">Actions</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody>
+                          <SortableContext
+                            items={filteredSessions.map(s => s.id)}
+                            strategy={verticalListSortingStrategy}
+                          >
+                            {filteredSessions.map((session) => (
+                              <SortableSessionRow
+                                key={session.id}
+                                session={session}
+                                onEdit={openEditModal}
+                                onDelete={deleteSession}
+                              />
+                            ))}
+                          </SortableContext>
+                        </tbody>
+                      </table>
+                    </div>
+                  </DndContext>
                 )}
               </CardContent>
             </Card>

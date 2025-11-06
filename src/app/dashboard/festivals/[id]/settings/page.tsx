@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { ArrowLeft, Eye, EyeOff, Trash2, Globe, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, Eye, EyeOff, Trash2, Globe, AlertTriangle, Download, Upload } from 'lucide-react'
 
 interface Festival {
   id: string
@@ -19,10 +19,13 @@ export default function FestivalSettings() {
   const params = useParams()
   const router = useRouter()
   const festivalId = params.id as string
+  const fileInputRef = useRef<HTMLInputElement>(null)
   
   const [festival, setFestival] = useState<Festival | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [isExporting, setIsExporting] = useState(false)
+  const [isImporting, setIsImporting] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
 
   useEffect(() => {
@@ -95,6 +98,104 @@ export default function FestivalSettings() {
       }
     } catch (error) {
       setMessage({ type: 'error', text: 'An error occurred' })
+    }
+  }
+
+  const exportFestival = async () => {
+    if (!festival) return
+    
+    setIsExporting(true)
+    setMessage(null)
+    
+    try {
+      const response = await fetch(`/api/admin/festivals/${festival.id}/export`)
+      
+      if (response.ok) {
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${festival.slug}-backup-${new Date().toISOString().split('T')[0]}.json`
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(a)
+        
+        setMessage({ type: 'success', text: 'Festival data exported successfully!' })
+      } else {
+        setMessage({ type: 'error', text: 'Failed to export festival data' })
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'An error occurred during export' })
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    
+    if (!file.name.endsWith('.json')) {
+      setMessage({ type: 'error', text: 'Please select a valid JSON backup file' })
+      return
+    }
+    
+    const reader = new FileReader()
+    reader.onload = async (e) => {
+      try {
+        const backup = JSON.parse(e.target?.result as string)
+        await importFestival(backup)
+      } catch (error) {
+        setMessage({ type: 'error', text: 'Invalid backup file format' })
+      }
+    }
+    reader.readAsText(file)
+  }
+
+  const importFestival = async (backup: any) => {
+    if (!festival) return
+    
+    const confirmed = confirm(
+      `Are you sure you want to restore from this backup?\n\n` +
+      `This will replace:\n` +
+      `- All sessions (${backup.metadata?.totalSessions || 0} sessions in backup)\n` +
+      `- All teachers (${backup.metadata?.totalTeachers || 0} teachers in backup)\n` +
+      `- Festival information\n\n` +
+      `Current data will be permanently deleted. This cannot be undone.`
+    )
+    
+    if (!confirmed) return
+    
+    setIsImporting(true)
+    setMessage(null)
+    
+    try {
+      const response = await fetch(`/api/admin/festivals/${festival.id}/import`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ backup })
+      })
+
+      const data = await response.json()
+      
+      if (response.ok) {
+        setMessage({ 
+          type: 'success', 
+          text: `Restored ${data.restored.sessions} sessions and ${data.restored.teachers} teachers. ${data.restored.photosNote}`
+        })
+        // Refresh festival data
+        fetchFestival()
+      } else {
+        setMessage({ type: 'error', text: data.error || 'Failed to import festival data' })
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'An error occurred during import' })
+    } finally {
+      setIsImporting(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
     }
   }
 
@@ -245,6 +346,91 @@ export default function FestivalSettings() {
             <p className="text-xs text-gray-500">
               This is your festival's public URL. Changing slugs will be available in a future update.
             </p>
+          </CardContent>
+        </Card>
+
+        {/* Backup & Restore */}
+        <Card className="mb-6 border-blue-200">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Download className="w-5 h-5 text-blue-600" />
+              Backup & Restore
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {/* Export */}
+              <div className="flex items-start justify-between pb-4 border-b">
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900 mb-1">Export Festival Data</h3>
+                  <p className="text-sm text-gray-600 mb-2">
+                    Download a complete backup of your festival including all sessions, teachers, and settings.
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Recommended before making major changes or deletions.
+                  </p>
+                </div>
+                <Button
+                  onClick={exportFestival}
+                  disabled={isExporting}
+                  variant="outline"
+                  className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                >
+                  {isExporting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                      Exporting...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4 mr-2" />
+                      Export
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {/* Import */}
+              <div className="flex items-start justify-between pt-2">
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900 mb-1">Restore from Backup</h3>
+                  <p className="text-sm text-gray-600 mb-2">
+                    Restore your festival from a previous backup file. This will replace all current data.
+                  </p>
+                  <p className="text-xs text-red-600 font-medium">
+                    ⚠️ Warning: Teacher photos must be re-uploaded manually after restore.
+                  </p>
+                </div>
+                <div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".json"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    disabled={isImporting}
+                  />
+                  <Button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isImporting}
+                    variant="outline"
+                    className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                  >
+                    {isImporting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                        Restoring...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4 mr-2" />
+                        Restore
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
