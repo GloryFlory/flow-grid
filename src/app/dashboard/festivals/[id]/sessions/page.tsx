@@ -404,15 +404,8 @@ export default function SessionsManagement() {
         setShowEditModal(false)
         setEditingSession(null)
         
-        // Force refresh the festival data with no-cache
-        const festivalResponse = await fetch(`/api/admin/festivals/${festivalId}`, {
-          headers: { 'Cache-Control': 'no-cache' }
-        })
-        
-        if (festivalResponse.ok) {
-          const data = await festivalResponse.json()
-          setFestival(data.festival)
-        }
+        // Force refresh both festival AND sessions data
+        await fetchFestival()
       } else {
         // Better error handling
         let errorMessage = 'Unknown error'

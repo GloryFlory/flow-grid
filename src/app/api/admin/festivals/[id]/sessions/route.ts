@@ -48,15 +48,12 @@ export async function POST(
     const { id: festivalId } = await params
     const data = await request.json()
 
-    // Validate required fields
+    // Validate required fields (only title, day, and times are mandatory)
     const missingFields = []
     if (!data.title) missingFields.push('title')
     if (!data.day) missingFields.push('day')
     if (!data.startTime) missingFields.push('startTime')
     if (!data.endTime) missingFields.push('endTime')
-    if (!data.teachers) missingFields.push('teachers')
-    if (!data.levels) missingFields.push('levels')
-    if (!data.styles) missingFields.push('styles')
     
     if (missingFields.length > 0) {
       return NextResponse.json({ 
@@ -64,9 +61,13 @@ export async function POST(
       }, { status: 400 })
     }
 
-    // Convert comma-separated strings to arrays
-    const teachersArray = data.teachers.split(',').map((t: string) => t.trim()).filter(Boolean)
-    const stylesArray = data.styles.split(',').map((s: string) => s.trim()).filter(Boolean)
+    // Convert comma-separated strings to arrays (handle empty strings)
+    const teachersArray = data.teachers 
+      ? data.teachers.split(',').map((t: string) => t.trim()).filter(Boolean)
+      : []
+    const stylesArray = data.styles
+      ? data.styles.split(',').map((s: string) => s.trim()).filter(Boolean)
+      : []
 
     // Parse displayOrder as decimal (optional, defaults to 0)
     const displayOrder = data.displayOrder ? parseFloat(data.displayOrder) : 0
