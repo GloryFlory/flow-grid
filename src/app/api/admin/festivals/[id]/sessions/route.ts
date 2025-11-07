@@ -27,6 +27,18 @@ export async function GET(
       ]
     })
 
+    // Debug: Log booking fields for first session
+    if (sessions.length > 0) {
+      console.log('📤 GET sessions - First session booking fields:', {
+        id: sessions[0].id,
+        title: sessions[0].title,
+        bookingEnabled: sessions[0].bookingEnabled,
+        bookingCapacity: sessions[0].bookingCapacity,
+        requirePayment: sessions[0].requirePayment,
+        price: sessions[0].price
+      })
+    }
+
     return NextResponse.json({ sessions })
   } catch (error) {
     console.error('Error fetching sessions:', error)
@@ -89,7 +101,11 @@ export async function POST(
         teachers: teachersArray,
         teacherBios: [], // Initialize empty
         cardType: data.cardType || 'full',
-        displayOrder: displayOrder
+        displayOrder: displayOrder,
+        bookingEnabled: data.bookingEnabled === true,
+        bookingCapacity: data.bookingCapacity ? parseInt(data.bookingCapacity) : null,
+        requirePayment: data.requirePayment === true,
+        price: data.price ? parseFloat(data.price) : null
       }
     })
 

@@ -17,6 +17,14 @@ export async function PUT(
     const { id: festivalId, sessionId } = await params
     const data = await request.json()
 
+    // Debug: Log what we received
+    console.log('📥 API received booking fields:', {
+      bookingEnabled: data.bookingEnabled,
+      bookingCapacity: data.bookingCapacity,
+      requirePayment: data.requirePayment,
+      price: data.price
+    })
+
     // Validate required fields (only title, day, and times are mandatory)
     const missingFields = []
     if (!data.title) missingFields.push('title')
@@ -60,8 +68,20 @@ export async function PUT(
         capacity: data.capacity ? parseInt(data.capacity) : null,
         teachers: teachersArray,
         cardType: data.cardType || 'full',
-        ...(displayOrder !== undefined && { displayOrder })
+        ...(displayOrder !== undefined && { displayOrder }),
+        bookingEnabled: data.bookingEnabled === true,
+        bookingCapacity: data.bookingCapacity ? parseInt(data.bookingCapacity) : null,
+        requirePayment: data.requirePayment === true,
+        price: data.price ? parseFloat(data.price) : null
       }
+    })
+
+    console.log('✅ Session updated in DB with booking fields:', {
+      id: updatedSession.id,
+      bookingEnabled: updatedSession.bookingEnabled,
+      bookingCapacity: updatedSession.bookingCapacity,
+      requirePayment: updatedSession.requirePayment,
+      price: updatedSession.price
     })
 
     return NextResponse.json({ session: updatedSession })

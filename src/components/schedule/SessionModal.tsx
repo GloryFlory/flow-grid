@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 
 interface Session {
   id: string
@@ -18,11 +18,14 @@ interface Session {
   capacity: number
   currentBookings: number
   cardType: string
+  bookingEnabled?: boolean
+  bookingCapacity?: number | null
 }
 
 interface SessionModalProps {
   session: Session | null
   onClose: () => void
+  festivalSlug: string
 }
 
 // Helper functions
@@ -67,13 +70,144 @@ const getTeacherLink = (teachers: string[], index: number, session: Session) => 
   return session.teacherUrls[index]
 }
 
-export function SessionModal({ session, onClose }: SessionModalProps) {
+export function SessionModal({ session, onClose, festivalSlug }: SessionModalProps) {
+  const [showBookingForm, setShowBookingForm] = useState(false)
+  const [bookingNames, setBookingNames] = useState('')
+  const [bookingEmail, setBookingEmail] = useState('')
+  const [isBooking, setIsBooking] = useState(false)
+  const [isBooked, setIsBooked] = useState(false)
+  const [deviceId, setDeviceId] = useState('')
+  const [currentBookings, setCurrentBookings] = useState(0)
+  
+  // Initialize device ID
+  useEffect(() => {
+    let id = localStorage.getItem('deviceId')
+    if (!id) {
+      id = `device_${Math.random().toString(36).substring(2, 15)}_${Date.now()}`
+      localStorage.setItem('deviceId', id)
+    }
+    setDeviceId(id)
+  }, [])
+  
+  // Check if user has already booked this session
+  useEffect(() => {
+    if (!session || !deviceId || !session.bookingEnabled) return
+    
+    const checkBooking = async () => {
+      try {
+        const response = await fetch(
+          `/api/public/festivals/${festivalSlug}/bookings?deviceId=${deviceId}`
+        )
+        if (response.ok) {
+          const bookings = await response.json()
+          const hasBooked = bookings.some((b: any) => b.sessionId === session.id)
+          setIsBooked(hasBooked)
+        }
+      } catch (error) {
+        console.error('Error checking booking:', error)
+      }
+    }
+    
+    checkBooking()
+  }, [session, deviceId, festivalSlug])
+  
+  // Fetch current booking count
+  useEffect(() => {
+    if (!session?.id) return
+    
+    const fetchBookingCount = async () => {
+      try {
+        const response = await fetch(
+          `/api/public/festivals/${festivalSlug}/sessions/${session.id}/booking-count`
+        )
+        if (response.ok) {
+          const data = await response.json()
+          setCurrentBookings(data.count || 0)
+        }
+      } catch (error) {
+        console.error('Error fetching booking count:', error)
+      }
+    }
+    
+    if (session.bookingEnabled) {
+      fetchBookingCount()
+    }
+  }, [session, festivalSlug])
+  
+  const handleBookSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!session || isBooking) return
+    
+    setIsBooking(true)
+    try {
+      const names = bookingNames.split(',').map(n => n.trim()).filter(n => n)
+      const response = await fetch(
+        `/api/public/festivals/${festivalSlug}/sessions/${session.id}/book`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            names,
+            email: bookingEmail,
+            deviceId
+          })
+        }
+      )
+      
+      if (!response.ok) {
+        const error = await response.json()
+        alert(error.error || 'Failed to book session')
+        return
+      }
+      
+      setIsBooked(true)
+      setShowBookingForm(false)
+      setBookingNames('')
+      setBookingEmail('')
+      setCurrentBookings(prev => prev + names.length)
+    } catch (error) {
+      console.error('Error booking session:', error)
+      alert('Failed to book session. Please try again.')
+    } finally {
+      setIsBooking(false)
+    }
+  }
+  
+  const handleCancelBooking = async () => {
+    if (!session || !confirm('Are you sure you want to cancel your booking?')) return
+    
+    try {
+      const response = await fetch(
+        `/api/public/festivals/${festivalSlug}/sessions/${session.id}/book?deviceId=${deviceId}`,
+        { method: 'DELETE' }
+      )
+      
+      if (!response.ok) {
+        alert('Failed to cancel booking')
+        return
+      }
+      
+      const data = await response.json()
+      const namesCount = data.namesCount || 1
+      
+      setIsBooked(false)
+      setCurrentBookings(prev => Math.max(0, prev - namesCount))
+    } catch (error) {
+      console.error('Error canceling booking:', error)
+      alert('Failed to cancel booking')
+    }
+  }
+  
   if (!session) return null
 
   const cardType = session.cardType || 'detailed'
   const isSimplified = cardType === 'minimal' || cardType === 'simplified'
   const isPhotoOnly = cardType === 'photo' || cardType === 'photo-only'
   const isPhotoshoot = session.title.toLowerCase().includes('photoshoot')
+  
+  const capacity = session.bookingCapacity || 0
+  const spotsLeft = capacity > 0 ? capacity - currentBookings : null
+  const isFull = spotsLeft !== null && spotsLeft <= 0
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -186,6 +320,101 @@ export function SessionModal({ session, onClose }: SessionModalProps) {
                     {style}
                   </span>
                 ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Booking Section */}
+          {session.bookingEnabled && (
+            <div className="modal-booking-section">
+              <h3 className="modal-section-title">Booking</h3>
+              
+              {/* Capacity Display */}
+              {capacity > 0 && (
+                <div className="booking-capacity">
+                  {isFull ? (
+                    <span className="capacity-full">⚠️ Session Full</span>
+                  ) : spotsLeft !== null && spotsLeft <= 5 ? (
+                    <span className="capacity-low">🔥 Only {spotsLeft} spot{spotsLeft !== 1 ? 's' : ''} left!</span>
+                  ) : (
+                    <span className="capacity-available">
+                      ✓ {currentBookings}/{capacity} spots taken
+                    </span>
+                  )}
+                </div>
+              )}
+              
+              {/* Booking Status / Actions */}
+              <div className="booking-actions">
+                {isBooked ? (
+                  <div className="booking-confirmed">
+                    <div className="booking-confirmed-badge">
+                      ✓ You're booked for this session
+                    </div>
+                    <button 
+                      onClick={handleCancelBooking}
+                      className="cancel-booking-btn"
+                    >
+                      Cancel Booking
+                    </button>
+                  </div>
+                ) : isFull ? (
+                  <div className="booking-full-message">
+                    This session is currently full. Check back later in case spots open up!
+                  </div>
+                ) : !showBookingForm ? (
+                  <button 
+                    onClick={() => setShowBookingForm(true)}
+                    className="book-spot-btn"
+                  >
+                    Book Your Spot
+                  </button>
+                ) : (
+                  <form onSubmit={handleBookSubmit} className="booking-form">
+                    <div className="form-group">
+                      <label htmlFor="booking-names">
+                        Name(s) <span className="form-hint">(separate multiple names with commas)</span>
+                      </label>
+                      <input
+                        id="booking-names"
+                        type="text"
+                        value={bookingNames}
+                        onChange={(e) => setBookingNames(e.target.value)}
+                        placeholder="Your Name, Partner's Name"
+                        required
+                        className="booking-input"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="booking-email">Email</label>
+                      <input
+                        id="booking-email"
+                        type="email"
+                        value={bookingEmail}
+                        onChange={(e) => setBookingEmail(e.target.value)}
+                        placeholder="your.email@example.com"
+                        required
+                        className="booking-input"
+                      />
+                    </div>
+                    <div className="booking-form-actions">
+                      <button 
+                        type="submit" 
+                        disabled={isBooking}
+                        className="submit-booking-btn"
+                      >
+                        {isBooking ? 'Booking...' : 'Confirm Booking'}
+                      </button>
+                      <button 
+                        type="button"
+                        onClick={() => setShowBookingForm(false)}
+                        className="cancel-form-btn"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
             </div>
           )}

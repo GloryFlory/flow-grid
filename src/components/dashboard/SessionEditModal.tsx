@@ -18,6 +18,10 @@ interface Session {
   prerequisites?: string
   cardType: 'detailed' | 'minimal' | 'photo'
   displayOrder?: number
+  bookingEnabled?: boolean
+  bookingCapacity?: number
+  requirePayment?: boolean
+  price?: number
 }
 
 interface SessionEditModalProps {
@@ -80,7 +84,11 @@ export default function SessionEditModal({
     capacity: undefined,
     prerequisites: '',
     cardType: 'detailed',
-    displayOrder: undefined
+    displayOrder: undefined,
+    bookingEnabled: false,
+    bookingCapacity: undefined,
+    requirePayment: false,
+    price: undefined
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -94,10 +102,19 @@ export default function SessionEditModal({
       if (session) {
         setFormData({
           ...session,
-          capacity: session.capacity || undefined
+          capacity: session.capacity || undefined,
+          bookingEnabled: session.bookingEnabled === true,
+          bookingCapacity: session.bookingCapacity || undefined,
+          requirePayment: session.requirePayment === true,
+          price: session.price || undefined
         })
         // Show advanced section if any advanced fields have values
-        setShowAdvanced(!!(session.prerequisites || session.location || session.capacity))
+        setShowAdvanced(!!(
+          session.prerequisites || 
+          session.location || 
+          session.capacity || 
+          session.bookingEnabled
+        ))
       } else {
         // Reset form for new session
         setFormData({
@@ -112,7 +129,11 @@ export default function SessionEditModal({
           location: '',
           capacity: undefined,
           prerequisites: '',
-          cardType: 'detailed'
+          cardType: 'detailed',
+          bookingEnabled: false,
+          bookingCapacity: undefined,
+          requirePayment: false,
+          price: undefined
         })
         setShowAdvanced(false)
       }
@@ -480,6 +501,88 @@ export default function SessionEditModal({
                   placeholder="Required experience"
                 />
               </div>
+            </div>
+          )}
+          
+          {/* Booking Options */}
+          {showAdvanced && (
+            <div className="pt-4 border-t border-gray-100 mt-4">
+              <div className="mb-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.bookingEnabled || false}
+                    onChange={(e) => handleInputChange('bookingEnabled', e.target.checked)}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700">
+                    Enable Booking System
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    Allow participants to reserve spots
+                  </span>
+                </label>
+              </div>
+              
+              {formData.bookingEnabled && (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 pl-6 border-l-2 border-blue-200">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Booking Capacity *
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={formData.bookingCapacity || ''}
+                      onChange={(e) => handleInputChange('bookingCapacity', e.target.value ? parseInt(e.target.value) : undefined)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Max bookings"
+                      required
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Maximum number of spots available
+                    </p>
+                  </div>
+                  
+                  <div className="lg:col-span-2">
+                    <label className="flex items-center gap-2 cursor-pointer mb-2">
+                      <input
+                        type="checkbox"
+                        checked={formData.requirePayment || false}
+                        onChange={(e) => handleInputChange('requirePayment', e.target.checked)}
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <span className="text-sm font-medium text-gray-700">
+                        Require Payment
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        (Coming soon with Stripe integration)
+                      </span>
+                    </label>
+                    
+                    {formData.requirePayment && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Price (€)
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={formData.price || ''}
+                          onChange={(e) => handleInputChange('price', e.target.value ? parseFloat(e.target.value) : undefined)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="10.00"
+                          disabled
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Payment processing will be available in a future update
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

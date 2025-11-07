@@ -58,6 +58,10 @@ interface FestivalSession {
   teacherBios: string[]
   cardType: 'minimal' | 'photo' | 'detailed'
   displayOrder?: number
+  bookingEnabled?: boolean
+  bookingCapacity?: number
+  requirePayment?: boolean
+  price?: number
 }
 
 interface Festival {
@@ -72,12 +76,16 @@ interface Festival {
 // Sortable Row Component
 function SortableSessionRow({ 
   session, 
+  bookings,
   onEdit, 
-  onDelete 
+  onDelete,
+  onViewBookings
 }: { 
   session: FestivalSession
+  bookings: any[]
   onEdit: (session: FestivalSession) => void
   onDelete: (id: string) => void
+  onViewBookings: (sessionId: string) => void
 }) {
   const {
     attributes,
@@ -87,6 +95,16 @@ function SortableSessionRow({
     transition,
     isDragging,
   } = useSortable({ id: session.id })
+
+  // Calculate booking count for this session
+  const sessionBookings = bookings.filter(b => b.sessionId === session.id)
+  const totalBooked = sessionBookings.reduce((sum, booking) => {
+    const names = booking.participantName?.split(',').map((n: string) => n.trim()).filter(Boolean) || []
+    return sum + names.length
+  }, 0)
+  const capacity = session.bookingCapacity || 0
+  const isFullyBooked = session.bookingEnabled && capacity > 0 && totalBooked >= capacity
+  const hasBookings = session.bookingEnabled && totalBooked > 0
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -156,6 +174,26 @@ function SortableSessionRow({
           )}
         </div>
       </td>
+      <td className="py-3 px-4">
+        {session.bookingEnabled ? (
+          <button
+            onClick={() => onViewBookings(session.id)}
+            className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+              isFullyBooked
+                ? 'bg-red-100 text-red-800 hover:bg-red-200'
+                : hasBookings
+                ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            <Users className="w-3.5 h-3.5 mr-1.5" />
+            {totalBooked}/{capacity}
+            {isFullyBooked && <span className="ml-1.5">FULL</span>}
+          </button>
+        ) : (
+          <span className="text-sm text-gray-400">-</span>
+        )}
+      </td>
       <td className="py-3 px-4 text-right">
         <div className="flex items-center justify-end gap-2">
           <Button
@@ -185,6 +223,8 @@ export default function SessionsManagement() {
   
   const [festival, setFestival] = useState<Festival | null>(null)
   const [sessions, setSessions] = useState<FestivalSession[]>([])
+  const [bookings, setBookings] = useState<any[]>([])
+  const [activeTab, setActiveTab] = useState<'sessions' | 'bookings'>('sessions')
   const [isLoading, setIsLoading] = useState(true)
   const [isUploading, setIsUploading] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -193,6 +233,8 @@ export default function SessionsManagement() {
   const [showEditModal, setShowEditModal] = useState(false)
   const [editingSession, setEditingSession] = useState<FestivalSession | null>(null)
   const [dragActive, setDragActive] = useState(false)
+  const [bookingSearchTerm, setBookingSearchTerm] = useState('')
+  const [bookingFilterSession, setBookingFilterSession] = useState('all')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Drag and drop sensors
@@ -206,6 +248,7 @@ export default function SessionsManagement() {
   useEffect(() => {
     if (festivalId) {
       fetchFestival()
+      fetchBookings() // Always fetch bookings for the count
     }
   }, [festivalId])
 
@@ -228,6 +271,18 @@ export default function SessionsManagement() {
       console.error('Error fetching festival:', error)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const fetchBookings = async () => {
+    try {
+      const response = await fetch(`/api/admin/festivals/${festivalId}/bookings`)
+      if (response.ok) {
+        const data = await response.json()
+        setBookings(data.bookings || [])
+      }
+    } catch (error) {
+      console.error('Error fetching bookings:', error)
     }
   }
 
@@ -490,7 +545,52 @@ export default function SessionsManagement() {
       capacity: session.capacity,
       prerequisites: session.prerequisites || '',
       cardType: session.cardType as 'detailed' | 'minimal' | 'photo',
-      displayOrder: session.displayOrder
+      displayOrder: session.displayOrder,
+      bookingEnabled: session.bookingEnabled,
+      bookingCapacity: session.bookingCapacity,
+      requirePayment: session.requirePayment,
+      price: session.price
+    }
+  }
+
+  const exportBookingsCSV = () => {
+    const csv = [
+      ['Session', 'Day', 'Time', 'Names', 'Email', 'Booked At'].join(','),
+      ...filteredBookings.map(b => [
+        `"${b.session.title}"`,
+        b.session.day,
+        `${b.session.startTime}-${b.session.endTime}`,
+        `"${b.names.join(', ')}"`,
+        b.email || 'N/A',
+        new Date(b.createdAt).toLocaleString()
+      ].join(','))
+    ].join('\n')
+
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${festival?.name}-bookings-${new Date().toISOString().split('T')[0]}.csv`
+    a.click()
+    window.URL.revokeObjectURL(url)
+  }
+
+  const handleDeleteBooking = async (bookingId: string) => {
+    if (!confirm('Are you sure you want to delete this booking?')) return
+    
+    try {
+      const response = await fetch(`/api/admin/festivals/${festivalId}/bookings/${bookingId}`, {
+        method: 'DELETE'
+      })
+      
+      if (response.ok) {
+        setBookings(prev => prev.filter(b => b.id !== bookingId))
+      } else {
+        alert('Failed to delete booking')
+      }
+    } catch (error) {
+      console.error('Error deleting booking:', error)
+      alert('Failed to delete booking')
     }
   }
 
@@ -589,6 +689,49 @@ export default function SessionsManagement() {
       })
   }, [sessions, festival])
 
+  // Filter bookings
+  const filteredBookings = React.useMemo(() => {
+    if (!festival) return bookings
+    
+    // Generate festival day order based on dates
+    const festivalDayOrder: string[] = []
+    const startDate = new Date(festival.startDate + 'T00:00:00Z')
+    const endDate = new Date(festival.endDate + 'T00:00:00Z')
+    
+    const currentDate = new Date(startDate)
+    while (currentDate <= endDate) {
+      const dayName = currentDate.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' })
+      festivalDayOrder.push(dayName)
+      currentDate.setUTCDate(currentDate.getUTCDate() + 1)
+    }
+    
+    // Filter bookings
+    const filtered = bookings.filter(booking => {
+      const matchesSearch = bookingSearchTerm === '' || 
+        booking.names.some((name: string) => name.toLowerCase().includes(bookingSearchTerm.toLowerCase())) ||
+        booking.email?.toLowerCase().includes(bookingSearchTerm.toLowerCase()) ||
+        booking.session.title.toLowerCase().includes(bookingSearchTerm.toLowerCase());
+      
+      const matchesSession = bookingFilterSession === 'all' || booking.session.id === bookingFilterSession;
+      
+      return matchesSearch && matchesSession;
+    })
+    
+    // Sort by session day order, then by session time, then by booking creation time
+    return filtered.sort((a, b) => {
+      // First sort by session day
+      const dayComparison = festivalDayOrder.indexOf(a.session.day) - festivalDayOrder.indexOf(b.session.day)
+      if (dayComparison !== 0) return dayComparison
+      
+      // Then by session start time
+      const timeComparison = a.session.startTime.localeCompare(b.session.startTime)
+      if (timeComparison !== 0) return timeComparison
+      
+      // Finally by booking creation time (most recent first)
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    })
+  }, [bookings, bookingSearchTerm, bookingFilterSession, festival])
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -652,21 +795,62 @@ export default function SessionsManagement() {
                   <span className="hidden sm:inline">View Live Schedule</span>
                 </Button>
               </Link>
-              <Button onClick={exportCSV} variant="outline" size="sm">
-                <Download className="w-4 h-4 sm:mr-2" />
-                <span className="hidden sm:inline">Export CSV</span>
-              </Button>
-              <Button onClick={() => openEditModal()} size="sm">
-                <Plus className="w-4 h-4 sm:mr-2" />
-                <span className="hidden sm:inline">Add Session</span>
-              </Button>
+              {activeTab === 'sessions' && (
+                <>
+                  <Button onClick={exportCSV} variant="outline" size="sm">
+                    <Download className="w-4 h-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Export CSV</span>
+                  </Button>
+                  <Button onClick={() => openEditModal()} size="sm">
+                    <Plus className="w-4 h-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Add Session</span>
+                  </Button>
+                </>
+              )}
+              {activeTab === 'bookings' && (
+                <Button onClick={exportBookingsCSV} variant="outline" size="sm">
+                  <Download className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Export Bookings</span>
+                </Button>
+              )}
             </div>
+          </div>
+          
+          {/* Tabs */}
+          <div className="flex gap-1 mt-6 border-b border-gray-200">
+            <button
+              onClick={() => setActiveTab('sessions')}
+              className={`px-4 py-2 text-sm font-medium transition-colors relative ${
+                activeTab === 'sessions'
+                  ? 'text-purple-600'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Sessions ({sessions.length})
+              {activeTab === 'sessions' && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600"></div>
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab('bookings')}
+              className={`px-4 py-2 text-sm font-medium transition-colors relative ${
+                activeTab === 'bookings'
+                  ? 'text-purple-600'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Bookings ({bookings.length})
+              {activeTab === 'bookings' && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600"></div>
+              )}
+            </button>
           </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {activeTab === 'sessions' ? (
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* CSV Upload Section */}
           <div className="lg:col-span-1">
             <Card>
@@ -764,6 +948,15 @@ export default function SessionsManagement() {
                   <span className="text-sm text-gray-600">Unique Teachers</span>
                   <span className="font-semibold">
                     {Array.from(new Set(sessions.flatMap(s => s.teachers))).length}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Total Bookings</span>
+                  <span className="font-semibold text-green-600">
+                    {bookings.reduce((sum, booking) => {
+                      const names = booking.participantName?.split(',').map((n: string) => n.trim()).filter(Boolean) || []
+                      return sum + names.length
+                    }, 0)}
                   </span>
                 </div>
                 
@@ -870,6 +1063,7 @@ export default function SessionsManagement() {
                             <th className="text-left py-3 px-4 font-medium text-gray-900">Teachers</th>
                             <th className="text-left py-3 px-4 font-medium text-gray-900">Level</th>
                             <th className="text-left py-3 px-4 font-medium text-gray-900">Styles</th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-900">Bookings</th>
                             <th className="text-right py-3 px-4 font-medium text-gray-900">Actions</th>
                           </tr>
                         </thead>
@@ -882,8 +1076,13 @@ export default function SessionsManagement() {
                               <SortableSessionRow
                                 key={session.id}
                                 session={session}
+                                bookings={bookings}
                                 onEdit={openEditModal}
                                 onDelete={deleteSession}
+                                onViewBookings={(sessionId) => {
+                                  setBookingFilterSession(sessionId)
+                                  setActiveTab('bookings')
+                                }}
                               />
                             ))}
                           </SortableContext>
@@ -896,6 +1095,110 @@ export default function SessionsManagement() {
             </Card>
           </div>
         </div>
+        ) : (
+          /* Bookings Tab Content */
+          <div className="space-y-6">
+            {/* Filters */}
+            <div className="flex gap-4">
+              <input
+                type="text"
+                placeholder="Search by name, email, or session..."
+                value={bookingSearchTerm}
+                onChange={(e) => setBookingSearchTerm(e.target.value)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+              />
+              <select
+                value={bookingFilterSession}
+                onChange={(e) => setBookingFilterSession(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent min-w-[250px]"
+              >
+                <option value="all">All Sessions ({bookings.length})</option>
+                {Array.from(new Set(bookings.map(b => b.session.id))).map(sessionId => {
+                  const booking = bookings.find(b => b.session.id === sessionId)!
+                  const count = bookings.filter(b => b.session.id === sessionId).length
+                  return (
+                    <option key={sessionId} value={sessionId}>
+                      {booking.session.title} ({count})
+                    </option>
+                  )
+                })}
+              </select>
+            </div>
+
+            {/* Bookings Table */}
+            {filteredBookings.length === 0 ? (
+              <Card>
+                <CardContent className="text-center py-12">
+                  <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600">No bookings found</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardContent className="p-0">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Session</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Day & Time</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attendees</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Booked At</th>
+                          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {filteredBookings.map((booking: any) => (
+                          <tr key={booking.id} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm font-medium text-gray-900">{booking.session.title}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">{booking.session.day}</div>
+                              <div className="text-sm text-gray-500">
+                                {booking.session.startTime.substring(0, 5)} - {booking.session.endTime.substring(0, 5)}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex flex-wrap gap-2">
+                                {booking.names.map((name: string, idx: number) => (
+                                  <span key={idx} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    {name}
+                                  </span>
+                                ))}
+                              </div>
+                              <div className="text-xs text-gray-500 mt-1">
+                                {booking.names.length} spot{booking.names.length !== 1 ? 's' : ''}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">{booking.email || <span className="text-gray-400 italic">No email</span>}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">{new Date(booking.createdAt).toLocaleDateString()}</div>
+                              <div className="text-sm text-gray-500">
+                                {new Date(booking.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-right">
+                              <button
+                                onClick={() => handleDeleteBooking(booking.id)}
+                                className="text-red-600 hover:text-red-900 text-sm font-medium"
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Session Edit Modal */}
