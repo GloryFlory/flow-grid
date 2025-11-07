@@ -29,7 +29,7 @@ export function FilterBar({
   availableStyles,
   availableTeachers
 }: FilterBarProps) {
-  const [filtersOpen, setFiltersOpen] = useState(true) // Open by default for better discoverability
+  const [filtersOpen, setFiltersOpen] = useState(false) // Collapsed by default on mobile
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
