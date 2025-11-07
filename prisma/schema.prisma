@@ -9,23 +9,23 @@ datasource db {
 }
 
 model User {
-  id                    String                 @id @default(cuid())
-  email                 String                 @unique
-  emailVerified         DateTime?
-  name                  String?
-  avatar                String?
-  password              String? // legacy only
-  resetToken            String?
-  resetTokenExpiry      DateTime?
-  createdAt             DateTime               @default(now())
-  updatedAt             DateTime               @updatedAt
-  role                  UserRole               @default(USER)
-  accounts              Account[]
-  festivals             Festival[]
-  sessions              Session[]
-  subscription          Subscription?
-  webAuthnCredentials   WebAuthnCredential[]
-  analytics             Analytics[]
+  id                  String               @id @default(cuid())
+  email               String               @unique
+  emailVerified       DateTime?
+  name                String?
+  avatar              String?
+  password            String?
+  resetToken          String?
+  resetTokenExpiry    DateTime?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  role                UserRole             @default(USER)
+  accounts            Account[]
+  analytics           Analytics[]
+  festivals           Festival[]
+  sessions            Session[]
+  subscription        Subscription?
+  webAuthnCredentials WebAuthnCredential[]
 
   @@map("users")
 }
@@ -74,43 +74,47 @@ model Festival {
   accentColor    String            @default("#ff6b6b")
   isPublished    Boolean           @default(false)
   customDomain   String?           @unique
-  whatsappLink   String?
-  telegramLink   String?
-  facebookLink   String?
-  instagramLink  String?
   userId         String
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
+  facebookLink   String?
+  instagramLink  String?
+  telegramLink   String?
+  whatsappLink   String?
   analytics      Analytics[]
   bookings       Booking[]
   sessions       FestivalSession[]
-  teachers       Teacher[]
   user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  teachers       Teacher[]
 
   @@map("festivals")
 }
 
 model FestivalSession {
-  id            String    @id @default(cuid())
-  title         String
-  description   String?
-  day           String
-  startTime     String
-  endTime       String
-  location      String?
-  level         String?
-  styles        String[]
-  prerequisites String?
-  capacity      Int?
-  teachers      String[]
-  teacherBios   String[]
-  cardType      String    @default("full")
-  displayOrder  Decimal   @default(0)
-  festivalId    String
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  bookings      Booking[]
-  festival      Festival  @relation(fields: [festivalId], references: [id], onDelete: Cascade)
+  id              String    @id @default(cuid())
+  title           String
+  description     String?
+  day             String
+  startTime       String
+  endTime         String
+  location        String?
+  level           String?
+  styles          String[]
+  prerequisites   String?
+  capacity        Int?
+  teachers        String[]
+  teacherBios     String[]
+  cardType        String    @default("full")
+  festivalId      String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  displayOrder    Decimal   @default(0)
+  bookingCapacity Int?
+  bookingEnabled  Boolean   @default(false)
+  price           Decimal?
+  requirePayment  Boolean   @default(false)
+  bookings        Booking[]
+  festival        Festival  @relation(fields: [festivalId], references: [id], onDelete: Cascade)
 
   @@map("festival_sessions")
 }
@@ -152,30 +156,28 @@ model Subscription {
 model TeacherPhoto {
   id          String   @id @default(cuid())
   filename    String   @unique
-  teacherName String   // Legacy: kept for backward compatibility
-  teacherId   String?  // New: link to Teacher record
+  teacherName String
+  teacherId   String?
   filePath    String
   fileSize    Int
   mimeType    String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
   teacher     Teacher? @relation(fields: [teacherId], references: [id], onDelete: Cascade)
 
   @@map("teacher_photos")
 }
 
 model Teacher {
-  id         String          @id @default(cuid())
+  id         String         @id @default(cuid())
   festivalId String
   name       String
   url        String?
-  isGroup    Boolean         @default(false)
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
-
-  festival   Festival        @relation(fields: [festivalId], references: [id], onDelete: Cascade)
+  isGroup    Boolean        @default(false)
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
   photos     TeacherPhoto[]
+  festival   Festival       @relation(fields: [festivalId], references: [id], onDelete: Cascade)
 
   @@unique([festivalId, name])
   @@map("teachers")
@@ -189,8 +191,8 @@ model Analytics {
   userId     String?
   festivalId String?
   timestamp  DateTime  @default(now())
-  user       User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   festival   Festival? @relation(fields: [festivalId], references: [id], onDelete: Cascade)
+  user       User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("analytics")
 }
@@ -207,13 +209,13 @@ model VerificationToken {
 model WebAuthnCredential {
   id           String   @id @default(cuid())
   userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   credentialId String   @unique
   publicKey    Bytes
   counter      BigInt
   transports   String?
   createdAt    DateTime @default(now())
   lastUsedAt   DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("webauthn_credentials")

@@ -46,10 +46,10 @@ export async function GET(
             prerequisites: true,
             capacity: true,
             cardType: true,
-            displayOrder: true,
+            bookingEnabled: true,
+            bookingCapacity: true,
           },
           orderBy: [
-            { displayOrder: 'asc' },
             { startTime: 'asc' }
           ]
         },
@@ -179,7 +179,8 @@ export async function GET(
       capacity: session.capacity || 20,
       currentBookings: 0, // TODO: Implement booking system
       cardType: session.cardType || 'detailed',
-      displayOrder: session.displayOrder || 0
+      bookingEnabled: session.bookingEnabled || false,
+      bookingCapacity: session.bookingCapacity || null
     }))
 
     const response = {

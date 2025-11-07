@@ -18,6 +18,8 @@ interface Session {
   currentBookings: number
   cardType: string
   CardType?: string // Handle casing variations from CSV imports
+  bookingEnabled?: boolean
+  bookingCapacity?: number | null
 }
 
 interface SessionCardProps {
@@ -107,9 +109,19 @@ export function SessionCard({ session, onClick, onStyleClick, onLevelClick, onTe
       <div className={`session-card session-card-${size} simple-card ${workshopClass}`} onClick={() => onClick(session)}>
         <div className="session-header">
           <h3 className="session-title session-title-fixed-height">{session.title}</h3>
-          <button className="info-button" onClick={(e) => { e.stopPropagation(); onClick(session); }}>
-            <span>ℹ</span>
-          </button>
+          {session.bookingEnabled && session.bookingCapacity && session.bookingCapacity > 0 ? (
+            <button 
+              className="book-pill-button"
+              onClick={(e) => { e.stopPropagation(); onClick(session); }}
+              title="Book this session"
+            >
+              Book
+            </button>
+          ) : (
+            <button className="info-button" onClick={(e) => { e.stopPropagation(); onClick(session); }}>
+              <span>ℹ</span>
+            </button>
+          )}
         </div>
         <div className="session-content">
           <div className="session-time-location">
@@ -127,9 +139,19 @@ export function SessionCard({ session, onClick, onStyleClick, onLevelClick, onTe
       <div className={`session-card session-card-${size} photo-only-card ${workshopClass}`} onClick={() => onClick(session)}>
         <div className="session-header">
           <h3 className="session-title session-title-fixed-height">{session.title}</h3>
-          <button className="info-button" onClick={(e) => { e.stopPropagation(); onClick(session); }}>
-            <span>ℹ</span>
-          </button>
+          {session.bookingEnabled && session.bookingCapacity && session.bookingCapacity > 0 ? (
+            <button 
+              className="book-pill-button"
+              onClick={(e) => { e.stopPropagation(); onClick(session); }}
+              title="Book this session"
+            >
+              Book
+            </button>
+          ) : (
+            <button className="info-button" onClick={(e) => { e.stopPropagation(); onClick(session); }}>
+              <span>ℹ</span>
+            </button>
+          )}
         </div>
         <div className="session-content">
           <div className="session-time-location">
@@ -225,9 +247,19 @@ export function SessionCard({ session, onClick, onStyleClick, onLevelClick, onTe
         {/* Line 1: Name and Info button */}
         <div className="session-header">
           <h3 className="session-title session-title-fixed-height">{session.title}</h3>
-          <button className="info-button" onClick={(e) => { e.stopPropagation(); onClick(session); }}>
-            <span>ℹ</span>
-          </button>
+          {session.bookingEnabled && session.bookingCapacity && session.bookingCapacity > 0 ? (
+            <button 
+              className="book-pill-button"
+              onClick={(e) => { e.stopPropagation(); onClick(session); }}
+              title="Book this session"
+            >
+              Book
+            </button>
+          ) : (
+            <button className="info-button" onClick={(e) => { e.stopPropagation(); onClick(session); }}>
+              <span>ℹ</span>
+            </button>
+          )}
         </div>
         
         <div className="session-content">

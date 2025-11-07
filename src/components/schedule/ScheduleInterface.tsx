@@ -606,6 +606,7 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
       <SessionModal 
         session={selectedSession} 
         onClose={() => setSelectedSession(null)}
+        festivalSlug={festival.slug}
       />
     </div>
   )
