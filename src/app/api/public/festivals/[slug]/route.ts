@@ -8,64 +8,15 @@ export async function GET(
   try {
     const { slug } = await params
     
-    // Optimized query - select only needed fields
+    // Optimized query - get published festival with all sessions and teachers
     const festival = await prisma.festival.findUnique({
       where: { 
         slug,
         isPublished: true // Only show published festivals
       },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        slug: true,
-        location: true,
-        logo: true,
-        primaryColor: true,
-        secondaryColor: true,
-        accentColor: true,
-        startDate: true,
-        endDate: true,
-        timezone: true,
-        whatsappLink: true,
-        telegramLink: true,
-        facebookLink: true,
-        instagramLink: true,
-        sessions: {
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            day: true,
-            startTime: true,
-            endTime: true,
-            location: true,
-            level: true,
-            styles: true,
-            teachers: true,
-            prerequisites: true,
-            capacity: true,
-            cardType: true,
-            bookingEnabled: true,
-            bookingCapacity: true,
-          },
-          orderBy: [
-            { startTime: 'asc' }
-          ]
-        },
-        teachers: {
-          select: {
-            id: true,
-            name: true,
-            url: true,
-            photos: {
-              select: {
-                filePath: true
-              },
-              take: 1 // Only get the first photo per teacher
-            }
-          } as any
-        }
+      include: {
+        sessions: true,
+        teachers: true
       }
     })
 
@@ -78,10 +29,27 @@ export async function GET(
 
     // Create maps for ONLY this festival's teachers (privacy fix!)
     const f: any = festival as any
-    const teacherPhotoMap = (f.teachers as any[]).reduce((acc: Record<string, string>, teacher: any) => {
-      const teacherKey = teacher.name.toLowerCase().trim()
-      if (teacher.photos && teacher.photos.length > 0) {
-        acc[teacherKey] = teacher.photos[0].filePath
+    
+    // Fetch teacher photos for this festival's teachers
+    const teacherNames = (f.teachers as any[]).map((t: any) => t.name)
+    const teacherPhotos = await prisma.teacherPhoto.findMany({
+      where: {
+        OR: [
+          { teacherName: { in: teacherNames } },
+          { 
+            teacher: {
+              festivalId: festival.id
+            }
+          } as any
+        ]
+      }
+    })
+    
+    // Create teacher photo map by name (use first photo found)
+    const teacherPhotoMap = teacherPhotos.reduce((acc: Record<string, string>, photo: any) => {
+      const teacherKey = photo.teacherName.toLowerCase().trim()
+      if (!acc[teacherKey]) {
+        acc[teacherKey] = photo.filePath
       }
       return acc
     }, {})
@@ -160,28 +128,37 @@ export async function GET(
       }
     }
 
-    // Streamlined transformation
-    const transformedSessions = (f.sessions as any[]).map((session: any) => ({
-      id: session.id,
-      title: session.title,
-      description: session.description || '',
-      day: session.day === 'Invalid Date' ? 'TBD' : convertDateToDay(session.day || 'TBD'),
-      start: session.startTime || '00:00',
-      end: session.endTime || '01:00',
-      location: session.location || '',
-      level: session.level || 'All Levels',
-      styles: session.styles || [],
-      teachers: session.teachers || [],
-      teacherPhoto: getTeacherPhoto(session.teachers || []), // Single photo for backward compatibility
-      teacherPhotos: getTeacherPhotos(session.teachers || []), // Array of photos for each teacher
-      teacherUrls: getTeacherUrls(session.teachers || []),
-      prereqs: session.prerequisites || '',
-      capacity: session.capacity || 20,
-      currentBookings: 0, // TODO: Implement booking system
-      cardType: session.cardType || 'detailed',
-      bookingEnabled: session.bookingEnabled || false,
-      bookingCapacity: session.bookingCapacity || null
-    }))
+    // Streamlined transformation with sorting
+    const transformedSessions = (f.sessions as any[])
+      .sort((a: any, b: any) => {
+        // Sort by displayOrder first, then by startTime
+        const orderA = a.displayOrder || 0
+        const orderB = b.displayOrder || 0
+        if (orderA !== orderB) return orderA - orderB
+        return (a.startTime || '00:00').localeCompare(b.startTime || '00:00')
+      })
+      .map((session: any) => ({
+        id: session.id,
+        title: session.title,
+        description: session.description || '',
+        day: session.day === 'Invalid Date' ? 'TBD' : convertDateToDay(session.day || 'TBD'),
+        start: session.startTime || '00:00',
+        end: session.endTime || '01:00',
+        location: session.location || '',
+        level: session.level || 'All Levels',
+        styles: session.styles || [],
+        teachers: session.teachers || [],
+        teacherPhoto: getTeacherPhoto(session.teachers || []), // Single photo for backward compatibility
+        teacherPhotos: getTeacherPhotos(session.teachers || []), // Array of photos for each teacher
+        teacherUrls: getTeacherUrls(session.teachers || []),
+        prereqs: session.prerequisites || '',
+        capacity: session.capacity || 20,
+        currentBookings: 0, // TODO: Implement booking system
+        cardType: session.cardType || 'detailed',
+        bookingEnabled: session.bookingEnabled || false,
+        bookingCapacity: session.bookingCapacity || null,
+        displayOrder: session.displayOrder || 0
+      }))
 
     const response = {
       festival: {
