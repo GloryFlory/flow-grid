@@ -491,8 +491,8 @@ body {
 
 .clear-filters-btn.active {
   border-color: var(--accent-color, var(--coral-accent));
-  color: white;
-  background: var(--accent-color, var(--coral-accent));
+  color: var(--accent-color, var(--coral-accent));
+  background: white;
   font-weight: 700;
   box-shadow: 0 2px 8px rgba(255, 111, 97, 0.3);
 }
