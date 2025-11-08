@@ -16,10 +16,17 @@ export async function GET(
 
     const { id: festivalId } = await params
 
-    // Get all sessions for this festival
+    // Get all sessions for this festival with bookings to count participants
     const sessions = await prisma.festivalSession.findMany({
       where: {
         festivalId: festivalId
+      },
+      include: {
+        bookings: {
+          select: {
+            names: true
+          }
+        }
       },
       orderBy: [
         { displayOrder: 'asc' },
@@ -27,19 +34,37 @@ export async function GET(
       ]
     })
 
+    // Transform sessions to include participant count instead of raw bookings
+    const sessionsWithCounts = sessions.map(session => {
+      // Count total participants across all bookings
+      const totalParticipants = session.bookings.reduce((sum, booking) => {
+        return sum + (booking.names?.length || 0)
+      }, 0)
+
+      const { bookings, ...sessionData } = session
+      
+      return {
+        ...sessionData,
+        _count: {
+          bookings: totalParticipants // Total number of participants, not booking rows
+        }
+      }
+    })
+
     // Debug: Log booking fields for first session
-    if (sessions.length > 0) {
+    if (sessionsWithCounts.length > 0) {
       console.log('📤 GET sessions - First session booking fields:', {
-        id: sessions[0].id,
-        title: sessions[0].title,
-        bookingEnabled: sessions[0].bookingEnabled,
-        bookingCapacity: sessions[0].bookingCapacity,
-        requirePayment: sessions[0].requirePayment,
-        price: sessions[0].price
+        id: sessionsWithCounts[0].id,
+        title: sessionsWithCounts[0].title,
+        bookingEnabled: sessionsWithCounts[0].bookingEnabled,
+        bookingCapacity: sessionsWithCounts[0].bookingCapacity,
+        participantCount: sessionsWithCounts[0]._count.bookings,
+        requirePayment: sessionsWithCounts[0].requirePayment,
+        price: sessionsWithCounts[0].price
       })
     }
 
-    return NextResponse.json({ sessions })
+    return NextResponse.json({ sessions: sessionsWithCounts })
   } catch (error) {
     console.error('Error fetching sessions:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

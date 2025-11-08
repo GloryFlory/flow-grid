@@ -22,6 +22,9 @@ interface Session {
   bookingCapacity?: number
   requirePayment?: boolean
   price?: number
+  _count?: {
+    bookings: number
+  }
 }
 
 interface SessionEditModalProps {
@@ -522,6 +525,23 @@ export default function SessionEditModal({
                     Allow participants to reserve spots
                   </span>
                 </label>
+                
+                {/* Show current booking count if session has bookings enabled */}
+                {session?.bookingEnabled && session?._count && (
+                  <div className="ml-6 mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <Users className="w-4 h-4 text-blue-600" />
+                      <span className="text-sm font-medium text-blue-900">
+                        Current Bookings: {session._count.bookings}/{session.bookingCapacity || 0}
+                      </span>
+                      {session._count.bookings >= (session.bookingCapacity || 0) && (
+                        <span className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded-full">
+                          FULL
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
               
               {formData.bookingEnabled && (

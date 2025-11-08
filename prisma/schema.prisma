@@ -74,6 +74,7 @@ model Festival {
   accentColor    String            @default("#ff6b6b")
   isPublished    Boolean           @default(false)
   customDomain   String?           @unique
+  googleSheetUrl String?
   userId         String
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
