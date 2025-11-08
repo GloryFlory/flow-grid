@@ -89,6 +89,7 @@ export async function POST(
     const { id: festivalId } = await params
     const formData = await request.formData()
     const file = formData.get('file') as File
+    const mode = formData.get('mode') as string || 'replace' // 'replace' or 'merge'
     
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
@@ -105,7 +106,7 @@ export async function POST(
     // Remove BOM if present
     const firstLine = lines[0].replace(/^\uFEFF/, '')
     const delimiter = firstLine.includes(';') ? ';' : ','
-    console.log(`CSV import: detected delimiter = "${delimiter}"`)
+    console.log(`CSV import: detected delimiter = "${delimiter}", mode = "${mode}"`)
 
     // Skip header row
     const dataLines = lines.slice(1).filter(line => line.trim())
@@ -190,19 +191,117 @@ export async function POST(
       return NextResponse.json({ error: 'No valid sessions found in CSV' }, { status: 400 })
     }
 
-    // Delete existing sessions for this festival
-    await prisma.festivalSession.deleteMany({
-      where: { festivalId }
+    // ========== MODE: REPLACE ALL ==========
+    if (mode === 'replace') {
+      // Check for sessions with bookings before deleting
+      const sessionsWithBookings = await prisma.festivalSession.findMany({
+        where: {
+          festivalId,
+          bookings: {
+            some: {}
+          }
+        },
+        include: {
+          _count: {
+            select: { bookings: true }
+          }
+        }
+      })
+
+      // In replace mode, we still allow deletion but user was warned
+      console.log(`Replace mode: Deleting ${sessionsWithBookings.length} sessions with bookings`)
+
+      // Delete existing sessions for this festival
+      await prisma.festivalSession.deleteMany({
+        where: { festivalId }
+      })
+
+      // Create new sessions
+      const createdSessions = await prisma.festivalSession.createMany({
+        data: sessionsToCreate
+      })
+
+      return NextResponse.json({ 
+        message: `Successfully replaced all sessions with ${createdSessions.count} new sessions`,
+        count: createdSessions.count,
+        mode: 'replace'
+      })
+    }
+
+    // ========== MODE: SMART MERGE ==========
+    // Get current sessions
+    const currentSessions = await prisma.festivalSession.findMany({
+      where: { festivalId },
+      include: {
+        _count: {
+          select: { bookings: true }
+        }
+      }
     })
 
-    // Create new sessions
-    const createdSessions = await prisma.festivalSession.createMany({
-      data: sessionsToCreate
-    })
+    // Create a map for matching by composite key: day|startTime|title
+    const currentSessionsMap = new Map(
+      currentSessions.map(s => [
+        `${s.day}|${s.startTime}|${s.title}`,
+        s
+      ])
+    )
+
+    const csvSessionKeys = new Set(
+      sessionsToCreate.map(s => `${s.day}|${s.startTime}|${s.title}`)
+    )
+
+    let updatedCount = 0
+    let createdCount = 0
+    let deletedCount = 0
+
+    // 1. UPDATE or CREATE sessions from CSV
+    for (const csvSession of sessionsToCreate) {
+      const key = `${csvSession.day}|${csvSession.startTime}|${csvSession.title}`
+      const existing = currentSessionsMap.get(key)
+
+      if (existing) {
+        // UPDATE existing session
+        await prisma.festivalSession.update({
+          where: { id: existing.id },
+          data: {
+            ...csvSession,
+            festivalId: undefined // Remove festivalId from update
+          }
+        })
+        updatedCount++
+      } else {
+        // CREATE new session
+        await prisma.festivalSession.create({
+          data: csvSession
+        })
+        createdCount++
+      }
+    }
+
+    // 2. DELETE sessions not in CSV (only if they have no bookings)
+    // KEEP sessions with bookings even if not in CSV
+    for (const current of currentSessions) {
+      const key = `${current.day}|${current.startTime}|${current.title}`
+      
+      if (!csvSessionKeys.has(key)) {
+        if (current._count.bookings === 0) {
+          // Safe to delete - no bookings
+          await prisma.festivalSession.delete({
+            where: { id: current.id }
+          })
+          deletedCount++
+        }
+        // else: Keep the session (has bookings)
+      }
+    }
 
     return NextResponse.json({ 
-      message: `Successfully imported ${createdSessions.count} sessions`,
-      count: createdSessions.count
+      message: `Smart merge completed: ${createdCount} created, ${updatedCount} updated, ${deletedCount} deleted`,
+      created: createdCount,
+      updated: updatedCount,
+      deleted: deletedCount,
+      mode: 'merge'
     })
   } catch (error) {
     console.error('Error importing sessions:', error)

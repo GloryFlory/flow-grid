@@ -256,18 +256,6 @@ export default function FestivalManagement() {
                   </div>
                 </Link>
 
-                <Link href={`/dashboard/festivals/${festival.id}/bookings`}>
-                  <div className="p-3 sm:p-4 border border-gray-200 rounded-lg hover:border-emerald-300 hover:bg-emerald-50 transition-all cursor-pointer">
-                    <div className="flex items-start sm:items-center justify-between gap-3">
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 break-words">Session Bookings</h3>
-                        <p className="text-xs sm:text-sm text-gray-600 mt-0.5">View attendee bookings</p>
-                      </div>
-                      <Users className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 flex-shrink-0" />
-                    </div>
-                  </div>
-                </Link>
-
                 <Link href={`/dashboard/festivals/${festival.id}/info`}>
                   <div className="p-3 sm:p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all cursor-pointer">
                     <div className="flex items-start sm:items-center justify-between gap-3">
