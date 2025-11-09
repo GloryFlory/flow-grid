@@ -103,8 +103,30 @@ export default function SessionEditModal({
   useEffect(() => {
     if (isOpen) {
       if (session) {
+        // Extract time from datetime strings (format: "2025-11-14T09:00:00" -> "09:00")
+        const extractTime = (datetime: string) => {
+          if (!datetime) return ''
+          // Check if it's already just a time (HH:mm)
+          if (datetime.match(/^\d{2}:\d{2}$/)) return datetime
+          // Extract time from ISO datetime string
+          const timePart = datetime.split('T')[1]
+          return timePart ? timePart.substring(0, 5) : datetime
+        }
+
+        // Extract date from datetime string for the day field (format: "2025-11-14T09:00:00" -> "2025-11-14")
+        const extractDate = (datetime: string) => {
+          if (!datetime) return session.day || ''
+          // Check if it's already just a date (YYYY-MM-DD)
+          if (datetime.match(/^\d{4}-\d{2}-\d{2}$/)) return datetime
+          // Extract date from ISO datetime string
+          return datetime.split('T')[0]
+        }
+
         setFormData({
           ...session,
+          day: extractDate(session.startTime),
+          startTime: extractTime(session.startTime),
+          endTime: extractTime(session.endTime),
           capacity: session.capacity || undefined,
           bookingEnabled: session.bookingEnabled === true,
           bookingCapacity: session.bookingCapacity || undefined,

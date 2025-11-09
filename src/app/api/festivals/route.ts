@@ -121,6 +121,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(festival)
   } catch (error) {
     if (error instanceof z.ZodError) {
+      console.error('Zod validation error:', JSON.stringify(error.errors, null, 2))
       return NextResponse.json(
         { error: 'Invalid input', details: error.errors },
         { status: 400 }

@@ -1,0 +1,29 @@
+day,start,end,title,teachers,location,level,capacity,prerequisites,types,cardType,description
+Friday,09:00,10:30,Opening Ceremony,Sarah Johnson,Main Hall,All Levels,100,,Workshop,detailed,Welcome to the festival
+Friday,11:00,12:30,Morning Yoga,Maria Garcia,Yoga Studio,Beginner,30,,Class,detailed,Gentle morning practice
+Friday,14:00,15:30,Contact Improvisation,Alex Chen,Dance Hall,Intermediate,25,,Workshop,detailed,Exploring movement
+Friday,16:00,17:30,Evening Flow,Lisa Brown,Yoga Studio,All Levels,30,,Class,detailed,Sunset practice
+Saturday,09:00,10:30,Acro Yoga Basics,Tom Wilson,Outside Lawn,Beginner,20,,Workshop,detailed,Partner acrobatics
+Saturday,11:00,12:30,Advanced Vinyasa,Maria Garcia,Yoga Studio,Advanced,25,,Class,detailed,Dynamic flow
+Saturday,14:00,16:00,Jam Session,Various,Main Hall,All Levels,50,,Social,minimal,Open dance floor
+Saturday,16:30,18:00,Partner Dance,Emma Davis,Dance Hall,Intermediate,30,,Workshop,detailed,Connection through movement
+Sunday,09:00,10:30,Morning Meditation,Sarah Johnson,Meditation Room,All Levels,40,,Class,detailed,Guided meditation
+Sunday,11:00,12:30,Blues Dance,Mike Thompson,Dance Hall,Beginner,25,,Workshop,detailed,Introduction to blues
+Sunday,14:00,15:30,Aerial Yoga,Lisa Brown,Aerial Studio,Intermediate,15,,Class,detailed,Yoga in the air
+Sunday,16:00,17:30,Closing Circle,Sarah Johnson,Main Hall,All Levels,100,,Workshop,minimal,Festival closing
+Monday,09:00,10:30,Week 2 Yoga,Maria Garcia,Yoga Studio,Beginner,30,,Class,detailed,Fresh start for week 2
+Monday,11:00,12:30,Contact Deep Dive,Alex Chen,Dance Hall,Advanced,20,,Workshop,detailed,Advanced contact work
+Monday,14:00,15:30,Restorative Practice,Lisa Brown,Yoga Studio,All Levels,25,,Class,detailed,Deep relaxation
+Tuesday,09:00,10:30,Movement Lab,Tom Wilson,Dance Hall,Intermediate,20,,Workshop,detailed,Creative exploration
+Tuesday,11:00,12:30,Power Yoga,Maria Garcia,Yoga Studio,Advanced,25,,Class,detailed,Strength building
+Tuesday,14:00,16:00,Afternoon Jam,Various,Main Hall,All Levels,50,,Social,minimal,Community dance time
+Wednesday,09:00,10:30,Mindful Movement,Sarah Johnson,Yoga Studio,All Levels,30,,Class,detailed,Slow intentional practice
+Wednesday,11:00,12:30,Partner Acrobatics,Tom Wilson,Outside Lawn,Intermediate,20,,Workshop,detailed,Advanced partner work
+Wednesday,14:00,15:30,Dance Fusion,Emma Davis,Dance Hall,All Levels,30,,Workshop,detailed,Mixed dance styles
+Thursday,09:00,10:30,Morning Flow,Lisa Brown,Yoga Studio,Beginner,30,,Class,detailed,Energizing practice
+Thursday,11:00,12:30,Blues Intermediate,Mike Thompson,Dance Hall,Intermediate,25,,Workshop,detailed,Blues technique
+Thursday,14:00,15:30,Yin Yoga,Maria Garcia,Yoga Studio,All Levels,25,,Class,detailed,Deep stretching
+Friday,09:00,10:30,Week 2 Opening,Sarah Johnson,Main Hall,All Levels,100,,Workshop,detailed,Second weekend begins
+Friday,11:00,12:30,Creative Movement,Alex Chen,Dance Hall,All Levels,25,,Workshop,detailed,Express yourself
+Friday,14:00,16:00,Grand Jam,Various,Main Hall,All Levels,75,,Social,minimal,Big dance party
+Friday,16:30,18:00,Final Celebration,Sarah Johnson,Main Hall,All Levels,100,,Workshop,minimal,Festival finale

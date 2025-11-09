@@ -11,8 +11,10 @@ interface Session {
   title: string
   description: string
   day: string
-  start: string
-  end: string
+  start: string  // Just the time portion (HH:mm)
+  end: string    // Just the time portion (HH:mm)
+  startTime: string  // Full datetime string
+  endTime: string    // Full datetime string
   location: string
   level: string
   styles: string[]
@@ -51,11 +53,12 @@ interface ScheduleInterfaceProps {
 // Helper function to group sessions by day
 const groupByDay = (sessions: Session[]) => {
   return sessions.reduce((groups, session) => {
-    const day = session.day
-    if (!groups[day]) {
-      groups[day] = []
+    // Extract date from startTime (format: "YYYY-MM-DDTHH:mm:ss")
+    const dateKey = session.startTime.split('T')[0] // Get "YYYY-MM-DD"
+    if (!groups[dateKey]) {
+      groups[dateKey] = []
     }
-    groups[day].push(session)
+    groups[dateKey].push(session)
     return groups
   }, {} as Record<string, Session[]>)
 }
@@ -78,6 +81,24 @@ const formatDateRange = (startDate: Date, endDate: Date) => {
   }
   
   return `${start} - ${end}`
+}
+
+// Helper to format day header - shows day name, conditionally includes date
+const formatDayHeader = (dateStr: string, showDates: boolean): string => {
+  try {
+    const date = new Date(dateStr + 'T12:00:00Z')
+    const dayName = date.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' })
+    
+    if (showDates) {
+      const day = date.getUTCDate()
+      const month = date.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' })
+      return `${dayName}, ${month} ${day}`  // e.g., "Friday, Nov 14"
+    }
+    
+    return dayName  // e.g., "Friday"
+  } catch (e) {
+    return dateStr
+  }
 }
 
 export default function ScheduleInterface({ festival, sessions }: ScheduleInterfaceProps) {
@@ -232,13 +253,14 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
     
     const currentDate = new Date(startDate)
     while (currentDate <= endDate) {
-      const dayName = currentDate.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' })
-      days.push(dayName)
-      console.log('Adding day to order:', dayName, 'from date:', currentDate.toISOString())
+      // Use ISO date string (YYYY-MM-DD) as the key
+      const dateKey = currentDate.toISOString().split('T')[0]
+      days.push(dateKey)
+      console.log('Adding date to order:', dateKey, 'from date:', currentDate.toISOString())
       currentDate.setUTCDate(currentDate.getUTCDate() + 1)
     }
     
-    console.log('Final festival day order:', days)
+    console.log('Final festival day order (dates):', days)
     return days
   }, [festival.startDate, festival.endDate])
 
@@ -261,6 +283,26 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
     console.log('Sorted days:', sortedDays)
     return ['All Days', ...sortedDays]
   }, [sessionsByDay, festivalDayOrder])
+
+  // Detect if there are duplicate day names (multi-week festival)
+  const hasDuplicateDayNames = useMemo(() => {
+    const dayNames = new Set<string>()
+    const foundDays = Object.keys(sessionsByDay).filter(day => day && day !== 'TBD')
+    
+    for (const dateStr of foundDays) {
+      try {
+        const date = new Date(dateStr + 'T12:00:00Z')
+        const dayName = date.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' })
+        if (dayNames.has(dayName)) {
+          return true // Found a duplicate
+        }
+        dayNames.add(dayName)
+      } catch (e) {
+        continue
+      }
+    }
+    return false
+  }, [sessionsByDay])
 
   const availableLevels = useMemo(() => {
     const levels = [...new Set(sessions.map(session => session.level))]
@@ -495,7 +537,8 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
         <ScheduleTabs 
           days={availableDays} 
           activeDay={activeDay} 
-          setActiveDay={setActiveDay} 
+          setActiveDay={setActiveDay}
+          showDates={hasDuplicateDayNames}
         />
 
         {/* Filters */}
@@ -518,7 +561,7 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
           // Show grouped by day when viewing all
           (() => {
             // Use festival-based day order instead of hardcoded week order
-            return festivalDayOrder.filter(day => sessionsByDay[day] && sessionsByDay[day].length > 0).map(day => {
+            return festivalDayOrder.filter(day => sessionsByDay[day] && sessionsByDay[day].length > 0).map((day, dayIndex) => {
               const daySessions = sessionsByDay[day]
               const filteredDaySessions = daySessions.filter(session => {
                 if (levelFilter && session.level !== levelFilter) return false
@@ -547,8 +590,8 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
               if (filteredDaySessions.length === 0) return null
 
               return (
-                <div key={day} className="day-section">
-                  <h2 className="day-header">{day}</h2>
+                <div key={`day-${dayIndex}-${day}`} className="day-section">
+                  <h2 className="day-header">{formatDayHeader(day, hasDuplicateDayNames)}</h2>
                   <div className="sessions-grid">
                     {filteredDaySessions.map(session => (
                       <SessionCard

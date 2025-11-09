@@ -29,7 +29,7 @@ interface ParsedSession {
   end: string
   title: string
   level: string
-  capacity: number
+  capacity?: number
   types: string
   cardType: 'minimal' | 'photo' | 'detailed'
   teachers: string
@@ -58,6 +58,15 @@ export default function CreateFestivalPage() {
   const [csvErrors, setCsvErrors] = useState<string[]>([])
   const [isParsingCsv, setIsParsingCsv] = useState(false)
   const [slugValidation, setSlugValidation] = useState({ isChecking: false, isAvailable: true, message: '' })
+  
+  // Google Sheets state
+  const [googleSheetUrl, setGoogleSheetUrl] = useState('')
+  const [isValidatingSheet, setIsValidatingSheet] = useState(false)
+  const [sheetValidation, setSheetValidation] = useState<{
+    isValid: boolean
+    message: string
+    sessionCount?: number
+  } | null>(null)
 
   const steps = [
     { id: 'basic', title: 'Festival Details', description: 'Basic information about your festival' },
@@ -153,6 +162,10 @@ export default function CreateFestivalPage() {
     setCsvFile(file)
     setIsParsingCsv(true)
     setCsvErrors([])
+    
+    // Clear Google Sheets data when CSV is uploaded
+    setGoogleSheetUrl('')
+    setSheetValidation(null)
 
     Papa.parse(file, {
       header: true,
@@ -170,8 +183,17 @@ export default function CreateFestivalPage() {
           }
 
           // Validate CardType
-          const cardType = row.CardType?.toLowerCase().trim()
-          if (cardType && !['minimal', 'photo', 'detailed', ''].includes(cardType)) {
+          const cardTypeRaw = row.CardType?.toLowerCase().trim() || ''
+          const validCardType: 'minimal' | 'photo' | 'detailed' = ['minimal', 'photo', 'detailed'].includes(cardTypeRaw) 
+            ? (cardTypeRaw as 'minimal' | 'photo' | 'detailed')
+            : 'detailed'
+          
+          // Log for debugging
+          if (index < 3) {
+            console.log(`Row ${index}: CardType="${row.CardType}" → raw="${cardTypeRaw}" → valid="${validCardType}"`)
+          }
+          
+          if (cardTypeRaw && !['minimal', 'photo', 'detailed', ''].includes(cardTypeRaw)) {
             errors.push(`Row ${index + 1}: Invalid CardType "${row.CardType}". Must be "minimal", "photo", or "detailed" (or leave empty for default "detailed")`)
           }
 
@@ -182,9 +204,9 @@ export default function CreateFestivalPage() {
             end: row.end || '',
             title: row.title || '',
             level: row.level || '',
-            capacity: parseInt(row.capacity) || 20,
+            capacity: row.capacity ? parseInt(row.capacity) : undefined,
             types: row.types || '',
-            cardType: (cardType as 'minimal' | 'photo' | 'detailed') || 'detailed',
+            cardType: validCardType,
             teachers: row.teachers || '',
             location: row.location || '',
             description: row.Description || '',
@@ -236,22 +258,111 @@ export default function CreateFestivalPage() {
     window.URL.revokeObjectURL(url)
   }
 
+  const handleGoogleSheetValidation = async () => {
+    if (!googleSheetUrl.trim()) {
+      setSheetValidation({ isValid: false, message: 'Please enter a Google Sheets URL' })
+      return
+    }
+
+    setIsValidatingSheet(true)
+    setSheetValidation(null)
+    setCsvErrors([])
+
+    try {
+      const response = await fetch('/api/festivals/validate-google-sheet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ googleSheetUrl })
+      })
+
+      const data = await response.json()
+
+      if (response.ok && data.isValid) {
+        const warnings: string[] = []
+        
+        // Map Google Sheets sessions to ParsedSession format and validate CardType
+        const parsedSessions: ParsedSession[] = data.sessions.map((session: any, index: number) => {
+          // Validate CardType
+          const cardTypeRaw = session.cardType?.toLowerCase().trim() || ''
+          const validCardType: 'minimal' | 'photo' | 'detailed' = ['minimal', 'photo', 'detailed'].includes(cardTypeRaw)
+            ? (cardTypeRaw as 'minimal' | 'photo' | 'detailed')
+            : 'detailed'
+          
+          // Log for debugging
+          if (index < 3) {
+            console.log(`Google Row ${index}: CardType="${session.cardType}" → raw="${cardTypeRaw}" → valid="${validCardType}"`)
+          }
+          
+          if (cardTypeRaw && !['minimal', 'photo', 'detailed', ''].includes(cardTypeRaw)) {
+            warnings.push(`Row ${index + 1}: Invalid CardType "${session.cardType}". Using default "detailed"`)
+          }
+          
+          return {
+            id: `google-${index}`,
+            day: session.day || '',
+            start: session.start || '',
+            end: session.end || '',
+            title: session.title || '',
+            level: session.level || '',
+            capacity: session.capacity || undefined,
+            types: session.types || '',
+            cardType: validCardType,
+            teachers: session.teachers || '',
+            location: session.location || '',
+            description: session.description || '',
+            prerequisites: session.prerequisites || ''
+          }
+        })
+
+        setSessions(parsedSessions)
+        setCsvFile(null) // Clear CSV file if Google Sheets is used
+        setCsvErrors(warnings) // Set warnings if any CardType issues
+        
+        let message = `✓ Successfully loaded ${data.sessionCount} sessions from Google Sheets`
+        if (warnings.length > 0) {
+          message += ` (${warnings.length} warnings - check CardType values)`
+        }
+        
+        setSheetValidation({
+          isValid: true,
+          message,
+          sessionCount: data.sessionCount
+        })
+      } else {
+        setSheetValidation({
+          isValid: false,
+          message: data.error || 'Failed to validate Google Sheets URL'
+        })
+      }
+    } catch (error) {
+      console.error('Google Sheets validation error:', error)
+      setSheetValidation({
+        isValid: false,
+        message: 'Failed to connect to Google Sheets. Please check the URL and try again.'
+      })
+    } finally {
+      setIsValidatingSheet(false)
+    }
+  }
+
   const handleScheduleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
-    // Enhanced validation
-    if (!csvFile) {
-      alert('Please upload a CSV file')
-      return
-    }
-    
+    // Enhanced validation - check if sessions were loaded
     if (sessions.length === 0) {
-      alert('No sessions found in the CSV. Please ensure your CSV file contains valid session data.')
+      alert('No sessions found. Please upload a CSV file or load sessions from Google Sheets.')
       return
     }
     
-    if (csvErrors.length > 0) {
-      alert('Please fix the CSV errors before proceeding.')
+    // Note: We allow csvErrors (warnings) for CardType issues - they default to 'detailed'
+    // Only block if there are critical errors (missing required fields)
+    const criticalErrors = csvErrors.filter(err => 
+      err.includes('Missing required fields') || 
+      err.includes('CSV parsing error')
+    )
+    
+    if (criticalErrors.length > 0) {
+      alert('Please fix the critical errors before proceeding:\n' + criticalErrors.join('\n'))
       return
     }
     
@@ -259,7 +370,9 @@ export default function CreateFestivalPage() {
     console.log('Moving to preview with:', {
       festivalData,
       sessions: sessions.length,
-      csvFile: csvFile.name
+      csvFile: csvFile?.name,
+      googleSheetUrl,
+      warnings: csvErrors.length
     })
     
     setCurrentStep('preview')
@@ -291,28 +404,94 @@ export default function CreateFestivalPage() {
     console.log('Sessions length:', sessions.length)
     
     try {
+      // Build festival date mappings ONCE before mapping sessions
+      const startDate = new Date(festivalData.startDate)
+      const endDate = new Date(festivalData.endDate)
+      
+      // Build a complete list of festival dates
+      const festivalDates: Date[] = []
+      const currentDate = new Date(startDate)
+      
+      while (currentDate <= endDate) {
+        festivalDates.push(new Date(currentDate))
+        currentDate.setDate(currentDate.getDate() + 1)
+      }
+      
+      // Group dates by day name
+      const dayNameToDates: Record<string, Date[]> = {}
+      festivalDates.forEach(date => {
+        const dayName = date.toLocaleDateString('en-US', { weekday: 'long' })
+        if (!dayNameToDates[dayName]) {
+          dayNameToDates[dayName] = []
+        }
+        dayNameToDates[dayName].push(date)
+      })
+      
+      // Build a map of which date occurrence each session should use
+      // This tracks transitions between different days to properly assign dates
+      const sessionDateMap: Record<number, Date> = {}
+      const dayNameCounters: Record<string, number> = {}
+      let lastSeenDay: string | null = null
+      
+      sessions.forEach((session, index) => {
+        const sessionDayName = session.day
+        
+        // If we've moved to a different day than the last session, increment the counter for this day
+        if (lastSeenDay !== null && lastSeenDay !== sessionDayName) {
+          // We've transitioned to a new day, so the next time we see the PREVIOUS day, use the next occurrence
+          dayNameCounters[lastSeenDay] = (dayNameCounters[lastSeenDay] || 0) + 1
+        }
+        
+        // Get current occurrence number for this day (defaults to 0 for first occurrence)
+        const currentCounter = dayNameCounters[sessionDayName] || 0
+        const datesForThisDay = dayNameToDates[sessionDayName] || []
+        
+        // Assign the date for this session
+        const sessionDate = datesForThisDay[currentCounter] || datesForThisDay[datesForThisDay.length - 1] || startDate
+        sessionDateMap[index] = sessionDate
+        
+        lastSeenDay = sessionDayName
+      })
+      
+      // Validation: Check for potential issues
+      const dayOccurrenceCounts: Record<string, number> = {}
+      Object.values(dayNameCounters).forEach((count, _) => {
+        const keys = Object.keys(dayNameCounters)
+        keys.forEach(day => {
+          dayOccurrenceCounts[day] = (dayNameCounters[day] || 0) + 1
+        })
+      })
+      
+      const multiWeekDays = Object.entries(dayOccurrenceCounts)
+        .filter(([day, count]) => count > 1 && dayNameToDates[day])
+        .map(([day, count]) => `${day} (${count}x)`)
+      
+      if (multiWeekDays.length > 0) {
+        console.log('📅 Multi-week festival detected:', {
+          festivalDuration: `${festivalDates.length} days`,
+          repeatingDays: multiWeekDays,
+          message: 'Sessions with the same day name will be assigned to different weeks based on CSV grouping'
+        })
+      }
+      
       const payload = {
         ...festivalData,
         isPublished: true, // This is for publishing
         sessions: sessions.map((session, index) => {
-          // Map day names to actual dates
-          const startDate = new Date(festivalData.startDate)
-          const endDate = new Date(festivalData.endDate)
+          // Get the pre-calculated date for this session
+          const sessionDate = sessionDateMap[index]
+          const sessionDayName = session.day
+          const datesForThisDay = dayNameToDates[sessionDayName] || []
           
-          // Create a mapping of day names to dates within the festival range
-          const dayToDateMap: Record<string, Date> = {}
-          const currentDate = new Date(startDate)
-          
-          while (currentDate <= endDate) {
-            const dayName = currentDate.toLocaleDateString('en-US', { weekday: 'long' })
-            if (!dayToDateMap[dayName]) {
-              dayToDateMap[dayName] = new Date(currentDate)
-            }
-            currentDate.setDate(currentDate.getDate() + 1)
+          // Defensive validation
+          if (!datesForThisDay || datesForThisDay.length === 0) {
+            console.warn(`⚠️ Session ${index + 1} ("${session.title}"): Day "${sessionDayName}" not found in festival date range (${festivalData.startDate} to ${festivalData.endDate}). Using festival start date as fallback.`)
           }
           
-          // Get the correct date for this session's day
-          const sessionDate = dayToDateMap[session.day] || startDate
+          // Log first few sessions for debugging
+          if (index < 3) {
+            console.log(`Payload session ${index}: day="${sessionDayName}", date=${sessionDate.toISOString()}`)
+          }
           
           return {
             title: session.title,
@@ -324,7 +503,7 @@ export default function CreateFestivalPage() {
             endTime: `${sessionDate.toISOString().split('T')[0]}T${session.end}:00`,
             duration: calculateDuration(session.start, session.end),
             level: session.level || '',
-            maxParticipants: session.capacity || 20,
+            maxParticipants: session.capacity || 0, // 0 means unlimited
             currentBookings: 0,
             location: session.location || '',
             requirements: session.prerequisites || '',
@@ -350,35 +529,21 @@ export default function CreateFestivalPage() {
         const festival = await response.json()
         router.push(`/dashboard/festivals/${festival.id}`)
       } else {
-        const errorData = await response.json()
+        // Try to parse error response
+        let errorData: any = {}
+        const responseText = await response.text()
+        console.error('Raw error response:', responseText)
+        
+        try {
+          errorData = JSON.parse(responseText)
+        } catch (e) {
+          console.error('Failed to parse error response as JSON')
+          errorData = { error: responseText || `HTTP ${response.status}` }
+        }
+        
         console.error('API Error Response:', errorData)
-        console.error('Request payload was:', {
-          ...festivalData,
-          sessions: sessions.map((session, index) => {
-            const startDate = new Date(festivalData.startDate)
-            const sessionDate = new Date(startDate)
-            
-            return {
-              title: session.title,
-              description: session.description || '',
-              teachers: typeof session.teachers === 'string' ? session.teachers : (Array.isArray(session.teachers) ? (session.teachers as string[]).join(', ') : ''),
-              teacherBio: '',
-              teacherPhoto: '',
-              startTime: `${sessionDate.toISOString().split('T')[0]}T${session.start}:00`,
-              endTime: `${sessionDate.toISOString().split('T')[0]}T${session.end}:00`,
-              duration: calculateDuration(session.start, session.end),
-              level: session.level || '',
-              maxParticipants: session.capacity || 20,
-              currentBookings: 0,
-              location: session.location || '',
-              requirements: session.prerequisites || '',
-              price: 0,
-              order: index,
-              cardType: session.cardType || 'detailed',
-              sessionTypes: typeof session.types === 'string' ? session.types : (Array.isArray(session.types) ? (session.types as string[]).join(', ') : '')
-            }
-          })
-        })
+        console.error('Validation errors details:', JSON.stringify(errorData.details, null, 2))
+        console.error('Request payload was:', payload)
         throw new Error(errorData.error || `HTTP ${response.status}: Failed to create festival`)
       }
     } catch (error) {
@@ -714,19 +879,174 @@ export default function CreateFestivalPage() {
 
           {currentStep === 'schedule' && (
             <form onSubmit={handleScheduleSubmit} className="space-y-6">
-              {/* Information Section */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                <div className="flex items-start gap-3">
-                  <Info className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
-                  <div className="w-full">
-                    <h3 className="font-semibold text-blue-900 mb-3">CSV Template & Instructions</h3>
-                    
-                    <p className="text-blue-800 mb-6">
-                      Upload your schedule CSV to create your festival program. 
-                      Only a few columns are required — the rest simply make your schedule more visual and interactive.
-                    </p>
+              {/* Brief Introduction */}
+              <div className="text-center max-w-2xl mx-auto">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Add Your Festival Schedule</h2>
+                <p className="text-gray-600">
+                  Choose your preferred method: upload a CSV file or connect to a Google Sheet
+                </p>
+              </div>
 
-                    {/* Required Columns */}
+              {/* CSV Upload Section */}
+              <div className="border-2 border-gray-300 rounded-lg p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <Upload className="w-6 h-6 text-blue-600" />
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Option 1: Upload CSV File</h3>
+                    <p className="text-sm text-gray-600">Import sessions from a CSV file</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {/* Download Template Button */}
+                  <div className="flex items-center gap-3">
+                    <Button
+                      type="button"
+                      onClick={downloadCsvTemplate}
+                      className="flex-shrink-0 bg-green-600 hover:bg-green-700"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Download CSV Template
+                    </Button>
+                    <p className="text-sm text-gray-600">
+                      Pre-filled with example sessions to get you started
+                    </p>
+                  </div>
+
+                  {/* CSV Drop Zone */}
+                  <div 
+                    className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 hover:bg-blue-50/50 transition-colors cursor-pointer"
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                    onDragEnter={handleDragEnter}
+                    onDragLeave={handleDragLeave}
+                    onClick={() => document.getElementById('csvUpload')?.click()}
+                  >
+                    {isParsingCsv ? (
+                      <div>
+                        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                        <p className="text-blue-600 font-medium">Parsing CSV file...</p>
+                      </div>
+                    ) : csvFile ? (
+                      <div>
+                        <Check className="w-12 h-12 text-green-600 mx-auto mb-3" />
+                        <p className="text-green-600 font-medium mb-2">✓ {csvFile.name}</p>
+                        <p className="text-sm text-gray-600 mb-3">
+                          {sessions.length} sessions loaded
+                          {csvErrors.length > 0 && `, ${csvErrors.length} warnings`}
+                        </p>
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            document.getElementById('csvUpload')?.click()
+                          }}
+                        >
+                          Change File
+                        </Button>
+                      </div>
+                    ) : (
+                      <div>
+                        <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                        <p className="text-gray-700 font-medium mb-2">Drop your CSV file here or click to browse</p>
+                        <p className="text-sm text-gray-500">Supports .csv files up to 10MB</p>
+                      </div>
+                    )}
+                    
+                    <input
+                      type="file"
+                      accept=".csv"
+                      onChange={handleCsvUpload}
+                      className="hidden"
+                      id="csvUpload"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* OR Divider */}
+              <div className="flex items-center gap-4">
+                <div className="flex-1 h-px bg-gray-300"></div>
+                <span className="text-sm font-semibold text-gray-500 px-3">OR</span>
+                <div className="flex-1 h-px bg-gray-300"></div>
+              </div>
+
+              {/* Google Sheets Section */}
+              <div className="border-2 border-gray-300 rounded-lg p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <ExternalLink className="w-6 h-6 text-purple-600" />
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Option 2: Connect Google Sheet</h3>
+                    <p className="text-sm text-gray-600">Link to a public Google Sheets document</p>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <input
+                      type="url"
+                      value={googleSheetUrl}
+                      onChange={(e) => setGoogleSheetUrl(e.target.value)}
+                      placeholder="https://docs.google.com/spreadsheets/d/..."
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      disabled={isValidatingSheet}
+                    />
+                    <Button
+                      type="button"
+                      onClick={handleGoogleSheetValidation}
+                      disabled={isValidatingSheet || !googleSheetUrl.trim()}
+                      className="bg-purple-600 hover:bg-purple-700 whitespace-nowrap"
+                    >
+                      {isValidatingSheet ? (
+                        <>
+                          <span className="mr-2">⏳</span>
+                          Loading...
+                        </>
+                      ) : (
+                        <>
+                          <ExternalLink className="w-4 h-4 mr-2" />
+                          Load Sessions
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  <p className="text-xs text-gray-500">
+                    Make sure your Google Sheet is publicly accessible or shared with "Anyone with the link can view"
+                  </p>
+
+                  {sheetValidation && (
+                    <div className={`border rounded-lg p-4 ${
+                      sheetValidation.isValid 
+                        ? 'bg-green-50 border-green-200' 
+                        : 'bg-red-50 border-red-200'
+                    }`}>
+                      <p className={`text-sm font-medium ${
+                        sheetValidation.isValid ? 'text-green-700' : 'text-red-700'
+                      }`}>
+                        {sheetValidation.message}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Detailed CSV Instructions (Collapsible) */}
+              <details className="bg-blue-50 border border-blue-200 rounded-lg">
+                <summary className="cursor-pointer font-semibold text-blue-900 p-4 flex items-center gap-2 hover:bg-blue-100">
+                  <Info className="w-5 h-5" />
+                  CSV Format Guide (click to expand)
+                </summary>
+                
+                <div className="p-6 pt-2 space-y-6">
+                  <p className="text-blue-800">
+                    Upload your schedule CSV to create your festival program. 
+                    Only a few columns are required — the rest simply make your schedule more visual and interactive.
+                  </p>
+
+                  {/* Required Columns */}
                     <div className="mb-6">
                       <h4 className="text-sm font-semibold text-slate-700 mb-3">Required Columns</h4>
                       <div className="overflow-x-auto">
@@ -861,96 +1181,22 @@ export default function CreateFestivalPage() {
                       </p>
                     </div>
                   </div>
-                </div>
-              </div>
+                </details>
 
-              {/* CSV Template Download */}
-              <div className="text-center">
-                <Button
-                  type="button"
-                  onClick={downloadCsvTemplate}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Download CSV Template
-                </Button>
-                <p className="text-sm text-gray-600 mt-2">
-                  Pre-filled with sample event data to get you started
-                </p>
-              </div>
-
-              {/* CSV Upload */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Upload Your Completed CSV *
-                </label>
-                
-                <div 
-                  className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors cursor-pointer"
-                  onDrop={handleDrop}
-                  onDragOver={handleDragOver}
-                  onDragEnter={handleDragEnter}
-                  onDragLeave={handleDragLeave}
-                  onClick={() => document.getElementById('csvUpload')?.click()}
-                >
-                  <Upload className="w-8 h-8 text-gray-400 mx-auto mb-4" />
-                  
-                  {isParsingCsv ? (
-                    <div>
-                      <p className="text-blue-600 font-medium mb-2">⏳ Parsing CSV file...</p>
-                      <p className="text-sm text-gray-500 mb-4">Please wait while we process your sessions</p>
-                    </div>
-                  ) : csvFile ? (
-                    <div>
-                      <p className="text-green-600 font-medium mb-2">✓ {csvFile.name} uploaded</p>
-                      <p className="text-sm text-gray-500 mb-4">
-                        {sessions.length} sessions found
-                        {csvErrors.length > 0 && `, ${csvErrors.length} warnings`}
-                      </p>
-                    </div>
-                  ) : (
-                    <div>
-                      <p className="text-gray-600 mb-2">Drop your CSV file here, or click to browse</p>
-                      <p className="text-sm text-gray-500 mb-4">Supports .csv files up to 10MB</p>
-                    </div>
-                  )}
-                  
-                  <input
-                    type="file"
-                    accept=".csv"
-                    onChange={handleCsvUpload}
-                    className="hidden"
-                    id="csvUpload"
-                  />
-                  
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    disabled={isParsingCsv}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      document.getElementById('csvUpload')?.click()
-                    }}
-                  >
-                    {csvFile ? 'Change File' : 'Choose CSV File'}
-                  </Button>
-                </div>
-              </div>
-
-              {/* CSV Errors */}
+              {/* CSV Errors/Warnings */}
               {csvErrors.length > 0 && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                  <h4 className="font-medium text-red-800 mb-2">CSV Validation Warnings:</h4>
-                  <ul className="text-red-700 text-sm space-y-1">
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <h4 className="font-medium text-yellow-800 mb-2">Validation Warnings:</h4>
+                  <ul className="text-yellow-700 text-sm space-y-1">
                     {csvErrors.map((error, index) => (
                       <li key={index} className="flex items-start gap-2">
-                        <span className="text-red-500 mt-0.5">•</span>
+                        <span className="text-yellow-500 mt-0.5">•</span>
                         {error}
                       </li>
                     ))}
                   </ul>
-                  <p className="text-red-600 text-xs mt-2">
-                    ⚠️ These sessions may not display correctly. Please review your CSV file.
+                  <p className="text-yellow-600 text-xs mt-2">
+                    ℹ️ These are warnings only. Invalid CardTypes will default to "detailed". You can still proceed.
                   </p>
                 </div>
               )}
@@ -1026,7 +1272,7 @@ export default function CreateFestivalPage() {
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Back
                 </Button>
-                <Button type="submit" disabled={!csvFile || sessions.length === 0}>
+                <Button type="submit" disabled={sessions.length === 0}>
                   Continue to Preview
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>

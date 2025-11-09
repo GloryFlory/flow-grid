@@ -8,8 +8,10 @@ interface Session {
   title: string
   description: string
   day: string
-  start: string
-  end: string
+  start: string  // Just the time portion (HH:mm)
+  end: string    // Just the time portion (HH:mm)
+  startTime: string  // Full datetime string
+  endTime: string    // Full datetime string
   location: string
   level: string
   styles: string[]
