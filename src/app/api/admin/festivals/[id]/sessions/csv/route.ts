@@ -90,6 +90,8 @@ export async function POST(
     const formData = await request.formData()
     const file = formData.get('file') as File
     const mode = formData.get('mode') as string || 'replace' // 'replace' or 'merge'
+    const suggestedMatchesStr = formData.get('suggestedMatches') as string
+    const suggestedMatches = suggestedMatchesStr ? JSON.parse(suggestedMatchesStr) : {}
     
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
@@ -235,42 +237,101 @@ export async function POST(
       include: {
         _count: {
           select: { bookings: true }
-        }
+        },
+        bookings: true // Include bookings for preserving them
       }
     })
 
-    // Create a map for matching by composite key: day|startTime|title
+    // Create a map for matching by composite key: day|startTime|title (normalized)
     const currentSessionsMap = new Map(
       currentSessions.map(s => [
-        `${s.day}|${s.startTime}|${s.title}`,
+        `${s.day?.toLowerCase().trim()}|${s.startTime?.trim()}|${s.title?.toLowerCase().trim()}`,
         s
       ])
     )
 
+    // Create a map by session ID for suggested matches
+    const currentSessionsById = new Map(
+      currentSessions.map(s => [s.id, s])
+    )
+
     const csvSessionKeys = new Set(
-      sessionsToCreate.map(s => `${s.day}|${s.startTime}|${s.title}`)
+      sessionsToCreate.map(s => `${s.day?.toLowerCase().trim()}|${s.startTime?.trim()}|${s.title?.toLowerCase().trim()}`)
     )
 
     let updatedCount = 0
     let createdCount = 0
-    let deletedCount = 0
+    let suggestedMatchCount = 0
+    const processedSessionIds = new Set<string>()
 
     // 1. UPDATE or CREATE sessions from CSV
     for (const csvSession of sessionsToCreate) {
-      const key = `${csvSession.day}|${csvSession.startTime}|${csvSession.title}`
-      const existing = currentSessionsMap.get(key)
+      const key = `${csvSession.day?.toLowerCase().trim()}|${csvSession.startTime?.trim()}|${csvSession.title?.toLowerCase().trim()}`
+      let existing = currentSessionsMap.get(key)
 
-      if (existing) {
-        // UPDATE existing session
+      // Check if this CSV session should match a suggested session
+      const matchedDbSessionId = Object.entries(suggestedMatches).find(([dbId, decision]) => {
+        if (decision === 'update') {
+          const dbSession = currentSessionsById.get(dbId)
+          // Match by title (since suggested matches are based on title similarity)
+          return dbSession && dbSession.title.toLowerCase().trim() === csvSession.title.toLowerCase().trim()
+        }
+        return false
+      })?.[0]
+
+      if (matchedDbSessionId && suggestedMatches[matchedDbSessionId] === 'update') {
+        // This is a user-confirmed suggested match
+        existing = currentSessionsById.get(matchedDbSessionId)
+        if (existing) {
+          await prisma.festivalSession.update({
+            where: { id: existing.id },
+            data: {
+              day: csvSession.day,
+              startTime: csvSession.startTime,
+              endTime: csvSession.endTime,
+              title: csvSession.title,
+              level: csvSession.level,
+              capacity: csvSession.capacity,
+              styles: csvSession.styles,
+              cardType: csvSession.cardType,
+              teachers: csvSession.teachers,
+              location: csvSession.location,
+              description: csvSession.description,
+              prerequisites: csvSession.prerequisites
+              // Preserve festivalId and bookings
+            }
+          })
+          suggestedMatchCount++
+          processedSessionIds.add(existing.id)
+        }
+      } else if (existing && !processedSessionIds.has(existing.id)) {
+        // Exact composite key match
         await prisma.festivalSession.update({
           where: { id: existing.id },
           data: {
-            ...csvSession,
-            festivalId: undefined // Remove festivalId from update
+            level: csvSession.level,
+            capacity: csvSession.capacity,
+            styles: csvSession.styles,
+            cardType: csvSession.cardType,
+            teachers: csvSession.teachers,
+            location: csvSession.location,
+            description: csvSession.description,
+            prerequisites: csvSession.prerequisites
+            // Preserve day, startTime, endTime, title, festivalId, bookings
           }
         })
         updatedCount++
-      } else {
+        processedSessionIds.add(existing.id)
+      } else if (!existing) {
+        // Check if user chose "create new" for a suggested match
+        const shouldCreateNew = Object.entries(suggestedMatches).some(([dbId, decision]) => {
+          if (decision === 'create') {
+            const dbSession = currentSessionsById.get(dbId)
+            return dbSession && dbSession.title.toLowerCase().trim() === csvSession.title.toLowerCase().trim()
+          }
+          return false
+        })
+
         // CREATE new session
         await prisma.festivalSession.create({
           data: csvSession
@@ -279,28 +340,25 @@ export async function POST(
       }
     }
 
-    // 2. DELETE sessions not in CSV (only if they have no bookings)
-    // KEEP sessions with bookings even if not in CSV
+    // 2. KEEP all sessions not in CSV (Smart Merge doesn't delete anything)
+    let keptCount = 0
     for (const current of currentSessions) {
-      const key = `${current.day}|${current.startTime}|${current.title}`
+      const key = `${current.day?.toLowerCase().trim()}|${current.startTime?.trim()}|${current.title?.toLowerCase().trim()}`
       
-      if (!csvSessionKeys.has(key)) {
-        if (current._count.bookings === 0) {
-          // Safe to delete - no bookings
-          await prisma.festivalSession.delete({
-            where: { id: current.id }
-          })
-          deletedCount++
-        }
-        // else: Keep the session (has bookings)
+      if (!csvSessionKeys.has(key) && !processedSessionIds.has(current.id)) {
+        // In Smart Merge mode, we keep ALL existing sessions
+        // They're not "outdated", they're just not being updated right now
+        keptCount++
       }
     }
 
     return NextResponse.json({ 
-      message: `Smart merge completed: ${createdCount} created, ${updatedCount} updated, ${deletedCount} deleted`,
+      message: `Smart merge completed: ${createdCount} created, ${updatedCount} updated, ${suggestedMatchCount} suggested matches applied, ${keptCount} kept`,
       created: createdCount,
       updated: updatedCount,
-      deleted: deletedCount,
+      suggested: suggestedMatchCount,
+      kept: keptCount,
+      deleted: 0,
       mode: 'merge'
     })
   } catch (error) {

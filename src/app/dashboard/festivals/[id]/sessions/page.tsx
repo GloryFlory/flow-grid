@@ -136,11 +136,33 @@ function SortableSessionRow({
       <td className="py-3 px-4">
         <div className="text-sm">
           <div className="font-medium text-gray-900">
-            {session.day}
+            {(() => {
+              // Extract and format date from startTime (YYYY-MM-DD or full datetime)
+              const dateStr = session.startTime?.split('T')[0] || session.day
+              try {
+                const date = new Date(dateStr + 'T12:00:00Z')
+                const dayName = date.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' })
+                const monthDay = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
+                return `${dayName}, ${monthDay}`
+              } catch {
+                return session.day || dateStr
+              }
+            })()}
           </div>
-          <div className="flex items-center gap-1 text-gray-500">
-            <Clock className="w-3 h-3" />
-            {session.startTime?.substring(0, 5)} - {session.endTime?.substring(0, 5)}
+          <div className="flex items-center gap-1 text-gray-500 mt-1 text-xs whitespace-nowrap">
+            <Clock className="w-3 h-3 flex-shrink-0" />
+            <span className="inline-block">
+              {(() => {
+                // Extract time from datetime string
+                const extractTime = (datetime: string) => {
+                  if (!datetime) return ''
+                  if (datetime.match(/^\d{2}:\d{2}$/)) return datetime
+                  const timePart = datetime.split('T')[1]
+                  return timePart ? timePart.substring(0, 5) : datetime
+                }
+                return `${extractTime(session.startTime)} - ${extractTime(session.endTime)}`
+              })()}
+            </span>
           </div>
         </div>
       </td>
@@ -728,17 +750,18 @@ export default function SessionsManagement() {
       endParsed: endDate.toISOString()
     })
     
-    // Generate day names from festival date range
+    // Generate dates from festival date range
     const days: Array<{value: string, label: string}> = []
     const currentDate = new Date(startDate)
     
     // Include all days within the festival date range
     while (currentDate.getTime() <= endDate.getTime()) {
       const dayName = currentDate.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' })
-      const dateStr = currentDate.toLocaleDateString('en-US', { timeZone: 'UTC' })
+      const dateKey = currentDate.toISOString().split('T')[0] // YYYY-MM-DD
+      const dateStr = currentDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', timeZone: 'UTC' })
       
       days.push({
-        value: dayName,
+        value: dateKey, // Use ISO date as value
         label: `${dayName} (${dateStr})`
       })
       
@@ -819,18 +842,6 @@ export default function SessionsManagement() {
   const filteredSessions = React.useMemo(() => {
     if (!festival) return sessions
     
-    // Generate festival day order based on dates
-    const festivalDayOrder: string[] = []
-    const startDate = new Date(festival.startDate + 'T00:00:00Z')
-    const endDate = new Date(festival.endDate + 'T00:00:00Z')
-    
-    const currentDate = new Date(startDate)
-    while (currentDate <= endDate) {
-      const dayName = currentDate.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' })
-      festivalDayOrder.push(dayName)
-      currentDate.setUTCDate(currentDate.getUTCDate() + 1)
-    }
-    
     // Filter sessions
     const filtered = sessions.filter(session => {
       const matchesSearch = session.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -845,19 +856,27 @@ export default function SessionsManagement() {
       return matchesSearch && matchesDay
     })
     
-    // Sort by festival day order, then by time, then by display order, then by title
+    // Sort by actual date (from startTime), then by time, then by display order, then by title
     return filtered.sort((a, b) => {
-      const dayComparison = festivalDayOrder.indexOf(a.day) - festivalDayOrder.indexOf(b.day)
-      if (dayComparison !== 0) return dayComparison
+      // Extract dates from startTime
+      const dateA = a.startTime.split('T')[0] || a.day
+      const dateB = b.startTime.split('T')[0] || b.day
       
+      // Compare by date first
+      const dateComparison = dateA.localeCompare(dateB)
+      if (dateComparison !== 0) return dateComparison
+      
+      // Then by start time
       const timeComparison = a.startTime.localeCompare(b.startTime)
       if (timeComparison !== 0) return timeComparison
       
+      // Then by display order
       const displayOrderA = a.displayOrder || 0
       const displayOrderB = b.displayOrder || 0
       const orderComparison = displayOrderA - displayOrderB
       if (orderComparison !== 0) return orderComparison
       
+      // Finally by title
       return a.title.localeCompare(b.title)
     })
   }, [sessions, searchTerm, selectedDay, festival])

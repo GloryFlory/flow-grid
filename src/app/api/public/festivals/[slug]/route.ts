@@ -142,8 +142,10 @@ export async function GET(
         title: session.title,
         description: session.description || '',
         day: session.day === 'Invalid Date' ? 'TBD' : convertDateToDay(session.day || 'TBD'),
-        start: session.startTime || '00:00',
-        end: session.endTime || '01:00',
+        start: session.startTime ? session.startTime.split('T')[1]?.substring(0, 5) || '00:00' : '00:00', // Extract time portion
+        end: session.endTime ? session.endTime.split('T')[1]?.substring(0, 5) || '01:00' : '01:00', // Extract time portion
+        startTime: session.startTime || '', // Full datetime string
+        endTime: session.endTime || '', // Full datetime string
         location: session.location || '',
         level: session.level || 'All Levels',
         styles: session.styles || [],

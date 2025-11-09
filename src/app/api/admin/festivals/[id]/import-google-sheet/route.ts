@@ -21,7 +21,7 @@ export async function POST(
 
     const { id: festivalId } = await params
     const body = await req.json()
-    const { googleSheetUrl, mode = 'merge' } = body
+    const { googleSheetUrl, mode = 'merge', suggestedMatches = {} } = body
 
     if (!googleSheetUrl) {
       return NextResponse.json(
@@ -73,6 +73,56 @@ export async function POST(
 
     const parsedSessions = result.sessions
 
+    // Build festival date mappings for date calculation
+    const festivalStartDate = new Date(festival.startDate)
+    const festivalEndDate = new Date(festival.endDate)
+    const festivalDates: Date[] = []
+    const currentDate = new Date(festivalStartDate)
+
+    while (currentDate <= festivalEndDate) {
+      festivalDates.push(new Date(currentDate))
+      currentDate.setDate(currentDate.getDate() + 1)
+    }
+
+    // Map day names to their dates within the festival range
+    const dayNameToDates: Record<string, Date[]> = {}
+    festivalDates.forEach(date => {
+      const dayName = date.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' })
+      if (!dayNameToDates[dayName]) {
+        dayNameToDates[dayName] = []
+      }
+      dayNameToDates[dayName].push(date)
+    })
+
+    // Pre-calculate session dates using occurrence counter
+    const sessionDateMap: Record<number, Date> = {}
+    const dayNameCounters: Record<string, number> = {}
+    let lastSeenDay: string | null = null
+
+    parsedSessions.forEach((session, index) => {
+      const sessionDayName = session.day
+
+      // Increment counter only when transitioning to DIFFERENT day
+      if (lastSeenDay !== null && lastSeenDay !== sessionDayName) {
+        dayNameCounters[lastSeenDay] = (dayNameCounters[lastSeenDay] || 0) + 1
+      }
+
+      const currentCounter = dayNameCounters[sessionDayName] || 0
+      const datesForThisDay = dayNameToDates[sessionDayName] || []
+      
+      if (!datesForThisDay || datesForThisDay.length === 0) {
+        console.warn(`⚠️ Session ${index + 1}: Day "${sessionDayName}" not found in festival date range`)
+      }
+
+      if (currentCounter >= datesForThisDay.length) {
+        console.warn(`⚠️ Session ${index + 1}: Too many ${sessionDayName} sessions (occurrence #${currentCounter}) for festival date range`)
+      }
+
+      // Use the date at the current counter, or fall back to first occurrence or festival start
+      sessionDateMap[index] = datesForThisDay[currentCounter] || datesForThisDay[0] || festivalStartDate
+      lastSeenDay = sessionDayName
+    })
+
     // REPLACE MODE: Delete all sessions, create new ones
     if (mode === 'replace') {
       // Count sessions with bookings before deleting
@@ -91,17 +141,20 @@ export async function POST(
         where: { festivalId }
       })
 
-      // Create all new sessions
+      // Create all new sessions with calculated dates
       const createdSessions = await Promise.all(
         parsedSessions.map(async (session, index) => {
+          const sessionDate = sessionDateMap[index]
+          const dateStr = sessionDate.toISOString().split('T')[0] // YYYY-MM-DD
+
           return prisma.festivalSession.create({
             data: {
               festivalId,
               title: session.title,
               description: session.description || null,
               day: session.day,
-              startTime: session.start,
-              endTime: session.end,
+              startTime: `${dateStr}T${session.start}:00`,
+              endTime: `${dateStr}T${session.end}:00`,
               location: session.location || null,
               level: session.level || null,
               styles: session.types ? session.types.split(',').map(s => s.trim()) : [],
@@ -124,27 +177,75 @@ export async function POST(
     }
 
     // SMART MERGE MODE: Update existing, create new, preserve bookings
-    // Create a map of current sessions by composite key (day|startTime|title)
+    // Create a map of current sessions by composite key (day|startTime|title) - NORMALIZED
     const currentSessionsMap = new Map(
-      festival.sessions.map((s: any) => [`${s.day}|${s.startTime}|${s.title}`, s])
+      festival.sessions.map((s: any) => [
+        `${s.day?.toLowerCase().trim()}|${s.startTime?.trim()}|${s.title?.toLowerCase().trim()}`,
+        s
+      ])
+    )
+
+    // Create a map by session ID for suggested matches
+    const currentSessionsById = new Map(
+      festival.sessions.map((s: any) => [s.id, s])
     )
 
     let updatedCount = 0
     let createdCount = 0
+    let suggestedMatchCount = 0
+    const processedSessionIds = new Set<string>()
 
     // Process each session from Google Sheets
     for (let index = 0; index < parsedSessions.length; index++) {
       const sheetSession = parsedSessions[index]
-      const compositeKey = `${sheetSession.day}|${sheetSession.start}|${sheetSession.title}`
-      const existingSession = currentSessionsMap.get(compositeKey)
+      const sessionDate = sessionDateMap[index]
+      const dateStr = sessionDate.toISOString().split('T')[0] // YYYY-MM-DD
+      
+      // NORMALIZED composite key to match frontend
+      const compositeKey = `${sheetSession.day?.toLowerCase().trim()}|${sheetSession.start?.trim()}|${sheetSession.title?.toLowerCase().trim()}`
+      let existingSession = currentSessionsMap.get(compositeKey)
 
-      if (existingSession) {
-        // UPDATE existing session (preserves ID and bookings)
+      // Check if this sheet session should match a suggested session
+      const matchedDbSessionId = Object.entries(suggestedMatches).find(([dbId, decision]) => {
+        if (decision === 'update') {
+          const dbSession = currentSessionsById.get(dbId)
+          return dbSession && dbSession.title.toLowerCase().trim() === sheetSession.title.toLowerCase().trim()
+        }
+        return false
+      })?.[0]
+
+      if (matchedDbSessionId && suggestedMatches[matchedDbSessionId] === 'update') {
+        // This is a user-confirmed suggested match
+        existingSession = currentSessionsById.get(matchedDbSessionId)
+        if (existingSession) {
+          await prisma.festivalSession.update({
+            where: { id: existingSession.id },
+            data: {
+              title: sheetSession.title,
+              day: sheetSession.day,
+              startTime: `${dateStr}T${sheetSession.start}:00`,
+              endTime: `${dateStr}T${sheetSession.end}:00`,
+              description: sheetSession.description || null,
+              location: sheetSession.location || null,
+              level: sheetSession.level || null,
+              styles: sheetSession.types ? sheetSession.types.split(',').map(s => s.trim()) : [],
+              prerequisites: sheetSession.prerequisites || null,
+              capacity: sheetSession.capacity || null,
+              teachers: sheetSession.teachers ? sheetSession.teachers.split(',').map(t => t.trim()) : [],
+              cardType: sheetSession.cardType || 'detailed'
+            }
+          })
+          suggestedMatchCount++
+          processedSessionIds.add(existingSession.id)
+        }
+      } else if (existingSession && !processedSessionIds.has(existingSession.id)) {
+        // Exact composite key match - UPDATE existing session (preserves ID and bookings)
         await prisma.festivalSession.update({
           where: { id: existingSession.id },
           data: {
             description: sheetSession.description || null,
-            endTime: sheetSession.end,
+            startTime: `${dateStr}T${sheetSession.start}:00`,
+            endTime: `${dateStr}T${sheetSession.end}:00`,
             location: sheetSession.location || null,
             level: sheetSession.level || null,
             styles: sheetSession.types ? sheetSession.types.split(',').map(s => s.trim()) : [],
@@ -155,8 +256,9 @@ export async function POST(
           }
         })
         updatedCount++
+        processedSessionIds.add(existingSession.id)
         currentSessionsMap.delete(compositeKey) // Mark as processed
-      } else {
+      } else if (!existingSession) {
         // CREATE new session
         await prisma.festivalSession.create({
           data: {
@@ -164,8 +266,8 @@ export async function POST(
             title: sheetSession.title,
             description: sheetSession.description || null,
             day: sheetSession.day,
-            startTime: sheetSession.start,
-            endTime: sheetSession.end,
+            startTime: `${dateStr}T${sheetSession.start}:00`,
+            endTime: `${dateStr}T${sheetSession.end}:00`,
             location: sheetSession.location || null,
             level: sheetSession.level || null,
             styles: sheetSession.types ? sheetSession.types.split(',').map(s => s.trim()) : [],
@@ -181,22 +283,15 @@ export async function POST(
     }
 
     // Handle sessions not in Google Sheets
+    // In Smart Merge mode: KEEP everything not in sheet (it's just not being updated)
     let keptCount = 0
-    let deletedCount = 0
 
     for (const [key, session] of currentSessionsMap) {
-      const hasBookings = session.bookings && session.bookings.length > 0
-      
-      if (hasBookings) {
-        // KEEP sessions with bookings (even if not in sheet)
-        console.log(`[Google Sheets Merge] Keeping session with bookings: ${session.title}`)
+      if (!processedSessionIds.has(session.id)) {
+        // In Smart Merge, we keep ALL existing sessions
+        // They're not "outdated", they're just not being modified right now
+        console.log(`[Google Sheets Merge] Keeping existing session: ${session.title}`)
         keptCount++
-      } else {
-        // DELETE empty sessions not in sheet
-        await prisma.festivalSession.delete({
-          where: { id: session.id }
-        })
-        deletedCount++
       }
     }
 
@@ -205,9 +300,10 @@ export async function POST(
       mode: 'merge',
       updated: updatedCount,
       created: createdCount,
+      suggested: suggestedMatchCount,
       kept: keptCount,
-      deleted: deletedCount,
-      message: `Smart Merge complete: Updated ${updatedCount}, created ${createdCount}, kept ${keptCount} with bookings, deleted ${deletedCount} empty sessions.`
+      deleted: 0,
+      message: `Smart Merge complete: Updated ${updatedCount}, created ${createdCount}${suggestedMatchCount > 0 ? `, applied ${suggestedMatchCount} suggested matches` : ''}, kept ${keptCount} existing sessions.`
     })
   } catch (error) {
     console.error('Google Sheets import error:', error)
