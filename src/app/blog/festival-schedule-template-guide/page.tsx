@@ -1,12 +1,13 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
+import AuthorBio from '@/components/blog/AuthorBio'
 import type { Metadata } from 'next'
 import { ArrowLeft, Calendar, Music, Users, Clock } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'The Ultimate Festival Schedule Template Guide - Flow Grid',
-  description: 'Complete guide to festival schedule templates for music festivals, art events, and multi-day celebrations. Includes downloadable templates and expert tips from professional organizers.',
+  title: 'Festival Schedule Template Guide - Music & Event Planning',
+  description: 'Complete festival schedule templates for music events, workshops & multi-day celebrations. Expert tips and downloadable examples included.',
   keywords: [
     'festival schedule template',
     'music festival schedule',
@@ -17,12 +18,41 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'The Ultimate Festival Schedule Template Guide',
     description: 'Everything you need to create professional festival schedules. Templates and best practices included.',
+    images: ['/og-image.png'],
   },
 }
 
 export default function BlogPost() {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: 'The Ultimate Festival Schedule Template Guide',
+    description: 'Complete festival schedule templates for music events, workshops & multi-day celebrations.',
+    image: 'https://tryflowgrid.com/og-image.png',
+    datePublished: '2025-11-07',
+    dateModified: '2025-11-10',
+    author: {
+      '@type': 'Person',
+      name: 'Florian Hohenleitner',
+      url: 'https://growwiththeflo.com',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Flow Grid',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://tryflowgrid.com/flow-grid-logo.png',
+      },
+    },
+  }
+
   return (
     <div className="min-h-screen bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      
       {/* Navigation */}
       <nav className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -468,6 +498,8 @@ export default function BlogPost() {
           </p>
 
         </div>
+
+        <AuthorBio />
 
         <div className="mt-12 pt-8 border-t">
           <Link href="/blog" className="inline-flex items-center text-blue-600 hover:text-blue-700">
