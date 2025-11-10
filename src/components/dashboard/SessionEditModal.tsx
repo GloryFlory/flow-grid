@@ -115,11 +115,17 @@ export default function SessionEditModal({
 
         // Extract date from datetime string for the day field (format: "2025-11-14T09:00:00" -> "2025-11-14")
         const extractDate = (datetime: string) => {
-          if (!datetime) return session.day || ''
+          if (!datetime) return session.day === 'Invalid Date' ? '' : (session.day || '')
           // Check if it's already just a date (YYYY-MM-DD)
           if (datetime.match(/^\d{4}-\d{2}-\d{2}$/)) return datetime
           // Extract date from ISO datetime string
-          return datetime.split('T')[0]
+          const datePart = datetime.split('T')[0]
+          // Validate the extracted date
+          if (datePart && !isNaN(Date.parse(datePart))) {
+            return datePart
+          }
+          // Fallback to session.day if extraction fails, but not if it's 'Invalid Date'
+          return session.day === 'Invalid Date' ? '' : (session.day || '')
         }
 
         setFormData({

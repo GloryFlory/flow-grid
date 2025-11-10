@@ -38,9 +38,9 @@ interface Festival {
 
 interface AnalyticsData {
   totalViews: number
-  sessionClicks: number
+  totalSessionClicks: number
   uniqueVisitors: number
-  avgSessionTime: string
+  avgSessionTime?: string
 }
 
 export default function FestivalManagement() {
@@ -221,7 +221,7 @@ export default function FestivalManagement() {
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm font-medium text-gray-600">Session Clicks</p>
-                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{analytics?.sessionClicks || 0}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{analytics?.totalSessionClicks || 0}</p>
                   <p className="text-xs text-gray-500 hidden sm:block">Engagement</p>
                 </div>
               </div>

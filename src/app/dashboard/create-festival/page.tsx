@@ -199,7 +199,7 @@ export default function CreateFestivalPage() {
 
           parsedSessions.push({
             id: row.id || `session-${index}`,
-            day: row.day || '',
+            day: (row.day && row.day !== 'Invalid Date') ? row.day : '',
             start: row.start || '',
             end: row.end || '',
             title: row.title || '',

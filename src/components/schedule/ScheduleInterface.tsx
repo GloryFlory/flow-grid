@@ -284,25 +284,7 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
     return ['All Days', ...sortedDays]
   }, [sessionsByDay, festivalDayOrder])
 
-  // Detect if there are duplicate day names (multi-week festival)
-  const hasDuplicateDayNames = useMemo(() => {
-    const dayNames = new Set<string>()
-    const foundDays = Object.keys(sessionsByDay).filter(day => day && day !== 'TBD')
-    
-    for (const dateStr of foundDays) {
-      try {
-        const date = new Date(dateStr + 'T12:00:00Z')
-        const dayName = date.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' })
-        if (dayNames.has(dayName)) {
-          return true // Found a duplicate
-        }
-        dayNames.add(dayName)
-      } catch (e) {
-        continue
-      }
-    }
-    return false
-  }, [sessionsByDay])
+
 
   const availableLevels = useMemo(() => {
     const levels = [...new Set(sessions.map(session => session.level))]
@@ -538,7 +520,7 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
           days={availableDays} 
           activeDay={activeDay} 
           setActiveDay={setActiveDay}
-          showDates={hasDuplicateDayNames}
+          showDates={true}
         />
 
         {/* Filters */}
@@ -591,7 +573,7 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
 
               return (
                 <div key={`day-${dayIndex}-${day}`} className="day-section">
-                  <h2 className="day-header">{formatDayHeader(day, hasDuplicateDayNames)}</h2>
+                  <h2 className="day-header">{formatDayHeader(day, true)}</h2>
                   <div className="sessions-grid">
                     {filteredDaySessions.map(session => (
                       <SessionCard

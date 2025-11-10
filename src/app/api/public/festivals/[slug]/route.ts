@@ -123,7 +123,8 @@ export async function GET(
         } else {
           // OLD FORMAT: startTime is "09:00", day is "Friday"
           // We need to convert day name to actual date based on festival dates
-          const dayName = session.day || 'Friday'
+          // Handle Invalid Date entries by defaulting to Friday
+          const dayName = (session.day && session.day !== 'Invalid Date') ? session.day : 'Friday'
           const festivalStart = new Date(festival.startDate)
           
           // Find the first occurrence of this day name within the festival dates
