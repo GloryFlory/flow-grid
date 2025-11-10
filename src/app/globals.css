@@ -3549,6 +3549,17 @@ body {
   }
 }
 
+/* Desktop: Allow tabs to spread evenly across container */
+@media (min-width: 769px) {
+  .tab {
+    max-width: none; /* Remove max-width constraint so tabs can grow to fill space */
+  }
+  
+  .tab.two-line {
+    max-width: none; /* Remove max-width for two-line tabs as well */
+  }
+}
+
 /* Image Cropper Slider Styling */
 input[type="range"]::-webkit-slider-thumb {
   appearance: none;
