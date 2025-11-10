@@ -2,6 +2,16 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Search, HelpCircle, Calendar, Users, Settings, Globe } from 'lucide-react'
 import Footer from '@/components/Footer'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Help Center - Flow Grid Festival Scheduling Guide',
+  description: 'Learn how to create festival schedules, manage bookings, and delight participants with Flow Grid. Step-by-step guides and tutorials.',
+  openGraph: {
+    title: 'Flow Grid Help Center - Festival Scheduling Guide',
+    description: 'Transform your festival into a seamless experience with Flow Grid. Create schedules, manage bookings, and delight participants.',
+  },
+}
 
 export default function HelpCenterPage() {
   return (
