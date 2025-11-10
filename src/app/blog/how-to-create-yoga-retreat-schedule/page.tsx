@@ -1,12 +1,13 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
+import AuthorBio from '@/components/blog/AuthorBio'
 import type { Metadata } from 'next'
 import { ArrowLeft, Calendar, CheckCircle } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'How to Create the Perfect Yoga Retreat Schedule - Flow Grid',
-  description: 'Complete guide to planning yoga retreat schedules that balance practice, rest, and community. Includes templates, timing tips, and best practices from successful retreat leaders.',
+  title: 'Yoga Retreat Schedule Guide: Perfect Planning Template',
+  description: 'Plan perfect yoga retreat schedules with proven templates. Balance practice, rest & community with timing strategies from successful retreat leaders.',
   keywords: [
     'yoga retreat schedule',
     'retreat planning',
@@ -17,12 +18,46 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'How to Create the Perfect Yoga Retreat Schedule',
     description: 'Complete guide to planning yoga retreat schedules with templates and best practices.',
+    images: ['/og-image.png'],
   },
 }
 
 export default function BlogPost() {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: 'How to Create the Perfect Yoga Retreat Schedule',
+    description: 'Plan perfect yoga retreat schedules with proven templates. Balance practice, rest & community with timing strategies from successful retreat leaders.',
+    image: 'https://tryflowgrid.com/og-image.png',
+    datePublished: '2025-11-08',
+    dateModified: '2025-11-10',
+    author: {
+      '@type': 'Person',
+      name: 'Florian Hohenleitner',
+      url: 'https://growwiththeflo.com',
+      jobTitle: 'Event Organizer & Podcast Host',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Flow Grid',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://tryflowgrid.com/flow-grid-logo.png',
+      },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': 'https://tryflowgrid.com/blog/how-to-create-yoga-retreat-schedule',
+    },
+  }
+
   return (
     <div className="min-h-screen bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      
       {/* Navigation */}
       <nav className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -87,7 +122,7 @@ export default function BlogPost() {
           <h2>Understanding the Rhythm of a Retreat Day</h2>
           
           <p>
-            Unlike a typical yoga class schedule, retreat days follow natural energy cycles. The best retreat schedules honor these rhythms rather than fighting against them.
+            Unlike a typical yoga class schedule, retreat days follow natural energy cycles. <a href="https://www.yogaalliance.org/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Research in yoga and wellness practices</a> shows that honoring these natural rhythms—rather than fighting against them—leads to deeper transformation and participant satisfaction.
           </p>
 
           <h3>Morning Sessions (6:00 AM - 9:00 AM)</h3>
@@ -125,7 +160,7 @@ export default function BlogPost() {
           <h3>Midday Break (12:00 PM - 4:00 PM)</h3>
           
           <p>
-            This is where many retreat organizers make their biggest mistake: over-scheduling. The midday period is crucial for integration and rest. Here's the ideal structure:
+            This is where many retreat organizers make their biggest mistake: over-scheduling. According to <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6137615/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">research on rest and recovery</a>, the midday period is crucial for integration and rest. Here's the ideal structure:
           </p>
 
           <ul>
@@ -313,6 +348,8 @@ export default function BlogPost() {
           </p>
 
         </div>
+
+        <AuthorBio />
 
         <div className="mt-12 pt-8 border-t">
           <Link href="/blog" className="inline-flex items-center text-blue-600 hover:text-blue-700">

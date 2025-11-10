@@ -1,12 +1,13 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
+import AuthorBio from '@/components/blog/AuthorBio'
 import type { Metadata } from 'next'
 import { ArrowLeft, Calendar, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Spreadsheets vs Scheduling Software: What\'s Best for Your Event? - Flow Grid',
-  description: 'Detailed comparison of managing event schedules in Excel/Google Sheets versus dedicated scheduling software. Real examples, pros & cons, and when to make the switch.',
+  title: 'Spreadsheets vs Scheduling Software for Events - 2025',
+  description: 'Compare Excel/Google Sheets vs scheduling software for events. Real examples, honest pros & cons, and when to make the switch.',
   keywords: [
     'event scheduling software',
     'spreadsheet vs software',
@@ -17,12 +18,41 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Spreadsheets vs Scheduling Software for Events',
     description: 'Should you use Excel or dedicated software for your event schedule? Compare the pros and cons.',
+    images: ['/og-image.png'],
   },
 }
 
 export default function BlogPost() {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: 'Spreadsheets vs Scheduling Software: What\'s Best for Your Event?',
+    description: 'Compare Excel/Google Sheets vs scheduling software for events. Real examples, honest pros & cons, and when to make the switch.',
+    image: 'https://tryflowgrid.com/og-image.png',
+    datePublished: '2025-11-06',
+    dateModified: '2025-11-10',
+    author: {
+      '@type': 'Person',
+      name: 'Florian Hohenleitner',
+      url: 'https://growwiththeflo.com',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Flow Grid',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://tryflowgrid.com/flow-grid-logo.png',
+      },
+    },
+  }
+
   return (
     <div className="min-h-screen bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      
       {/* Navigation */}
       <nav className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -255,7 +285,7 @@ export default function BlogPost() {
           <h2>What Scheduling Software Actually Costs</h2>
           
           <p>
-            This is usually the first question. The range is huge depending on features:
+            This is usually the first question. According to <a href="https://www.capterra.com/event-management-software/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Capterra's event management software research</a>, the range is huge depending on features:
           </p>
 
           <ul>
@@ -416,6 +446,8 @@ export default function BlogPost() {
           </p>
 
         </div>
+
+        <AuthorBio />
 
         <div className="mt-12 pt-8 border-t">
           <Link href="/blog" className="inline-flex items-center text-blue-600 hover:text-blue-700">

@@ -1,12 +1,13 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
+import AuthorBio from '@/components/blog/AuthorBio'
 import type { Metadata } from 'next'
 import { ArrowLeft, Calendar, CheckSquare } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'The Complete Event Planning Checklist for 2025 - Flow Grid',
-  description: 'Comprehensive event planning checklist covering everything from 6 months before to post-event follow-up. Free downloadable template included.',
+  title: 'Event Planning Checklist 2025 - Complete Guide',
+  description: 'Complete event planning checklist from 6 months out to post-event. Don\'t miss critical steps for festivals, retreats & conferences.',
   keywords: [
     'event planning checklist',
     'event planning template',
@@ -17,12 +18,41 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'The Complete Event Planning Checklist for 2025',
     description: 'Don\'t miss a detail! Comprehensive event planning checklist from start to finish.',
+    images: ['/og-image.png'],
   },
 }
 
 export default function BlogPost() {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: 'The Complete Event Planning Checklist for 2025',
+    description: 'Complete event planning checklist from 6 months out to post-event follow-up.',
+    image: 'https://tryflowgrid.com/og-image.png',
+    datePublished: '2025-11-05',
+    dateModified: '2025-11-10',
+    author: {
+      '@type': 'Person',
+      name: 'Florian Hohenleitner',
+      url: 'https://growwiththeflo.com',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Flow Grid',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://tryflowgrid.com/flow-grid-logo.png',
+      },
+    },
+  }
+
   return (
     <div className="min-h-screen bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      
       {/* Navigation */}
       <nav className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -350,6 +380,8 @@ export default function BlogPost() {
           </p>
 
         </div>
+
+        <AuthorBio />
 
         <div className="mt-12 pt-8 border-t">
           <Link href="/blog" className="inline-flex items-center text-blue-600 hover:text-blue-700">

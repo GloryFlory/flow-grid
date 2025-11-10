@@ -1,12 +1,13 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
+import AuthorBio from '@/components/blog/AuthorBio'
 import type { Metadata } from 'next'
 import { ArrowLeft, Calendar, TrendingUp } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: '7 Essential Tips for Multi-Day Festival Scheduling - Flow Grid',
-  description: 'Master the art of multi-day festival scheduling. Learn how to manage complex schedules with overlapping sessions, multiple venues, and hundreds of attendees.',
+  title: '7 Multi-Day Festival Scheduling Tips - Expert Guide 2025',
+  description: 'Master complex multi-day festival scheduling. Manage overlapping sessions, multiple venues & hundreds of attendees with proven strategies.',
   keywords: [
     'multi-day festival',
     'festival scheduling',
@@ -17,12 +18,41 @@ export const metadata: Metadata = {
   openGraph: {
     title: '7 Essential Tips for Multi-Day Festival Scheduling',
     description: 'Learn how to manage complex multi-day festivals with ease. Expert tips from professional organizers.',
+    images: ['/og-image.png'],
   },
 }
 
 export default function BlogPost() {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: '7 Essential Tips for Multi-Day Festival Scheduling',
+    description: 'Master complex multi-day festival scheduling with proven strategies from expert organizers.',
+    image: 'https://tryflowgrid.com/og-image.png',
+    datePublished: '2025-11-04',
+    dateModified: '2025-11-10',
+    author: {
+      '@type': 'Person',
+      name: 'Florian Hohenleitner',
+      url: 'https://growwiththeflo.com',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Flow Grid',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://tryflowgrid.com/flow-grid-logo.png',
+      },
+    },
+  }
+
   return (
     <div className="min-h-screen bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      
       {/* Navigation */}
       <nav className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -379,6 +409,8 @@ export default function BlogPost() {
           </p>
 
         </div>
+
+        <AuthorBio />
 
         <div className="mt-12 pt-8 border-t">
           <Link href="/blog" className="inline-flex items-center text-blue-600 hover:text-blue-700">
