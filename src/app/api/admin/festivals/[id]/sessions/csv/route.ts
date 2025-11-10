@@ -167,7 +167,10 @@ export async function POST(
       sessionsToCreate.push({
         title: title.replace(/^"|"$/g, '').trim(),
         description: description ? description.replace(/^"|"$/g, '').trim() : null,
-        day: day.replace(/^"|"$/g, '').trim(),
+        day: (() => {
+          const cleanDay = day.replace(/^"|"$/g, '').trim();
+          return cleanDay === 'Invalid Date' ? 'TBD' : cleanDay;
+        })(),
         startTime: start.replace(/^"|"$/g, '').trim(),
         endTime: end.replace(/^"|"$/g, '').trim(),
         location: location ? location.replace(/^"|"$/g, '').trim() : null,

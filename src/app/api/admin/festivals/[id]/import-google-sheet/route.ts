@@ -152,7 +152,7 @@ export async function POST(
               festivalId,
               title: session.title,
               description: session.description || null,
-              day: session.day,
+              day: session.day === 'Invalid Date' ? 'TBD' : session.day,
               startTime: `${dateStr}T${session.start}:00`,
               endTime: `${dateStr}T${session.end}:00`,
               location: session.location || null,

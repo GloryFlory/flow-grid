@@ -58,14 +58,21 @@ export default function FestivalBookingsPage() {
   const handleExportCSV = () => {
     const csv = [
       ['Session', 'Day', 'Time', 'Names', 'Email', 'Booked At'].join(','),
-      ...filteredBookings.map(b => [
-        `"${b.session.title}"`,
-        b.session.day,
-        `${b.session.startTime}-${b.session.endTime}`,
-        `"${b.names.join(', ')}"`,
-        b.email || 'N/A',
-        new Date(b.createdAt).toLocaleString()
-      ].join(','))
+      ...filteredBookings.map(b => {
+        // Fix Invalid Date display in CSV export
+        const displayDay = b.session.day === 'Invalid Date' 
+          ? (b.session.startTime ? new Date(b.session.startTime).toLocaleDateString('en-US', { weekday: 'long' }) : 'TBD')
+          : b.session.day;
+        
+        return [
+          `"${b.session.title}"`,
+          displayDay,
+          `${b.session.startTime}-${b.session.endTime}`,
+          `"${b.names.join(', ')}"`,
+          b.email || 'N/A',
+          new Date(b.createdAt).toLocaleString()
+        ].join(',')
+      })
     ].join('\n');
 
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -164,7 +171,11 @@ export default function FestivalBookingsPage() {
                     <strong>{booking.session.title}</strong>
                   </td>
                   <td className="time-cell">
-                    <div>{booking.session.day}</div>
+                    <div>
+                      {booking.session.day === 'Invalid Date' 
+                        ? (booking.session.startTime ? new Date(booking.session.startTime).toLocaleDateString('en-US', { weekday: 'long' }) : 'TBD')
+                        : booking.session.day}
+                    </div>
                     <div className="time-range">
                       {booking.session.startTime} - {booking.session.endTime}
                     </div>

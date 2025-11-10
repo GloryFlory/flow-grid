@@ -39,6 +39,7 @@ export default function FestivalAnalytics() {
 
   const fetchData = async () => {
     try {
+      console.log('Fetching data for festival ID:', festivalId)
       const [festivalRes, analyticsRes] = await Promise.all([
         fetch(`/api/admin/festivals/${festivalId}`),
         fetch(`/api/admin/festivals/${festivalId}/analytics`)
@@ -51,8 +52,16 @@ export default function FestivalAnalytics() {
 
       if (analyticsRes.ok) {
         const analyticsData = await analyticsRes.json()
+        console.log('Analytics data received:', analyticsData)
         setAnalytics(analyticsData)
       } else {
+        // Log the error response for debugging
+        const errorText = await analyticsRes.text()
+        console.error('Analytics endpoint failed:', {
+          status: analyticsRes.status,
+          statusText: analyticsRes.statusText,
+          response: errorText
+        })
         // Set default empty analytics if endpoint doesn't exist
         setAnalytics({
           totalViews: 0,

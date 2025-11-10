@@ -137,15 +137,29 @@ function SortableSessionRow({
         <div className="text-sm">
           <div className="font-medium text-gray-900">
             {(() => {
-              // Extract and format date from startTime (YYYY-MM-DD or full datetime)
-              const dateStr = session.startTime?.split('T')[0] || session.day
+              // Always try to extract date from startTime first (most reliable)
+              let dateStr = session.startTime?.split('T')[0] || ''
+              
+              // If startTime doesn't have a valid date, fall back to session.day (unless it's Invalid Date)
+              if (!dateStr || isNaN(Date.parse(dateStr))) {
+                dateStr = session.day !== 'Invalid Date' ? (session.day || '') : ''
+              }
+              
+              // If we still don't have a valid date, return a fallback
+              if (!dateStr || dateStr === 'Invalid Date' || isNaN(Date.parse(dateStr))) {
+                return session.day === 'Invalid Date' ? 'Date needs fixing' : (session.day || 'No date set')
+              }
+              
               try {
                 const date = new Date(dateStr + 'T12:00:00Z')
+                if (isNaN(date.getTime())) {
+                  return session.day || dateStr
+                }
                 const dayName = date.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' })
                 const monthDay = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
                 return `${dayName}, ${monthDay}`
               } catch {
-                return session.day || dateStr
+                return session.day === 'Invalid Date' ? 'Date needs fixing' : (session.day || dateStr)
               }
             })()}
           </div>
@@ -682,11 +696,21 @@ export default function SessionsManagement() {
 
   const handleSaveSession = async (sessionData: any) => {
     try {
-      const url = sessionData.id 
-        ? `/api/admin/festivals/${festivalId}/sessions/${sessionData.id}`
+      // Clean and validate session data before saving
+      const cleanedData = {
+        ...sessionData,
+        // Prevent "Invalid Date" from being saved - if it's still Invalid Date, the form should have corrected it
+        day: sessionData.day === 'Invalid Date' ? 'TBD' : sessionData.day,
+        // Ensure times are properly formatted
+        startTime: sessionData.startTime || '',
+        endTime: sessionData.endTime || ''
+      }
+      
+      const url = cleanedData.id 
+        ? `/api/admin/festivals/${festivalId}/sessions/${cleanedData.id}`
         : `/api/admin/festivals/${festivalId}/sessions`
       
-      const method = sessionData.id ? 'PUT' : 'POST'
+      const method = cleanedData.id ? 'PUT' : 'POST'
       
       const response = await fetch(url, {
         method,
@@ -694,7 +718,7 @@ export default function SessionsManagement() {
           'Content-Type': 'application/json',
           'Cache-Control': 'no-cache'
         },
-        body: JSON.stringify(sessionData),
+        body: JSON.stringify(cleanedData),
       })
 
       if (response.ok) {
@@ -800,14 +824,21 @@ export default function SessionsManagement() {
   const exportBookingsCSV = () => {
     const csv = [
       ['Session', 'Day', 'Time', 'Names', 'Email', 'Booked At'].join(','),
-      ...filteredBookings.map(b => [
-        `"${b.session.title}"`,
-        b.session.day,
-        `${b.session.startTime}-${b.session.endTime}`,
-        `"${b.names.join(', ')}"`,
-        b.email || 'N/A',
-        new Date(b.createdAt).toLocaleString()
-      ].join(','))
+      ...filteredBookings.map(b => {
+        // Fix display of Invalid Date entries
+        const displayDay = b.session.day === 'Invalid Date' 
+          ? (b.session.startTime ? new Date(b.session.startTime).toLocaleDateString('en-US', { weekday: 'long' }) : 'TBD')
+          : b.session.day;
+        
+        return [
+          `"${b.session.title}"`,
+          displayDay,
+          `${b.session.startTime}-${b.session.endTime}`,
+          `"${b.names.join(', ')}"`,
+          b.email || 'N/A',
+          new Date(b.createdAt).toLocaleString()
+        ].join(',')
+      })
     ].join('\n')
 
     const blob = new Blob([csv], { type: 'text/csv' })
@@ -851,7 +882,7 @@ export default function SessionsManagement() {
                            session.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            session.description?.toLowerCase().includes(searchTerm.toLowerCase())
       
-      const matchesDay = selectedDay === 'all' || session.day === selectedDay
+      const matchesDay = selectedDay === 'all' || getEffectiveDay(session) === selectedDay
       
       return matchesSearch && matchesDay
     })
@@ -882,6 +913,23 @@ export default function SessionsManagement() {
   }, [sessions, searchTerm, selectedDay, festival])
 
   // Get unique days sorted by festival date order
+  // Helper function to get the effective day for a session
+  const getEffectiveDay = (session: FestivalSession): string => {
+    // If day is Invalid Date, try to reconstruct from startTime
+    if (session.day === 'Invalid Date' && session.startTime) {
+      const dateStr = session.startTime.split('T')[0]
+      if (dateStr && !isNaN(Date.parse(dateStr))) {
+        try {
+          const date = new Date(dateStr + 'T12:00:00Z')
+          return date.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' })
+        } catch {
+          return session.day
+        }
+      }
+    }
+    return session.day
+  }
+
   const uniqueDays = React.useMemo(() => {
     if (!festival) return []
     
@@ -897,9 +945,9 @@ export default function SessionsManagement() {
       currentDate.setUTCDate(currentDate.getUTCDate() + 1)
     }
     
-    // Get unique days from sessions and sort by festival order
-    return Array.from(new Set(sessions.map(s => s.day)))
-      .filter(day => day && day !== 'Invalid Date')
+    // Get unique days from sessions using effective day, and sort by festival order
+    return Array.from(new Set(sessions.map(s => getEffectiveDay(s))))
+      .filter(day => day && day !== 'Invalid Date' && day.trim() !== '')
       .sort((a, b) => festivalDayOrder.indexOf(a) - festivalDayOrder.indexOf(b))
       .map(dayString => {
         // Check if it's already a day name (like "Friday", "Saturday")
@@ -1517,7 +1565,11 @@ export default function SessionsManagement() {
                               <div className="text-sm font-medium text-gray-900">{booking.session.title}</div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-gray-900">{booking.session.day}</div>
+                              <div className="text-sm text-gray-900">
+                                {booking.session.day === 'Invalid Date' 
+                                  ? (booking.session.startTime ? new Date(booking.session.startTime).toLocaleDateString('en-US', { weekday: 'long' }) : 'TBD')
+                                  : booking.session.day}
+                              </div>
                               <div className="text-sm text-gray-500">
                                 {booking.session.startTime.substring(0, 5)} - {booking.session.endTime.substring(0, 5)}
                               </div>
