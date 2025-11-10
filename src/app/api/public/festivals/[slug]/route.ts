@@ -103,30 +103,77 @@ export async function GET(
         if (orderA !== orderB) return orderA - orderB
         return (a.startTime || '00:00').localeCompare(b.startTime || '00:00')
       })
-      .map((session: any) => ({
-        id: session.id,
-        title: session.title,
-        description: session.description || '',
-        day: session.startTime ? session.startTime.split('T')[0] : (session.day || 'TBD'), // Use date from startTime (YYYY-MM-DD format)
-        start: session.startTime ? session.startTime.split('T')[1]?.substring(0, 5) || '00:00' : '00:00', // Extract time portion
-        end: session.endTime ? session.endTime.split('T')[1]?.substring(0, 5) || '01:00' : '01:00', // Extract time portion
-        startTime: session.startTime || '', // Full datetime string
-        endTime: session.endTime || '', // Full datetime string
-        location: session.location || '',
-        level: session.level || 'All Levels',
-        styles: session.styles || [],
-        teachers: session.teachers || [],
-        teacherPhoto: getTeacherPhoto(session.teachers || []), // Single photo for backward compatibility
-        teacherPhotos: getTeacherPhotos(session.teachers || []), // Array of photos for each teacher
-        teacherUrls: getTeacherUrls(session.teachers || []),
-        prereqs: session.prerequisites || '',
-        capacity: session.capacity || 20,
-        currentBookings: 0, // TODO: Implement booking system
-        cardType: session.cardType || 'detailed',
-        bookingEnabled: session.bookingEnabled || false,
-        bookingCapacity: session.bookingCapacity || null,
-        displayOrder: session.displayOrder || 0
-      }))
+      .map((session: any) => {
+        // Determine if this is new format (datetime string) or old format (just time + day name)
+        const hasFullDatetime = session.startTime && session.startTime.includes('T')
+        
+        let dayValue: string
+        let startTimeValue: string
+        let endTimeValue: string
+        let fullStartTime: string
+        let fullEndTime: string
+        
+        if (hasFullDatetime) {
+          // NEW FORMAT: startTime is "2025-11-14T09:00:00"
+          dayValue = session.startTime.split('T')[0] // Extract "2025-11-14"
+          startTimeValue = session.startTime.split('T')[1]?.substring(0, 5) || '00:00' // Extract "09:00"
+          endTimeValue = session.endTime?.split('T')[1]?.substring(0, 5) || '01:00' // Extract "10:30"
+          fullStartTime = session.startTime
+          fullEndTime = session.endTime || session.startTime
+        } else {
+          // OLD FORMAT: startTime is "09:00", day is "Friday"
+          // We need to convert day name to actual date based on festival dates
+          const dayName = session.day || 'Friday'
+          const festivalStart = new Date(festival.startDate)
+          
+          // Find the first occurrence of this day name within the festival dates
+          let currentDate = new Date(festivalStart)
+          const festivalEnd = new Date(festival.endDate)
+          const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+          const targetDayIndex = dayNames.indexOf(dayName)
+          
+          while (currentDate <= festivalEnd && currentDate.getDay() !== targetDayIndex) {
+            currentDate.setDate(currentDate.getDate() + 1)
+          }
+          
+          if (currentDate > festivalEnd) {
+            // Couldn't find the day, use festival start date
+            currentDate = festivalStart
+          }
+          
+          const dateStr = currentDate.toISOString().split('T')[0]
+          dayValue = dateStr
+          startTimeValue = session.startTime || '00:00'
+          endTimeValue = session.endTime || '01:00'
+          fullStartTime = `${dateStr}T${startTimeValue}:00`
+          fullEndTime = `${dateStr}T${endTimeValue}:00`
+        }
+        
+        return {
+          id: session.id,
+          title: session.title,
+          description: session.description || '',
+          day: dayValue, // Always YYYY-MM-DD format
+          start: startTimeValue, // Just time (HH:mm)
+          end: endTimeValue, // Just time (HH:mm)
+          startTime: fullStartTime, // Full datetime string
+          endTime: fullEndTime, // Full datetime string
+          location: session.location || '',
+          level: session.level || 'All Levels',
+          styles: session.styles || [],
+          teachers: session.teachers || [],
+          teacherPhoto: getTeacherPhoto(session.teachers || []), // Single photo for backward compatibility
+          teacherPhotos: getTeacherPhotos(session.teachers || []), // Array of photos for each teacher
+          teacherUrls: getTeacherUrls(session.teachers || []),
+          prereqs: session.prerequisites || '',
+          capacity: session.capacity || 20,
+          currentBookings: 0, // TODO: Implement booking system
+          cardType: session.cardType || 'detailed',
+          bookingEnabled: session.bookingEnabled || false,
+          bookingCapacity: session.bookingCapacity || null,
+          displayOrder: session.displayOrder || 0
+        }
+      })
 
     const response = {
       festival: {
