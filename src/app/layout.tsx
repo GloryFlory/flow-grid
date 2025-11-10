@@ -3,8 +3,8 @@ import { Providers } from '@/components/providers';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Flow Grid - Festival & Event Schedule Maker | Create Beautiful Schedules in Minutes',
-  description: 'Professional festival scheduling software for retreats, workshops & events. Create beautiful schedules, manage sessions, track attendance. Free to start. Perfect for yoga retreats, music festivals & conferences.',
+  title: 'Flow Grid - Festival Schedule Maker | Free Event Planning Software',
+  description: 'Create beautiful festival schedules in minutes. Manage sessions, bookings & attendees for retreats, workshops & events. Free to start, easy to use.',
   keywords: [
     'festival schedule maker',
     'event scheduling software',
@@ -58,9 +58,14 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: '/flow-grid-logo.png',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/flow-grid-logo.png', sizes: '192x192', type: 'image/png' },
+    ],
     apple: '/flow-grid-logo.png',
+    shortcut: '/favicon.ico',
   },
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
