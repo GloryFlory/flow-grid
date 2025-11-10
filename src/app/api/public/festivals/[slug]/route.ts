@@ -94,40 +94,6 @@ export async function GET(
       })
     }
 
-    // Helper function to convert date string to day name
-    function convertDateToDay(dateString: string) {
-      try {
-        console.log('convertDateToDay input:', dateString, 'type:', typeof dateString)
-        
-        // If it's already a day name, return as is
-        if (['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].includes(dateString)) {
-          return dateString
-        }
-        
-        // If it's a date string (YYYY-MM-DD), convert to day name
-        if (dateString && dateString.includes && dateString.includes('-') && dateString.length === 10) {
-          const date = new Date(dateString + 'T12:00:00.000Z') // Use noon UTC to avoid timezone issues
-          console.log('Created date object:', date, 'isValid:', !isNaN(date.getTime()))
-          
-          if (isNaN(date.getTime())) {
-            console.error('Invalid date created from:', dateString)
-            return 'TBD'
-          }
-          
-          const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-          const dayName = dayNames[date.getUTCDay()]
-          console.log('Converted to day name:', dayName)
-          return dayName
-        }
-        
-        console.log('No conversion applied, returning:', dateString || 'TBD')
-        return dateString || 'TBD'
-      } catch (error) {
-        console.error('Error converting date to day name:', error, 'input was:', dateString)
-        return 'TBD'
-      }
-    }
-
     // Streamlined transformation with sorting
     const transformedSessions = (f.sessions as any[])
       .sort((a: any, b: any) => {
@@ -141,7 +107,7 @@ export async function GET(
         id: session.id,
         title: session.title,
         description: session.description || '',
-        day: session.day === 'Invalid Date' ? 'TBD' : convertDateToDay(session.day || 'TBD'),
+        day: session.startTime ? session.startTime.split('T')[0] : (session.day || 'TBD'), // Use date from startTime (YYYY-MM-DD format)
         start: session.startTime ? session.startTime.split('T')[1]?.substring(0, 5) || '00:00' : '00:00', // Extract time portion
         end: session.endTime ? session.endTime.split('T')[1]?.substring(0, 5) || '01:00' : '01:00', // Extract time portion
         startTime: session.startTime || '', // Full datetime string
