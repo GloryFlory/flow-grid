@@ -105,6 +105,36 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="icon" href="/flow-grid-logo.png" type="image/png" />
         <link rel="apple-touch-icon" href="/flow-grid-logo.png" />
+        
+        {/* Amplitude Analytics */}
+        <script 
+          src="https://cdn.eu.amplitude.com/script/46325823b94e297568aa8e2ee0361dd7.js"
+          async
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.amplitude = window.amplitude || { _q: [], _iq: {} };
+              window.amplitude.add = window.amplitude.add || function(plugin) {
+                window.amplitude._q = window.amplitude._q || [];
+                window.amplitude._q.push(['add', plugin]);
+              };
+              if (typeof window !== 'undefined') {
+                window.addEventListener('load', function() {
+                  if (window.amplitude && window.amplitude.init && window.sessionReplay) {
+                    window.amplitude.add(window.sessionReplay.plugin({sampleRate: 1}));
+                    window.amplitude.init('46325823b94e297568aa8e2ee0361dd7', {
+                      fetchRemoteConfig: true,
+                      serverZone: 'EU',
+                      autocapture: true
+                    });
+                  }
+                });
+              }
+            `,
+          }}
+        />
+        
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
