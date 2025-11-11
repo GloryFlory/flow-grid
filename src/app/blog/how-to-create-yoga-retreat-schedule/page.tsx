@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
 import AuthorBio from '@/components/blog/AuthorBio'
+import RelatedPosts from '@/components/blog/RelatedPosts'
 import type { Metadata } from 'next'
 import { ArrowLeft, Calendar, CheckCircle } from 'lucide-react'
 
@@ -33,8 +34,13 @@ export default function BlogPost() {
     dateModified: '2025-11-10',
     author: {
       '@type': 'Person',
+      '@id': 'https://florianhohenleitner.com/#person',
       name: 'Florian Hohenleitner',
-      url: 'https://growwiththeflo.com',
+      url: 'https://florianhohenleitner.com',
+      sameAs: [
+        'https://growwiththeflo.com',
+        'https://mediterranean-acro-convention.com'
+      ],
       jobTitle: 'Event Organizer & Podcast Host',
     },
     publisher: {
@@ -49,7 +55,30 @@ export default function BlogPost() {
       '@type': 'WebPage',
       '@id': 'https://tryflowgrid.com/blog/how-to-create-yoga-retreat-schedule',
     },
+    wordCount: 2100,
+    articleBody: 'Full guide to creating yoga retreat schedules...',
   }
+
+  const relatedPosts = [
+    {
+      slug: 'festival-schedule-template-guide',
+      title: 'Festival Schedule Template Guide',
+      excerpt: 'Create professional festival schedules with our comprehensive templates and expert tips.',
+      category: 'Festival Planning'
+    },
+    {
+      slug: 'event-planning-checklist',
+      title: 'Event Planning Checklist 2025',
+      excerpt: 'Complete checklist covering everything from 6 months before to post-event follow-up.',
+      category: 'Event Planning'
+    },
+    {
+      slug: 'multi-day-festival-scheduling-tips',
+      title: '7 Multi-Day Festival Scheduling Tips',
+      excerpt: 'Master complex multi-day events with overlapping sessions and multiple venues.',
+      category: 'Festival Planning'
+    }
+  ]
 
   return (
     <div className="min-h-screen bg-white">
@@ -102,7 +131,7 @@ export default function BlogPost() {
               <Calendar className="h-4 w-4" />
               November 8, 2025
             </span>
-            <span>• 8 min read</span>
+            <span>• 10 min read</span>
           </div>
           
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
@@ -114,7 +143,7 @@ export default function BlogPost() {
           </p>
         </header>
 
-        <div className="prose prose-lg max-w-none">
+  <div className="prose prose-lg max-w-none prose-headings:scroll-mt-24 prose-h2:mt-12 prose-h2:border-b prose-h2:pb-2 prose-h3:mt-8 prose-p:leading-relaxed prose-li:marker:text-blue-600">
           <p>
             Planning a yoga retreat schedule is both an art and a science. You need to create enough structure to give participants a transformative experience while leaving room for spontaneity, rest, and personal reflection. After years of helping retreat organizers create schedules, we've identified the key elements that make a retreat schedule truly exceptional.
           </p>
@@ -270,7 +299,7 @@ export default function BlogPost() {
           
           <h3>1. Over-Programming</h3>
           <p>
-            The most common mistake is packing too much in. Remember: participants came to retreat, not to race through a packed schedule. If you're wondering whether to add another activity, the answer is probably no.
+            The most common mistake is packing too much in. Remember: participants came to retreat, not to race through a packed schedule. If you're wondering whether to add another activity, the answer is probably no. Learn more about <Link href="/blog/multi-day-festival-scheduling-tips" className="text-blue-600 hover:underline">managing multi-day event energy</Link>.
           </p>
 
           <h3>2. Insufficient Transition Time</h3>
@@ -348,6 +377,8 @@ export default function BlogPost() {
           </p>
 
         </div>
+
+        <RelatedPosts posts={relatedPosts} />
 
         <AuthorBio />
 

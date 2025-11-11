@@ -94,62 +94,100 @@ export async function GET(
       })
     }
 
-    // Streamlined transformation with sorting
+    // Helper: compute canonical full datetime for sorting and display
+    const computeFullDateTime = (session: any): { dayISO: string, start: string, end: string, fullStart: string, fullEnd: string } => {
+      const hasFullDatetime = session.startTime && session.startTime.includes('T')
+      if (hasFullDatetime) {
+        const dayISO = session.startTime.split('T')[0]
+        const start = session.startTime.split('T')[1]?.substring(0,5) || '00:00'
+        const end = session.endTime?.split('T')[1]?.substring(0,5) || '01:00'
+        return { dayISO, start, end, fullStart: session.startTime, fullEnd: session.endTime || session.startTime }
+      }
+      // OLD FORMAT: try to derive date from session.day or festival range
+      const tryParseDayToISO = (): string | null => {
+        if (!session.day) return null
+        // Try parse as date string
+        const parsed = Date.parse(session.day)
+        if (!isNaN(parsed)) return new Date(parsed).toISOString().split('T')[0]
+        // Try map day name within festival range
+        const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+        const idx = dayNames.indexOf(String(session.day))
+        if (idx !== -1) {
+          // Parse festival dates - handle both Date objects and ISO strings
+          const startValue: any = festival.startDate
+          const endValue: any = festival.endDate
+          
+          let festivalStart: Date
+          let festivalEnd: Date
+          
+          if (startValue instanceof Date) {
+            festivalStart = startValue
+            festivalEnd = endValue instanceof Date ? endValue : new Date(endValue)
+          } else {
+            const startStr = String(startValue)
+            const endStr = String(endValue)
+            festivalStart = new Date(startStr.includes('T') ? startStr : startStr + 'T00:00:00Z')
+            festivalEnd = new Date(endStr.includes('T') ? endStr : endStr + 'T00:00:00Z')
+          }
+          
+          // Validate dates
+          if (isNaN(festivalStart.getTime()) || isNaN(festivalEnd.getTime())) {
+            console.error('Invalid festival dates in public API:', { startDate: festival.startDate, endDate: festival.endDate })
+            return null
+          }
+          
+          const cur = new Date(festivalStart)
+          while (cur <= festivalEnd && cur.getUTCDay() !== idx) cur.setUTCDate(cur.getUTCDate()+1)
+          if (cur <= festivalEnd) return cur.toISOString().split('T')[0]
+          // Not found in range, use first occurrence after start
+          const fallback = new Date(festivalStart)
+          let safety = 0
+          while (fallback.getUTCDay() !== idx && safety < 8) {
+            fallback.setUTCDate(fallback.getUTCDate()+1)
+            safety++
+          }
+          
+          if (isNaN(fallback.getTime())) {
+            console.error('Invalid fallback date in public API for day:', session.day)
+            return null
+          }
+          
+          return fallback.toISOString().split('T')[0]
+        }
+        return null
+      }
+      
+      // Get the festival start date safely
+      let festivalStartISO: string
+      const startValue: any = festival.startDate
+      if (startValue instanceof Date) {
+        festivalStartISO = startValue.toISOString().split('T')[0]
+      } else {
+        const startStr = String(startValue)
+        const parsed = new Date(startStr.includes('T') ? startStr : startStr + 'T00:00:00Z')
+        festivalStartISO = isNaN(parsed.getTime()) ? '2025-01-01' : parsed.toISOString().split('T')[0]
+      }
+      
+      const dayISO = tryParseDayToISO() || festivalStartISO
+      const start = (session.startTime || '00:00').substring(0,5)
+      const end = (session.endTime || '01:00').substring(0,5)
+      const fullStart = `${dayISO}T${start}:00`
+      const fullEnd = `${dayISO}T${end}:00`
+      return { dayISO, start, end, fullStart, fullEnd }
+    }
+
+    // Streamlined transformation with sorting by datetime primarily
     const transformedSessions = (f.sessions as any[])
-      .sort((a: any, b: any) => {
-        // Sort by displayOrder first, then by startTime
-        const orderA = a.displayOrder || 0
-        const orderB = b.displayOrder || 0
-        if (orderA !== orderB) return orderA - orderB
-        return (a.startTime || '00:00').localeCompare(b.startTime || '00:00')
-      })
       .map((session: any) => {
+        const computed = computeFullDateTime(session)
         // Determine if this is new format (datetime string) or old format (just time + day name)
         const hasFullDatetime = session.startTime && session.startTime.includes('T')
-        
-        let dayValue: string
-        let startTimeValue: string
-        let endTimeValue: string
-        let fullStartTime: string
-        let fullEndTime: string
-        
-        if (hasFullDatetime) {
-          // NEW FORMAT: startTime is "2025-11-14T09:00:00"
-          dayValue = session.startTime.split('T')[0] // Extract "2025-11-14"
-          startTimeValue = session.startTime.split('T')[1]?.substring(0, 5) || '00:00' // Extract "09:00"
-          endTimeValue = session.endTime?.split('T')[1]?.substring(0, 5) || '01:00' // Extract "10:30"
-          fullStartTime = session.startTime
-          fullEndTime = session.endTime || session.startTime
-        } else {
-          // OLD FORMAT: startTime is "09:00", day is "Friday"
-          // We need to convert day name to actual date based on festival dates
-          // Handle Invalid Date entries by defaulting to Friday
-          const dayName = (session.day && session.day !== 'Invalid Date') ? session.day : 'Friday'
-          const festivalStart = new Date(festival.startDate)
-          
-          // Find the first occurrence of this day name within the festival dates
-          let currentDate = new Date(festivalStart)
-          const festivalEnd = new Date(festival.endDate)
-          const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-          const targetDayIndex = dayNames.indexOf(dayName)
-          
-          while (currentDate <= festivalEnd && currentDate.getDay() !== targetDayIndex) {
-            currentDate.setDate(currentDate.getDate() + 1)
-          }
-          
-          if (currentDate > festivalEnd) {
-            // Couldn't find the day, use festival start date
-            currentDate = festivalStart
-          }
-          
-          const dateStr = currentDate.toISOString().split('T')[0]
-          dayValue = dateStr
-          startTimeValue = session.startTime || '00:00'
-          endTimeValue = session.endTime || '01:00'
-          fullStartTime = `${dateStr}T${startTimeValue}:00`
-          fullEndTime = `${dateStr}T${endTimeValue}:00`
-        }
-        
+        const dayValue = computed.dayISO
+        const startTimeValue = computed.start
+        const endTimeValue = computed.end
+        const fullStartTime = computed.fullStart
+        const fullEndTime = computed.fullEnd
+
         return {
           id: session.id,
           title: session.title,
@@ -174,6 +212,17 @@ export async function GET(
           bookingCapacity: session.bookingCapacity || null,
           displayOrder: session.displayOrder || 0
         }
+      })
+      .sort((a: any, b: any) => {
+        // Sort by full datetime first
+        const dtA = (a.startTime || '').localeCompare(b.startTime || '')
+        if (dtA !== 0) return dtA
+        // Fallback to displayOrder
+        const orderA = a.displayOrder || 0
+        const orderB = b.displayOrder || 0
+        if (orderA !== orderB) return orderA - orderB
+        // Finally by title
+        return (a.title || '').localeCompare(b.title || '')
       })
 
     const response = {

@@ -1,5 +1,6 @@
 import './globals.css';
 import { Providers } from '@/components/providers';
+import { AmplitudeScript } from '@/components/AmplitudeScript';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -68,42 +69,43 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Flow Grid',
+  applicationCategory: 'BusinessApplication',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '5.0',
+    ratingCount: '1'
+  },
+  description: 'Professional festival and event scheduling software. Create beautiful schedules for retreats, workshops, festivals and conferences.',
+  operatingSystem: 'Web Browser',
+  url: 'https://tryflowgrid.com',
+  screenshot: 'https://tryflowgrid.com/og-image.png',
+  featureList: [
+    'Festival Schedule Creation',
+    'Session Management',
+    'Teacher/Speaker Profiles',
+    'Booking System',
+    'Custom Branding',
+    'Analytics Dashboard',
+    'Multi-Festival Support',
+    'Public Schedule Pages'
+  ],
+  author: {
+    '@type': 'Organization',
     name: 'Flow Grid',
-    applicationCategory: 'BusinessApplication',
-    offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'USD',
-    },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '5.0',
-      ratingCount: '1'
-    },
-    description: 'Professional festival and event scheduling software. Create beautiful schedules for retreats, workshops, festivals and conferences.',
-    operatingSystem: 'Web Browser',
-    url: 'https://tryflowgrid.com',
-    screenshot: 'https://tryflowgrid.com/og-image.png',
-    featureList: [
-      'Festival Schedule Creation',
-      'Session Management',
-      'Teacher/Speaker Profiles',
-      'Booking System',
-      'Custom Branding',
-      'Analytics Dashboard',
-      'Multi-Festival Support',
-      'Public Schedule Pages'
-    ],
-    author: {
-      '@type': 'Organization',
-      name: 'Flow Grid',
-      url: 'https://tryflowgrid.com'
-    }
-  };
+    url: 'https://tryflowgrid.com'
+  }
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <html lang="en">
@@ -111,41 +113,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" href="/flow-grid-logo.png" type="image/png" />
         <link rel="apple-touch-icon" href="/flow-grid-logo.png" />
         
-        {/* Amplitude Analytics */}
-        <script 
-          src="https://cdn.eu.amplitude.com/script/46325823b94e297568aa8e2ee0361dd7.js"
-          async
-        />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.amplitude = window.amplitude || { _q: [], _iq: {} };
-              window.amplitude.add = window.amplitude.add || function(plugin) {
-                window.amplitude._q = window.amplitude._q || [];
-                window.amplitude._q.push(['add', plugin]);
-              };
-              if (typeof window !== 'undefined') {
-                window.addEventListener('load', function() {
-                  if (window.amplitude && window.amplitude.init && window.sessionReplay) {
-                    window.amplitude.add(window.sessionReplay.plugin({sampleRate: 1}));
-                    window.amplitude.init('46325823b94e297568aa8e2ee0361dd7', {
-                      fetchRemoteConfig: true,
-                      serverZone: 'EU',
-                      autocapture: true
-                    });
-                  }
-                });
-              }
-            `,
-          }}
-        />
-        
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
       <body>
+        <AmplitudeScript />
         <Providers>
           {children}
         </Providers>

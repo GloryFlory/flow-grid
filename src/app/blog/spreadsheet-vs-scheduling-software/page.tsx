@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
 import AuthorBio from '@/components/blog/AuthorBio'
+import RelatedPosts from '@/components/blog/RelatedPosts'
 import type { Metadata } from 'next'
 import { ArrowLeft, Calendar, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
 
@@ -33,8 +34,13 @@ export default function BlogPost() {
     dateModified: '2025-11-10',
     author: {
       '@type': 'Person',
+      '@id': 'https://florianhohenleitner.com/#person',
       name: 'Florian Hohenleitner',
-      url: 'https://growwiththeflo.com',
+      url: 'https://florianhohenleitner.com',
+      sameAs: [
+        'https://growwiththeflo.com',
+        'https://mediterranean-acro-convention.com'
+      ],
     },
     publisher: {
       '@type': 'Organization',
@@ -44,7 +50,29 @@ export default function BlogPost() {
         url: 'https://tryflowgrid.com/flow-grid-logo.png',
       },
     },
+    wordCount: 2200,
   }
+
+  const relatedPosts = [
+    {
+      slug: 'festival-schedule-template-guide',
+      title: 'Festival Schedule Template Guide',
+      excerpt: 'Everything you need to create professional festival schedules with downloadable templates.',
+      category: 'Festival Planning'
+    },
+    {
+      slug: 'event-planning-checklist',
+      title: 'Event Planning Checklist 2025',
+      excerpt: 'Comprehensive checklist from 6 months before to post-event follow-up.',
+      category: 'Event Planning'
+    },
+    {
+      slug: 'how-to-create-yoga-retreat-schedule',
+      title: 'Yoga Retreat Schedule Guide',
+      excerpt: 'Plan perfect yoga retreat schedules that balance practice, rest, and community.',
+      category: 'Retreat Planning'
+    }
+  ]
 
   return (
     <div className="min-h-screen bg-white">
@@ -109,7 +137,7 @@ export default function BlogPost() {
           </p>
         </header>
 
-        <div className="prose prose-lg max-w-none">
+  <div className="prose prose-lg max-w-none prose-headings:scroll-mt-24 prose-h2:mt-12 prose-h2:border-b prose-h2:pb-2 prose-h3:mt-8 prose-p:leading-relaxed prose-li:marker:text-blue-600">
           <p>
             If you're reading this, chances are you've been managing your event schedule in Excel or Google Sheets. You're not alone—it's where most event organizers start. But at some point, you've probably hit friction: sharing updates is painful, the schedule looks unprofessional, or you've accidentally broken a formula at 11 PM the night before your event.
           </p>
@@ -446,6 +474,8 @@ export default function BlogPost() {
           </p>
 
         </div>
+
+        <RelatedPosts posts={relatedPosts} />
 
         <AuthorBio />
 

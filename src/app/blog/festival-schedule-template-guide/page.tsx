@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
 import AuthorBio from '@/components/blog/AuthorBio'
+import RelatedPosts from '@/components/blog/RelatedPosts'
 import type { Metadata } from 'next'
 import { ArrowLeft, Calendar, Music, Users, Clock } from 'lucide-react'
 
@@ -33,8 +34,13 @@ export default function BlogPost() {
     dateModified: '2025-11-10',
     author: {
       '@type': 'Person',
+      '@id': 'https://florianhohenleitner.com/#person',
       name: 'Florian Hohenleitner',
-      url: 'https://growwiththeflo.com',
+      url: 'https://florianhohenleitner.com',
+      sameAs: [
+        'https://growwiththeflo.com',
+        'https://mediterranean-acro-convention.com'
+      ],
     },
     publisher: {
       '@type': 'Organization',
@@ -44,7 +50,29 @@ export default function BlogPost() {
         url: 'https://tryflowgrid.com/flow-grid-logo.png',
       },
     },
+    wordCount: 2600,
   }
+
+  const relatedPosts = [
+    {
+      slug: 'multi-day-festival-scheduling-tips',
+      title: '7 Multi-Day Festival Scheduling Tips',
+      excerpt: 'Master complex multi-day festivals with overlapping sessions and multiple venues.',
+      category: 'Festival Planning'
+    },
+    {
+      slug: 'spreadsheet-vs-scheduling-software',
+      title: 'Spreadsheets vs Scheduling Software',
+      excerpt: 'Detailed comparison to help you choose the right tool for your event schedule.',
+      category: 'Event Management'
+    },
+    {
+      slug: 'event-planning-checklist',
+      title: 'Event Planning Checklist 2025',
+      excerpt: 'Complete checklist from initial planning to post-event follow-up.',
+      category: 'Event Planning'
+    }
+  ]
 
   return (
     <div className="min-h-screen bg-white">
@@ -109,7 +137,7 @@ export default function BlogPost() {
           </p>
         </header>
 
-        <div className="prose prose-lg max-w-none">
+  <div className="prose prose-lg max-w-none prose-headings:scroll-mt-24 prose-h2:mt-12 prose-h2:border-b prose-h2:pb-2 prose-h3:mt-8 prose-p:leading-relaxed prose-li:marker:text-blue-600">
           <p>
             Creating a festival schedule is one of the most critical tasks in event planning. A well-designed schedule ensures smooth operations, happy attendees, and successful performers. Whether you're organizing a music festival, arts celebration, or community gathering, this guide will walk you through everything you need to know.
           </p>
@@ -498,6 +526,8 @@ export default function BlogPost() {
           </p>
 
         </div>
+
+        <RelatedPosts posts={relatedPosts} />
 
         <AuthorBio />
 

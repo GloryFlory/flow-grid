@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
 import AuthorBio from '@/components/blog/AuthorBio'
+import RelatedPosts from '@/components/blog/RelatedPosts'
 import type { Metadata } from 'next'
 import { ArrowLeft, Calendar, TrendingUp } from 'lucide-react'
 
@@ -33,8 +34,13 @@ export default function BlogPost() {
     dateModified: '2025-11-10',
     author: {
       '@type': 'Person',
+      '@id': 'https://florianhohenleitner.com/#person',
       name: 'Florian Hohenleitner',
-      url: 'https://growwiththeflo.com',
+      url: 'https://florianhohenleitner.com',
+      sameAs: [
+        'https://growwiththeflo.com',
+        'https://mediterranean-acro-convention.com'
+      ]
     },
     publisher: {
       '@type': 'Organization',
@@ -44,7 +50,29 @@ export default function BlogPost() {
         url: 'https://tryflowgrid.com/flow-grid-logo.png',
       },
     },
+    wordCount: 2000,
   }
+
+  const relatedPosts = [
+    {
+      slug: 'how-to-create-yoga-retreat-schedule',
+      title: 'How to Create a Yoga Retreat Schedule',
+      excerpt: 'Design the perfect yoga retreat flow with expert scheduling strategies for workshops, meditation, and free time.',
+      category: 'Retreat Planning'
+    },
+    {
+      slug: 'festival-schedule-template-guide',
+      title: 'Free Festival Schedule Template & Setup Guide',
+      excerpt: 'Download our proven festival schedule template and learn how to customize it for your multi-stage, multi-day event.',
+      category: 'Templates'
+    },
+    {
+      slug: 'event-planning-checklist',
+      title: 'The Complete Event Planning Checklist',
+      excerpt: 'Never miss a detail with our comprehensive event planning checklist covering everything from initial concept to post-event follow-up.',
+      category: 'Event Planning'
+    }
+  ]
 
   return (
     <div className="min-h-screen bg-white">
@@ -109,7 +137,7 @@ export default function BlogPost() {
           </p>
         </header>
 
-        <div className="prose prose-lg max-w-none">
+  <div className="prose prose-lg max-w-none prose-headings:scroll-mt-24 prose-h2:mt-12 prose-h2:border-b prose-h2:pb-2 prose-h3:mt-8 prose-p:leading-relaxed prose-li:marker:text-blue-600">
           <p>
             Multi-day festivals are incredibly rewarding to organize, but they come with unique scheduling challenges. You're not just planning a few hours—you're orchestrating an experience that unfolds over days, managing attendee energy, creating narrative arc, and coordinating countless moving pieces across time and space.
           </p>
@@ -409,6 +437,8 @@ export default function BlogPost() {
           </p>
 
         </div>
+
+        <RelatedPosts posts={relatedPosts} />
 
         <AuthorBio />
 

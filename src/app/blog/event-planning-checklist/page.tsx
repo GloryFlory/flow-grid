@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
 import AuthorBio from '@/components/blog/AuthorBio'
+import RelatedPosts from '@/components/blog/RelatedPosts'
 import type { Metadata } from 'next'
 import { ArrowLeft, Calendar, CheckSquare } from 'lucide-react'
 
@@ -33,8 +34,13 @@ export default function BlogPost() {
     dateModified: '2025-11-10',
     author: {
       '@type': 'Person',
+      '@id': 'https://florianhohenleitner.com/#person',
       name: 'Florian Hohenleitner',
-      url: 'https://growwiththeflo.com',
+      url: 'https://florianhohenleitner.com',
+      sameAs: [
+        'https://growwiththeflo.com',
+        'https://mediterranean-acro-convention.com'
+      ],
     },
     publisher: {
       '@type': 'Organization',
@@ -44,7 +50,29 @@ export default function BlogPost() {
         url: 'https://tryflowgrid.com/flow-grid-logo.png',
       },
     },
+    wordCount: 1700,
   }
+
+  const relatedPosts = [
+    {
+      slug: 'festival-schedule-template-guide',
+      title: 'Festival Schedule Template Guide',
+      excerpt: 'Create professional festival schedules from single-day to multi-day events.',
+      category: 'Festival Planning'
+    },
+    {
+      slug: 'multi-day-festival-scheduling-tips',
+      title: '7 Multi-Day Festival Scheduling Tips',
+      excerpt: 'Expert strategies for managing complex multi-day events.',
+      category: 'Festival Planning'
+    },
+    {
+      slug: 'spreadsheet-vs-scheduling-software',
+      title: 'Spreadsheets vs Scheduling Software',
+      excerpt: 'Compare tools and find the best fit for your event needs.',
+      category: 'Event Management'
+    }
+  ]
 
   return (
     <div className="min-h-screen bg-white">
@@ -109,7 +137,7 @@ export default function BlogPost() {
           </p>
         </header>
 
-        <div className="prose prose-lg max-w-none">
+  <div className="prose prose-lg max-w-none prose-headings:scroll-mt-24 prose-h2:mt-12 prose-h2:border-b prose-h2:pb-2 prose-h3:mt-8 prose-p:leading-relaxed prose-li:marker:text-blue-600">
           <p>
             Planning an event—whether it's a festival, retreat, conference, or workshop—involves coordinating hundreds of details. Miss one, and it can cascade into bigger problems. This checklist will keep you organized and on track from start to finish.
           </p>
@@ -380,6 +408,8 @@ export default function BlogPost() {
           </p>
 
         </div>
+
+        <RelatedPosts posts={relatedPosts} />
 
         <AuthorBio />
 

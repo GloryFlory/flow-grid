@@ -80,12 +80,14 @@ interface Festival {
 function SortableSessionRow({ 
   session, 
   bookings,
+  festival,
   onEdit, 
   onDelete,
   onViewBookings
 }: { 
   session: FestivalSession
   bookings: any[]
+  festival: Festival | null
   onEdit: (session: FestivalSession) => void
   onDelete: (id: string) => void
   onViewBookings: (sessionId: string) => void
@@ -104,6 +106,19 @@ function SortableSessionRow({
   const capacity = session.bookingCapacity || 0
   const isFullyBooked = session.bookingEnabled && capacity > 0 && totalBooked >= capacity
   const hasBookings = session.bookingEnabled && totalBooked > 0
+
+  // Check if session is outside festival range
+  const isOutsideRange = festival && (() => {
+    try {
+      const sessionDate = new Date(session.day)
+      const startDate = new Date(festival.startDate)
+      const endDate = new Date(festival.endDate)
+      endDate.setDate(endDate.getDate() + 1)
+      return sessionDate < startDate || sessionDate >= endDate
+    } catch {
+      return false
+    }
+  })()
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -135,33 +150,44 @@ function SortableSessionRow({
       </td>
       <td className="py-3 px-4">
         <div className="text-sm">
-          <div className="font-medium text-gray-900">
-            {(() => {
-              // Always try to extract date from startTime first (most reliable)
-              let dateStr = session.startTime?.split('T')[0] || ''
-              
-              // If startTime doesn't have a valid date, fall back to session.day (unless it's Invalid Date)
-              if (!dateStr || isNaN(Date.parse(dateStr))) {
-                dateStr = session.day !== 'Invalid Date' ? (session.day || '') : ''
-              }
-              
-              // If we still don't have a valid date, return a fallback
-              if (!dateStr || dateStr === 'Invalid Date' || isNaN(Date.parse(dateStr))) {
-                return session.day === 'Invalid Date' ? 'Date needs fixing' : (session.day || 'No date set')
-              }
-              
-              try {
-                const date = new Date(dateStr + 'T12:00:00Z')
-                if (isNaN(date.getTime())) {
-                  return session.day || dateStr
+          <div className="font-medium text-gray-900 flex items-center gap-2">
+            <span>
+              {(() => {
+                // Always try to extract date from startTime first (most reliable)
+                let dateStr = session.startTime?.split('T')[0] || ''
+                
+                // If startTime doesn't have a valid date, fall back to session.day (unless it's Invalid Date)
+                if (!dateStr || isNaN(Date.parse(dateStr))) {
+                  dateStr = session.day !== 'Invalid Date' ? (session.day || '') : ''
                 }
-                const dayName = date.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' })
-                const monthDay = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
-                return `${dayName}, ${monthDay}`
-              } catch {
-                return session.day === 'Invalid Date' ? 'Date needs fixing' : (session.day || dateStr)
-              }
-            })()}
+                
+                // If we still don't have a valid date, return a fallback
+                if (!dateStr || dateStr === 'Invalid Date' || isNaN(Date.parse(dateStr))) {
+                  return session.day === 'Invalid Date' ? 'Date needs fixing' : (session.day || 'No date set')
+                }
+                
+                try {
+                  const date = new Date(dateStr + 'T12:00:00Z')
+                  if (isNaN(date.getTime())) {
+                    return session.day || dateStr
+                  }
+                  const dayName = date.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' })
+                  const monthDay = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
+                  return `${dayName}, ${monthDay}`
+                } catch {
+                  return session.day === 'Invalid Date' ? 'Date needs fixing' : (session.day || dateStr)
+                }
+              })()}
+            </span>
+            {isOutsideRange && festival && (
+              <div className="relative group">
+                <AlertCircle className="w-4 h-4 text-amber-500 cursor-help flex-shrink-0" />
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10 shadow-lg">
+                  Date outside festival range ({new Date(festival.startDate).toLocaleDateString()} - {new Date(festival.endDate).toLocaleDateString()})
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45 -mt-1"></div>
+                </div>
+              </div>
+            )}
           </div>
           <div className="flex items-center gap-1 text-gray-500 mt-1 text-xs whitespace-nowrap">
             <Clock className="w-3 h-3 flex-shrink-0" />
@@ -288,6 +314,7 @@ export default function SessionsManagement() {
   const [selectedMode, setSelectedMode] = useState<'replace' | 'merge'>('merge')
   const [suggestedMatchDecisions, setSuggestedMatchDecisions] = useState<Record<string, 'update' | 'create' | 'skip'>>({})
   const [isGoogleSheetsImport, setIsGoogleSheetsImport] = useState(false) // Track import source)
+  const [showDateWarningBanner, setShowDateWarningBanner] = useState(true)
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -296,6 +323,33 @@ export default function SessionsManagement() {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   )
+
+  // Date range validation helper
+  const isSessionOutsideRange = (sessionDay: string, festivalStart: string, festivalEnd: string): boolean => {
+    try {
+      const sessionDate = new Date(sessionDay)
+      const startDate = new Date(festivalStart)
+      const endDate = new Date(festivalEnd)
+      
+      // Add one day to end date to include the end day
+      endDate.setDate(endDate.getDate() + 1)
+      
+      return sessionDate < startDate || sessionDate >= endDate
+    } catch {
+      return false
+    }
+  }
+
+  // Get sessions outside festival range
+  const getOutOfRangeSessions = () => {
+    if (!festival || !sessions.length) return []
+    
+    return sessions.filter(session => 
+      isSessionOutsideRange(session.day, festival.startDate, festival.endDate)
+    )
+  }
+
+  const outOfRangeSessions = getOutOfRangeSessions()
 
   useEffect(() => {
     if (festivalId) {
@@ -1438,6 +1492,31 @@ export default function SessionsManagement() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
+                {/* Date Range Warning Banner */}
+                {outOfRangeSessions.length > 0 && showDateWarningBanner && festival && (
+                  <div className="mb-4 bg-amber-50 border-l-4 border-amber-400 p-4 rounded-lg">
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-amber-900">
+                          {outOfRangeSessions.length} session{outOfRangeSessions.length !== 1 ? 's' : ''} outside festival range
+                        </p>
+                        <p className="text-xs text-amber-800 mt-1">
+                          These sessions have dates outside your festival period (
+                          {new Date(festival.startDate).toLocaleDateString()} - {new Date(festival.endDate).toLocaleDateString()}
+                          ). Click on the warning icons to review and fix.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setShowDateWarningBanner(false)}
+                        className="text-amber-600 hover:text-amber-800"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
                 {filteredSessions.length === 0 ? (
                   <div className="text-center py-12">
                     <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
@@ -1486,6 +1565,7 @@ export default function SessionsManagement() {
                               <SortableSessionRow
                                 key={session.id}
                                 session={session}
+                                festival={festival}
                                 bookings={bookings}
                                 onEdit={openEditModal}
                                 onDelete={deleteSession}

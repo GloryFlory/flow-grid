@@ -32,17 +32,29 @@ export async function GET(
     const csvHeader = 'id;day;start;end;title;level;capacity;styles;CardType;teachers;location;Description;Prerequisites\n'
     
     const csvRows = sessions.map((session, index) => {
+      const startOut = (() => {
+        const s = session.startTime || ''
+        if (/^\d{2}:\d{2}$/.test(s)) return s
+        const m = s.match(/T(\d{2}:\d{2})/)
+        return m ? m[1] : s
+      })()
+      const endOut = (() => {
+        const s = session.endTime || ''
+        if (/^\d{2}:\d{2}$/.test(s)) return s
+        const m = s.match(/T(\d{2}:\d{2})/)
+        return m ? m[1] : s
+      })()
       const fields = [
         index + 1, // id
         session.day, // day
-        session.startTime, // start
-        session.endTime, // end
+        startOut, // start (HH:mm)
+        endOut, // end (HH:mm)
         session.title, // title
         session.level || '', // level
         session.capacity || '', // capacity
         session.styles.join(', '), // styles
         session.cardType, // CardType
-        session.teachers.join(' & '), // teachers (using & separator as in template)
+        session.teachers.join(', '), // teachers (comma-separated for multiple teachers)
         session.location || '', // location
         session.description || '', // Description
         session.prerequisites || '' // Prerequisites
@@ -97,7 +109,7 @@ export async function POST(
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 
-    const csvContent = await file.text()
+  const csvContent = await file.text()
     const lines = csvContent.split('\n')
     
     if (lines.length < 2) {
@@ -113,7 +125,88 @@ export async function POST(
     // Skip header row
     const dataLines = lines.slice(1).filter(line => line.trim())
     
-    const sessionsToCreate = []
+    const sessionsToCreate: any[] = []
+
+    // Fetch festival date range to normalize day names to actual dates
+    const festival = await prisma.festival.findUnique({
+      where: { id: festivalId },
+      select: { startDate: true, endDate: true }
+    })
+
+    // Helpers for date normalization
+    const isIsoDate = (s: string) => /^\d{4}-\d{2}-\d{2}$/.test(s)
+    const tryExtractIsoFromDateTime = (s?: string | null): string | null => {
+      if (!s) return null
+      const m = s.match(/(\d{4}-\d{2}-\d{2})[T\s]?/)
+      return m ? m[1] : null
+    }
+    const normalizeTimeHHMM = (s?: string | null): string => {
+      if (!s) return ''
+      const trimmed = s.replace(/^"|"$/g, '').trim()
+      // If it's already HH:mm
+      if (/^\d{2}:\d{2}$/.test(trimmed)) return trimmed
+      // If it includes datetime, extract HH:mm
+      const m = trimmed.match(/T(\d{2}:\d{2})|\s(\d{2}:\d{2})/)
+      if (m) return (m[1] || m[2]) as string
+      // If it's like H:MM, pad
+      const m2 = trimmed.match(/^(\d{1,2}):(\d{2})/)
+      if (m2) return `${m2[1].padStart(2,'0')}:${m2[2]}`
+      return trimmed
+    }
+    const findDateForDayName = (dayName?: string | null): string | null => {
+      if (!festival || !dayName) return null
+      const day = dayName.trim()
+      const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+      const idx = dayNames.findIndex(d => d.toLowerCase() === day.toLowerCase())
+      if (idx === -1) return null
+      
+      // Parse festival dates - handle both Date objects and ISO strings
+      const startValue: any = festival.startDate
+      const endValue: any = festival.endDate
+      
+      let startDate: Date
+      let endDate: Date
+      
+      if (startValue instanceof Date) {
+        startDate = startValue
+        endDate = endValue instanceof Date ? endValue : new Date(endValue)
+      } else {
+        const startStr = String(startValue)
+        const endStr = String(endValue)
+        startDate = new Date(startStr.includes('T') ? startStr : startStr + 'T00:00:00Z')
+        endDate = new Date(endStr.includes('T') ? endStr : endStr + 'T00:00:00Z')
+      }
+      
+      // Validate dates
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        console.error('Invalid festival dates:', { startDate: festival.startDate, endDate: festival.endDate })
+        return null
+      }
+      
+      const cur = new Date(startDate)
+      while (cur <= endDate) {
+        if (cur.getUTCDay() === idx) {
+          return cur.toISOString().split('T')[0]
+        }
+        cur.setUTCDate(cur.getUTCDate() + 1)
+      }
+      
+      // If not found in range, use the first occurrence after festival start
+      console.warn(`Day ${dayName} not found in festival range, using first ${dayName} from start date`)
+      const fallback = new Date(startDate)
+      let safety = 0
+      while (fallback.getUTCDay() !== idx && safety < 8) {
+        fallback.setUTCDate(fallback.getUTCDate() + 1)
+        safety++
+      }
+      
+      if (isNaN(fallback.getTime())) {
+        console.error('Invalid fallback date for day:', dayName)
+        return null
+      }
+      
+      return fallback.toISOString().split('T')[0]
+    }
     
     // Proper CSV parsing function that handles quoted fields and delimiter within fields
     const parseCSVLine = (line: string): string[] => {
@@ -154,25 +247,60 @@ export async function POST(
       if (fields.length < 10) continue // Skip invalid rows
       
       // Match the CSV template column order: id,day,start,end,title,level,capacity,styles,CardType,teachers,location,Description,Prerequisites
-      const [id, day, start, end, title, level, capacity, styles, cardType, teachers, location, description, prerequisites] = fields
+  const [id, day, start, end, title, level, capacity, styles, cardType, teachers, location, description, prerequisites] = fields
       
       if (!title || !day || !start || !end) continue // Skip rows missing required fields
       
       // Parse comma-separated values properly
       const parseCommaSeparated = (value: string): string[] => {
         if (!value || value.trim() === '') return []
-        return value.split(/[,&]/).map(item => item.trim()).filter(Boolean)
+        // Only split on commas - ampersands (&) and "and" are kept as part of teaching couple names
+        return value.split(',').map(item => item.trim()).filter(Boolean)
       }
       
+      // Clean basic fields
+      const cleanTitle = title.replace(/^"|"$/g, '').trim()
+      const cleanDesc = description ? description.replace(/^"|"$/g, '').trim() : null
+      const cleanDayRaw = day.replace(/^"|"$/g, '').trim()
+      const cleanStartRaw = start.replace(/^"|"$/g, '').trim()
+      const cleanEndRaw = end.replace(/^"|"$/g, '').trim()
+
+      // Determine normalized ISO date for the session's day
+      let normalizedISODate: string | null = null
+      if (isIsoDate(cleanDayRaw)) {
+        normalizedISODate = cleanDayRaw
+      } else {
+        const isoFromStart = tryExtractIsoFromDateTime(cleanStartRaw)
+        const isoFromEnd = tryExtractIsoFromDateTime(cleanEndRaw)
+        if (isoFromStart) normalizedISODate = isoFromStart
+        else if (isoFromEnd) normalizedISODate = isoFromEnd
+        else {
+          // Try parsing cleanDayRaw as a date string (e.g., 6/14/2025)
+          const parsed = Date.parse(cleanDayRaw)
+          if (!isNaN(parsed)) {
+            normalizedISODate = new Date(parsed).toISOString().split('T')[0]
+          } else {
+            // Try mapping day name within festival range
+            normalizedISODate = findDateForDayName(cleanDayRaw)
+          }
+        }
+      }
+
+      const startHHMM = normalizeTimeHHMM(cleanStartRaw)
+      const endHHMM = normalizeTimeHHMM(cleanEndRaw)
+      const startTimeFinal = normalizedISODate ? `${normalizedISODate}T${startHHMM}` : startHHMM
+      const endTimeFinal = normalizedISODate ? `${normalizedISODate}T${endHHMM}` : endHHMM
+
       sessionsToCreate.push({
-        title: title.replace(/^"|"$/g, '').trim(),
-        description: description ? description.replace(/^"|"$/g, '').trim() : null,
+        title: cleanTitle,
+        description: cleanDesc,
         day: (() => {
-          const cleanDay = day.replace(/^"|"$/g, '').trim();
-          return cleanDay === 'Invalid Date' ? 'TBD' : cleanDay;
+          const d = cleanDayRaw === 'Invalid Date' ? 'TBD' : cleanDayRaw
+          // Prefer normalized ISO date when available
+          return normalizedISODate || d
         })(),
-        startTime: start.replace(/^"|"$/g, '').trim(),
-        endTime: end.replace(/^"|"$/g, '').trim(),
+        startTime: startTimeFinal,
+        endTime: endTimeFinal,
         location: location ? location.replace(/^"|"$/g, '').trim() : null,
         level: level ? level.replace(/^"|"$/g, '').trim() : null,
         styles: parseCommaSeparated(styles?.replace(/^"|"$/g, '') || ''),
@@ -185,9 +313,9 @@ export async function POST(
           if (['minimal', 'simplified'].includes(cleanCardType)) return 'simplified'
           if (['photo', 'photo-only'].includes(cleanCardType)) return 'photo-only'
           if (['detailed', 'full'].includes(cleanCardType)) return 'full'
-          return 'full' // default
+          return 'full'
         })(),
-        displayOrder: rowIndex + 1, // Auto-assign row number as display order (1, 2, 3...)
+        displayOrder: rowIndex + 1,
         festivalId
       })
     }
