@@ -204,13 +204,13 @@ export async function POST(
       
       if (fields.length < 10) continue
       
-      // id;day;start;end;title;level;capacity;styles;CardType;teachers;location;Description;Prerequisites
-  const [id, day, start, end, title, level, capacity, styles, cardType, teachers, location, description, prerequisites] = fields
+      // id;date;start;end;title;level;capacity;styles;CardType;teachers;location;Description;Prerequisites
+  const [id, date, start, end, title, level, capacity, styles, cardType, teachers, location, description, prerequisites] = fields
       
-      if (!title || !day || !start || !end) continue
+      if (!title || !date || !start || !end) continue
       
   const cleanTitle = title.replace(/^"|"$/g, '').trim()
-  const cleanDayRaw = day.replace(/^"|"$/g, '').trim()
+  const cleanDateRaw = date.replace(/^"|"$/g, '').trim()
   const cleanStartRaw = start.replace(/^"|"$/g, '').trim()
   const cleanEndRaw = end.replace(/^"|"$/g, '').trim()
       const cleanLevel = (level || '').replace(/^"|"$/g, '').trim()
@@ -224,17 +224,17 @@ export async function POST(
       
       // Normalize date and times similar to import logic
       let normalizedISODate: string | null = null
-      if (isIsoDate(cleanDayRaw)) {
-        normalizedISODate = cleanDayRaw
+      if (isIsoDate(cleanDateRaw)) {
+        normalizedISODate = cleanDateRaw
       } else {
         const isoFromStart = tryExtractIsoFromDateTime(cleanStartRaw)
         const isoFromEnd = tryExtractIsoFromDateTime(cleanEndRaw)
         if (isoFromStart) normalizedISODate = isoFromStart
         else if (isoFromEnd) normalizedISODate = isoFromEnd
         else {
-          const parsed = Date.parse(cleanDayRaw)
+          const parsed = Date.parse(cleanDateRaw)
           if (!isNaN(parsed)) normalizedISODate = new Date(parsed).toISOString().split('T')[0]
-          else normalizedISODate = findDateForDayName(cleanDayRaw)
+          else normalizedISODate = findDateForDayName(cleanDateRaw)
         }
       }
       const startHHMM = normalizeTimeHHMM(cleanStartRaw)
@@ -244,7 +244,7 @@ export async function POST(
 
       csvSessions.push({
         title: cleanTitle,
-        day: normalizedISODate || cleanDayRaw,
+        day: normalizedISODate || cleanDateRaw,
         startTime: startFinal,
         endTime: endFinal,
         level: cleanLevel,
@@ -255,7 +255,7 @@ export async function POST(
         location: cleanLocation,
         description: cleanDescription,
         prerequisites: cleanPrerequisites,
-        key: `${(normalizedISODate || cleanDayRaw).toLowerCase().trim()}|${startFinal.trim()}|${cleanTitle.toLowerCase().trim()}`
+        key: `${(normalizedISODate || cleanDateRaw).toLowerCase().trim()}|${startFinal.trim()}|${cleanTitle.toLowerCase().trim()}`
       })
     }
 
