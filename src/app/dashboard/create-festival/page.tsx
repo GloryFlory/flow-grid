@@ -231,17 +231,17 @@ export default function CreateFestivalPage() {
   const downloadCsvTemplate = () => {
     // Use semicolon delimiter for Windows Excel compatibility
     // Note: Using semicolon (;) instead of comma (,) because Excel on Windows expects this format
-    const csvContent = `id;day;start;end;title;level;capacity;types;CardType;teachers;location;Description;Prerequisites
-1;Friday;08:00;09:00;Registration & Check-in;;50;Logistics;minimal;;Main Entrance;Welcome and registration desk;Event ticket required
-2;Friday;09:00;10:30;Opening Keynote;;200;Presentation;photo;Dr. Sarah Chen;Main Auditorium;Welcome address and festival overview;
-3;Friday;11:00;12:30;Workshop: Creative Writing;Beginner;25;Workshop;detailed;Alex Rivera;Room 101;Hands-on writing workshop exploring narrative techniques;Notebook and pen recommended
-4;Friday;13:00;14:00;Lunch Break;;80;Break;minimal;;Garden Terrace;Catered lunch and networking time;
-5;Friday;14:30;16:00;Panel Discussion;Intermediate;40;Panel;photo;Maria Lopez, John Smith;Conference Room;Industry experts discuss current trends;Basic familiarity with topic helpful
-6;Friday;16:30;17:30;Networking Session;;60;Social;minimal;;Lobby;Informal networking and refreshments;
-7;Saturday;08:30;09:30;Morning Meditation;;30;Wellness;photo;Emma Thompson;Quiet Room;Guided meditation to start the day;Comfortable clothing suggested
-8;Saturday;10:00;12:00;Advanced Masterclass;Advanced;15;Masterclass;detailed;Prof. David Kim;Studio;Deep dive into advanced techniques;Previous experience required
-9;Saturday;13:00;14:00;Lunch Break;;80;Break;minimal;;Dining Hall;Lunch and informal discussions;
-10;Saturday;15:00;16:00;Closing Ceremony;;100;Community;minimal;;Main Hall;Wrap-up and thank you remarks;`
+    const csvContent = `id;date;start;end;title;level;capacity;types;CardType;teachers;location;Description;Prerequisites
+1;2025-11-28;08:00;09:00;Registration & Check-in;;50;Logistics;minimal;;Main Entrance;Welcome and registration desk;Event ticket required
+2;2025-11-28;09:00;10:30;Opening Keynote;;200;Presentation;photo;Dr. Sarah Chen;Main Auditorium;Welcome address and festival overview;
+3;2025-11-28;11:00;12:30;Workshop: Creative Writing;Beginner;25;Workshop;detailed;Alex Rivera;Room 101;Hands-on writing workshop exploring narrative techniques;Notebook and pen recommended
+4;2025-11-28;13:00;14:00;Lunch Break;;80;Break;minimal;;Garden Terrace;Catered lunch and networking time;
+5;2025-11-28;14:30;16:00;Panel Discussion;Intermediate;40;Panel;photo;Maria Lopez, John Smith;Conference Room;Industry experts discuss current trends;Basic familiarity with topic helpful
+6;2025-11-28;16:30;17:30;Networking Session;;60;Social;minimal;;Lobby;Informal networking and refreshments;
+7;2025-11-29;08:30;09:30;Morning Meditation;;30;Wellness;photo;Emma Thompson;Quiet Room;Guided meditation to start the day;Comfortable clothing suggested
+8;2025-11-29;10:00;12:00;Advanced Masterclass;Advanced;15;Masterclass;detailed;Prof. David Kim;Studio;Deep dive into advanced techniques;Previous experience required
+9;2025-11-29;13:00;14:00;Lunch Break;;80;Break;minimal;;Dining Hall;Lunch and informal discussions;
+10;2025-11-29;15:00;16:00;Closing Ceremony;;100;Community;minimal;;Main Hall;Wrap-up and thank you remarks;`
 
     // Add UTF-8 BOM for Excel compatibility (helps Excel recognize UTF-8 encoding)
     const BOM = '\uFEFF'
@@ -1065,9 +1065,16 @@ export default function CreateFestivalPage() {
                               <td className="py-2 px-3 text-blue-600">Morning Yoga</td>
                             </tr>
                             <tr className="border-b border-blue-100">
-                              <td className="py-2 px-3 font-medium">day</td>
-                              <td className="py-2 px-3">Day of the festival</td>
-                              <td className="py-2 px-3 text-blue-600">Friday</td>
+                              <td className="py-2 px-3 font-medium">date</td>
+                              <td className="py-2 px-3">
+                                Session date in YYYY-MM-DD format<br />
+                                <span className="text-xs text-blue-700 mt-1 inline-block">
+                                  Use ISO date format (e.g., 2025-11-28) for all festivals. The system automatically displays the correct weekday name.
+                                </span>
+                              </td>
+                              <td className="py-2 px-3 text-blue-600">
+                                2025-11-28
+                              </td>
                             </tr>
                             <tr>
                               <td className="py-2 px-3 font-medium">start / end</td>

@@ -246,10 +246,10 @@ export async function POST(
       
       if (fields.length < 10) continue // Skip invalid rows
       
-      // Match the CSV template column order: id,day,start,end,title,level,capacity,styles,CardType,teachers,location,Description,Prerequisites
-  const [id, day, start, end, title, level, capacity, styles, cardType, teachers, location, description, prerequisites] = fields
+      // Match the CSV template column order: id,date,start,end,title,level,capacity,styles,CardType,teachers,location,Description,Prerequisites
+  const [id, date, start, end, title, level, capacity, styles, cardType, teachers, location, description, prerequisites] = fields
       
-      if (!title || !day || !start || !end) continue // Skip rows missing required fields
+      if (!title || !date || !start || !end) continue // Skip rows missing required fields
       
       // Parse comma-separated values properly
       const parseCommaSeparated = (value: string): string[] => {
@@ -261,27 +261,27 @@ export async function POST(
       // Clean basic fields
       const cleanTitle = title.replace(/^"|"$/g, '').trim()
       const cleanDesc = description ? description.replace(/^"|"$/g, '').trim() : null
-      const cleanDayRaw = day.replace(/^"|"$/g, '').trim()
+      const cleanDateRaw = date.replace(/^"|"$/g, '').trim()
       const cleanStartRaw = start.replace(/^"|"$/g, '').trim()
       const cleanEndRaw = end.replace(/^"|"$/g, '').trim()
 
       // Determine normalized ISO date for the session's day
       let normalizedISODate: string | null = null
-      if (isIsoDate(cleanDayRaw)) {
-        normalizedISODate = cleanDayRaw
+      if (isIsoDate(cleanDateRaw)) {
+        normalizedISODate = cleanDateRaw
       } else {
         const isoFromStart = tryExtractIsoFromDateTime(cleanStartRaw)
         const isoFromEnd = tryExtractIsoFromDateTime(cleanEndRaw)
         if (isoFromStart) normalizedISODate = isoFromStart
         else if (isoFromEnd) normalizedISODate = isoFromEnd
         else {
-          // Try parsing cleanDayRaw as a date string (e.g., 6/14/2025)
-          const parsed = Date.parse(cleanDayRaw)
+          // Try parsing cleanDateRaw as a date string (e.g., 6/14/2025)
+          const parsed = Date.parse(cleanDateRaw)
           if (!isNaN(parsed)) {
             normalizedISODate = new Date(parsed).toISOString().split('T')[0]
           } else {
-            // Try mapping day name within festival range
-            normalizedISODate = findDateForDayName(cleanDayRaw)
+            // Fallback: Try mapping day name within festival range (for backwards compatibility)
+            normalizedISODate = findDateForDayName(cleanDateRaw)
           }
         }
       }
@@ -295,7 +295,7 @@ export async function POST(
         title: cleanTitle,
         description: cleanDesc,
         day: (() => {
-          const d = cleanDayRaw === 'Invalid Date' ? 'TBD' : cleanDayRaw
+          const d = cleanDateRaw === 'Invalid Date' ? 'TBD' : cleanDateRaw
           // Prefer normalized ISO date when available
           return normalizedISODate || d
         })(),
