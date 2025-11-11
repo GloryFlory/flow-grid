@@ -102,6 +102,85 @@ export async function POST(
     // Skip header row
     const dataLines = lines.slice(1).filter(line => line.trim())
     
+    // Fetch festival for date normalization
+    const { id: fid } = await params
+    const festival = await prisma.festival.findUnique({
+      where: { id: fid },
+      select: { startDate: true, endDate: true }
+    })
+
+    // Helpers for normalization
+    const isIsoDate = (s: string) => /^\d{4}-\d{2}-\d{2}$/.test(s)
+    const tryExtractIsoFromDateTime = (s?: string | null): string | null => {
+      if (!s) return null
+      const m = s.match(/(\d{4}-\d{2}-\d{2})[T\s]?/)
+      return m ? m[1] : null
+    }
+    const normalizeTimeHHMM = (s?: string | null): string => {
+      if (!s) return ''
+      const trimmed = s.replace(/^"|"$/g, '').trim()
+      if (/^\d{2}:\d{2}$/.test(trimmed)) return trimmed
+      const m = trimmed.match(/T(\d{2}:\d{2})|\s(\d{2}:\d{2})/)
+      if (m) return (m[1] || m[2]) as string
+      const m2 = trimmed.match(/^(\d{1,2}):(\d{2})/)
+      if (m2) return `${m2[1].padStart(2,'0')}:${m2[2]}`
+      return trimmed
+    }
+    const findDateForDayName = (dayName?: string | null): string | null => {
+      if (!festival || !dayName) return null
+      const day = dayName.trim()
+      const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+      const idx = dayNames.findIndex(d => d.toLowerCase() === day.toLowerCase())
+      if (idx === -1) return null
+      
+      // Parse festival dates - handle both Date objects and ISO strings
+      const startValue: any = festival.startDate
+      const endValue: any = festival.endDate
+      
+      let startDate: Date
+      let endDate: Date
+      
+      if (startValue instanceof Date) {
+        startDate = startValue
+        endDate = endValue instanceof Date ? endValue : new Date(endValue)
+      } else {
+        // Handle ISO string or other formats
+        const startStr = String(startValue)
+        const endStr = String(endValue)
+        startDate = new Date(startStr.includes('T') ? startStr : startStr + 'T00:00:00Z')
+        endDate = new Date(endStr.includes('T') ? endStr : endStr + 'T00:00:00Z')
+      }
+      
+      // Validate dates
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        console.error('Invalid festival dates:', { startDate: festival.startDate, endDate: festival.endDate })
+        return null
+      }
+      
+      const cur = new Date(startDate)
+      while (cur <= endDate) {
+        if (cur.getUTCDay() === idx) {
+          return cur.toISOString().split('T')[0]
+        }
+        cur.setUTCDate(cur.getUTCDate() + 1)
+      }
+      
+      // If not found in range, use the first occurrence after festival start
+      const fallback = new Date(startDate)
+      let safety = 0
+      while (fallback.getUTCDay() !== idx && safety < 8) {
+        fallback.setUTCDate(fallback.getUTCDate() + 1)
+        safety++
+      }
+      
+      if (isNaN(fallback.getTime())) {
+        console.error('Invalid fallback date for day:', dayName)
+        return null
+      }
+      
+      return fallback.toISOString().split('T')[0]
+    }
+
     // Parse CSV sessions
     const csvSessions: Array<{
       title: string
@@ -126,14 +205,14 @@ export async function POST(
       if (fields.length < 10) continue
       
       // id;day;start;end;title;level;capacity;styles;CardType;teachers;location;Description;Prerequisites
-      const [id, day, start, end, title, level, capacity, styles, cardType, teachers, location, description, prerequisites] = fields
+  const [id, day, start, end, title, level, capacity, styles, cardType, teachers, location, description, prerequisites] = fields
       
       if (!title || !day || !start || !end) continue
       
-      const cleanTitle = title.replace(/^"|"$/g, '').trim()
-      const cleanDay = day.replace(/^"|"$/g, '').trim()
-      const cleanStart = start.replace(/^"|"$/g, '').trim()
-      const cleanEnd = end.replace(/^"|"$/g, '').trim()
+  const cleanTitle = title.replace(/^"|"$/g, '').trim()
+  const cleanDayRaw = day.replace(/^"|"$/g, '').trim()
+  const cleanStartRaw = start.replace(/^"|"$/g, '').trim()
+  const cleanEndRaw = end.replace(/^"|"$/g, '').trim()
       const cleanLevel = (level || '').replace(/^"|"$/g, '').trim()
       const cleanCapacity = (capacity || '').replace(/^"|"$/g, '').trim()
       const cleanStyles = (styles || '').replace(/^"|"$/g, '').trim()
@@ -143,11 +222,31 @@ export async function POST(
       const cleanDescription = (description || '').replace(/^"|"$/g, '').trim()
       const cleanPrerequisites = (prerequisites || '').replace(/^"|"$/g, '').trim()
       
+      // Normalize date and times similar to import logic
+      let normalizedISODate: string | null = null
+      if (isIsoDate(cleanDayRaw)) {
+        normalizedISODate = cleanDayRaw
+      } else {
+        const isoFromStart = tryExtractIsoFromDateTime(cleanStartRaw)
+        const isoFromEnd = tryExtractIsoFromDateTime(cleanEndRaw)
+        if (isoFromStart) normalizedISODate = isoFromStart
+        else if (isoFromEnd) normalizedISODate = isoFromEnd
+        else {
+          const parsed = Date.parse(cleanDayRaw)
+          if (!isNaN(parsed)) normalizedISODate = new Date(parsed).toISOString().split('T')[0]
+          else normalizedISODate = findDateForDayName(cleanDayRaw)
+        }
+      }
+      const startHHMM = normalizeTimeHHMM(cleanStartRaw)
+      const endHHMM = normalizeTimeHHMM(cleanEndRaw)
+      const startFinal = normalizedISODate ? `${normalizedISODate}T${startHHMM}` : startHHMM
+      const endFinal = normalizedISODate ? `${normalizedISODate}T${endHHMM}` : endHHMM
+
       csvSessions.push({
         title: cleanTitle,
-        day: cleanDay,
-        startTime: cleanStart,
-        endTime: cleanEnd,
+        day: normalizedISODate || cleanDayRaw,
+        startTime: startFinal,
+        endTime: endFinal,
         level: cleanLevel,
         capacity: cleanCapacity,
         styles: cleanStyles,
@@ -156,7 +255,7 @@ export async function POST(
         location: cleanLocation,
         description: cleanDescription,
         prerequisites: cleanPrerequisites,
-        key: `${cleanDay}|${cleanStart}|${cleanTitle}`
+        key: `${(normalizedISODate || cleanDayRaw).toLowerCase().trim()}|${startFinal.trim()}|${cleanTitle.toLowerCase().trim()}`
       })
     }
 
@@ -264,50 +363,56 @@ export async function POST(
       changes: string[]
     }> = []
     
-    unmatchedCsvSessions.forEach(csvSession => {
-      // Look for same title on different day/time
-      const sameTitle = currentSessions.filter(dbSession => 
-        dbSession.title.toLowerCase().trim() === csvSession.title.toLowerCase().trim()
-      )
-      
-      if (sameTitle.length === 1) {
-        const dbSession = sameTitle[0]
-        const changes: string[] = []
+    // Only run fuzzy matching if session count is reasonable (< 200 total)
+    // Otherwise it's too slow (O(n²) with Levenshtein distance)
+    const shouldRunFuzzyMatch = unmatchedCsvSessions.length + currentSessions.length < 200
+    
+    if (shouldRunFuzzyMatch) {
+      unmatchedCsvSessions.forEach(csvSession => {
+        // Look for same title on different day/time
+        const sameTitle = currentSessions.filter(dbSession => 
+          dbSession.title.toLowerCase().trim() === csvSession.title.toLowerCase().trim()
+        )
         
-        if (dbSession.day !== csvSession.day) changes.push(`${dbSession.day} → ${csvSession.day}`)
-        if (dbSession.startTime !== csvSession.startTime) changes.push(`${dbSession.startTime} → ${csvSession.startTime}`)
-        if (dbSession.endTime !== csvSession.endTime) changes.push(`ends ${dbSession.endTime} → ${csvSession.endTime}`)
-        
-        suggestedMatches.push({
-          csvSession,
-          dbSession,
-          matchReason: 'Same title, different schedule',
-          similarity: 1.0,
-          changes
-        })
-      } else if (sameTitle.length === 0) {
-        // Look for similar titles (typo fixes, etc.)
-        currentSessions.forEach(dbSession => {
-          const similarity = calculateSimilarity(csvSession.title, dbSession.title)
+        if (sameTitle.length === 1) {
+          const dbSession = sameTitle[0]
+          const changes: string[] = []
           
-          if (similarity >= 0.7 && similarity < 1.0) {
-            const changes: string[] = [`"${dbSession.title}" → "${csvSession.title}"`]
+          if (dbSession.day !== csvSession.day) changes.push(`${dbSession.day} → ${csvSession.day}`)
+          if (dbSession.startTime !== csvSession.startTime) changes.push(`${dbSession.startTime} → ${csvSession.startTime}`)
+          if (dbSession.endTime !== csvSession.endTime) changes.push(`ends ${dbSession.endTime} → ${csvSession.endTime}`)
+          
+          suggestedMatches.push({
+            csvSession,
+            dbSession,
+            matchReason: 'Same title, different schedule',
+            similarity: 1.0,
+            changes
+          })
+        } else if (sameTitle.length === 0) {
+          // Look for similar titles (typo fixes, etc.)
+          currentSessions.forEach(dbSession => {
+            const similarity = calculateSimilarity(csvSession.title, dbSession.title)
             
-            if (dbSession.day !== csvSession.day) changes.push(`${dbSession.day} → ${csvSession.day}`)
-            if (dbSession.startTime !== csvSession.startTime) changes.push(`${dbSession.startTime} → ${csvSession.startTime}`)
-            if (dbSession.endTime !== csvSession.endTime) changes.push(`ends ${dbSession.endTime} → ${csvSession.endTime}`)
-            
-            suggestedMatches.push({
-              csvSession,
-              dbSession,
-              matchReason: `Similar title (${Math.round(similarity * 100)}% match)`,
-              similarity,
-              changes
-            })
-          }
-        })
-      }
-    })
+            if (similarity >= 0.7 && similarity < 1.0) {
+              const changes: string[] = [`"${dbSession.title}" → "${csvSession.title}"`]
+              
+              if (dbSession.day !== csvSession.day) changes.push(`${dbSession.day} → ${csvSession.day}`)
+              if (dbSession.startTime !== csvSession.startTime) changes.push(`${dbSession.startTime} → ${csvSession.startTime}`)
+              if (dbSession.endTime !== csvSession.endTime) changes.push(`ends ${dbSession.endTime} → ${csvSession.endTime}`)
+              
+              suggestedMatches.push({
+                csvSession,
+                dbSession,
+                matchReason: `Similar title (${Math.round(similarity * 100)}% match)`,
+                similarity,
+                changes
+              })
+            }
+          })
+        }
+      })
+    }
     
     // Remove duplicates (same dbSession matched multiple times) - keep highest similarity
     const uniqueMatches = new Map<string, typeof suggestedMatches[0]>()

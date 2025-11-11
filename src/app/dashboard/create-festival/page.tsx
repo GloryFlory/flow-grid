@@ -236,7 +236,7 @@ export default function CreateFestivalPage() {
 2;Friday;09:00;10:30;Opening Keynote;;200;Presentation;photo;Dr. Sarah Chen;Main Auditorium;Welcome address and festival overview;
 3;Friday;11:00;12:30;Workshop: Creative Writing;Beginner;25;Workshop;detailed;Alex Rivera;Room 101;Hands-on writing workshop exploring narrative techniques;Notebook and pen recommended
 4;Friday;13:00;14:00;Lunch Break;;80;Break;minimal;;Garden Terrace;Catered lunch and networking time;
-5;Friday;14:30;16:00;Panel Discussion;Intermediate;40;Panel;photo;Maria Lopez & John Smith;Conference Room;Industry experts discuss current trends;Basic familiarity with topic helpful
+5;Friday;14:30;16:00;Panel Discussion;Intermediate;40;Panel;photo;Maria Lopez, John Smith;Conference Room;Industry experts discuss current trends;Basic familiarity with topic helpful
 6;Friday;16:30;17:30;Networking Session;;60;Social;minimal;;Lobby;Informal networking and refreshments;
 7;Saturday;08:30;09:30;Morning Meditation;;30;Wellness;photo;Emma Thompson;Quiet Room;Guided meditation to start the day;Comfortable clothing suggested
 8;Saturday;10:00;12:00;Advanced Masterclass;Advanced;15;Masterclass;detailed;Prof. David Kim;Studio;Deep dive into advanced techniques;Previous experience required

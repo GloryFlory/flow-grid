@@ -16,6 +16,30 @@ export const metadata: Metadata = {
 
 const blogPosts = [
   {
+    slug: 'qr-code-event-schedules',
+    title: 'QR Code Event Schedules: Complete 2025 Guide',
+    excerpt: 'Create interactive QR code schedules attendees can scan instantly. Reduce printing costs and update in real-time.',
+    date: '2025-11-12',
+    readTime: '11 min read',
+    category: 'Scheduling & Logistics',
+  },
+  {
+    slug: 'volunteer-scheduling-best-practices',
+    title: 'Volunteer Scheduling Best Practices for Large Events',
+    excerpt: 'Organize hundreds of volunteers across shifts, roles & venues without chaos. Proven strategies from festival organizers.',
+    date: '2025-11-12',
+    readTime: '10 min read',
+    category: 'Scheduling & Logistics',
+  },
+  {
+    slug: 'real-time-schedule-updates',
+    title: 'Real-Time Schedule Updates: Keep Attendees Informed',
+    excerpt: 'Weather delays? Speaker cancellations? Learn how to communicate schedule changes instantly to avoid attendee frustration.',
+    date: '2025-11-12',
+    readTime: '10 min read',
+    category: 'Festival Experience',
+  },
+  {
     slug: 'how-to-create-yoga-retreat-schedule',
     title: 'How to Create the Perfect Yoga Retreat Schedule',
     excerpt: 'A comprehensive guide to planning yoga retreat schedules that balance practice, rest, and community time. Includes templates and best practices.',

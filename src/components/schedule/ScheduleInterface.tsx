@@ -277,7 +277,13 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
       const indexA = festivalDayOrder.indexOf(a)
       const indexB = festivalDayOrder.indexOf(b)
       console.log(`Comparing ${a} (index ${indexA}) vs ${b} (index ${indexB})`)
-      return indexA - indexB
+      
+      // If both are in festival range, use festival order
+      if (indexA !== -1 && indexB !== -1) {
+        return indexA - indexB
+      }
+      // If one or both are outside range, sort chronologically
+      return a.localeCompare(b)
     })
     
     console.log('Sorted days:', sortedDays)
@@ -335,12 +341,20 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
     }
 
     return sessionsToFilter.sort((a, b) => {
-      // Always sort by festival day order first (even for single day view to be consistent)
-      const dayComparison = festivalDayOrder.indexOf(a.day) - festivalDayOrder.indexOf(b.day)
-      console.log(`Comparing ${a.day} vs ${b.day}: ${festivalDayOrder.indexOf(a.day)} vs ${festivalDayOrder.indexOf(b.day)} = ${dayComparison}`)
+      // Sort by date chronologically (handles dates outside festival range)
+      const dayA = festivalDayOrder.indexOf(a.day)
+      const dayB = festivalDayOrder.indexOf(b.day)
       
-      if (dayComparison !== 0) {
-        return dayComparison
+      // If both dates are in festival range, use festival order
+      if (dayA !== -1 && dayB !== -1) {
+        const dayComparison = dayA - dayB
+        console.log(`Comparing ${a.day} vs ${b.day}: ${dayA} vs ${dayB} = ${dayComparison}`)
+        if (dayComparison !== 0) return dayComparison
+      } else {
+        // If either date is outside range, sort chronologically by ISO date string
+        const dateComparison = a.day.localeCompare(b.day)
+        console.log(`Comparing dates outside range: ${a.day} vs ${b.day} = ${dateComparison}`)
+        if (dateComparison !== 0) return dateComparison
       }
       
       // Same day, sort by start time
