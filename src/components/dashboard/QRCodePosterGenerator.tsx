@@ -168,8 +168,27 @@ export default function QRCodePosterGenerator({
               <QRCodeSVG
                 value={scheduleUrl}
                 size={200}
-                level="H" // High error correction
+                level="H" // High error correction for logo embedding
                 includeMargin={false}
+                imageSettings={
+                  logoUrl && isPremium
+                    ? {
+                        src: logoUrl,
+                        x: undefined,
+                        y: undefined,
+                        height: 40,
+                        width: 40,
+                        excavate: true, // Removes QR dots behind logo for clarity
+                      }
+                    : {
+                        src: '/flowgrid-qr-logo.svg', // FlowGrid watermark logo
+                        x: undefined,
+                        y: undefined,
+                        height: 36,
+                        width: 36,
+                        excavate: true,
+                      }
+                }
               />
             </div>
           </div>
@@ -222,16 +241,16 @@ export default function QRCodePosterGenerator({
       {!isPremium && (
         <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-lg p-6 text-center">
           <h4 className="font-semibold text-gray-900 mb-2">
-            Upgrade for Premium Posters
+            ✨ Upgrade for Premium QR Posters
           </h4>
           <p className="text-sm text-gray-600 mb-4">
-            Remove watermark • Custom colors • Upload your logo • Multiple sizes
+            Embed YOUR logo in the QR code • Remove FlowGrid watermark • Custom brand colors • Multiple sizes
           </p>
           <a
             href="/pricing"
             className="inline-block px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
           >
-            Upgrade Now
+            Upgrade to Premium
           </a>
         </div>
       )}
