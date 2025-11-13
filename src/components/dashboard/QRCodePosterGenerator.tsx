@@ -28,17 +28,6 @@ export default function QRCodePosterGenerator({
   const [customColor, setCustomColor] = useState(accentColor);
 
   const scheduleUrl = `https://tryflowgrid.com/${festivalSlug}/schedule`;
-  
-  // Simple FlowGrid logo as data URL for QR code embedding
-  const flowgridLogoDataUrl = 'data:image/svg+xml;base64,' + btoa(`
-    <svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-      <rect width="120" height="120" fill="white" rx="20"/>
-      <rect x="20" y="30" width="20" height="60" fill="#6366f1" rx="3"/>
-      <rect x="45" y="30" width="20" height="40" fill="#6366f1" rx="3"/>
-      <rect x="45" y="50" width="35" height="20" fill="#6366f1" rx="3"/>
-      <rect x="70" y="30" width="30" height="20" fill="#6366f1" rx="3"/>
-    </svg>
-  `.trim());
 
   const exportAsPNG = async () => {
     if (!posterRef.current) return;
@@ -182,7 +171,7 @@ export default function QRCodePosterGenerator({
                 level="H" // High error correction for logo embedding
                 includeMargin={false}
                 imageSettings={{
-                  src: logoUrl && isPremium ? logoUrl : flowgridLogoDataUrl,
+                  src: logoUrl && isPremium ? logoUrl : '/flow-grid-logo.png',
                   x: undefined,
                   y: undefined,
                   height: isPremium ? 40 : 35,
