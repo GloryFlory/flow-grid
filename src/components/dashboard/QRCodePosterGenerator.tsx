@@ -174,8 +174,8 @@ export default function QRCodePosterGenerator({
                   src: logoUrl && isPremium ? logoUrl : '/flow-grid-logo.png',
                   x: undefined,
                   y: undefined,
-                  height: isPremium ? 40 : 35,
-                  width: isPremium ? 40 : 35,
+                  height: isPremium ? 50 : 45,
+                  width: isPremium ? 50 : 45,
                   excavate: true,
                 }}
               />
