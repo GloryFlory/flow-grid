@@ -67,6 +67,9 @@ export default function CreateFestivalPage() {
     message: string
     sessionCount?: number
   } | null>(null)
+  
+  // Quick create state
+  const [skipSessions, setSkipSessions] = useState(false)
 
   const steps = [
     { id: 'basic', title: 'Festival Details', description: 'Basic information about your festival' },
@@ -348,9 +351,16 @@ export default function CreateFestivalPage() {
   const handleScheduleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
+    // Allow skipping sessions if user opted to add them later
+    if (skipSessions) {
+      console.log('User chose to skip sessions - proceeding to preview')
+      setCurrentStep('preview')
+      return
+    }
+    
     // Enhanced validation - check if sessions were loaded
     if (sessions.length === 0) {
-      alert('No sessions found. Please upload a CSV file or load sessions from Google Sheets.')
+      alert('No sessions found. Please upload a CSV file, load sessions from Google Sheets, or check "I\'ll add sessions later"')
       return
     }
     
@@ -391,8 +401,9 @@ export default function CreateFestivalPage() {
       return
     }
     
-    if (sessions.length === 0) {
-      alert('Please upload and process a CSV file with session data.')
+    // Allow creating festival without sessions if user chose to skip
+    if (sessions.length === 0 && !skipSessions) {
+      alert('Please upload and process a CSV file with session data, or check "I\'ll add sessions later" on the previous step.')
       return
     }
     
@@ -1270,6 +1281,27 @@ export default function CreateFestivalPage() {
                 </div>
               )}
 
+              {/* Quick Create Option */}
+              <div className="border-2 border-dashed border-blue-300 rounded-lg p-6 bg-blue-50">
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="skipSessions"
+                    checked={skipSessions}
+                    onChange={(e) => setSkipSessions(e.target.checked)}
+                    className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <div className="flex-1">
+                    <label htmlFor="skipSessions" className="font-medium text-blue-900 cursor-pointer">
+                      I'll add sessions later
+                    </label>
+                    <p className="text-sm text-blue-700 mt-1">
+                      Skip the CSV upload for now and create your festival. You can add sessions manually later from the festival dashboard.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               <div className="flex justify-between">
                 <Button
                   type="button"
@@ -1279,7 +1311,7 @@ export default function CreateFestivalPage() {
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Back
                 </Button>
-                <Button type="submit" disabled={sessions.length === 0}>
+                <Button type="submit" disabled={!skipSessions && sessions.length === 0}>
                   Continue to Preview
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
@@ -1307,24 +1339,43 @@ export default function CreateFestivalPage() {
                   </div>
                   <div>
                     <span className="font-medium text-gray-700">Sessions:</span>
-                    <span className="ml-2 text-gray-900">{sessions.length} sessions imported</span>
+                    <span className="ml-2 text-gray-900">{sessions.length} sessions {sessions.length === 0 ? '(will add later)' : 'imported'}</span>
                   </div>
-                  <div>
-                    <span className="font-medium text-gray-700">Card Types:</span>
-                    <span className="ml-2 text-gray-900">
-                      {sessions.filter(s => s.cardType === 'minimal').length} minimal, {' '}
-                      {sessions.filter(s => s.cardType === 'photo').length} photo, {' '}
-                      {sessions.filter(s => s.cardType === 'detailed').length} detailed
-                    </span>
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-700">Teachers:</span>
-                    <span className="ml-2 text-gray-900">
-                      {Array.from(new Set(sessions.map(s => s.teachers).filter(Boolean))).length} instructors
-                    </span>
-                  </div>
+                  {sessions.length > 0 && (
+                    <>
+                      <div>
+                        <span className="font-medium text-gray-700">Card Types:</span>
+                        <span className="ml-2 text-gray-900">
+                          {sessions.filter(s => s.cardType === 'minimal').length} minimal, {' '}
+                          {sessions.filter(s => s.cardType === 'photo').length} photo, {' '}
+                          {sessions.filter(s => s.cardType === 'detailed').length} detailed
+                        </span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Teachers:</span>
+                        <span className="ml-2 text-gray-900">
+                          {Array.from(new Set(sessions.map(s => s.teachers).filter(Boolean))).length} instructors
+                        </span>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
+
+              {/* Empty State Message */}
+              {sessions.length === 0 && (
+                <div className="border-2 border-dashed border-blue-300 rounded-lg p-8 bg-blue-50 text-center">
+                  <Calendar className="w-12 h-12 text-blue-600 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-blue-900 mb-2">You're creating an empty festival</h3>
+                  <p className="text-blue-700 mb-4">
+                    Don't worry! After creating your festival, you can add sessions manually or upload a CSV from the festival dashboard.
+                  </p>
+                  <div className="inline-flex items-center gap-2 text-sm text-blue-600 bg-white px-4 py-2 rounded-lg border border-blue-200">
+                    <Info className="w-4 h-4" />
+                    <span>Navigate to <strong>Manage Sessions</strong> to add your schedule</span>
+                  </div>
+                </div>
+              )}
 
               <div className="flex justify-between">
                 <Button
