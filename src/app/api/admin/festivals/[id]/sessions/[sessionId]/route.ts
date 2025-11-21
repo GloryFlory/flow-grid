@@ -10,11 +10,40 @@ export async function PUT(
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session?.user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const { id: festivalId, sessionId } = await params
+
+    // Verify festival ownership or admin access
+    const festival = await prisma.festival.findUnique({
+      where: { id: festivalId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            role: true
+          }
+        }
+      }
+    })
+
+    if (!festival) {
+      return NextResponse.json({ error: 'Festival not found' }, { status: 404 })
+    }
+
+    // Authorization check
+    const isOwner = festival.user.id === session.user.id
+    const isAdmin = (session.user as any).role === 'ADMIN'
+    
+    if (!isOwner && !isAdmin) {
+      return NextResponse.json(
+        { error: 'Forbidden - You do not have permission to update sessions for this festival' },
+        { status: 403 }
+      )
+    }
+
     const data = await request.json()
 
     // Debug: Log what we received
@@ -98,11 +127,39 @@ export async function DELETE(
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session?.user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const { id: festivalId, sessionId } = await params
+
+    // Verify festival ownership or admin access
+    const festival = await prisma.festival.findUnique({
+      where: { id: festivalId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            role: true
+          }
+        }
+      }
+    })
+
+    if (!festival) {
+      return NextResponse.json({ error: 'Festival not found' }, { status: 404 })
+    }
+
+    // Authorization check
+    const isOwner = festival.user.id === session.user.id
+    const isAdmin = (session.user as any).role === 'ADMIN'
+    
+    if (!isOwner && !isAdmin) {
+      return NextResponse.json(
+        { error: 'Forbidden - You do not have permission to delete sessions for this festival' },
+        { status: 403 }
+      )
+    }
 
     // Delete the session
     await prisma.festivalSession.delete({

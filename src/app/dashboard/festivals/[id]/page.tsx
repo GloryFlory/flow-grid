@@ -2,8 +2,11 @@
 
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { OnboardingTour } from '@/components/OnboardingTour'
+import { startFestivalTour } from '@/lib/onboarding-tour'
 import { 
   Settings, 
   Image as ImageIcon, 
@@ -47,17 +50,33 @@ interface AnalyticsData {
 export default function FestivalManagement() {
   const params = useParams()
   const festivalId = params.id as string
+  const { data: session } = useSession()
   
   const [festival, setFestival] = useState<Festival | null>(null)
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<{type: 'not-found' | 'forbidden' | 'error', message: string} | null>(null)
+  const [userOnboardingStatus, setUserOnboardingStatus] = useState<boolean>(true)
 
   useEffect(() => {
     if (festivalId) {
       fetchFestival()
       fetchAnalytics()
+      fetchUserOnboardingStatus()
     }
   }, [festivalId])
+
+  const fetchUserOnboardingStatus = async () => {
+    try {
+      const response = await fetch('/api/user/onboarding-status')
+      if (response.ok) {
+        const data = await response.json()
+        setUserOnboardingStatus(data.hasCompletedOnboarding)
+      }
+    } catch (error) {
+      console.error('Error fetching onboarding status:', error)
+    }
+  }
 
   const fetchFestival = async () => {
     try {
@@ -65,9 +84,28 @@ export default function FestivalManagement() {
       if (response.ok) {
         const data = await response.json()
         setFestival(data.festival)
+      } else if (response.status === 403) {
+        setError({
+          type: 'forbidden',
+          message: 'You do not have permission to access this festival'
+        })
+      } else if (response.status === 404) {
+        setError({
+          type: 'not-found',
+          message: 'Festival not found'
+        })
+      } else {
+        setError({
+          type: 'error',
+          message: 'Failed to load festival'
+        })
       }
     } catch (error) {
       console.error('Error fetching festival:', error)
+      setError({
+        type: 'error',
+        message: 'An unexpected error occurred'
+      })
     } finally {
       setIsLoading(false)
     }
@@ -106,6 +144,37 @@ export default function FestivalManagement() {
     )
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="mb-4">
+            {error.type === 'forbidden' ? (
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+            ) : (
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            )}
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            {error.type === 'forbidden' ? 'Access Denied' : 'Festival Not Found'}
+          </h1>
+          <p className="text-gray-600 mb-6">{error.message}</p>
+          <Link href="/dashboard">
+            <Button>Back to Dashboard</Button>
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
   if (!festival) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -121,18 +190,49 @@ export default function FestivalManagement() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Onboarding Tour */}
+      {session?.user?.id && (
+        <OnboardingTour 
+          userId={session.user.id} 
+          hasCompletedOnboarding={userOnboardingStatus} 
+        />
+      )}
+      
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-4 sm:py-6">
             {/* Back Button Row */}
-            <div className="mb-3 sm:mb-4">
-              <Link href="/dashboard">
+            <div className="mb-3 sm:mb-4 flex items-center justify-between">
+              <Link href="/dashboard" data-tour="back-to-dashboard">
                 <Button variant="outline" size="sm">
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Back to Dashboard
                 </Button>
               </Link>
+              {session?.user?.id && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => startFestivalTour(session.user.id)}
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  <svg
+                    className="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <span className="hidden sm:inline">Take Tour</span>
+                </Button>
+              )}
             </div>
             
             {/* Festival Info Row */}
@@ -155,7 +255,7 @@ export default function FestivalManagement() {
                   {festival.isPublished ? 'Published' : 'Draft'}
                 </span>
                 {festival.isPublished && (
-                  <Link href={`/${festival.slug}/schedule`} target="_blank">
+                  <Link href={`/${festival.slug}/schedule`} target="_blank" data-tour="view-schedule">
                     <Button variant="outline" size="sm">
                       <Eye className="w-4 h-4 sm:mr-2" />
                       <span className="hidden sm:inline">View Live Schedule</span>
@@ -234,7 +334,7 @@ export default function FestivalManagement() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
           {/* Festival Content */}
           <div className="space-y-4 sm:space-y-6">
-            <Card>
+            <Card data-tour="festival-content">
               <CardHeader className="pb-3 sm:pb-6">
                 <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                   <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -271,7 +371,7 @@ export default function FestivalManagement() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card data-tour="analytics">
               <CardHeader className="pb-3 sm:pb-6">
                 <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                   <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -299,7 +399,7 @@ export default function FestivalManagement() {
 
           {/* Branding & Assets */}
           <div className="space-y-4 sm:space-y-6">
-            <Card>
+            <Card data-tour="branding-design">
               <CardHeader className="pb-3 sm:pb-6">
                 <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                   <Palette className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -346,7 +446,7 @@ export default function FestivalManagement() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card data-tour="festival-settings">
               <CardHeader className="pb-3 sm:pb-6">
                 <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                   <Settings className="w-4 h-4 sm:w-5 sm:h-5" />

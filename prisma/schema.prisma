@@ -9,23 +9,24 @@ datasource db {
 }
 
 model User {
-  id                  String               @id @default(cuid())
-  email               String               @unique
-  emailVerified       DateTime?
-  name                String?
-  avatar              String?
-  password            String?
-  resetToken          String?
-  resetTokenExpiry    DateTime?
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  role                UserRole             @default(USER)
-  accounts            Account[]
-  analytics           Analytics[]
-  festivals           Festival[]
-  sessions            Session[]
-  subscription        Subscription?
-  webAuthnCredentials WebAuthnCredential[]
+  id                     String               @id @default(cuid())
+  email                  String               @unique
+  emailVerified          DateTime?
+  name                   String?
+  avatar                 String?
+  password               String?
+  resetToken             String?
+  resetTokenExpiry       DateTime?
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+  role                   UserRole             @default(USER)
+  hasCompletedOnboarding Boolean              @default(false)
+  accounts               Account[]
+  analytics              Analytics[]
+  festivals              Festival[]
+  sessions               Session[]
+  subscription           Subscription?
+  webAuthnCredentials    WebAuthnCredential[]
 
   @@map("users")
 }
