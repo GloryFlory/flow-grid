@@ -15,16 +15,32 @@ export async function GET(
 
     const { id: festivalId } = await context.params
 
-    // Verify festival ownership
-    const festival = await prisma.festival.findFirst({
-      where: {
-        id: festivalId,
-        userId: session.user.id,
-      },
+    // Verify festival ownership or admin access
+    const festival = await prisma.festival.findUnique({
+      where: { id: festivalId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            role: true
+          }
+        }
+      }
     })
 
     if (!festival) {
       return NextResponse.json({ error: 'Festival not found' }, { status: 404 })
+    }
+
+    // Authorization check - user must own the festival or be an admin
+    const isOwner = festival.user.id === session.user.id
+    const isAdmin = (session.user as any).role === 'ADMIN'
+    
+    if (!isOwner && !isAdmin) {
+      return NextResponse.json(
+        { error: 'Forbidden - You do not have permission to view analytics for this festival' },
+        { status: 403 }
+      )
     }
 
     // Fetch analytics data

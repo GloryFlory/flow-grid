@@ -20,7 +20,9 @@ import {
   Check,
   AlertCircle,
   Eye,
-  GripVertical
+  GripVertical,
+  Lock,
+  Frown
 } from 'lucide-react'
 import Link from 'next/link'
 import SessionEditModal from '@/components/dashboard/SessionEditModal'
@@ -287,6 +289,7 @@ export default function SessionsManagement() {
   const [bookings, setBookings] = useState<any[]>([])
   const [activeTab, setActiveTab] = useState<'sessions' | 'bookings'>('sessions')
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<{ type: 'not-found' | 'forbidden' | 'error'; message: string } | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
@@ -362,10 +365,36 @@ export default function SessionsManagement() {
     try {
       // Fetch festival data
       const festivalResponse = await fetch(`/api/admin/festivals/${festivalId}`)
-      if (festivalResponse.ok) {
-        const festivalData = await festivalResponse.json()
-        setFestival(festivalData.festival)
+      
+      if (festivalResponse.status === 403) {
+        setError({ 
+          type: 'forbidden', 
+          message: 'You do not have permission to access this festival. Please contact support if you believe this is an error.' 
+        })
+        setIsLoading(false)
+        return
       }
+      
+      if (festivalResponse.status === 404) {
+        setError({ 
+          type: 'not-found', 
+          message: 'This festival could not be found. It may have been deleted.' 
+        })
+        setIsLoading(false)
+        return
+      }
+      
+      if (!festivalResponse.ok) {
+        setError({ 
+          type: 'error', 
+          message: 'Failed to load festival data. Please try again.' 
+        })
+        setIsLoading(false)
+        return
+      }
+      
+      const festivalData = await festivalResponse.json()
+      setFestival(festivalData.festival)
 
       // Fetch sessions data
       const sessionsResponse = await fetch(`/api/admin/festivals/${festivalId}/sessions`)
@@ -375,6 +404,10 @@ export default function SessionsManagement() {
       }
     } catch (error) {
       console.error('Error fetching festival:', error)
+      setError({ 
+        type: 'error', 
+        message: 'An unexpected error occurred. Please try again.' 
+      })
     } finally {
       setIsLoading(false)
     }
@@ -695,27 +728,43 @@ export default function SessionsManagement() {
       return
     }
 
-    const oldIndex = filteredSessions.findIndex((s) => s.id === active.id)
-    const newIndex = filteredSessions.findIndex((s) => s.id === over.id)
+    const activeSession = filteredSessions.find((s) => s.id === active.id)
+    const overSession = filteredSessions.find((s) => s.id === over.id)
+
+    if (!activeSession || !overSession) {
+      return
+    }
+
+    // Only allow reordering within the same day and time slot
+    if (activeSession.day !== overSession.day || activeSession.startTime !== overSession.startTime) {
+      return
+    }
+
+    // Get all sessions in the same time slot FROM FILTERED SESSIONS (which are already sorted by displayOrder)
+    const sameSlotSessions = filteredSessions.filter(
+      s => s.day === activeSession.day && s.startTime === activeSession.startTime
+    )
+
+    const oldIndex = sameSlotSessions.findIndex((s) => s.id === active.id)
+    const newIndex = sameSlotSessions.findIndex((s) => s.id === over.id)
 
     if (oldIndex === -1 || newIndex === -1) {
       return
     }
 
-    // Optimistically update UI
-    const reorderedSessions = arrayMove(filteredSessions, oldIndex, newIndex)
+    // Reorder within the same slot
+    const reorderedSlot = arrayMove(sameSlotSessions, oldIndex, newIndex)
     
-    // Update display order values
-    const updatedSessions = reorderedSessions.map((session, index) => ({
+    // Assign displayOrder based on position within the slot
+    const updatedSlotSessions = reorderedSlot.map((session, index) => ({
       ...session,
       displayOrder: index
     }))
 
-    // Update local state
+    // Update local state first
     setSessions(prevSessions => {
       const newSessions = [...prevSessions]
-      // Find and update the reordered sessions
-      updatedSessions.forEach(updatedSession => {
+      updatedSlotSessions.forEach(updatedSession => {
         const idx = newSessions.findIndex(s => s.id === updatedSession.id)
         if (idx !== -1) {
           newSessions[idx] = updatedSession
@@ -724,22 +773,26 @@ export default function SessionsManagement() {
       return newSessions
     })
 
-    // Save to backend
+    // Save to backend after state update
     try {
-      await fetch(`/api/admin/festivals/${festivalId}/sessions/reorder`, {
+      const response = await fetch(`/api/admin/festivals/${festivalId}/sessions/reorder`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          sessions: updatedSessions.map((s, index) => ({
+          sessions: updatedSlotSessions.map((s, index) => ({
             id: s.id,
             displayOrder: index
           }))
         })
       })
+      
+      if (!response.ok) {
+        // Silently fail - state already updated optimistically
+        console.error('Failed to save reorder')
+      }
     } catch (error) {
-      console.error('Error saving order:', error)
-      // Optionally revert on error
-      fetchFestival()
+      // Silently fail - state already updated optimistically
+      console.error('Error saving reorder:', error)
     }
   }
 
@@ -821,13 +874,6 @@ export default function SessionsManagement() {
       return []
     }
     
-    console.log('Festival date range:', {
-      start: festival.startDate,
-      end: festival.endDate,
-      startParsed: startDate.toISOString(),
-      endParsed: endDate.toISOString()
-    })
-    
     // Generate dates from festival date range
     const days: Array<{value: string, label: string}> = []
     const currentDate = new Date(startDate)
@@ -846,7 +892,6 @@ export default function SessionsManagement() {
       currentDate.setUTCDate(currentDate.getUTCDate() + 1)
     }
     
-    console.log('Generated days:', days)
     return days
   }
 
@@ -923,50 +968,6 @@ export default function SessionsManagement() {
     }
   }
 
-  // Filter and sort sessions by festival date order
-  const filteredSessions = React.useMemo(() => {
-    if (!festival) return sessions
-    
-    // Filter sessions
-    const filtered = sessions.filter(session => {
-      const matchesSearch = session.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           session.teachers.some(teacher => teacher.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                           session.styles.some(style => style.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                           session.level?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           session.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           session.description?.toLowerCase().includes(searchTerm.toLowerCase())
-      
-      const matchesDay = selectedDay === 'all' || getEffectiveDay(session) === selectedDay
-      
-      return matchesSearch && matchesDay
-    })
-    
-    // Sort by actual date (from startTime), then by time, then by display order, then by title
-    return filtered.sort((a, b) => {
-      // Extract dates from startTime
-      const dateA = a.startTime.split('T')[0] || a.day
-      const dateB = b.startTime.split('T')[0] || b.day
-      
-      // Compare by date first
-      const dateComparison = dateA.localeCompare(dateB)
-      if (dateComparison !== 0) return dateComparison
-      
-      // Then by start time
-      const timeComparison = a.startTime.localeCompare(b.startTime)
-      if (timeComparison !== 0) return timeComparison
-      
-      // Then by display order
-      const displayOrderA = a.displayOrder || 0
-      const displayOrderB = b.displayOrder || 0
-      const orderComparison = displayOrderA - displayOrderB
-      if (orderComparison !== 0) return orderComparison
-      
-      // Finally by title
-      return a.title.localeCompare(b.title)
-    })
-  }, [sessions, searchTerm, selectedDay, festival])
-
-  // Get unique days sorted by festival date order
   // Helper function to get the effective day for a session
   const getEffectiveDay = (session: FestivalSession): string => {
     // If day is Invalid Date, try to reconstruct from startTime
@@ -984,6 +985,42 @@ export default function SessionsManagement() {
     return session.day
   }
 
+  // Filter and sort sessions by festival date order
+  const filteredSessions = React.useMemo(() => {
+    if (!festival) return sessions
+    
+    // Filter sessions based on search and day
+    const filtered = sessions.filter(session => {
+      const matchesSearch = session.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           session.teachers.some(teacher => teacher.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                           session.styles.some(style => style.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                           session.level?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           session.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           session.description?.toLowerCase().includes(searchTerm.toLowerCase())
+      
+      const matchesDay = selectedDay === 'all' || getEffectiveDay(session) === selectedDay
+      
+      return matchesSearch && matchesDay
+    })
+    
+    // Sort by day+time, then by displayOrder for parallel sessions
+    return filtered.sort((a, b) => {
+      // First, sort by day and time
+      const dateTimeA = a.day && a.startTime ? `${a.day}T${a.startTime}` : a.day || ''
+      const dateTimeB = b.day && b.startTime ? `${b.day}T${b.startTime}` : b.day || ''
+      
+      if (dateTimeA !== dateTimeB) {
+        return dateTimeA.localeCompare(dateTimeB)
+      }
+      
+      // For sessions at the same day+time, sort by displayOrder
+      const orderA = a.displayOrder !== null && a.displayOrder !== undefined ? Number(a.displayOrder) : 999999
+      const orderB = b.displayOrder !== null && b.displayOrder !== undefined ? Number(b.displayOrder) : 999999
+      return orderA - orderB
+    })
+  }, [sessions, searchTerm, selectedDay, festival])
+
+  // Get unique days sorted by festival date order
   const uniqueDays = React.useMemo(() => {
     if (!festival) return []
     
@@ -1083,6 +1120,47 @@ export default function SessionsManagement() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
           <p className="text-gray-600 mt-2">Loading sessions...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="text-center max-w-md">
+          {error.type === 'forbidden' ? (
+            <>
+              <div className="mb-4">
+                <Lock className="w-16 h-16 text-red-500 mx-auto" />
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
+              <p className="text-gray-600 mb-6">{error.message}</p>
+            </>
+          ) : error.type === 'not-found' ? (
+            <>
+              <div className="mb-4">
+                <Frown className="w-16 h-16 text-gray-400 mx-auto" />
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">Festival Not Found</h1>
+              <p className="text-gray-600 mb-6">{error.message}</p>
+            </>
+          ) : (
+            <>
+              <div className="mb-4">
+                <AlertCircle className="w-16 h-16 text-orange-500 mx-auto" />
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">Something Went Wrong</h1>
+              <p className="text-gray-600 mb-6">{error.message}</p>
+            </>
+          )}
+          <Link href="/dashboard">
+            <Button>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Dashboard
+            </Button>
+          </Link>
         </div>
       </div>
     )

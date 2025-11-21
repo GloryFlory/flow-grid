@@ -7,6 +7,7 @@
 
 'use client'
 
+import React from 'react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
@@ -15,7 +16,8 @@ import {
   type WeeklyStats,
   type FestivalHealth
 } from '@/lib/adminAnalytics'
-import { TrendingUp, Users, Calendar, Eye, CheckCircle, ChevronDown, ChevronRight, X } from 'lucide-react'
+import { TrendingUp, Users, Calendar, Eye, CheckCircle, ChevronDown, ChevronRight, X, ExternalLink } from 'lucide-react'
+import Link from 'next/link'
 
 export default function AdminAnalyticsDashboard() {
   const router = useRouter()
@@ -233,28 +235,41 @@ export default function AdminAnalyticsDashboard() {
                 {festivalHealth.map((festival) => {
                   const isExpanded = expandedRows.has(festival.id)
                   return (
-                    <>
-                      <tr key={festival.id} className="hover:bg-gray-50">
+                    <React.Fragment key={festival.id}>
+                      <tr 
+                        className="hover:bg-gray-50 cursor-pointer"
+                        onClick={() => toggleRow(festival.id)}
+                      >
                         <td className="px-4 py-3">
-                          <button
-                            onClick={() => toggleRow(festival.id)}
-                            className="text-gray-400 hover:text-gray-600 transition-colors"
-                          >
+                          <div className="text-gray-400 hover:text-gray-600 transition-colors">
                             {isExpanded ? (
                               <ChevronDown className="w-5 h-5" />
                             ) : (
                               <ChevronRight className="w-5 h-5" />
                             )}
-                          </button>
+                          </div>
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="text-sm font-medium text-gray-900">
+                          <div className="flex items-center gap-2 group">
+                            <Link 
+                              href={`/dashboard/festivals/${festival.id}`}
+                              className="text-sm font-medium text-gray-900 hover:text-purple-600 transition-colors"
+                              title="View festival dashboard"
+                              onClick={(e) => e.stopPropagation()}
+                            >
                               {festival.name}
-                            </div>
+                            </Link>
                             {festival.isPublished && (
-                              <CheckCircle className="w-4 h-4 text-green-500 ml-2" />
+                              <CheckCircle className="w-4 h-4 text-green-500" />
                             )}
+                            <Link
+                              href={`/dashboard/festivals/${festival.id}`}
+                              className="opacity-0 group-hover:opacity-100 transition-opacity"
+                              title="Open dashboard"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <ExternalLink className="w-4 h-4 text-purple-600 hover:text-purple-700" />
+                            </Link>
                           </div>
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
@@ -364,7 +379,7 @@ export default function AdminAnalyticsDashboard() {
                           </td>
                         </tr>
                       )}
-                    </>
+                    </React.Fragment>
                   )
                 })}
               </tbody>

@@ -10,11 +10,39 @@ export async function GET(
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session?.user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const { id: festivalId } = await params
+
+    // Verify festival ownership or admin access
+    const festival = await prisma.festival.findUnique({
+      where: { id: festivalId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            role: true
+          }
+        }
+      }
+    })
+
+    if (!festival) {
+      return NextResponse.json({ error: 'Festival not found' }, { status: 404 })
+    }
+
+    // Authorization check
+    const isOwner = festival.user.id === session.user.id
+    const isAdmin = (session.user as any).role === 'ADMIN'
+    
+    if (!isOwner && !isAdmin) {
+      return NextResponse.json(
+        { error: 'Forbidden - You do not have permission to view sessions for this festival' },
+        { status: 403 }
+      )
+    }
 
     // Get all sessions for this festival with bookings to count participants
     const sessions = await prisma.festivalSession.findMany({
@@ -27,15 +55,42 @@ export async function GET(
             names: true
           }
         }
-      },
-      orderBy: [
-        { displayOrder: 'asc' },
-        { startTime: 'asc' }
-      ]
+      }
+    })
+    
+    // Sort sessions: FIRST by day (chronologically), THEN by time, THEN by displayOrder
+    const sortedSessions = sessions.sort((a, b) => {
+      // Get full datetime for comparison
+      // If startTime contains 'T', it's already a full datetime like "2025-11-14T07:00:00"
+      // If startTime is just a time like "09:00", combine with day field
+      const getFullDateTime = (session: any) => {
+        if (session.startTime && session.startTime.includes('T')) {
+          return session.startTime // e.g., "2025-11-14T07:00:00"
+        }
+        // Combine day field (date) with startTime (time only)
+        if (session.day && session.startTime) {
+          return `${session.day}T${session.startTime}:00` // e.g., "2025-11-14T09:00:00"
+        }
+        // Fallback to just the day if no startTime
+        return session.day || ''
+      }
+      
+      const dateTimeA = getFullDateTime(a)
+      const dateTimeB = getFullDateTime(b)
+      
+      // Primary sort: by full datetime (includes both date and time)
+      if (dateTimeA !== dateTimeB) {
+        return dateTimeA.localeCompare(dateTimeB)
+      }
+      
+      // Tertiary: displayOrder (for parallel sessions at same time)
+      const orderA: number = a.displayOrder !== null && a.displayOrder !== undefined ? Number(a.displayOrder) : 999999
+      const orderB: number = b.displayOrder !== null && b.displayOrder !== undefined ? Number(b.displayOrder) : 999999
+      return orderA - orderB
     })
 
     // Transform sessions to include participant count instead of raw bookings
-    const sessionsWithCounts = sessions.map(session => {
+    const sessionsWithCounts = sortedSessions.map(session => {
       // Count total participants across all bookings
       const totalParticipants = session.bookings.reduce((sum, booking) => {
         return sum + (booking.names?.length || 0)
@@ -78,11 +133,40 @@ export async function POST(
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session?.user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const { id: festivalId } = await params
+
+    // Verify festival ownership or admin access
+    const festival = await prisma.festival.findUnique({
+      where: { id: festivalId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            role: true
+          }
+        }
+      }
+    })
+
+    if (!festival) {
+      return NextResponse.json({ error: 'Festival not found' }, { status: 404 })
+    }
+
+    // Authorization check
+    const isOwner = festival.user.id === session.user.id
+    const isAdmin = (session.user as any).role === 'ADMIN'
+    
+    if (!isOwner && !isAdmin) {
+      return NextResponse.json(
+        { error: 'Forbidden - You do not have permission to create sessions for this festival' },
+        { status: 403 }
+      )
+    }
+
     const data = await request.json()
 
     // Validate required fields (only title, day, and times are mandatory)

@@ -16,6 +16,14 @@ export const metadata: Metadata = {
 
 const blogPosts = [
   {
+    slug: 'get-festival-live-10-minutes',
+    title: 'Get Your First Festival Live in 10 Minutes',
+    excerpt: 'Skip the complexity. Create your festival schedule in minutes, not days. Step-by-step guide to launching your first event.',
+    date: '2025-11-14',
+    readTime: '8 min read',
+    category: 'Quick Start Guide',
+  },
+  {
     slug: 'qr-code-event-schedules',
     title: 'QR Code Event Schedules: Complete 2025 Guide',
     excerpt: 'Create interactive QR code schedules attendees can scan instantly. Reduce printing costs and update in real-time.',
