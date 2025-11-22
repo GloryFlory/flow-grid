@@ -12,6 +12,8 @@ interface QRCodePosterGeneratorProps {
   festivalDates?: string;
   logoUrl?: string;
   isPremium?: boolean;
+  primaryColor?: string;
+  secondaryColor?: string;
   accentColor?: string;
 }
 
@@ -21,13 +23,28 @@ export default function QRCodePosterGenerator({
   festivalDates,
   logoUrl,
   isPremium = false,
-  accentColor = '#6366f1', // Default indigo
+  primaryColor = '#4a90e2',
+  secondaryColor = '#7b68ee',
+  accentColor = '#ff6b6b',
 }: QRCodePosterGeneratorProps) {
   const posterRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
-  const [customColor, setCustomColor] = useState(accentColor);
+  const [customPrimaryColor, setCustomPrimaryColor] = useState(primaryColor);
+  const [customSecondaryColor, setCustomSecondaryColor] = useState(secondaryColor);
+  const [customAccentColor, setCustomAccentColor] = useState(accentColor);
+  const [selectedFont, setSelectedFont] = useState('modern');
 
   const scheduleUrl = `https://tryflowgrid.com/${festivalSlug}/schedule`;
+
+  const fontOptions = [
+    { value: 'modern', label: 'Modern', font: 'var(--font-domine), serif', weight: 700, size: '48px', transform: 'uppercase' as const },
+    { value: 'bold', label: 'Bold', font: 'var(--font-space-grotesk), sans-serif', weight: 700, size: '48px', transform: 'uppercase' as const },
+    { value: 'futuristic', label: 'Futuristic', font: 'var(--font-metamorphous), cursive', weight: 400, size: '48px', transform: 'uppercase' as const },
+    { value: 'playful', label: 'Playful', font: 'var(--font-henny-penny), cursive', weight: 400, size: '48px', transform: 'uppercase' as const },
+    { value: 'handwritten', label: 'Handwritten', font: 'var(--font-italianno), cursive', weight: 400, size: '64px', transform: 'capitalize' as const },
+  ];
+
+  const currentFont = fontOptions.find(f => f.value === selectedFont) || fontOptions[0];
 
   const exportAsPNG = async () => {
     if (!posterRef.current) return;
@@ -96,112 +113,179 @@ export default function QRCodePosterGenerator({
   return (
     <div className="space-y-6">
       {/* Controls */}
-      <div className="flex items-center justify-between">
+      <div className="space-y-4">
         <div>
           <h3 className="text-lg font-semibold text-gray-900">
             Printable QR Code Poster
           </h3>
           <p className="text-sm text-gray-600">
-            Download and print for entrance, registration desk, or venue signage
+            High-resolution A4 poster for printing (8.3" × 11.7")
           </p>
         </div>
 
-        {isPremium && (
+        {/* Color Controls */}
+        <div className="flex items-center gap-4 flex-wrap">
           <div className="flex items-center gap-2">
             <label className="text-sm font-medium text-gray-700">
-              Accent Color:
+              Border:
             </label>
             <input
               type="color"
-              value={customColor}
-              onChange={(e) => setCustomColor(e.target.value)}
+              value={customPrimaryColor}
+              onChange={(e) => setCustomPrimaryColor(e.target.value)}
               className="h-10 w-20 cursor-pointer rounded border border-gray-300"
             />
           </div>
-        )}
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium text-gray-700">
+              Background:
+            </label>
+            <input
+              type="color"
+              value={customSecondaryColor}
+              onChange={(e) => setCustomSecondaryColor(e.target.value)}
+              className="h-10 w-20 cursor-pointer rounded border border-gray-300"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium text-gray-700">
+              Text:
+            </label>
+            <input
+              type="color"
+              value={customAccentColor}
+              onChange={(e) => setCustomAccentColor(e.target.value)}
+              className="h-10 w-20 cursor-pointer rounded border border-gray-300"
+            />
+          </div>
+        </div>
+
+        {/* Font Chooser */}
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium text-gray-700">
+            Font Style:
+          </label>
+          <select
+            value={selectedFont}
+            onChange={(e) => setSelectedFont(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            {fontOptions.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Poster Preview */}
-      <div className="flex justify-center bg-gray-50 p-6 rounded-lg">
+      <div className="flex justify-center bg-gray-100 p-8 rounded-lg">
         <div
           ref={posterRef}
-          className="bg-white shadow-lg"
+          className="relative shadow-2xl"
           style={{
-            width: '420px', // Scaled down A4 (~70% of 595px)
-            padding: '40px',
+            width: '595px', // A4 width at 72 DPI
+            height: '842px', // A4 height at 72 DPI
             fontFamily: 'system-ui, -apple-system, sans-serif',
           }}
         >
-          {/* Header Section */}
-          <div className="text-center mb-6">
+          {/* Solid Background Color */}
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundColor: customSecondaryColor,
+            }}
+          />
+
+          {/* Bold Border Frame */}
+          <div
+            className="absolute inset-0 m-8"
+            style={{
+              border: `12px solid ${customPrimaryColor}`,
+              borderRadius: '8px',
+            }}
+          />
+
+          {/* Content Container */}
+          <div className="absolute inset-0 m-8 p-12 flex flex-col items-center justify-between">
+            {/* Logo Section - 20% of A4 height */}
             {logoUrl && (
-              <div className="mb-4 flex justify-center">
+              <div className="flex justify-center">
                 <img
                   src={logoUrl}
                   alt={`${festivalName} logo`}
-                  className="max-h-16 max-w-full object-contain"
+                  className="object-contain filter drop-shadow-lg"
+                  style={{ maxHeight: '168px', width: 'auto' }}
                 />
               </div>
             )}
 
-            <h1
-              className="text-3xl font-bold mb-2"
-              style={{ color: customColor }}
-            >
-              {festivalName}
-            </h1>
-
-            {festivalDates && (
-              <p className="text-lg text-gray-600 mb-3">{festivalDates}</p>
-            )}
-
-            {/* Decorative border */}
-            <div
-              className="mx-auto mt-4 mb-4 h-1 w-24"
-              style={{ backgroundColor: customColor }}
-            />
-          </div>
-
-          {/* QR Code Section */}
-          <div className="flex justify-center mb-6">
-            <div className="border-6 p-4 rounded-lg" style={{ borderColor: customColor }}>
-              <QRCodeSVG
-                value={scheduleUrl}
-                size={200}
-                level="H" // High error correction for logo embedding
-                includeMargin={false}
-                imageSettings={{
-                  src: logoUrl && isPremium ? logoUrl : '/flow-grid-logo.png',
-                  x: undefined,
-                  y: undefined,
-                  height: isPremium ? 50 : 45,
-                  width: isPremium ? 50 : 45,
-                  excavate: true,
+            {/* Main CTA - Centered between logo and QR */}
+            <div className="text-center flex-shrink-0">
+              <div
+                className="tracking-wider"
+                style={{
+                  color: customAccentColor,
+                  textShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                  fontFamily: currentFont.font,
+                  fontWeight: currentFont.weight,
+                  letterSpacing: '0.08em',
+                  lineHeight: '1.2',
+                  fontSize: currentFont.size,
+                  textTransform: currentFont.transform,
                 }}
-              />
+              >
+                Check the
+                <br />
+                Schedule
+              </div>
+            </div>
+
+              {/* QR Code - 20% of A4 height, same as logo */}
+              <div className="flex justify-center">
+                <div
+                  className="p-4 bg-white rounded-lg"
+                  style={{
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
+                  }}
+                >
+                  <QRCodeSVG
+                    value={scheduleUrl}
+                    size={160}
+                    level="H"
+                    includeMargin={false}
+                    fgColor="#000000"
+                  />
+                </div>
+              </div>
+
+            {/* Footer - Powered by Flow Grid - with logo and frame */}
+            <div className="w-full flex justify-center items-center">
+              <div 
+                className="flex items-center gap-2 px-4 py-2 rounded-lg"
+                style={{
+                  border: `2px solid ${customPrimaryColor}`,
+                  backgroundColor: 'rgb(255, 255, 255)',
+                  boxShadow: 'none',
+                  opacity: 1,
+                }}
+              >
+                <span className="text-xs font-medium" style={{ color: '#374151' }}>
+                  Powered by
+                </span>
+                <img
+                  src="/flow-grid-logo.png"
+                  alt="Flow Grid"
+                  className="h-6 object-contain"
+                  style={{ opacity: 1 }}
+                />
+                <span className="text-sm font-bold" style={{ color: '#1f2937' }}>
+                  Flow Grid
+                </span>
+              </div>
             </div>
           </div>
-
-          {/* CTA Section */}
-          <div className="text-center mb-6">
-            <p className="text-xl font-semibold text-gray-900">
-              Scan for Full Schedule
-            </p>
-          </div>
-
-          {/* Decorative bottom border */}
-          <div
-            className="mx-auto h-1 w-24"
-            style={{ backgroundColor: customColor }}
-          />
-
-          {/* Watermark for free tier */}
-          {!isPremium && (
-            <div className="mt-6 text-center text-xs text-gray-400 border-t border-gray-200 pt-3">
-              Powered by <span className="font-semibold">FlowGrid</span> • Event
-              Scheduling Made Simple
-            </div>
-          )}
         </div>
       </div>
 
@@ -226,23 +310,19 @@ export default function QRCodePosterGenerator({
         </button>
       </div>
 
-      {/* Premium Upsell */}
-      {!isPremium && (
-        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-lg p-6 text-center">
-          <h4 className="font-semibold text-gray-900 mb-2">
-            ✨ Upgrade for Premium QR Posters
-          </h4>
-          <p className="text-sm text-gray-600 mb-4">
-            Embed YOUR logo in the QR code • Remove FlowGrid watermark • Custom brand colors • Multiple sizes
-          </p>
-          <a
-            href="/pricing"
-            className="inline-block px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
-          >
-            Upgrade to Premium
-          </a>
-        </div>
-      )}
+      {/* Usage Tips */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <h4 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
+          <span>💡</span> Printing Tips
+        </h4>
+        <ul className="text-sm text-blue-800 space-y-2">
+          <li>• Download as PDF for best print quality</li>
+          <li>• Print on A4 paper (8.3" × 11.7") or US Letter</li>
+          <li>• Use high-quality color printing for vibrant results</li>
+          <li>• Place at entrance, registration desk, or around your venue</li>
+          <li>• Test QR code with your phone before printing large quantities</li>
+        </ul>
+      </div>
     </div>
   );
 }

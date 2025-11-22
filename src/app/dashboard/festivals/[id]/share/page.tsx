@@ -196,6 +196,8 @@ export default function ShareAndPromote() {
                   festivalDates={`${formatDate(festival.startDate)} - ${formatDate(festival.endDate)}`}
                   logoUrl={festival.logo || undefined}
                   isPremium={false} // TODO: Connect to subscription tier
+                  primaryColor={festival.primaryColor}
+                  secondaryColor={festival.secondaryColor}
                   accentColor={festival.accentColor}
                 />
               </CardContent>
