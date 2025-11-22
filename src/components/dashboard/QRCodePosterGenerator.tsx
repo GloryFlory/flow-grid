@@ -55,6 +55,8 @@ export default function QRCodePosterGenerator({
         scale: 3, // High DPI for printing (300 DPI equivalent)
         backgroundColor: '#ffffff',
         logging: false,
+        useCORS: true, // Enable CORS for external images
+        allowTaint: true, // Allow cross-origin images
       });
 
       const link = document.createElement('a');
@@ -77,6 +79,8 @@ export default function QRCodePosterGenerator({
         scale: 3,
         backgroundColor: '#ffffff',
         logging: false,
+        useCORS: true, // Enable CORS for external images
+        allowTaint: true, // Allow cross-origin images
       });
 
       const imgData = canvas.toDataURL('image/png');
@@ -217,6 +221,7 @@ export default function QRCodePosterGenerator({
                   alt={`${festivalName} logo`}
                   className="object-contain filter drop-shadow-lg"
                   style={{ maxHeight: '168px', width: 'auto' }}
+                  crossOrigin="anonymous"
                 />
               </div>
             )}
@@ -279,6 +284,7 @@ export default function QRCodePosterGenerator({
                   alt="Flow Grid"
                   className="h-6 object-contain"
                   style={{ opacity: 1 }}
+                  crossOrigin="anonymous"
                 />
                 <span className="text-sm font-bold" style={{ color: '#1f2937' }}>
                   Flow Grid
