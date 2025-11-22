@@ -46,17 +46,42 @@ export default function QRCodePosterGenerator({
 
   const currentFont = fontOptions.find(f => f.value === selectedFont) || fontOptions[0];
 
+  // Proxy logo URL to avoid CORS issues with html2canvas
+  const proxiedLogoUrl = logoUrl && logoUrl.startsWith('http') 
+    ? `/api/proxy-image?url=${encodeURIComponent(logoUrl)}`
+    : logoUrl;
+
+  // Helper function to convert image URL to base64
+  const imageUrlToBase64 = async (url: string): Promise<string> => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error('Failed to convert image to base64:', error);
+      return '';
+    }
+  };
+
   const exportAsPNG = async () => {
     if (!posterRef.current) return;
     setIsExporting(true);
 
     try {
+      // Wait a bit for images to load
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       const canvas = await html2canvas(posterRef.current, {
         scale: 3, // High DPI for printing (300 DPI equivalent)
         backgroundColor: '#ffffff',
         logging: false,
         useCORS: true, // Enable CORS for external images
-        allowTaint: true, // Allow cross-origin images
+        allowTaint: false,
       });
 
       const link = document.createElement('a');
@@ -75,12 +100,15 @@ export default function QRCodePosterGenerator({
     setIsExporting(true);
 
     try {
+      // Wait a bit for images to load
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       const canvas = await html2canvas(posterRef.current, {
         scale: 3,
         backgroundColor: '#ffffff',
         logging: false,
         useCORS: true, // Enable CORS for external images
-        allowTaint: true, // Allow cross-origin images
+        allowTaint: false,
       });
 
       const imgData = canvas.toDataURL('image/png');
@@ -214,10 +242,10 @@ export default function QRCodePosterGenerator({
           {/* Content Container */}
           <div className="absolute inset-0 m-8 p-12 flex flex-col items-center justify-between">
             {/* Logo Section - 20% of A4 height */}
-            {logoUrl && (
+            {proxiedLogoUrl && (
               <div className="flex justify-center">
                 <img
-                  src={logoUrl}
+                  src={proxiedLogoUrl}
                   alt={`${festivalName} logo`}
                   className="object-contain filter drop-shadow-lg"
                   style={{ maxHeight: '168px', width: 'auto' }}
