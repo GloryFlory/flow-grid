@@ -2,6 +2,15 @@ import './globals.css';
 import { Providers } from '@/components/providers';
 import { AmplitudeScript } from '@/components/AmplitudeScript';
 import type { Metadata } from 'next';
+import { Domine, Lora, Metamorphous, Henny_Penny, Space_Grotesk, Italianno } from 'next/font/google';
+
+// Load Google Fonts for QR Poster
+export const domine = Domine({ weight: ['400', '700'], subsets: ['latin'], variable: '--font-domine' });
+export const lora = Lora({ weight: ['400', '700'], subsets: ['latin'], variable: '--font-lora' });
+export const metamorphous = Metamorphous({ weight: '400', subsets: ['latin'], variable: '--font-metamorphous' });
+export const hennyPenny = Henny_Penny({ weight: '400', subsets: ['latin'], variable: '--font-henny-penny' });
+export const spaceGrotesk = Space_Grotesk({ weight: ['400', '700'], subsets: ['latin'], variable: '--font-space-grotesk' });
+export const italianno = Italianno({ weight: '400', subsets: ['latin'], variable: '--font-italianno' });
 
 export const metadata: Metadata = {
   title: 'Flow Grid - Festival Schedule Maker | Free Event Planning Software',
@@ -108,7 +117,7 @@ const jsonLd = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 
   return (
-    <html lang="en">
+    <html lang="en" className={`${domine.variable} ${lora.variable} ${metamorphous.variable} ${hennyPenny.variable} ${spaceGrotesk.variable} ${italianno.variable}`}>
       <head>
         <link rel="icon" href="/flow-grid-logo.png" type="image/png" />
         <link rel="apple-touch-icon" href="/flow-grid-logo.png" />
