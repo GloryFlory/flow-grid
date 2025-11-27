@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useMemo } from 'react'
-import { ArrowLeft, Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, LayoutGrid } from 'lucide-react'
 import Link from 'next/link'
 import { SessionModal } from './SessionModal'
 import { FilterBar } from './FilterBar'
@@ -324,36 +324,27 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
       <header className="header shadow-sm sticky top-0 z-50">
         <div className="header-content">
           <div className="flex items-center gap-4">
-            <Link 
-              href={`/${festival.slug}/schedule`}
-              className="flex items-center gap-2 transition-colors hover:opacity-80"
-              style={{ color: 'white' }}
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span className="hidden sm:inline">Back to Cards</span>
-            </Link>
             {festival.logo && (
               <img src={festival.logo} alt={festival.name} className="festival-logo" />
             )}
             <div className="title-section">
               <h1>{festival.name}</h1>
-              <p style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '1.1rem' }}>Full View</p>
+              <p>
+                {new Date(festival.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                {' - '}
+                {new Date(festival.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+              </p>
             </div>
           </div>
           <div className="header-info">
-            <div className="flex items-center gap-2 text-sm" style={{ color: 'white', fontSize: '1.1rem' }}>
-              <Calendar className="w-4 h-4" />
-              <span className="sm:hidden text-xs">
-                {new Date(festival.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
-                {' - '}
-                {new Date(festival.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
-              </span>
-              <span className="hidden sm:inline">
-                {new Date(festival.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })}
-                {' - '}
-                {new Date(festival.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
-              </span>
-            </div>
+            <Link
+              href={`/${festival.slug}/schedule`}
+              className="share-button text-sm"
+              aria-label="View card layout"
+            >
+              <LayoutGrid className="w-4 h-4" />
+              <span className="ml-2">Card View</span>
+            </Link>
           </div>
         </div>
       </header>
