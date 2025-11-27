@@ -3,6 +3,7 @@ import React, { useState, useMemo } from 'react'
 import { ArrowLeft, Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { SessionModal } from './SessionModal'
+import { FilterBar } from './FilterBar'
 
 interface Session {
   id: string
@@ -71,24 +72,28 @@ const formatDayHeader = (dateStr: string): string => {
 }
 
 // Get level-based color - match SessionCard colors exactly
-const getSessionColor = (session: Session): string => {
-  switch (session.level) {
-    case 'Beginner':
-      return '#22C55E' // green
-    case 'Beginner+':
-      return '#84CC16' // lime
-    case 'Intermediate':
-      return '#EAB308' // yellow
-    case 'Intermediate+':
-      return '#F97316' // orange
-    case 'Advanced':
-      return '#8B5CF6' // purple
-    case 'All Levels':
-    case 'Open Level':
-      return '#3B82F6' // blue
-    default:
-      return '#3B82F6' // blue
+const getSessionColor = (session: Session, festival?: { primaryColor?: string }): string => {
+  // If level is set, use level-based colors
+  if (session.level) {
+    switch (session.level) {
+      case 'Beginner':
+        return '#22C55E' // green
+      case 'Beginner+':
+        return '#84CC16' // lime
+      case 'Intermediate':
+        return '#EAB308' // yellow
+      case 'Intermediate+':
+        return '#F97316' // orange
+      case 'Advanced':
+        return '#8B5CF6' // purple
+      case 'All Levels':
+      case 'Open Level':
+        return '#3B82F6' // blue
+    }
   }
+  
+  // Fallback: use festival's primary color or Flow Grid default
+  return festival?.primaryColor || '#6366F1' // Flow Grid indigo
 }
 
 // Helper to create a subtle background color from the festival's primary color
@@ -110,6 +115,74 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
   const [currentWeekIndex, setCurrentWeekIndex] = useState(0)
   const [viewMode, setViewMode] = useState<'day' | '3day' | 'week'>('week')
   const [selectedDayIndex, setSelectedDayIndex] = useState(0)
+
+  // Filter state
+  const [levelFilter, setLevelFilter] = useState('')
+  const [styleFilter, setStyleFilter] = useState('')
+  const [searchFilter, setSearchFilter] = useState('')
+  const [teacherFilter, setTeacherFilter] = useState('')
+
+  // Calculate available filter options from all sessions
+  const { availableLevels, availableStyles, availableTeachers } = useMemo(() => {
+    const levelsMap = new Map<string, string>() // lowercase -> original case
+    const styles = new Set<string>()
+    const teachers = new Set<string>()
+
+    sessions.forEach(session => {
+      if (session.level) {
+        const lowerLevel = session.level.toLowerCase()
+        // Keep the first casing we see (or prefer title case)
+        if (!levelsMap.has(lowerLevel)) {
+          levelsMap.set(lowerLevel, session.level)
+        }
+      }
+      session.styles?.forEach(s => styles.add(s))
+      session.teachers?.forEach(t => teachers.add(t))
+    })
+
+    return {
+      availableLevels: Array.from(levelsMap.values()).sort(),
+      availableStyles: Array.from(styles).sort(),
+      availableTeachers: Array.from(teachers).sort()
+    }
+  }, [sessions])
+
+  // Filter sessions based on current filter state
+  const filteredSessions = useMemo(() => {
+    return sessions.filter(session => {
+      if (levelFilter) {
+        const sessionLevel = session.level?.toLowerCase() || ''
+        const filterLevel = levelFilter.toLowerCase()
+        const isSessionAllLevels = sessionLevel === 'all levels' || sessionLevel === 'open level'
+        
+        // "All Levels" / "Open Level" sessions appear for any level filter
+        // (since they accept all skill levels)
+        if (!isSessionAllLevels && sessionLevel !== filterLevel) return false
+      }
+      if (styleFilter && !session.styles?.includes(styleFilter)) return false
+      if (teacherFilter && !session.teachers?.includes(teacherFilter)) return false
+      if (searchFilter) {
+        const searchLower = searchFilter.toLowerCase()
+        const matchesTitle = session.title.toLowerCase().includes(searchLower)
+        const matchesDescription = session.description?.toLowerCase().includes(searchLower)
+        const matchesTeacher = session.teachers?.some(t => t.toLowerCase().includes(searchLower))
+        const matchesStyle = session.styles?.some(s => s.toLowerCase().includes(searchLower))
+        if (!matchesTitle && !matchesDescription && !matchesTeacher && !matchesStyle) return false
+      }
+      return true
+    })
+  }, [sessions, levelFilter, styleFilter, teacherFilter, searchFilter])
+
+  // Get current time in minutes for the time indicator
+  const getCurrentTimeInMinutes = (): number => {
+    const now = new Date()
+    return now.getHours() * 60 + now.getMinutes()
+  }
+
+  // Get today's date
+  const getTodayDate = (): string => {
+    return new Date().toISOString().split('T')[0]
+  }
 
   // Generate list of ALL festival days
   const allFestivalDays = useMemo(() => {
@@ -182,17 +255,17 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
     return { earliestTime: earliest, latestTime: latest, timeSlots: slots }
   }, [sessions])
 
-  // Group sessions by day
+  // Group filtered sessions by day (for layout calculation)
   const sessionsByDay = useMemo(() => {
     const grouped: Record<string, Session[]> = {}
-    sessions.forEach(session => {
+    filteredSessions.forEach(session => {
       if (!grouped[session.day]) {
         grouped[session.day] = []
       }
       grouped[session.day].push(session)
     })
     return grouped
-  }, [sessions])
+  }, [filteredSessions])
 
   // Pre-calculate overlapping sessions for each time slot (performance optimization)
   const overlappingSessionsCache = useMemo(() => {
@@ -436,6 +509,25 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
         </div>
       </div>
 
+      {/* Filter Bar */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto">
+          <FilterBar
+            levelFilter={levelFilter}
+            setLevelFilter={setLevelFilter}
+            styleFilter={styleFilter}
+            setStyleFilter={setStyleFilter}
+            searchFilter={searchFilter}
+            setSearchFilter={setSearchFilter}
+            teacherFilter={teacherFilter}
+            setTeacherFilter={setTeacherFilter}
+            availableLevels={availableLevels}
+            availableStyles={availableStyles}
+            availableTeachers={availableTeachers}
+          />
+        </div>
+      </div>
+
       {/* Grid Container */}
       <div className="overflow-x-auto px-2 md:px-4 py-3 md:py-6" style={{ WebkitOverflowScrolling: 'touch' }}>
         <div className="inline-block min-w-full">
@@ -450,7 +542,7 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
                     Time
                   </th>
                   {festivalDays.map(day => {
-                    const today = new Date().toISOString().split('T')[0]
+                    const today = getTodayDate()
                     const isToday = day === today
                     const date = new Date(day + 'T12:00:00Z')
                     const dayName = date.toLocaleDateString('en-GB', { weekday: 'short' }).toUpperCase()
@@ -493,7 +585,129 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
                 </tr>
               </thead>
               <tbody>
-                {timeSlots.map((timeSlotMinutes) => (
+                {(() => {
+                  // Helper function to find transitive overlap groups
+                  const findOverlapGroups = (sessions: Session[]): Session[][] => {
+                    if (sessions.length === 0) return []
+                    
+                    const sorted = [...sessions].sort((a, b) => {
+                      const timeCompare = timeToMinutes(a.start) - timeToMinutes(b.start)
+                      if (timeCompare !== 0) return timeCompare
+                      return a.id.localeCompare(b.id)
+                    })
+                    
+                    const groups: Session[][] = []
+                    let currentGroup: Session[] = [sorted[0]]
+                    let groupEnd = timeToMinutes(sorted[0].end)
+                    
+                    for (let i = 1; i < sorted.length; i++) {
+                      const session = sorted[i]
+                      const sessionStart = timeToMinutes(session.start)
+                      
+                      if (sessionStart < groupEnd) {
+                        // Overlaps with current group
+                        currentGroup.push(session)
+                        groupEnd = Math.max(groupEnd, timeToMinutes(session.end))
+                      } else {
+                        // No overlap - start new group
+                        groups.push(currentGroup)
+                        currentGroup = [session]
+                        groupEnd = timeToMinutes(session.end)
+                      }
+                    }
+                    
+                    if (currentGroup.length > 0) {
+                      groups.push(currentGroup)
+                    }
+                    
+                    return groups
+                  }
+                  
+                  // Pre-calculate layout for each session
+                  const sessionLayouts = new Map<string, { 
+                    columnIndex: number
+                    totalColumns: number 
+                    columnSpan: number
+                  }>()
+                  
+                  festivalDays.forEach(day => {
+                    const daySessions = sessionsByDay[day] || []
+                    const groups = findOverlapGroups(daySessions)
+                    
+                    groups.forEach(group => {
+                      if (group.length === 1) {
+                        sessionLayouts.set(group[0].id, {
+                          columnIndex: 0,
+                          totalColumns: 1,
+                          columnSpan: 1
+                        })
+                      } else {
+                        // Assign columns within this group using greedy packing
+                        const columns: Session[][] = []
+                        
+                        const sortedGroup = [...group].sort((a, b) => {
+                          const timeCompare = timeToMinutes(a.start) - timeToMinutes(b.start)
+                          if (timeCompare !== 0) return timeCompare
+                          return a.id.localeCompare(b.id)
+                        })
+                        
+                        sortedGroup.forEach(session => {
+                          const sStart = timeToMinutes(session.start)
+                          const sEnd = timeToMinutes(session.end)
+                          
+                          let placed = false
+                          for (let colIndex = 0; colIndex < columns.length; colIndex++) {
+                            const hasConflict = columns[colIndex].some(existing => {
+                              const eStart = timeToMinutes(existing.start)
+                              const eEnd = timeToMinutes(existing.end)
+                              return sStart < eEnd && sEnd > eStart
+                            })
+                            
+                            if (!hasConflict) {
+                              columns[colIndex].push(session)
+                              placed = true
+                              break
+                            }
+                          }
+                          
+                          if (!placed) {
+                            columns.push([session])
+                          }
+                        })
+                        
+                        const totalCols = columns.length
+                        
+                        columns.forEach((column, colIndex) => {
+                          column.forEach(session => {
+                            const sessionEnd = timeToMinutes(session.end)
+                            const sessionStart = timeToMinutes(session.start)
+                            
+                            // Calculate span (greedy expansion to the right)
+                            let span = 1
+                            for (let nextCol = colIndex + 1; nextCol < totalCols; nextCol++) {
+                              const hasConflict = columns[nextCol].some(s => {
+                                const sStart = timeToMinutes(s.start)
+                                const sEnd = timeToMinutes(s.end)
+                                return sStart < sessionEnd && sEnd > sessionStart
+                              })
+                              
+                              if (hasConflict) break
+                              span++
+                            }
+                            
+                            sessionLayouts.set(session.id, {
+                              columnIndex: colIndex,
+                              totalColumns: totalCols,
+                              columnSpan: span
+                            })
+                          })
+                        })
+                      }
+                    })
+                  })
+                  
+                  // Now render the time slots
+                  return timeSlots.map((timeSlotMinutes) => (
                   <tr key={timeSlotMinutes} style={{ height: '40px' }}>
                     <td className="sticky left-0 z-10 bg-gray-50 border border-gray-300 px-1 md:px-3 py-1 text-[10px] md:text-xs font-medium text-gray-600 align-top">
                       {minutesToTime(timeSlotMinutes)}
@@ -504,86 +718,49 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
                         className="border border-gray-300 relative"
                         style={{ height: '40px', padding: 0 }}
                       >
-                        {/* Render ALL sessions that overlap with this time slot */}
-                        <div className="absolute inset-0 p-0.5">
+                        {/* Render sessions that start in this time slot */}
+                        <div className="absolute left-0 right-0 top-0" style={{ padding: '2px' }}>
                           {(() => {
-                            // Get all sessions that are active during this time slot (started at or before, ending after)
-                            const allActiveSessions = getSessionsAtTimeSlot(day, timeSlotMinutes)
-                              .sort((a, b) => {
-                                // Sort by start time - earliest sessions render first (appear behind)
-                                return timeToMinutes(a.start) - timeToMinutes(b.start)
-                              })
+                            // Get sessions that start in this time slot
+                            const sessionsStartingHere = getSessionsAtTimeSlot(day, timeSlotMinutes)
+                              .filter(s => timeToMinutes(s.start) === timeSlotMinutes)
                             
-                            return allActiveSessions.map((session, absoluteIndex) => {
+                            if (sessionsStartingHere.length === 0) return null
+                            
+                            return sessionsStartingHere.map((session) => {
                               const sessionStart = timeToMinutes(session.start)
                               const sessionEnd = timeToMinutes(session.end)
                               
-                              // Only render the session card at its actual START time slot
-                              if (sessionStart !== timeSlotMinutes) {
-                                return null
-                              }
-                              
                               const durationMinutes = sessionEnd - sessionStart
-                              // Calculate height with minimum for readability (at least 28px to show title)
                               const calculatedHeight = (durationMinutes / 30) * 40 - 4
                               const heightInPixels = Math.max(28, calculatedHeight)
-                              const levelColor = getSessionColor(session)
+                              const levelColor = getSessionColor(session, festival)
                               
-                              // Find all sessions ON THIS DAY that overlap with this one at ANY point
-                              const allDaySessions = sessionsByDay[day] || []
-                              
-                              // To find the correct width, we need to find the MAXIMUM number of
-                              // concurrent sessions at any single point during this session's duration
-                              let maxConcurrent = 1
-                              let concurrentAtStart: Session[] = []
-                              
-                              // Check every 30-minute interval during this session
-                              for (let checkTime = sessionStart; checkTime < sessionEnd; checkTime += 30) {
-                                const concurrentAtThisTime = allDaySessions.filter(s => {
-                                  const sStart = timeToMinutes(s.start)
-                                  const sEnd = timeToMinutes(s.end)
-                                  // Session is concurrent if it's active at checkTime
-                                  return sStart <= checkTime && sEnd > checkTime
-                                })
-                                
-                                if (concurrentAtThisTime.length > maxConcurrent) {
-                                  maxConcurrent = concurrentAtThisTime.length
-                                  concurrentAtStart = concurrentAtThisTime
-                                }
+                              // Get pre-calculated layout from overlap group analysis
+                              const layout = sessionLayouts.get(session.id) || { 
+                                columnIndex: 0, 
+                                totalColumns: 1, 
+                                columnSpan: 1 
                               }
                               
-                              // Use the concurrent sessions at the point of maximum overlap
-                              const sortedConcurrent = [...concurrentAtStart].sort((a, b) => {
-                                const timeCompare = timeToMinutes(a.start) - timeToMinutes(b.start)
-                                if (timeCompare !== 0) return timeCompare
-                                return a.id.localeCompare(b.id)
-                              })
+                              const { columnIndex, totalColumns, columnSpan } = layout
                               
-                              const positionInOverlap = sortedConcurrent.findIndex(s => s.id === session.id)
-                              const totalOverlapping = maxConcurrent
-                              
-                              // Google Calendar-style layout: all overlapping sessions get equal width
-                              // and are distributed evenly across the available space
+                              // Calculate positioning
                               let width = '100%'
                               let leftOffset = '0'
-                              let topOffset = '2px'
-                              let zIndex = 10 + positionInOverlap // Sessions sorted by start time get appropriate z-index
+                              let topOffset = '1px'
+                              let zIndex = 10 + columnIndex
                               
-                              if (totalOverlapping === 1) {
-                                // Only session at this time - full width
+                              if (totalColumns === 1) {
                                 width = 'calc(100% - 2px)'
                                 leftOffset = '1px'
                               } else {
-                                // Multiple overlapping sessions - equal width for all with slight overlap
-                                // Calculate so that sessions overlap but last one doesn't exceed 100%
-                                const baseWidthPercent = 100 / totalOverlapping
-                                const overlap = 2 // 2% overlap between sessions
-                                const widthPercent = baseWidthPercent + overlap
-                                const offsetPercent = positionInOverlap * (baseWidthPercent - overlap)
+                                const columnWidthPercent = 100 / totalColumns
+                                const totalWidthPercent = columnWidthPercent * columnSpan
+                                const leftOffsetPercent = columnWidthPercent * columnIndex
                                 
-                                width = `calc(${widthPercent}% - 2px)`
-                                leftOffset = `calc(${offsetPercent}% + 1px)`
-                                topOffset = `${2 + (positionInOverlap * 1)}px` // Slight vertical offset for depth
+                                width = `calc(${totalWidthPercent}% - 2px)`
+                                leftOffset = `${leftOffsetPercent}%`
                               }
                               
                               return (
@@ -643,9 +820,64 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
                       </td>
                     ))}
                   </tr>
-                ))}
+                ))
+                })()}
               </tbody>
             </table>
+
+            {/* Current Time Indicator - Google Calendar style red line */}
+            {(() => {
+              const today = getTodayDate()
+              const currentTimeMinutes = getCurrentTimeInMinutes()
+              
+              // Only show if current time is within the displayed time range
+              if (currentTimeMinutes < earliestTime || currentTimeMinutes > latestTime) {
+                return null
+              }
+              
+              // Check if today is in the currently displayed days
+              const todayColumnIndex = festivalDays.indexOf(today)
+              if (todayColumnIndex === -1) {
+                return null
+              }
+              
+              // Calculate vertical position based on current time
+              // Each 30-minute slot is 40px tall
+              const minutesSinceEarliest = currentTimeMinutes - earliestTime
+              const topPosition = (minutesSinceEarliest / 30) * 40
+              
+              // Calculate horizontal position for today's column
+              // Time column is 50px wide, then each day column gets equal space
+              const columnWidth = `calc((100% - 50px) / ${festivalDays.length})`
+              const leftOffset = `calc(50px + (${columnWidth} * ${todayColumnIndex}))`
+              
+              return (
+                <div
+                  className="absolute pointer-events-none z-30"
+                  style={{
+                    top: `${topPosition}px`,
+                    left: leftOffset,
+                    width: columnWidth,
+                    height: '2px',
+                  }}
+                >
+                  {/* Red line */}
+                  <div className="w-full h-full bg-red-500" style={{ boxShadow: '0 0 4px rgba(239, 68, 68, 0.5)' }}></div>
+                  
+                  {/* Red dot centered on the left column border */}
+                  <div
+                    className="absolute bg-red-500 rounded-full"
+                    style={{
+                      width: '8px',
+                      height: '8px',
+                      top: '-3px',
+                      left: '-4px', // Center the 8px dot on the border (half of 8px)
+                      boxShadow: '0 0 4px rgba(239, 68, 68, 0.5)',
+                    }}
+                  ></div>
+                </div>
+              )
+            })()}
           </div>
         </div>
       </div>

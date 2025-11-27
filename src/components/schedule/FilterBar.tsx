@@ -84,7 +84,7 @@ export function FilterBar({
               value={levelFilter}
               onChange={setLevelFilter}
               options={availableLevels}
-              placeholder="All Levels"
+              placeholder="Any Level"
             />
           ) : (
             <select 
@@ -92,7 +92,7 @@ export function FilterBar({
               onChange={(e) => setLevelFilter(e.target.value)}
               className="filter-select"
             >
-              <option value="">All Levels</option>
+              <option value="">Any Level</option>
               {availableLevels.map(level => (
                 <option key={level} value={level}>{level}</option>
               ))}
