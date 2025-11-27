@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, useMemo, useEffect } from 'react'
-import { Share2, Link as LinkIcon, Facebook, Twitter, Check } from 'lucide-react'
+import { Share2, Link as LinkIcon, Facebook, Twitter, Check, Grid3x3 } from 'lucide-react'
+import Link from 'next/link'
 import { SessionCard } from './SessionCard'
 import { FilterBar } from './FilterBar'
 import { ScheduleTabs } from './ScheduleTabs'
@@ -522,6 +523,18 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
                 </div>
               )}
               </div>
+            </div>
+            
+            {/* Full View Button - Separate Row */}
+            <div className="flex justify-end mt-2">
+              <Link
+                href={`/${festival.slug}/schedule/grid`}
+                className="share-button text-sm"
+                aria-label="View full timetable"
+              >
+                <Grid3x3 className="w-4 h-4" />
+                <span className="ml-2">Full View</span>
+              </Link>
             </div>
           </div>
         </div>
