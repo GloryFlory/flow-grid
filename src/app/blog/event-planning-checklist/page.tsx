@@ -31,7 +31,7 @@ export default function BlogPost() {
     description: 'Complete event planning checklist from 6 months out to post-event follow-up.',
     image: 'https://tryflowgrid.com/og-image.png',
     datePublished: '2025-11-05',
-    dateModified: '2025-11-10',
+    dateModified: '2025-11-27',
     author: {
       '@type': 'Person',
       '@id': 'https://florianhohenleitner.com/#person',
@@ -51,6 +51,45 @@ export default function BlogPost() {
       },
     },
     wordCount: 1700,
+  }
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How far in advance should I start planning an event?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'For major festivals and conferences, start 6-12 months in advance. For smaller workshops or retreats, 2-3 months is usually sufficient. The key is securing your venue and keynote speakers early, as these book up quickly.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'What is the most important thing to do first when planning an event?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Define your event goals and budget first. Everything else—venue selection, speaker booking, marketing—flows from understanding what you want to achieve and what resources you have available.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'How do I create an event schedule that attendees can easily access?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Use a digital scheduling tool like Flow Grid that creates mobile-friendly schedules. Attendees can filter by track, speaker, or time, and you can push real-time updates if anything changes. QR codes make sharing instant.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'What should I include in a post-event follow-up?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Send thank you emails within 48 hours, share event photos, request feedback via a short survey, and document lessons learned while they are fresh. This information is invaluable for planning your next event.'
+        }
+      }
+    ]
   }
 
   const relatedPosts = [
@@ -79,6 +118,10 @@ export default function BlogPost() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       
       {/* Navigation */}
@@ -205,7 +248,7 @@ export default function BlogPost() {
           <div className="space-y-3 my-6">
             <div className="flex gap-3 items-start">
               <CheckSquare className="h-5 w-5 text-blue-600 flex-shrink-0 mt-1" />
-              <p className="m-0"><strong>Finalize event schedule</strong> - Lock in times and programming</p>
+              <p className="m-0"><strong>Finalize event schedule</strong> - Lock in times and programming. Need help? Check our <Link href="/blog/festival-schedule-template-guide" className="text-blue-600 hover:underline">festival schedule template guide</Link>.</p>
             </div>
             <div className="flex gap-3 items-start">
               <CheckSquare className="h-5 w-5 text-blue-600 flex-shrink-0 mt-1" />
@@ -221,7 +264,7 @@ export default function BlogPost() {
             </div>
             <div className="flex gap-3 items-start">
               <CheckSquare className="h-5 w-5 text-blue-600 flex-shrink-0 mt-1" />
-              <p className="m-0"><strong>Create event app/digital schedule</strong> - Attendees want mobile access</p>
+              <p className="m-0"><strong>Create event app/digital schedule</strong> - Attendees want mobile access. Learn about <Link href="/blog/qr-code-event-schedules" className="text-blue-600 hover:underline">QR code schedules</Link> for easy sharing.</p>
             </div>
             <div className="flex gap-3 items-start">
               <CheckSquare className="h-5 w-5 text-blue-600 flex-shrink-0 mt-1" />
@@ -250,7 +293,7 @@ export default function BlogPost() {
             </div>
             <div className="flex gap-3 items-start">
               <CheckSquare className="h-5 w-5 text-blue-600 flex-shrink-0 mt-1" />
-              <p className="m-0"><strong>Recruit and train volunteers/staff</strong> - Schedule orientation sessions</p>
+              <p className="m-0"><strong>Recruit and train volunteers/staff</strong> - Schedule orientation sessions. See our <Link href="/blog/volunteer-scheduling-best-practices" className="text-blue-600 hover:underline">volunteer scheduling guide</Link>.</p>
             </div>
             <div className="flex gap-3 items-start">
               <CheckSquare className="h-5 w-5 text-blue-600 flex-shrink-0 mt-1" />
@@ -406,6 +449,30 @@ export default function BlogPost() {
           <p>
             Event planning is complex, but with the right checklist and tools, you can stay organized and reduce stress. Remember that even the best-planned events will have unexpected moments—that's where your preparation and calm leadership make all the difference.
           </p>
+
+          <h2>Frequently Asked Questions</h2>
+
+          <div className="space-y-6 my-8">
+            <div className="bg-gray-50 p-6 rounded-lg">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">How far in advance should I start planning an event?</h3>
+              <p className="text-gray-700 m-0">For major festivals and conferences, start 6-12 months in advance. For smaller workshops or retreats, 2-3 months is usually sufficient. The key is securing your venue and keynote speakers early, as these book up quickly.</p>
+            </div>
+            
+            <div className="bg-gray-50 p-6 rounded-lg">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">What is the most important thing to do first when planning an event?</h3>
+              <p className="text-gray-700 m-0">Define your event goals and budget first. Everything else—venue selection, speaker booking, marketing—flows from understanding what you want to achieve and what resources you have available.</p>
+            </div>
+            
+            <div className="bg-gray-50 p-6 rounded-lg">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">How do I create an event schedule that attendees can easily access?</h3>
+              <p className="text-gray-700 m-0">Use a digital scheduling tool like Flow Grid that creates mobile-friendly schedules. Attendees can filter by track, speaker, or time, and you can push <Link href="/blog/real-time-schedule-updates" className="text-blue-600 hover:underline">real-time updates</Link> if anything changes. <Link href="/blog/qr-code-event-schedules" className="text-blue-600 hover:underline">QR codes</Link> make sharing instant.</p>
+            </div>
+            
+            <div className="bg-gray-50 p-6 rounded-lg">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">What should I include in a post-event follow-up?</h3>
+              <p className="text-gray-700 m-0">Send thank you emails within 48 hours, share event photos, request feedback via a short survey, and document lessons learned while they are fresh. This information is invaluable for planning your next event.</p>
+            </div>
+          </div>
 
         </div>
 

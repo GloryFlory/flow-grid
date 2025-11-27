@@ -31,7 +31,7 @@ export default function BlogPost() {
     description: 'Plan perfect yoga retreat schedules with proven templates. Balance practice, rest & community with timing strategies from successful retreat leaders.',
     image: 'https://tryflowgrid.com/og-image.png',
     datePublished: '2025-11-08',
-    dateModified: '2025-11-10',
+    dateModified: '2025-11-27',
     author: {
       '@type': 'Person',
       '@id': 'https://florianhohenleitner.com/#person',
@@ -57,6 +57,53 @@ export default function BlogPost() {
     },
     wordCount: 2100,
     articleBody: 'Full guide to creating yoga retreat schedules...',
+  }
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What time should a yoga retreat schedule start?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Most yoga retreats should start between 6:00-6:30 AM with optional sunrise meditation or morning practice. Starting at 5:00 AM might work for seasoned practitioners but can be off-putting for beginners. Consider making early morning sessions optional on arrival day.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'How much free time should a yoga retreat schedule include?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The ideal ratio is about 35% free time, 40% structured practice, and 25% for meals and transitions. The midday break (12 PM - 4 PM) is crucial for integration and rest - participants need this unstructured time for napping, journaling, and personal reflection.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'What are the most common yoga retreat scheduling mistakes?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The top mistakes are: over-programming (packing too much in), insufficient transition time between sessions (need 15-30 min), rushing meals (allow 1-1.5 hours), no flexibility for weather or energy changes, and starting too early on day one when participants are tired from travel.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'How do you structure a multi-day yoga retreat?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'For retreats longer than 3 days, think about arc and progression: Days 1-2 are for arrival and settling in with gentler practices. Middle days are peak intensity where transformation happens. Final 1-2 days focus on integration and preparation for departure with gentler sessions.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'What should I include in an evening retreat schedule?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Evening is for winding down and building community. Include dinner (6:00-7:30 PM) as the most social meal, gentle evening practice like yoga nidra or chanting (7:30-8:30 PM), and optional social time such as fire circles or tea ceremonies after 8:30 PM.'
+        }
+      }
+    ]
   }
 
   const relatedPosts = [
@@ -85,6 +132,10 @@ export default function BlogPost() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       
       {/* Navigation */}
@@ -145,7 +196,7 @@ export default function BlogPost() {
 
   <div className="prose prose-lg max-w-none prose-headings:scroll-mt-24 prose-h2:mt-12 prose-h2:border-b prose-h2:pb-2 prose-h3:mt-8 prose-p:leading-relaxed prose-li:marker:text-blue-600">
           <p>
-            Planning a yoga retreat schedule is both an art and a science. You need to create enough structure to give participants a transformative experience while leaving room for spontaneity, rest, and personal reflection. After years of helping retreat organizers create schedules, we've identified the key elements that make a retreat schedule truly exceptional.
+            Planning a yoga retreat schedule is both an art and a science. You need to create enough structure to give participants a transformative experience while leaving room for spontaneity, rest, and personal reflection. After years of helping retreat organizers create schedules, we've identified the key elements that make a retreat schedule truly exceptional. If you're new to event planning, our <Link href="/blog/event-planning-checklist" className="text-blue-600 hover:underline">event planning checklist</Link> provides a great foundation.
           </p>
 
           <h2>Understanding the Rhythm of a Retreat Day</h2>
@@ -261,7 +312,7 @@ export default function BlogPost() {
           <h2>Sample 3-Day Retreat Schedule</h2>
           
           <p>
-            Here's a battle-tested schedule template for a weekend yoga retreat:
+            Here's a battle-tested schedule template for a weekend yoga retreat. For more templates and formatting options, check out our <Link href="/blog/festival-schedule-template-guide" className="text-blue-600 hover:underline">festival schedule template guide</Link>.
           </p>
 
           <h3>Friday Evening (Arrival Day)</h3>
@@ -342,7 +393,7 @@ export default function BlogPost() {
 
           <ul>
             <li>Create beautiful, mobile-friendly schedules</li>
-            <li>Update times and sessions in real-time</li>
+            <li>Update times and sessions in real-time (learn about <Link href="/blog/real-time-schedule-updates" className="text-blue-600 hover:underline">real-time updates</Link>)</li>
             <li>Share your schedule via simple link</li>
             <li>Track which sessions participants are interested in</li>
             <li>Manage room assignments and locations</li>
@@ -360,6 +411,60 @@ export default function BlogPost() {
                 Create Your Schedule Free
               </Button>
             </Link>
+          </div>
+
+          <h2>Frequently Asked Questions</h2>
+
+          <div className="space-y-4 mb-8">
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                What time should a yoga retreat schedule start?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                Most yoga retreats should start between 6:00-6:30 AM with optional sunrise meditation or morning practice. Starting at 5:00 AM might work for seasoned practitioners but can be off-putting for beginners. Consider making early morning sessions optional on arrival day.
+              </div>
+            </details>
+
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                How much free time should a yoga retreat schedule include?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                The ideal ratio is about 35% free time, 40% structured practice, and 25% for meals and transitions. The midday break (12 PM - 4 PM) is crucial for integration and rest - participants need this unstructured time for napping, journaling, and personal reflection.
+              </div>
+            </details>
+
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                What are the most common yoga retreat scheduling mistakes?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                The top mistakes are: over-programming (packing too much in), insufficient transition time between sessions (need 15-30 min), rushing meals (allow 1-1.5 hours), no flexibility for weather or energy changes, and starting too early on day one when participants are tired from travel.
+              </div>
+            </details>
+
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                How do you structure a multi-day yoga retreat?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                For retreats longer than 3 days, think about arc and progression: Days 1-2 are for arrival and settling in with gentler practices. Middle days are peak intensity where transformation happens. Final 1-2 days focus on integration and preparation for departure with gentler sessions.
+              </div>
+            </details>
+
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                What should I include in an evening retreat schedule?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                Evening is for winding down and building community. Include dinner (6:00-7:30 PM) as the most social meal, gentle evening practice like yoga nidra or chanting (7:30-8:30 PM), and optional social time such as fire circles or tea ceremonies after 8:30 PM.
+              </div>
+            </details>
           </div>
 
           <h2>Final Thoughts</h2>

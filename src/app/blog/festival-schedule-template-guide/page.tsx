@@ -31,7 +31,7 @@ export default function BlogPost() {
     description: 'Complete festival schedule templates for music events, workshops & multi-day celebrations.',
     image: 'https://tryflowgrid.com/og-image.png',
     datePublished: '2025-11-07',
-    dateModified: '2025-11-10',
+    dateModified: '2025-11-27',
     author: {
       '@type': 'Person',
       '@id': 'https://florianhohenleitner.com/#person',
@@ -51,6 +51,45 @@ export default function BlogPost() {
       },
     },
     wordCount: 2600,
+  }
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What should a festival schedule include?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'A festival schedule should include: event/session titles, start and end times, locations/stages, performer or speaker names, level or track information, and any special requirements. For multi-day events, clearly separate each day and include meal breaks.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'How do I create a festival schedule for free?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'You can create a festival schedule for free using Flow Grid. Simply sign up, create your festival, add your sessions with times and locations, and share the link with attendees. The schedule is mobile-friendly and updates in real-time.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'What is the best format for a festival schedule?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The best format depends on your event. For single-track events, a simple timeline works well. For multi-stage festivals, use a grid view showing all stages side-by-side. Digital schedules that attendees can filter by interest are increasingly popular.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'How much buffer time should I include between festival sessions?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Include 10-15 minutes between sessions in the same room for transitions, and 15-30 minutes between sessions in different locations to allow attendees to move. For technical setups like band changeovers, allow 30-45 minutes.'
+        }
+      }
+    ]
   }
 
   const relatedPosts = [
@@ -79,6 +118,10 @@ export default function BlogPost() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       
       {/* Navigation */}
@@ -494,7 +537,7 @@ export default function BlogPost() {
             <li><strong>Digital-first approach:</strong> Online schedules can be updated instantly</li>
             <li><strong>Single source of truth:</strong> Update once, publish everywhere</li>
             <li><strong>Mobile-friendly:</strong> Most attendees check schedules on phones</li>
-            <li><strong>Real-time updates:</strong> Push notifications for last-minute changes</li>
+            <li><strong>Real-time updates:</strong> Push notifications for last-minute changes. Learn more in our <Link href="/blog/real-time-schedule-updates" className="text-blue-600 hover:underline">real-time updates guide</Link>.</li>
           </ul>
 
           <div className="bg-gradient-to-r from-blue-50 to-green-50 p-8 rounded-lg my-12 text-center">
@@ -524,6 +567,30 @@ export default function BlogPost() {
           <p>
             A great festival schedule is both an art and a science. It requires understanding your audience, respecting your performers, and creating a flow that makes the entire event feel effortless. Start with these templates, adjust for your specific needs, and don't be afraid to iterate as you learn what works for your festival.
           </p>
+
+          <h2>Frequently Asked Questions</h2>
+
+          <div className="space-y-6 my-8">
+            <div className="bg-gray-50 p-6 rounded-lg">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">What should a festival schedule include?</h3>
+              <p className="text-gray-700 m-0">A festival schedule should include: event/session titles, start and end times, locations/stages, performer or speaker names, level or track information, and any special requirements. For <Link href="/blog/multi-day-festival-scheduling-tips" className="text-blue-600 hover:underline">multi-day events</Link>, clearly separate each day and include meal breaks.</p>
+            </div>
+            
+            <div className="bg-gray-50 p-6 rounded-lg">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">How do I create a festival schedule for free?</h3>
+              <p className="text-gray-700 m-0">You can create a festival schedule for free using Flow Grid. Simply sign up, create your festival, add your sessions with times and locations, and share the link with attendees. The schedule is mobile-friendly and updates in real-time. Check our <Link href="/blog/get-festival-live-10-minutes" className="text-blue-600 hover:underline">quick start guide</Link>.</p>
+            </div>
+            
+            <div className="bg-gray-50 p-6 rounded-lg">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">What is the best format for a festival schedule?</h3>
+              <p className="text-gray-700 m-0">The best format depends on your event. For single-track events, a simple timeline works well. For multi-stage festivals, use a grid view showing all stages side-by-side. Digital schedules that attendees can filter by interest are increasingly popular. Compare your options in our <Link href="/blog/spreadsheet-vs-scheduling-software" className="text-blue-600 hover:underline">spreadsheet vs software guide</Link>.</p>
+            </div>
+            
+            <div className="bg-gray-50 p-6 rounded-lg">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">How much buffer time should I include between festival sessions?</h3>
+              <p className="text-gray-700 m-0">Include 10-15 minutes between sessions in the same room for transitions, and 15-30 minutes between sessions in different locations to allow attendees to move. For technical setups like band changeovers, allow 30-45 minutes.</p>
+            </div>
+          </div>
 
         </div>
 

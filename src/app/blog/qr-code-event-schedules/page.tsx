@@ -33,7 +33,7 @@ export default function BlogPost() {
     description: 'Create interactive QR code schedules that attendees can scan instantly. Reduce printing costs and update in real-time.',
     image: 'https://tryflowgrid.com/og-image.png',
     datePublished: '2025-11-12',
-    dateModified: '2025-11-12',
+    dateModified: '2025-11-27',
     author: {
       '@type': 'Person',
       '@id': 'https://florianhohenleitner.com/#person',
@@ -53,6 +53,53 @@ export default function BlogPost() {
       },
     },
     wordCount: 2400,
+  }
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How do I create a QR code for my event schedule?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Generate a shareable link to your online schedule, then use a QR code generator (like QR Code Monkey, Canva, or FlowGrid\'s built-in tool) to create scannable codes for posters, badges, and signage. Make sure your schedule page is mobile-optimized before generating the QR code.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'What\'s better: static or dynamic QR codes for events?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Dynamic QR codes are better for professional events because you can change the destination URL after printing, track analytics, and reuse codes for annual events. Static codes are fine for one-time workshops or simple events where the URL will never change.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'How big should my event QR code be?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Minimum 2cm x 2cm (0.8" x 0.8") for badges and close-up scanning. For posters and signage viewed from a distance, use at least 10cm x 10cm (4" x 4"). Follow the rule: QR code size should be 1/10th of the scanning distance.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'Can I update my schedule after printing QR codes?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes, if you\'re using dynamic QR codes or linking to a web-based schedule platform like FlowGrid. The QR code points to a URL, and you can update the content at that URL as many times as needed without reprinting codes.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'What if attendees don\'t have smartphones?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'In 2025, smartphone adoption is 95%+ for most event demographics. For the small percentage without phones, print a limited number of schedules available at registration, or post large printed schedules at key venue locations. Most organizers find that fewer than 5% of attendees need paper alternatives.'
+        }
+      }
+    ]
   }
 
   const relatedPosts = [
@@ -81,6 +128,10 @@ export default function BlogPost() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       
       {/* Navigation */}
@@ -155,7 +206,7 @@ export default function BlogPost() {
           </p>
 
           <p>
-            In this comprehensive guide, I'll show you exactly how to create QR code schedules for your events, share the lessons we've learned organizing multi-day festivals, and help you avoid the pitfalls that trip up first-time implementers.
+            In this comprehensive guide, I'll show you exactly how to create QR code schedules for your events, share the lessons we've learned organizing multi-day festivals, and help you avoid the pitfalls that trip up first-time implementers. For the complete event planning framework, check out our <Link href="/blog/event-planning-checklist" className="text-blue-600 hover:underline">event planning checklist</Link>.
           </p>
 
           <h2>Why QR Code Schedules Are Taking Over Event Planning</h2>
@@ -167,7 +218,7 @@ export default function BlogPost() {
           <h3>1. Real-Time Updates Without Reprinting</h3>
           
           <p>
-            The biggest advantage is simple: when your schedule changes (and it will), you can update the digital version instantly. Attendees who scan your QR code always see the current schedule—no reprints, no announcements, no confusion.
+            The biggest advantage is simple: when your schedule changes (and it will), you can update the digital version instantly. Learn more about <Link href="/blog/real-time-schedule-updates" className="text-blue-600 hover:underline">real-time schedule updates</Link> and how they transform attendee communication. Attendees who scan your QR code always see the current schedule—no reprints, no announcements, no confusion.
           </p>
 
           <p>
@@ -587,30 +638,57 @@ export default function BlogPost() {
 
           <h2>Frequently Asked Questions</h2>
 
-          <h3>How do I create a QR code for my event schedule?</h3>
-          <p>
-            Generate a shareable link to your online schedule, then use a QR code generator (like QR Code Monkey, Canva, or FlowGrid's built-in tool) to create scannable codes for posters, badges, and signage. Make sure your schedule page is mobile-optimized before generating the QR code.
-          </p>
+          <div className="space-y-4 mb-8">
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                How do I create a QR code for my event schedule?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                Generate a shareable link to your online schedule, then use a QR code generator (like QR Code Monkey, Canva, or FlowGrid's built-in tool) to create scannable codes for posters, badges, and signage. Make sure your schedule page is mobile-optimized before generating the QR code.
+              </div>
+            </details>
 
-          <h3>What's better: static or dynamic QR codes for events?</h3>
-          <p>
-            Dynamic QR codes are better for professional events because you can change the destination URL after printing, track analytics, and reuse codes for annual events. Static codes are fine for one-time workshops or simple events where the URL will never change.
-          </p>
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                What's better: static or dynamic QR codes for events?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                Dynamic QR codes are better for professional events because you can change the destination URL after printing, track analytics, and reuse codes for annual events. Static codes are fine for one-time workshops or simple events where the URL will never change.
+              </div>
+            </details>
 
-          <h3>How big should my event QR code be?</h3>
-          <p>
-            Minimum 2cm x 2cm (0.8" x 0.8") for badges and close-up scanning. For posters and signage viewed from a distance, use at least 10cm x 10cm (4" x 4"). Follow the rule: QR code size should be 1/10th of the scanning distance.
-          </p>
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                How big should my event QR code be?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                Minimum 2cm x 2cm (0.8" x 0.8") for badges and close-up scanning. For posters and signage viewed from a distance, use at least 10cm x 10cm (4" x 4"). Follow the rule: QR code size should be 1/10th of the scanning distance.
+              </div>
+            </details>
 
-          <h3>Can I update my schedule after printing QR codes?</h3>
-          <p>
-            Yes, if you're using dynamic QR codes or linking to a web-based schedule platform like FlowGrid. The QR code points to a URL, and you can update the content at that URL as many times as needed without reprinting codes.
-          </p>
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                Can I update my schedule after printing QR codes?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                Yes, if you're using dynamic QR codes or linking to a web-based schedule platform like FlowGrid. The QR code points to a URL, and you can update the content at that URL as many times as needed without reprinting codes.
+              </div>
+            </details>
 
-          <h3>What if attendees don't have smartphones?</h3>
-          <p>
-            In 2025, smartphone adoption is 95%+ for most event demographics. For the small percentage without phones, print a limited number of schedules available at registration, or post large printed schedules at key venue locations. Most organizers find that fewer than 5% of attendees need paper alternatives.
-          </p>
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                What if attendees don't have smartphones?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                In 2025, smartphone adoption is 95%+ for most event demographics. For the small percentage without phones, print a limited number of schedules available at registration, or post large printed schedules at key venue locations. Most organizers find that fewer than 5% of attendees need paper alternatives.
+              </div>
+            </details>
+          </div>
 
         </div>
 

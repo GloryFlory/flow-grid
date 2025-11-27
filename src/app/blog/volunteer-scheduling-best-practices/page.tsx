@@ -32,7 +32,7 @@ export default function BlogPost() {
     description: 'Organize hundreds of volunteers across shifts, roles & venues without chaos. Proven strategies from festival organizers.',
     image: 'https://tryflowgrid.com/og-image.png',
     datePublished: '2025-11-12',
-    dateModified: '2025-11-12',
+    dateModified: '2025-11-27',
     author: {
       '@type': 'Person',
       '@id': 'https://florianhohenleitner.com/#person',
@@ -52,6 +52,53 @@ export default function BlogPost() {
       },
     },
     wordCount: 2300,
+  }
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How many volunteers do I need for my festival?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'General rule: 1 volunteer per 50-75 attendees for festivals, more for conferences with complex logistics. Calculate by role (registration, info booth, stage crew) and shift length. A 500-person festival typically needs 40-60 volunteers across all shifts.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'What\'s the ideal volunteer shift length?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '3-4 hours is optimal. Long enough for volunteers to feel productive and settle into their role, short enough to avoid fatigue and allow them to enjoy the event. Setup/teardown crews can handle 5-6 hours since the work is time-bound.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'How do I prevent volunteer no-shows?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Send reminder emails 7 days and 1 day before the event, use WhatsApp groups for real-time communication, require confirmed responses, and always have 3-5 backup volunteers on call. Expect 5-10% no-show rate even with best practices.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'Should I pay volunteers or offer them free tickets?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Most event volunteers receive free or discounted admission plus perks (t-shirt, meals, early registration for next year). Payment is rare except for specialized roles (A/V techs, security). Make sure volunteer "work hours" feel proportional to the ticket value they\'re receiving.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'What tools work best for volunteer scheduling?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'For small events (under 30 volunteers): Google Sheets + WhatsApp. For medium events (30-100 volunteers): SignUpGenius or VolunteerLocal. For large events (100+ volunteers): Dedicated platforms like Better Impact or all-in-one event software like FlowGrid that handles both attendee and volunteer scheduling.'
+        }
+      }
+    ]
   }
 
   const relatedPosts = [
@@ -80,6 +127,10 @@ export default function BlogPost() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       
       {/* Navigation */}
@@ -152,7 +203,7 @@ export default function BlogPost() {
           </p>
 
           <p>
-            Here's everything we've learned about <strong>volunteer scheduling</strong> for large-scale events—the systems, tools, and strategies that actually work when you're managing dozens or hundreds of people.
+            Here's everything we've learned about <strong>volunteer scheduling</strong> for large-scale events—the systems, tools, and strategies that actually work when you're managing dozens or hundreds of people. For broader event planning guidance, see our <Link href="/blog/event-planning-checklist" className="text-blue-600 hover:underline">complete event planning checklist</Link>.
           </p>
 
           <h2>How Many Volunteers Do You Actually Need?</h2>
@@ -545,7 +596,7 @@ export default function BlogPost() {
           </p>
 
           <p>
-            <strong>Solution:</strong> Keep individual volunteer schedules simple and clean. Save the complex master schedule for coordinators only.
+            <strong>Solution:</strong> Keep individual volunteer schedules simple and clean. Save the complex master schedule for coordinators only. Learn more about <Link href="/blog/spreadsheet-vs-scheduling-software" className="text-blue-600 hover:underline">choosing the right scheduling tools</Link>.
           </p>
 
           <div className="bg-blue-50 border-l-4 border-blue-500 p-6 my-8">
@@ -565,30 +616,57 @@ export default function BlogPost() {
 
           <h2>Frequently Asked Questions</h2>
 
-          <h3>How many volunteers do I need for my festival?</h3>
-          <p>
-            General rule: 1 volunteer per 50-75 attendees for festivals, more for conferences with complex logistics. Calculate by role (registration, info booth, stage crew) and shift length. A 500-person festival typically needs 40-60 volunteers across all shifts.
-          </p>
+          <div className="space-y-4 mb-8">
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                How many volunteers do I need for my festival?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                General rule: 1 volunteer per 50-75 attendees for festivals, more for conferences with complex logistics. Calculate by role (registration, info booth, stage crew) and shift length. A 500-person festival typically needs 40-60 volunteers across all shifts.
+              </div>
+            </details>
 
-          <h3>What's the ideal volunteer shift length?</h3>
-          <p>
-            3-4 hours is optimal. Long enough for volunteers to feel productive and settle into their role, short enough to avoid fatigue and allow them to enjoy the event. Setup/teardown crews can handle 5-6 hours since the work is time-bound.
-          </p>
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                What's the ideal volunteer shift length?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                3-4 hours is optimal. Long enough for volunteers to feel productive and settle into their role, short enough to avoid fatigue and allow them to enjoy the event. Setup/teardown crews can handle 5-6 hours since the work is time-bound.
+              </div>
+            </details>
 
-          <h3>How do I prevent volunteer no-shows?</h3>
-          <p>
-            Send reminder emails 7 days and 1 day before the event, use WhatsApp groups for real-time communication, require confirmed responses, and always have 3-5 backup volunteers on call. Expect 5-10% no-show rate even with best practices.
-          </p>
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                How do I prevent volunteer no-shows?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                Send reminder emails 7 days and 1 day before the event, use WhatsApp groups for real-time communication, require confirmed responses, and always have 3-5 backup volunteers on call. Expect 5-10% no-show rate even with best practices.
+              </div>
+            </details>
 
-          <h3>Should I pay volunteers or offer them free tickets?</h3>
-          <p>
-            Most event volunteers receive free or discounted admission plus perks (t-shirt, meals, early registration for next year). Payment is rare except for specialized roles (A/V techs, security). Make sure volunteer "work hours" feel proportional to the ticket value they're receiving.
-          </p>
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                Should I pay volunteers or offer them free tickets?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                Most event volunteers receive free or discounted admission plus perks (t-shirt, meals, early registration for next year). Payment is rare except for specialized roles (A/V techs, security). Make sure volunteer "work hours" feel proportional to the ticket value they're receiving.
+              </div>
+            </details>
 
-          <h3>What tools work best for volunteer scheduling?</h3>
-          <p>
-            For small events (under 30 volunteers): Google Sheets + WhatsApp. For medium events (30-100 volunteers): SignUpGenius or VolunteerLocal. For large events (100+ volunteers): Dedicated platforms like Better Impact or all-in-one event software like FlowGrid that handles both attendee and volunteer scheduling.
-          </p>
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                What tools work best for volunteer scheduling?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                For small events (under 30 volunteers): Google Sheets + WhatsApp. For medium events (30-100 volunteers): SignUpGenius or VolunteerLocal. For large events (100+ volunteers): Dedicated platforms like Better Impact or all-in-one event software like FlowGrid that handles both attendee and volunteer scheduling.
+              </div>
+            </details>
+          </div>
 
         </div>
 

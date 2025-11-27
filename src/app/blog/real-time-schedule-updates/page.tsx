@@ -33,7 +33,7 @@ export default function BlogPost() {
     description: 'How to communicate schedule changes instantly across channels so attendees never miss an update.',
     image: 'https://tryflowgrid.com/og-image.png',
     datePublished: '2025-11-12',
-    dateModified: '2025-11-12',
+    dateModified: '2025-11-27',
     author: {
       '@type': 'Person',
       '@id': 'https://florianhohenleitner.com/#person',
@@ -53,6 +53,45 @@ export default function BlogPost() {
       },
     },
     wordCount: 2200,
+  }
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How do I notify attendees of schedule changes in real-time?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Use a live, web-based schedule as your source of truth. When you update a session, trigger a push alert (and SMS for critical changes), post QR-linked signage at key locations, and brief volunteers to redirect people. This 4-channel approach reaches 95%+ of attendees.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'What should a schedule change message include?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Include the change type (room/time), the new details, when it starts, what action attendees should take, and a link to the live schedule. Keep it under 160 characters for SMS.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'When should I send an SMS vs. push notification?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Reserve SMS for high-severity updates: venue moves, safety issues, headline changes. Use push + banner for room moves and moderate delays. Minor shifts can be banner-only.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'How do I prevent constant updates from fatiguing attendees?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Batch low-severity changes into a single hourly digest, add buffers to avoid cascading delays, and fix upstream scheduling conflicts before the event.'
+        }
+      }
+    ]
   }
 
   const relatedPosts = [
@@ -81,6 +120,10 @@ export default function BlogPost() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
 
       {/* Navigation */}
@@ -146,7 +189,7 @@ export default function BlogPost() {
           </ol>
 
           <p>
-            Pair this with an <Link href="/qr-code-event-schedules" className="text-blue-600 hover:text-blue-700">interactive QR code schedule</Link>, so the live source of truth is always one scan away.
+            Pair this with an <Link href="/blog/qr-code-event-schedules" className="text-blue-600 hover:text-blue-700">interactive QR code schedule</Link>, so the live source of truth is always one scan away.
           </p>
 
           <h2 className="flex items-center gap-2"><AlertTriangle className="h-5 w-5 text-blue-600" /> What to Say: Message Templates</h2>
@@ -189,9 +232,9 @@ export default function BlogPost() {
           <h2>Reducing Update Volume (So You Need Fewer Alerts)</h2>
           <ul>
             <li><strong>Smart buffers:</strong> Add 10–15 min between sessions to absorb delays without cascading changes.</li>
-            <li><strong>Conflict prevention:</strong> Use a tool that flags speaker/room clashes early. See our guide on <Link href="/multi-day-festival-scheduling-tips" className="text-blue-600 hover:text-blue-700">multi-day scheduling</Link>.</li>
+            <li><strong>Conflict prevention:</strong> Use a tool that flags speaker/room clashes early. See our guide on <Link href="/blog/multi-day-festival-scheduling-tips" className="text-blue-600 hover:text-blue-700">multi-day scheduling</Link>.</li>
             <li><strong>Weather-ready venues:</strong> Pre-assign indoor backups for outdoor sessions; label them in the schedule.</li>
-            <li><strong>Volunteer comms:</strong> Keep volunteers updated so they can redirect attendees before lines form.</li>
+            <li><strong>Volunteer comms:</strong> Keep volunteers updated so they can redirect attendees before lines form. See our <Link href="/blog/volunteer-scheduling-best-practices" className="text-blue-600 hover:text-blue-700">volunteer scheduling guide</Link>.</li>
           </ul>
 
           <div className="bg-blue-50 border-l-4 border-blue-500 p-6 my-8">
@@ -207,23 +250,49 @@ export default function BlogPost() {
             </Link>
           </div>
 
-          <h2>FAQ: Featured Snippet Candidates</h2>
-          <h3>How do I notify attendees of schedule changes in real-time?</h3>
-          <p>
-            Use a live, web-based schedule as your source of truth. When you update a session, trigger a push alert (and SMS for critical changes), post QR-linked signage at key locations, and brief volunteers to redirect people. This 4-channel approach reaches 95%+ of attendees.
-          </p>
-          <h3>What should a schedule change message include?</h3>
-          <p>
-            Include the change type (room/time), the new details, when it starts, what action attendees should take, and a link to the live schedule. Keep it under 160 characters for SMS.
-          </p>
-          <h3>When should I send an SMS vs. push notification?</h3>
-          <p>
-            Reserve SMS for high-severity updates: venue moves, safety issues, headline changes. Use push + banner for room moves and moderate delays. Minor shifts can be banner-only.
-          </p>
-          <h3>How do I prevent constant updates from fatiguing attendees?</h3>
-          <p>
-            Batch low-severity changes into a single hourly digest, add buffers to avoid cascading delays, and fix upstream scheduling conflicts before the event.
-          </p>
+          <h2>Frequently Asked Questions</h2>
+
+          <div className="space-y-4 mb-8">
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                How do I notify attendees of schedule changes in real-time?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                Use a live, web-based schedule as your source of truth. When you update a session, trigger a push alert (and SMS for critical changes), post QR-linked signage at key locations, and brief volunteers to redirect people. This 4-channel approach reaches 95%+ of attendees.
+              </div>
+            </details>
+
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                What should a schedule change message include?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                Include the change type (room/time), the new details, when it starts, what action attendees should take, and a link to the live schedule. Keep it under 160 characters for SMS.
+              </div>
+            </details>
+
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                When should I send an SMS vs. push notification?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                Reserve SMS for high-severity updates: venue moves, safety issues, headline changes. Use push + banner for room moves and moderate delays. Minor shifts can be banner-only.
+              </div>
+            </details>
+
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                How do I prevent constant updates from fatiguing attendees?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                Batch low-severity changes into a single hourly digest, add buffers to avoid cascading delays, and fix upstream scheduling conflicts before the event.
+              </div>
+            </details>
+          </div>
         </div>
 
         <RelatedPosts posts={relatedPosts} />

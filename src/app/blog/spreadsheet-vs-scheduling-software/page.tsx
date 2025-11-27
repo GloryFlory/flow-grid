@@ -31,7 +31,7 @@ export default function BlogPost() {
     description: 'Compare Excel/Google Sheets vs scheduling software for events. Real examples, honest pros & cons, and when to make the switch.',
     image: 'https://tryflowgrid.com/og-image.png',
     datePublished: '2025-11-06',
-    dateModified: '2025-11-10',
+    dateModified: '2025-11-27',
     author: {
       '@type': 'Person',
       '@id': 'https://florianhohenleitner.com/#person',
@@ -51,6 +51,53 @@ export default function BlogPost() {
       },
     },
     wordCount: 2200,
+  }
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'Should I use a spreadsheet or scheduling software for my event?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Use spreadsheets for events with fewer than 20 sessions, one-time events, or when attendees only need printed schedules. Switch to scheduling software for recurring events, 25+ sessions, multiple venues, real-time updates needed, or when you want professional presentation without the hassle.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'What are the main problems with using spreadsheets for event schedules?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Spreadsheets are terrible for public sharing (poor mobile UX, looks unprofessional), create version control nightmares, don\'t support real-time updates, have fragile formulas that break easily, lack built-in features like booking or filtering, and scale poorly for large events.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'When should I switch from spreadsheets to event scheduling software?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Consider switching when: you run events regularly, have 25+ sessions or multiple venues, need session booking/registration, frequently make schedule changes after publishing, want professional presentation, or want to reduce stress and save time.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'Can I use both spreadsheets and scheduling software together?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes! Many organizers use a hybrid approach: spreadsheets for internal planning, budget tracking, vendor management, and task lists; scheduling software for public-facing schedules, attendee bookings, and real-time updates. This gives you flexibility plus professional presentation.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'How do I migrate from spreadsheets to scheduling software?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Start with a new event rather than migrating mid-event. Keep your spreadsheet as backup. Try free tiers first. Most scheduling software can import via CSV, saving manual entry. Communicate the change to attendees so they know where to find the new schedule.'
+        }
+      }
+    ]
   }
 
   const relatedPosts = [
@@ -79,6 +126,10 @@ export default function BlogPost() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       
       {/* Navigation */}
@@ -139,7 +190,7 @@ export default function BlogPost() {
 
   <div className="prose prose-lg max-w-none prose-headings:scroll-mt-24 prose-h2:mt-12 prose-h2:border-b prose-h2:pb-2 prose-h3:mt-8 prose-p:leading-relaxed prose-li:marker:text-blue-600">
           <p>
-            If you're reading this, chances are you've been managing your event schedule in Excel or Google Sheets. You're not alone—it's where most event organizers start. But at some point, you've probably hit friction: sharing updates is painful, the schedule looks unprofessional, or you've accidentally broken a formula at 11 PM the night before your event.
+            If you're reading this, chances are you've been managing your event schedule in Excel or Google Sheets. You're not alone—it's where most event organizers start. But at some point, you've probably hit friction: sharing updates is painful, the schedule looks unprofessional, or you've accidentally broken a formula at 11 PM the night before your event. Check our <Link href="/blog/event-planning-checklist" className="text-blue-600 hover:underline">complete event planning checklist</Link> for more guidance.
           </p>
 
           <p>
@@ -409,7 +460,7 @@ export default function BlogPost() {
 
           <ul>
             <li><strong>Spreadsheets for:</strong> Internal planning, budget tracking, vendor management, task lists</li>
-            <li><strong>Scheduling software for:</strong> Public-facing schedules, attendee bookings, real-time updates</li>
+            <li><strong>Scheduling software for:</strong> Public-facing schedules, attendee bookings, <Link href="/blog/real-time-schedule-updates" className="text-blue-600 hover:underline">real-time updates</Link></li>
           </ul>
 
           <p>
@@ -453,6 +504,60 @@ export default function BlogPost() {
             <li>Professional presentation matters</li>
             <li>You want to save time and reduce stress</li>
           </ul>
+
+          <h2>Frequently Asked Questions</h2>
+
+          <div className="space-y-4 mb-8">
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                Should I use a spreadsheet or scheduling software for my event?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                Use spreadsheets for events with fewer than 20 sessions, one-time events, or when attendees only need printed schedules. Switch to scheduling software for recurring events, 25+ sessions, multiple venues, real-time updates needed, or when you want professional presentation without the hassle.
+              </div>
+            </details>
+
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                What are the main problems with using spreadsheets for event schedules?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                Spreadsheets are terrible for public sharing (poor mobile UX, looks unprofessional), create version control nightmares, don't support real-time updates, have fragile formulas that break easily, lack built-in features like booking or filtering, and scale poorly for large events.
+              </div>
+            </details>
+
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                When should I switch from spreadsheets to scheduling software?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                Consider switching when: you run events regularly, have 25+ sessions or multiple venues, need session booking/registration, frequently make schedule changes after publishing, want professional presentation, or want to reduce stress and save time.
+              </div>
+            </details>
+
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                Can I use both spreadsheets and scheduling software together?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                Yes! Many organizers use a hybrid approach: spreadsheets for internal planning, budget tracking, vendor management, and task lists; scheduling software for public-facing schedules, attendee bookings, and real-time updates.
+              </div>
+            </details>
+
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                How do I migrate from spreadsheets to scheduling software?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                Start with a new event rather than migrating mid-event. Keep your spreadsheet as backup. Try free tiers first. Most scheduling software can import via CSV, saving manual entry. Communicate the change to attendees so they know where to find the new schedule.
+              </div>
+            </details>
+          </div>
 
           <div className="bg-gradient-to-r from-blue-50 to-green-50 p-8 rounded-lg my-12 text-center">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">

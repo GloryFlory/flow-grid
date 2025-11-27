@@ -31,7 +31,7 @@ export default function BlogPost() {
     description: 'Skip the complexity. Create your festival schedule in minutes, not days. Step-by-step guide to launching your first event with FlowGrid\'s quick create feature.',
     image: 'https://tryflowgrid.com/og-image.png',
     datePublished: '2025-11-14',
-    dateModified: '2025-11-14',
+    dateModified: '2025-11-27',
     author: {
       '@type': 'Person',
       '@id': 'https://florianhohenleitner.com/#person',
@@ -57,6 +57,53 @@ export default function BlogPost() {
     },
     wordCount: 2200,
     articleBody: 'Complete guide to creating your first festival schedule in under 10 minutes...',
+  }
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How long does it take to create a festival schedule with Flow Grid?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'You can create and publish a basic festival schedule in under 10 minutes. More complex multi-day festivals with many sessions may take 20-30 minutes. The quick create feature lets you add sessions one-by-one without needing a CSV file.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'Do I need technical skills to use Flow Grid?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'No technical skills required. Flow Grid is designed to be intuitive. If you can fill in a form, you can create a festival schedule. No coding, no spreadsheet formulas, no complex software to install.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'Can I update my festival schedule after publishing?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes! You can update your schedule anytime and changes appear instantly for all attendees viewing the schedule. No need to resend links or republish - updates are live immediately.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'Do I need a paid plan to create a festival?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'No. FlowGrid\'s free plan lets you create one festival with unlimited sessions. Perfect for getting started.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'Can attendees see my schedule if I haven\'t added sessions?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes, they\'ll see your festival details and a message that says "Sessions coming soon." Great for early promotion!'
+        }
+      }
+    ]
   }
 
   const relatedPosts = [
@@ -85,6 +132,10 @@ export default function BlogPost() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       
       {/* Navigation */}
@@ -169,7 +220,7 @@ export default function BlogPost() {
           </p>
 
           <p className="text-gray-700 leading-relaxed mb-6">
-            Here's what I learned: <strong>The faster you get your festival online, the faster you can start promoting it, gathering feedback, and making real progress.</strong>
+            Here's what I learned: <strong>The faster you get your festival online, the faster you can start promoting it, gathering feedback, and making real progress.</strong> Whether you're creating a <Link href="/blog/how-to-create-yoga-retreat-schedule" className="text-blue-600 hover:underline">yoga retreat schedule</Link> or a <Link href="/blog/multi-day-festival-scheduling-tips" className="text-blue-600 hover:underline">multi-day festival</Link>, the same principle applies.
           </p>
 
           <p className="text-gray-700 leading-relaxed mb-8">
@@ -327,7 +378,7 @@ export default function BlogPost() {
           <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-4">Option 3: Sync with Google Sheets</h3>
 
           <p className="text-gray-700 leading-relaxed mb-6">
-            If you're already managing your schedule in Google Sheets, connect it to FlowGrid for automatic updates. Changes in your sheet sync to your public schedule in real-time. <Link href="/blog/spreadsheet-vs-scheduling-software" className="text-blue-600 hover:underline">Learn more about spreadsheet integration</Link>.
+            If you're already managing your schedule in Google Sheets, connect it to FlowGrid for automatic updates. Changes in your sheet sync to your public schedule in real-time. <Link href="/blog/spreadsheet-vs-scheduling-software" className="text-blue-600 hover:underline">Learn more about spreadsheet integration</Link>. Need instant updates? Check out our guide on <Link href="/blog/real-time-schedule-updates" className="text-blue-600 hover:underline">real-time schedule updates</Link>.
           </p>
 
           <h2 className="text-3xl font-bold text-gray-900 mt-12 mb-6">Real Organizer Success Stories</h2>
@@ -399,26 +450,76 @@ export default function BlogPost() {
 
           <h2 className="text-3xl font-bold text-gray-900 mt-12 mb-6">Frequently Asked Questions</h2>
 
-          <div className="space-y-6 mb-8">
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-2">Can I change everything later?</h4>
-              <p className="text-gray-700">Absolutely. Festival name, dates, description, logo—everything is editable. You're not locked in.</p>
-            </div>
+          <div className="space-y-4 mb-8">
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                How long does it take to create a festival schedule with Flow Grid?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                You can create and publish a basic festival schedule in under 10 minutes. More complex multi-day festivals with many sessions may take 20-30 minutes. The quick create feature lets you add sessions one-by-one without needing a CSV file.
+              </div>
+            </details>
 
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-2">What if I don't have final dates yet?</h4>
-              <p className="text-gray-700">Use your best estimate. You can update dates later. The goal is to get a page live so people can start hearing about your festival.</p>
-            </div>
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                Do I need technical skills to use Flow Grid?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                No technical skills required. Flow Grid is designed to be intuitive. If you can fill in a form, you can create a festival schedule. No coding, no spreadsheet formulas, no complex software to install.
+              </div>
+            </details>
 
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-2">Do I need a paid plan to create a festival?</h4>
-              <p className="text-gray-700">No. FlowGrid's free plan lets you create one festival with unlimited sessions. Perfect for getting started.</p>
-            </div>
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                Can I update my festival schedule after publishing?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                Yes! You can update your schedule anytime and changes appear instantly for all attendees viewing the schedule. No need to resend links or republish - updates are live immediately.
+              </div>
+            </details>
 
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-2">Can attendees see my schedule if I haven't added sessions?</h4>
-              <p className="text-gray-700">Yes, they'll see your festival details and a message that says "Sessions coming soon." Great for early promotion!</p>
-            </div>
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                Can I change everything later?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                Absolutely. Festival name, dates, description, logo—everything is editable. You're not locked in.
+              </div>
+            </details>
+
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                What if I don't have final dates yet?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                Use your best estimate. You can update dates later. The goal is to get a page live so people can start hearing about your festival.
+              </div>
+            </details>
+
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                Do I need a paid plan to create a festival?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                No. FlowGrid's free plan lets you create one festival with unlimited sessions. Perfect for getting started.
+              </div>
+            </details>
+
+            <details className="group bg-gray-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-4 font-semibold text-gray-900">
+                Can attendees see my schedule if I haven't added sessions?
+                <span className="ml-2 text-gray-500 group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-gray-700">
+                Yes, they'll see your festival details and a message that says "Sessions coming soon." Great for early promotion!
+              </div>
+            </details>
           </div>
 
           <h2 className="text-3xl font-bold text-gray-900 mt-12 mb-6">Ready to Launch?</h2>
