@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PlanLimitsBanner } from '@/components/PlanLimitsBanner'
+import { UpgradePrompt } from '@/components/UpgradePrompt'
 import { usePlanLimits } from '@/hooks/usePlanLimits'
 import { 
   Calendar, 
@@ -273,6 +274,13 @@ export function DashboardClient({ user }: { user: User }) {
               </CardContent>
             </Card>
           ))}
+        </div>
+      )}
+      
+      {/* Upgrade Prompt for Free Users */}
+      {limits && limits.currentPlan === 'FREE' && !limits.isAdmin && festivals.length > 0 && (
+        <div className="mt-8">
+          <UpgradePrompt dismissible storageKey="dashboard-upgrade-dismissed" />
         </div>
       )}
     </div>

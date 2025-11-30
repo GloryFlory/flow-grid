@@ -96,31 +96,49 @@ export function PlanLimitsBanner({
     )
   }
 
-  // Free plan with usage remaining
+  // Free plan with usage remaining - show upgrade prompt
   return (
-    <Card className="border-slate-200 bg-gradient-to-r from-slate-50 to-gray-50">
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center">
-              <span className="text-xs font-semibold text-slate-600">
-                {festivalsUsed}/{festivalsLimit}
-              </span>
+    <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 overflow-hidden">
+      <CardContent className="p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start sm:items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center flex-shrink-0">
+              <Zap className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="font-semibold text-slate-900">Free Plan</h3>
-              <p className="text-sm text-slate-600">
-                {festivalsLimit - festivalsUsed} festival{festivalsLimit - festivalsUsed !== 1 ? 's' : ''} remaining
+              <h3 className="font-bold text-slate-900 text-lg">You're on the Free Plan</h3>
+              <p className="text-sm text-slate-600 mt-0.5">
+                {festivalsUsed === 0 
+                  ? `Create your first festival for free!`
+                  : `${festivalsLimit - festivalsUsed} festival${festivalsLimit - festivalsUsed !== 1 ? 's' : ''} remaining`
+                }
               </p>
+              <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-slate-500">
+                <span className="flex items-center gap-1">
+                  <CheckCircle className="w-3 h-3 text-green-500" /> 1 festival
+                </span>
+                <span className="flex items-center gap-1">
+                  <CheckCircle className="w-3 h-3 text-green-500" /> Basic customization
+                </span>
+                <span className="flex items-center gap-1">
+                  <CheckCircle className="w-3 h-3 text-green-500" /> Shareable link
+                </span>
+              </div>
             </div>
           </div>
-          <Link 
-            href="/pricing" 
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors whitespace-nowrap"
-          >
-            <Zap className="w-4 h-4" />
-            Upgrade
-          </Link>
+          <div className="flex flex-col items-stretch sm:items-end gap-2">
+            <Link 
+              href="/pricing" 
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:from-blue-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
+            >
+              <Crown className="w-4 h-4" />
+              Upgrade to Pro
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <span className="text-xs text-slate-500 text-center sm:text-right">
+              5 festivals, custom branding & more
+            </span>
+          </div>
         </div>
       </CardContent>
     </Card>
