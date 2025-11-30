@@ -25,6 +25,7 @@ export default function Footer() {
             <h3 className="text-white font-semibold mb-4">Product</h3>
             <ul className="space-y-2">
               <li><Link href="/flow-grid-demo/schedule" className="hover:text-white transition-colors">View Demo</Link></li>
+              <li><Link href="/blog" className="hover:text-white transition-colors">Blog</Link></li>
               <li><Link href="/glossary" className="hover:text-white transition-colors">Glossary</Link></li>
             </ul>
           </div>

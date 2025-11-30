@@ -1,9 +1,10 @@
 'use client'
 import React, { useState, useMemo } from 'react'
-import { ChevronLeft, ChevronRight, LayoutGrid } from 'lucide-react'
+import { ChevronLeft, ChevronRight, LayoutGrid, Grid3x3, Star } from 'lucide-react'
 import Link from 'next/link'
 import { SessionModal } from './SessionModal'
 import { FilterBar } from './FilterBar'
+import { useFavourites } from '@/hooks/useFavourites'
 
 interface Session {
   id: string
@@ -122,6 +123,18 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
   const [searchFilter, setSearchFilter] = useState('')
   const [teacherFilter, setTeacherFilter] = useState('')
 
+  // Favourites hook for "My Schedule" feature
+  const { favourites, isFavourite, toggleFavourite } = useFavourites({ festivalId: festival.id })
+  
+  // Show favourites only filter
+  const [showFavouritesOnly, setShowFavouritesOnly] = useState(false)
+
+  // Handle favourite toggle
+  const handleFavouriteToggle = (sessionId: string, e: React.MouseEvent) => {
+    e.stopPropagation()  // Prevent session modal from opening
+    toggleFavourite(sessionId, festival.id)
+  }
+
   // Calculate available filter options from all sessions
   const { availableLevels, availableStyles, availableTeachers } = useMemo(() => {
     const levelsMap = new Map<string, string>() // lowercase -> original case
@@ -150,6 +163,9 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
   // Filter sessions based on current filter state
   const filteredSessions = useMemo(() => {
     return sessions.filter(session => {
+      // Apply favourites filter first
+      if (showFavouritesOnly && !favourites.has(session.id)) return false
+      
       if (levelFilter) {
         const sessionLevel = session.level?.toLowerCase() || ''
         const filterLevel = levelFilter.toLowerCase()
@@ -171,7 +187,7 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
       }
       return true
     })
-  }, [sessions, levelFilter, styleFilter, teacherFilter, searchFilter])
+  }, [sessions, levelFilter, styleFilter, teacherFilter, searchFilter, showFavouritesOnly, favourites])
 
   // Get current time in minutes for the time indicator
   const getCurrentTimeInMinutes = (): number => {
@@ -323,28 +339,49 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
       {/* Header */}
       <header className="header shadow-sm sticky top-0 z-50">
         <div className="header-content">
-          <div className="flex items-center gap-4">
+          <div className="logo-section">
             {festival.logo && (
               <img src={festival.logo} alt={festival.name} className="festival-logo" />
             )}
             <div className="title-section">
               <h1>{festival.name}</h1>
-              <p>
-                {new Date(festival.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
-                {' - '}
-                {new Date(festival.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
-              </p>
             </div>
           </div>
           <div className="header-info">
-            <Link
-              href={`/${festival.slug}/schedule`}
-              className="share-button text-sm"
-              aria-label="View card layout"
-            >
-              <LayoutGrid className="w-4 h-4" />
-              <span className="ml-2">Card View</span>
-            </Link>
+            {/* Row 1: Date */}
+            <p className="header-date">
+              {new Date(festival.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+              {' - '}
+              {new Date(festival.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+            </p>
+            
+            {/* Row 2: View toggles */}
+            <div className="header-view-row">
+              <Link
+                href={`/${festival.slug}/schedule`}
+                className="view-toggle-btn"
+                aria-label="Card view"
+              >
+                <LayoutGrid className="w-4 h-4" />
+                <span>Cards</span>
+              </Link>
+              <Link
+                href={`/${festival.slug}/schedule/grid`}
+                className="view-toggle-btn active"
+                aria-label="Grid view"
+              >
+                <Grid3x3 className="w-4 h-4" />
+                <span>Grid</span>
+              </Link>
+              <Link
+                href={`/${festival.slug}/my-schedule`}
+                className="view-toggle-btn"
+                aria-label="My schedule"
+              >
+                <Star className="w-4 h-4" />
+                <span>My Schedule</span>
+              </Link>
+            </div>
           </div>
         </div>
       </header>
@@ -515,6 +552,9 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
             availableLevels={availableLevels}
             availableStyles={availableStyles}
             availableTeachers={availableTeachers}
+            showFavouritesOnly={showFavouritesOnly}
+            setShowFavouritesOnly={setShowFavouritesOnly}
+            favouritesCount={favourites.size}
           />
         </div>
       </div>
@@ -755,9 +795,12 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
                               }
                               
                               return (
-                                <button
+                                <div
                                   key={session.id}
                                   onClick={() => setSelectedSession(session)}
+                                  role="button"
+                                  tabIndex={0}
+                                  onKeyDown={(e) => e.key === 'Enter' && setSelectedSession(session)}
                                   className="absolute text-left rounded-lg px-1.5 md:px-2 text-xs transition-all duration-200 hover:shadow-2xl hover:z-50 hover:scale-[1.03] cursor-pointer flex flex-col group"
                                   style={{
                                     backgroundColor: '#ffffff',
@@ -784,8 +827,20 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
                                 >
                                   {/* Always show: Title, Time, Location, Facilitator at top */}
                                   <div className="space-y-0.5 flex-shrink-0">
-                                    <div className="font-bold line-clamp-1 text-[11px] text-gray-900 group-hover:text-gray-950">
-                                      {session.title}
+                                    <div className="flex items-start justify-between gap-1">
+                                      <div className="font-bold line-clamp-1 text-[11px] text-gray-900 group-hover:text-gray-950 flex-1">
+                                        {session.title}
+                                      </div>
+                                      {/* Favourite star */}
+                                      <button
+                                        onClick={(e) => handleFavouriteToggle(session.id, e)}
+                                        className={`flex-shrink-0 w-4 h-4 flex items-center justify-center rounded-full hover:bg-amber-100 transition-colors ${isFavourite(session.id) ? 'text-amber-500' : 'text-gray-300 hover:text-amber-400'}`}
+                                        title={isFavourite(session.id) ? 'Remove from My Schedule' : 'Add to My Schedule'}
+                                      >
+                                        <svg width="10" height="10" viewBox="0 0 24 24" fill={isFavourite(session.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
+                                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                        </svg>
+                                      </button>
                                     </div>
                                     <div className="text-[9px] text-gray-500 font-semibold flex items-center gap-1">
                                       <span className="inline-block w-1 h-1 rounded-full bg-gray-400"></span>
@@ -803,7 +858,7 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
                                       </div>
                                     )}
                                   </div>
-                                </button>
+                                </div>
                               )
                             }).filter(Boolean)
                           })()}
@@ -911,6 +966,8 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
         session={selectedSession} 
         onClose={() => setSelectedSession(null)}
         festivalSlug={festival.slug}
+        isFavourite={selectedSession ? isFavourite(selectedSession.id) : false}
+        onFavouriteToggle={(sessionId) => toggleFavourite(sessionId, festival.id)}
       />
     </div>
   )

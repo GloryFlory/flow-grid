@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
 import AuthorBio from '@/components/blog/AuthorBio'
 import RelatedPosts from '@/components/blog/RelatedPosts'
+import Breadcrumbs, { getBreadcrumbSchema } from '@/components/blog/Breadcrumbs'
+import TableOfContents from '@/components/blog/TableOfContents'
 import type { Metadata } from 'next'
 import { ArrowLeft, Calendar, TrendingUp } from 'lucide-react'
 
@@ -160,12 +162,21 @@ export default function BlogPost() {
         </div>
       </nav>
 
+      {/* Breadcrumb Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(getBreadcrumbSchema([
+          { name: 'Blog', href: '/blog' },
+          { name: 'Multi-Day Festival Scheduling Tips' }
+        ])) }}
+      />
+
       {/* Article */}
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Link href="/blog" className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-8">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Blog
-        </Link>
+        <Breadcrumbs items={[
+          { name: 'Blog', href: '/blog' },
+          { name: 'Multi-Day Festival Scheduling Tips' }
+        ]} />
 
         <header className="mb-12">
           <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
@@ -188,6 +199,19 @@ export default function BlogPost() {
           </p>
         </header>
 
+        <TableOfContents items={[
+          { id: '1-design-your-festival-arc', title: '1. Design Your Festival Arc' },
+          { id: '2-master-the-art-of-parallel-programming', title: '2. Master Parallel Programming' },
+          { id: '3-build-in-strategic-breaks', title: '3. Build In Strategic Breaks' },
+          { id: '4-use-color-coding-and-visual-design', title: '4. Color Coding & Visual Design' },
+          { id: '5-plan-for-the-unexpected', title: '5. Plan for the Unexpected' },
+          { id: '6-manage-attendee-energy-cycles', title: '6. Manage Energy Cycles' },
+          { id: '7-make-updates-easy', title: '7. Make Updates Easy' },
+          { id: 'bonus-tips-from-pro-organizers', title: 'Bonus Tips' },
+          { id: 'frequently-asked-questions', title: 'FAQ' },
+          { id: 'final-thoughts', title: 'Final Thoughts' }
+        ]} />
+
   <div className="prose prose-lg max-w-none prose-headings:scroll-mt-24 prose-h2:mt-12 prose-h2:border-b prose-h2:pb-2 prose-h3:mt-8 prose-p:leading-relaxed prose-li:marker:text-blue-600">
           <p>
             Multi-day festivals are incredibly rewarding to organize, but they come with unique scheduling challenges. You're not just planning a few hours—you're orchestrating an experience that unfolds over days, managing attendee energy, creating narrative arc, and coordinating countless moving pieces across time and space. If you're just getting started, our <Link href="/blog/get-festival-live-10-minutes" className="text-blue-600 hover:underline">quick-start guide</Link> can help you launch fast.
@@ -197,7 +221,7 @@ export default function BlogPost() {
             After helping hundreds of festival organizers create multi-day schedules, we've identified seven essential strategies that separate great festivals from chaotic ones.
           </p>
 
-          <h2>1. Design Your Festival Arc</h2>
+          <h2 id="1-design-your-festival-arc">1. Design Your Festival Arc</h2>
           
           <p>
             Multi-day festivals need intentional pacing. Think of your entire event as a story with a beginning, middle, and end.
@@ -253,7 +277,7 @@ export default function BlogPost() {
             </p>
           </div>
 
-          <h2>2. Master the Art of Parallel Programming</h2>
+          <h2 id="2-master-the-art-of-parallel-programming">2. Master the Art of Parallel Programming</h2>
           
           <p>
             With multiple venues, you can't just schedule chronologically. You need strategic overlap management.
@@ -285,7 +309,7 @@ export default function BlogPost() {
             <li>Indicate which sessions require booking/registration</li>
           </ul>
 
-          <h2>3. Build In Strategic Breaks</h2>
+          <h2 id="3-build-in-strategic-breaks">3. Build In Strategic Breaks</h2>
           
           <p>
             This might be the most important tip: don't over-program. Even the most enthusiastic attendees need downtime.
@@ -330,7 +354,7 @@ export default function BlogPost() {
             </p>
           </div>
 
-          <h2>4. Use Color Coding and Visual Design</h2>
+          <h2 id="4-use-color-coding-and-visual-design">4. Use Color Coding and Visual Design</h2>
           
           <p>
             When you have 100+ time slots across multiple days and venues, visual clarity is essential.
@@ -349,7 +373,7 @@ export default function BlogPost() {
             Consistency is key—use the same color scheme throughout all materials (printed schedules, website, app, signage).
           </p>
 
-          <h2>5. Plan for the Unexpected</h2>
+          <h2 id="5-plan-for-the-unexpected">5. Plan for the Unexpected</h2>
           
           <p>
             The longer your festival, the more likely something will go wrong. Build resilience into your schedule.
@@ -384,7 +408,7 @@ export default function BlogPost() {
             <li>Schedule tech-intensive shows with buffer time before/after</li>
           </ul>
 
-          <h2>6. Manage Attendee Energy Cycles</h2>
+          <h2 id="6-manage-attendee-energy-cycles">6. Manage Attendee Energy Cycles</h2>
           
           <p>
             Understanding energy management across multiple days separates good from great festivals.
@@ -415,7 +439,7 @@ export default function BlogPost() {
             <li><strong>Throughout:</strong> Always provide low-key alternatives for burned-out attendees</li>
           </ul>
 
-          <h2>7. Make Updates Easy</h2>
+          <h2 id="7-make-updates-easy">7. Make Updates Easy</h2>
           
           <p>
             Over multiple days, changes are inevitable. Your scheduling system needs to handle this gracefully.
@@ -462,7 +486,7 @@ export default function BlogPost() {
             </Link>
           </div>
 
-          <h2>Bonus Tips from Pro Organizers</h2>
+          <h2 id="bonus-tips-from-pro-organizers">Bonus Tips from Pro Organizers</h2>
           
           <p>
             Looking for more detailed guidance? Check out our <Link href="/blog/volunteer-scheduling-best-practices" className="text-blue-600 hover:underline">volunteer scheduling guide</Link> and <Link href="/blog/event-planning-checklist" className="text-blue-600 hover:underline">complete event checklist</Link>.
@@ -477,7 +501,7 @@ export default function BlogPost() {
             <li><strong>Track what works:</strong> Take notes during the festival about which sessions were packed, which time slots worked best</li>
           </ul>
 
-          <h2>Frequently Asked Questions</h2>
+          <h2 id="frequently-asked-questions">Frequently Asked Questions</h2>
 
           <div className="space-y-4 mb-8">
             <details className="group bg-gray-50 rounded-lg">
@@ -531,7 +555,7 @@ export default function BlogPost() {
             </details>
           </div>
 
-          <h2>Final Thoughts</h2>
+          <h2 id="final-thoughts">Final Thoughts</h2>
           
           <p>
             Multi-day festival scheduling is complex, but these seven principles will help you create an experience that flows beautifully from start to finish. Remember that your schedule is a container for transformation, community, and joy—not just a timetable of events.

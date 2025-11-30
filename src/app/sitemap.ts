@@ -1,9 +1,26 @@
 import { MetadataRoute } from 'next'
 
+// Blog posts data - keep in sync with blog/page.tsx
+const blogPosts = [
+  { slug: 'event-app-community-building', date: '2025-11-29' },
+  { slug: 'hidden-costs-manual-event-scheduling', date: '2025-11-29' },
+  { slug: 'wellness-retreat-scheduling', date: '2025-11-29' },
+  { slug: 'get-festival-live-10-minutes', date: '2025-11-14' },
+  { slug: 'qr-code-event-schedules', date: '2025-11-12' },
+  { slug: 'volunteer-scheduling-best-practices', date: '2025-11-12' },
+  { slug: 'real-time-schedule-updates', date: '2025-11-12' },
+  { slug: 'how-to-create-yoga-retreat-schedule', date: '2025-11-08' },
+  { slug: 'festival-schedule-template-guide', date: '2025-11-07' },
+  { slug: 'spreadsheet-vs-scheduling-software', date: '2025-11-06' },
+  { slug: 'event-planning-checklist', date: '2025-11-05' },
+  { slug: 'multi-day-festival-scheduling-tips', date: '2025-11-04' },
+]
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://tryflowgrid.com'
   
-  return [
+  // Static pages
+  const staticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
       lastModified: new Date(),
@@ -53,36 +70,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/blog/how-to-create-yoga-retreat-schedule`,
-      lastModified: new Date('2025-11-08'),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/blog/festival-schedule-template-guide`,
-      lastModified: new Date('2025-11-07'),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/blog/spreadsheet-vs-scheduling-software`,
-      lastModified: new Date('2025-11-06'),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/blog/event-planning-checklist`,
-      lastModified: new Date('2025-11-05'),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/blog/multi-day-festival-scheduling-tips`,
-      lastModified: new Date('2025-11-04'),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
       url: `${baseUrl}/privacy`,
       lastModified: new Date(),
       changeFrequency: 'yearly',
@@ -95,4 +82,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.3,
     },
   ]
+
+  // Generate blog post URLs dynamically
+  const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
+    url: `${baseUrl}/blog/${post.slug}`,
+    lastModified: new Date(post.date),
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }))
+
+  return [...staticPages, ...blogPages]
 }

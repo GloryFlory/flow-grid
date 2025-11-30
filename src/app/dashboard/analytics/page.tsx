@@ -2,7 +2,8 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
-import { BarChart3, Calendar, Users, Eye, TrendingUp, Clock, AlertCircle } from 'lucide-react'
+import { BarChart3, Calendar, Users, Eye, TrendingUp, Clock, Heart, Download, MousePointerClick } from 'lucide-react'
+import Link from 'next/link'
 
 export default async function AnalyticsPage() {
   const session = await getServerSession(authOptions)
@@ -11,13 +12,31 @@ export default async function AnalyticsPage() {
     redirect('/auth/signin')
   }
 
+  // Date ranges for analytics
+  const last7Days = new Date()
+  last7Days.setDate(last7Days.getDate() - 7)
+  
+  const last30Days = new Date()
+  last30Days.setDate(last30Days.getDate() - 30)
+
   // Fetch analytics data
-  const [festivals, totalSessions, totalBookings, recentEvents] = await Promise.all([
+  const [
+    festivals, 
+    totalSessions, 
+    totalBookings, 
+    recentEvents,
+    totalFavourites,
+    totalPageViews,
+    last7DaysViews,
+    totalClicks,
+    calendarExports
+  ] = await Promise.all([
     prisma.festival.findMany({
       where: { userId: session.user.id },
       select: {
         id: true,
         name: true,
+        slug: true,
         isPublished: true,
         _count: {
           select: {
@@ -48,23 +67,56 @@ export default async function AnalyticsPage() {
         },
       },
       orderBy: { timestamp: 'desc' },
-      take: 10,
+      take: 20,
       include: {
         festival: {
           select: {
             name: true,
+            slug: true,
           },
         },
       },
     }),
+    prisma.sessionFavourite.count({
+      where: {
+        festival: {
+          userId: session.user.id,
+        },
+      },
+    }),
+    prisma.analytics.count({
+      where: {
+        festival: { userId: session.user.id },
+        event: 'schedule_viewed',
+      },
+    }),
+    prisma.analytics.count({
+      where: {
+        festival: { userId: session.user.id },
+        event: 'schedule_viewed',
+        timestamp: { gte: last7Days },
+      },
+    }),
+    prisma.analytics.count({
+      where: {
+        festival: { userId: session.user.id },
+        event: 'session_clicked',
+      },
+    }),
+    prisma.analytics.count({
+      where: {
+        festival: { userId: session.user.id },
+        event: 'calendar_exported',
+      },
+    }),
   ])
 
-  const publishedCount = festivals.filter(f => f.isPublished).length
+  const publishedCount = festivals.filter((f: { isPublished: boolean }) => f.isPublished).length
   const draftCount = festivals.length - publishedCount
 
   // Calculate some basic stats
   const totalEvents = recentEvents.length
-  const eventTypes = [...new Set(recentEvents.map(e => e.event))]
+  const eventTypes = [...new Set(recentEvents.map((e: { event: string }) => e.event))]
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -75,7 +127,68 @@ export default async function AnalyticsPage() {
           <p className="text-gray-600 mt-2">Track your festivals' performance and engagement</p>
         </div>
 
-        {/* Key Metrics Grid */}
+        {/* Key Metrics Grid - Row 1 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          {/* Total Page Views */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Page Views</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">{totalPageViews.toLocaleString()}</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {last7DaysViews.toLocaleString()} in last 7 days
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Eye className="w-6 h-6 text-blue-600" />
+              </div>
+            </div>
+          </div>
+
+          {/* Session Clicks */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Session Clicks</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">{totalClicks.toLocaleString()}</p>
+                <p className="text-xs text-gray-500 mt-1">Total interactions</p>
+              </div>
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <MousePointerClick className="w-6 h-6 text-purple-600" />
+              </div>
+            </div>
+          </div>
+
+          {/* Total Favourites */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Favourites</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">{totalFavourites.toLocaleString()}</p>
+                <p className="text-xs text-gray-500 mt-1">Sessions saved by visitors</p>
+              </div>
+              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                <Heart className="w-6 h-6 text-red-600" />
+              </div>
+            </div>
+          </div>
+
+          {/* Calendar Exports */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Calendar Exports</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">{calendarExports.toLocaleString()}</p>
+                <p className="text-xs text-gray-500 mt-1">ICS & Google Calendar</p>
+              </div>
+              <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                <Download className="w-6 h-6 text-indigo-600" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Key Metrics Grid - Row 2 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Total Festivals */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -87,8 +200,8 @@ export default async function AnalyticsPage() {
                   {publishedCount} published, {draftCount} draft
                 </p>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center">
+                <Calendar className="w-6 h-6 text-cyan-600" />
               </div>
             </div>
           </div>
@@ -101,8 +214,8 @@ export default async function AnalyticsPage() {
                 <p className="text-3xl font-bold text-gray-900 mt-2">{totalSessions}</p>
                 <p className="text-xs text-gray-500 mt-1">Across all festivals</p>
               </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Clock className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                <Clock className="w-6 h-6 text-amber-600" />
               </div>
             </div>
           </div>
@@ -121,13 +234,15 @@ export default async function AnalyticsPage() {
             </div>
           </div>
 
-          {/* Activity Events */}
+          {/* Conversion Rate */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Activity Events</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{totalEvents}</p>
-                <p className="text-xs text-gray-500 mt-1">Recent 10 events tracked</p>
+                <p className="text-sm font-medium text-gray-600">Engagement Rate</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">
+                  {totalPageViews > 0 ? ((totalFavourites / totalPageViews) * 100).toFixed(1) : 0}%
+                </p>
+                <p className="text-xs text-gray-500 mt-1">Favourites / Views</p>
               </div>
               <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
                 <TrendingUp className="w-6 h-6 text-orange-600" />
@@ -164,10 +279,13 @@ export default async function AnalyticsPage() {
                     <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Bookings
                     </th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {festivals.map((festival) => (
+                  {festivals.map((festival: { id: string; name: string; slug: string; isPublished: boolean; _count: { sessions: number; bookings: number } }) => (
                     <tr key={festival.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">{festival.name}</div>
@@ -186,6 +304,14 @@ export default async function AnalyticsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
                         <div className="text-sm text-gray-900">{festival._count.bookings}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                        <Link 
+                          href={`/dashboard/festivals/${festival.id}/analytics`}
+                          className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                        >
+                          View Details →
+                        </Link>
                       </td>
                     </tr>
                   ))}
@@ -210,12 +336,12 @@ export default async function AnalyticsPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {recentEvents.map((event) => (
+                {recentEvents.map((event: { id: string; event: string; timestamp: Date; festival: { name: string; slug: string } | null }) => (
                   <div key={event.id} className="flex items-start gap-4 p-3 rounded-lg hover:bg-gray-50">
                     <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-900">{event.event}</span>
+                        <span className="font-medium text-gray-900">{event.event.replace(/_/g, ' ')}</span>
                         {event.festival && (
                           <span className="text-sm text-gray-500">
                             • {event.festival.name}
@@ -233,43 +359,79 @@ export default async function AnalyticsPage() {
           </div>
         </div>
 
-        {/* Coming Soon Features */}
-        <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg border-2 border-dashed border-blue-300 p-8">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <BarChart3 className="w-6 h-6 text-blue-600" />
+        {/* Analytics Features */}
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Implemented Features */}
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border border-green-200 p-6">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <BarChart3 className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Available Analytics</h3>
+                <p className="text-gray-600 text-sm mb-3">
+                  Click "View Details" on any festival for in-depth analytics:
+                </p>
+                <ul className="space-y-1.5 text-sm text-gray-700">
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                    <span>Session popularity & clicks</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                    <span>Hourly activity & peak times</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                    <span>View mode usage (Cards/Grid/Schedule)</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                    <span>Calendar export tracking</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                    <span>Teacher profile clicks</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                    <span>Filter usage patterns</span>
+                  </li>
+                </ul>
+              </div>
             </div>
-            <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Advanced Analytics Coming Soon</h3>
-              <p className="text-gray-700 mb-4">
-                We're working on powerful new analytics features to help you understand your audience better:
-              </p>
-              <ul className="space-y-2 text-gray-700">
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
-                  <span>Session popularity and attendance trends</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
-                  <span>Booking patterns and peak times</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
-                  <span>Teacher performance metrics</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
-                  <span>Revenue tracking and financial reports</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
-                  <span>Attendee demographics and engagement</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
-                  <span>Custom reports and data exports</span>
-                </li>
-              </ul>
+          </div>
+
+          {/* Coming Soon Features */}
+          <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg border-2 border-dashed border-blue-300 p-6">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <TrendingUp className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Coming Soon</h3>
+                <p className="text-gray-600 text-sm mb-3">
+                  More powerful features in development:
+                </p>
+                <ul className="space-y-1.5 text-sm text-gray-700">
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                    <span>Revenue tracking & reports</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                    <span>Attendee demographics</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                    <span>Custom date range reports</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                    <span>Data exports (CSV/Excel)</span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>

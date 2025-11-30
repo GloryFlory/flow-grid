@@ -17,8 +17,11 @@ import {
   ExternalLink,
   FileText,
   Image,
-  Users
+  Users,
+  Globe
 } from 'lucide-react'
+import { TIMEZONE_GROUPS, COMMON_TIMEZONES } from '@/lib/timezones'
+import TimezoneSelect from '@/components/ui/TimezoneSelect'
 
 type Step = 'basic' | 'schedule' | 'preview'
 
@@ -50,8 +53,14 @@ export default function CreateFestivalPage() {
     slug: '',
     startDate: '',
     endDate: '',
-    timezone: 'America/Montreal'
+    timezone: ''  // Will be set from user's browser timezone
   })
+  
+  // Set timezone from browser on mount
+  useEffect(() => {
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    setFestivalData(prev => ({ ...prev, timezone: userTimezone || 'America/New_York' }))
+  }, [])
 
   const [csvFile, setCsvFile] = useState<File | null>(null)
   const [sessions, setSessions] = useState<ParsedSession[]>([])
@@ -835,6 +844,21 @@ export default function CreateFestivalPage() {
                     required
                   />
                 </div>
+              </div>
+
+              <div>
+                <label htmlFor="timezone" className="block text-sm font-medium text-gray-700 mb-2">
+                  <Globe className="inline-block w-4 h-4 mr-1" />
+                  Timezone *
+                </label>
+                <TimezoneSelect
+                  value={festivalData.timezone}
+                  onChange={(value) => setFestivalData(prev => ({ ...prev, timezone: value }))}
+                  placeholder="Select timezone"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  Session times will be displayed in this timezone. Attendees can add events to their calendar in their local time.
+                </p>
               </div>
 
               <div>

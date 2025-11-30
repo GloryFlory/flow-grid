@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
 import AuthorBio from '@/components/blog/AuthorBio'
 import RelatedPosts from '@/components/blog/RelatedPosts'
+import Breadcrumbs, { getBreadcrumbSchema } from '@/components/blog/Breadcrumbs'
+import TableOfContents from '@/components/blog/TableOfContents'
 import type { Metadata } from 'next'
 import { ArrowLeft, Calendar, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
 
@@ -160,12 +162,21 @@ export default function BlogPost() {
         </div>
       </nav>
 
+      {/* Breadcrumb Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(getBreadcrumbSchema([
+          { name: 'Blog', href: '/blog' },
+          { name: 'Spreadsheets vs Scheduling Software' }
+        ])) }}
+      />
+
       {/* Article */}
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Link href="/blog" className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-8">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Blog
-        </Link>
+        <Breadcrumbs items={[
+          { name: 'Blog', href: '/blog' },
+          { name: 'Spreadsheets vs Scheduling Software' }
+        ]} />
 
         <header className="mb-12">
           <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
@@ -188,6 +199,18 @@ export default function BlogPost() {
           </p>
         </header>
 
+        <TableOfContents items={[
+          { id: 'the-spreadsheet-reality-check', title: 'The Spreadsheet Reality Check' },
+          { id: 'real-world-scenario-festival-organizers-journey', title: 'Real-World Scenario' },
+          { id: 'the-breaking-points-when-to-switch', title: 'When to Switch' },
+          { id: 'what-scheduling-software-actually-costs', title: 'What Software Costs' },
+          { id: 'feature-by-feature-comparison', title: 'Feature Comparison' },
+          { id: 'the-hybrid-approach-best-of-both-worlds', title: 'The Hybrid Approach' },
+          { id: 'making-the-switch-migration-tips', title: 'Migration Tips' },
+          { id: 'the-bottom-line', title: 'The Bottom Line' },
+          { id: 'frequently-asked-questions', title: 'FAQ' }
+        ]} />
+
   <div className="prose prose-lg max-w-none prose-headings:scroll-mt-24 prose-h2:mt-12 prose-h2:border-b prose-h2:pb-2 prose-h3:mt-8 prose-p:leading-relaxed prose-li:marker:text-blue-600">
           <p>
             If you're reading this, chances are you've been managing your event schedule in Excel or Google Sheets. You're not alone—it's where most event organizers start. But at some point, you've probably hit friction: sharing updates is painful, the schedule looks unprofessional, or you've accidentally broken a formula at 11 PM the night before your event. Check our <Link href="/blog/event-planning-checklist" className="text-blue-600 hover:underline">complete event planning checklist</Link> for more guidance.
@@ -197,7 +220,7 @@ export default function BlogPost() {
             This article will help you decide whether to stick with spreadsheets or make the switch to dedicated scheduling software. We'll look at real scenarios, costs, and the exact breaking points where most organizers make the change.
           </p>
 
-          <h2>The Spreadsheet Reality Check</h2>
+          <h2 id="the-spreadsheet-reality-check">The Spreadsheet Reality Check</h2>
           
           <p>
             Let's be honest about what it's actually like to manage an event schedule in a spreadsheet.
@@ -291,7 +314,7 @@ export default function BlogPost() {
             </div>
           </div>
 
-          <h2>Real-World Scenario: Festival Organizer's Journey</h2>
+          <h2 id="real-world-scenario-festival-organizers-journey">Real-World Scenario: Festival Organizer's Journey</h2>
           
           <div className="bg-gray-50 p-6 rounded-lg my-8">
             <p className="font-semibold mb-4">Sarah's Story: From Spreadsheet to Software</p>
@@ -313,7 +336,7 @@ export default function BlogPost() {
             </p>
           </div>
 
-          <h2>The Breaking Points: When to Switch</h2>
+          <h2 id="the-breaking-points-when-to-switch">The Breaking Points: When to Switch</h2>
           
           <p>
             You should consider dedicated scheduling software when you hit any of these thresholds:
@@ -361,7 +384,7 @@ export default function BlogPost() {
             </div>
           </div>
 
-          <h2>What Scheduling Software Actually Costs</h2>
+          <h2 id="what-scheduling-software-actually-costs">What Scheduling Software Actually Costs</h2>
           
           <p>
             This is usually the first question. According to <a href="https://www.capterra.com/event-management-software/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Capterra's event management software research</a>, the range is huge depending on features:
@@ -381,7 +404,7 @@ export default function BlogPost() {
             </p>
           </div>
 
-          <h2>Feature-by-Feature Comparison</h2>
+          <h2 id="feature-by-feature-comparison">Feature-by-Feature Comparison</h2>
           
           <div className="overflow-x-auto my-8">
             <table className="min-w-full border-collapse border border-gray-300">
@@ -452,7 +475,7 @@ export default function BlogPost() {
             </table>
           </div>
 
-          <h2>The Hybrid Approach (Best of Both Worlds)</h2>
+          <h2 id="the-hybrid-approach-best-of-both-worlds">The Hybrid Approach (Best of Both Worlds)</h2>
           
           <p>
             You don't have to choose between one or the other. Many successful organizers use both:
@@ -467,7 +490,7 @@ export default function BlogPost() {
             This gives you the flexibility of spreadsheets for internal work plus the professional presentation and features of dedicated software for attendees.
           </p>
 
-          <h2>Making the Switch: Migration Tips</h2>
+          <h2 id="making-the-switch-migration-tips">Making the Switch: Migration Tips</h2>
           
           <p>
             If you decide to try scheduling software, here's how to do it smoothly:
@@ -481,7 +504,7 @@ export default function BlogPost() {
             <li><strong>Communicate the change:</strong> Let attendees know where to find the new schedule.</li>
           </ol>
 
-          <h2>The Bottom Line</h2>
+          <h2 id="the-bottom-line">The Bottom Line</h2>
           
           <p>
             <strong>Stick with spreadsheets if:</strong>
@@ -505,7 +528,7 @@ export default function BlogPost() {
             <li>You want to save time and reduce stress</li>
           </ul>
 
-          <h2>Frequently Asked Questions</h2>
+          <h2 id="frequently-asked-questions">Frequently Asked Questions</h2>
 
           <div className="space-y-4 mb-8">
             <details className="group bg-gray-50 rounded-lg">

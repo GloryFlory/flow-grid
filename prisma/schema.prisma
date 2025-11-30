@@ -85,6 +85,7 @@ model Festival {
   whatsappLink   String?
   analytics      Analytics[]
   bookings       Booking[]
+  favourites     SessionFavourite[]
   sessions       FestivalSession[]
   user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   teachers       Teacher[]
@@ -116,6 +117,7 @@ model FestivalSession {
   price           Decimal?
   requirePayment  Boolean   @default(false)
   bookings        Booking[]
+  favourites      SessionFavourite[]
   festival        Festival  @relation(fields: [festivalId], references: [id], onDelete: Cascade)
 
   @@map("festival_sessions")
@@ -197,6 +199,23 @@ model Analytics {
   user       User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("analytics")
+}
+
+model SessionFavourite {
+  id         String          @id @default(cuid())
+  anonUserId String
+  sessionId  String
+  festivalId String
+  createdAt  DateTime        @default(now())
+
+  session    FestivalSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  festival   Festival        @relation(fields: [festivalId], references: [id], onDelete: Cascade)
+
+  @@unique([anonUserId, sessionId])
+  @@index([anonUserId])
+  @@index([sessionId])
+  @@index([festivalId])
+  @@map("session_favourites")
 }
 
 model VerificationToken {

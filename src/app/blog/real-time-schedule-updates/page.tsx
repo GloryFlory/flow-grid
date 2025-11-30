@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
 import AuthorBio from '@/components/blog/AuthorBio'
 import RelatedPosts from '@/components/blog/RelatedPosts'
+import Breadcrumbs, { getBreadcrumbSchema } from '@/components/blog/Breadcrumbs'
+import TableOfContents from '@/components/blog/TableOfContents'
 import type { Metadata } from 'next'
 import { ArrowLeft, Calendar, Bell, AlertTriangle, RefreshCcw, Send } from 'lucide-react'
 
@@ -144,12 +146,21 @@ export default function BlogPost() {
         </div>
       </nav>
 
+      {/* Breadcrumb Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(getBreadcrumbSchema([
+          { name: 'Blog', href: '/blog' },
+          { name: 'Real-Time Schedule Updates' }
+        ])) }}
+      />
+
       {/* Article */}
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Link href="/blog" className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-8">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Blog
-        </Link>
+        <Breadcrumbs items={[
+          { name: 'Blog', href: '/blog' },
+          { name: 'Real-Time Schedule Updates' }
+        ]} />
 
         <header className="mb-12">
           <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
@@ -163,6 +174,16 @@ export default function BlogPost() {
           </p>
         </header>
 
+        <TableOfContents items={[
+          { id: 'why-real-time-updates-matter', title: 'Why Real-Time Updates Matter' },
+          { id: 'the-4-channel-update-framework', title: 'The 4-Channel Framework' },
+          { id: 'what-to-say-message-templates', title: 'Message Templates' },
+          { id: 'operational-playbook-from-change--notification-in-3-minutes', title: 'Operational Playbook' },
+          { id: 'set-up-your-real-time-update-system', title: 'Set Up Your System' },
+          { id: 'reducing-update-volume-so-you-need-fewer-alerts', title: 'Reducing Update Volume' },
+          { id: 'frequently-asked-questions', title: 'FAQ' }
+        ]} />
+
   <div className="prose prose-lg max-w-none prose-headings:scroll-mt-24 prose-h2:mt-12 prose-h2:border-b prose-h2:pb-2 prose-h3:mt-8 prose-p:leading-relaxed prose-li:marker:text-blue-600">
           <p>
             If you've run events long enough, you've lived this moment: a sudden storm rolls in, your outdoor stage needs to move, and the next session starts in 20 minutes. Or a keynote is stuck in traffic. Or the projector in Room B dies.
@@ -171,7 +192,7 @@ export default function BlogPost() {
             At Mediterranean Acro Convention we faced all of the above in a single year. What saved attendee experience wasn't perfection—it was <strong>real-time communication</strong>. When people know what's happening and what to do, frustration turns into flexibility.
           </p>
 
-          <h2 className="flex items-center gap-2"><Bell className="h-5 w-5 text-blue-600" /> Why Real-Time Updates Matter</h2>
+          <h2 id="why-real-time-updates-matter" className="flex items-center gap-2"><Bell className="h-5 w-5 text-blue-600" /> Why Real-Time Updates Matter</h2>
           <ul>
             <li><strong>Reduce confusion:</strong> Clear, timely updates prevent crowds gathering in the wrong place.</li>
             <li><strong>Protect experience:</strong> Attendees forgive change; they don't forgive silence.</li>
@@ -179,7 +200,7 @@ export default function BlogPost() {
             <li><strong>Operational agility:</strong> You can make better decisions knowing attendees will receive them.</li>
           </ul>
 
-          <h2 className="flex items-center gap-2"><RefreshCcw className="h-5 w-5 text-blue-600" /> The 4-Channel Update Framework</h2>
+          <h2 id="the-4-channel-update-framework" className="flex items-center gap-2"><RefreshCcw className="h-5 w-5 text-blue-600" /> The 4-Channel Update Framework</h2>
           <p>Use multiple channels. People miss emails. Phones are on silent. Posters get ignored. We use a four-channel stack that covers 95% of attendees:</p>
           <ol>
             <li><strong>In-app / Web push alerts:</strong> Fastest for people already on your schedule. FlowGrid triggers a banner + push when sessions move.</li>
@@ -192,7 +213,7 @@ export default function BlogPost() {
             Pair this with an <Link href="/blog/qr-code-event-schedules" className="text-blue-600 hover:text-blue-700">interactive QR code schedule</Link>, so the live source of truth is always one scan away.
           </p>
 
-          <h2 className="flex items-center gap-2"><AlertTriangle className="h-5 w-5 text-blue-600" /> What to Say: Message Templates</h2>
+          <h2 id="what-to-say-message-templates" className="flex items-center gap-2"><AlertTriangle className="h-5 w-5 text-blue-600" /> What to Say: Message Templates</h2>
           <p>Save these and adapt on-site:</p>
           <ul>
             <li><strong>Room change:</strong> Room change: Beginner Flow moved from Room B → Room D. Starts 5 min later at 14:35. See live map: YOUR_SHORT_LINK</li>
@@ -201,7 +222,7 @@ export default function BlogPost() {
             <li><strong>Safety notice:</strong> "Safety: Please avoid East Lawn due to lightning. Indoor sessions unaffected. Next update 15:10."</li>
           </ul>
 
-          <h2>Operational Playbook: From Change → Notification in 3 Minutes</h2>
+          <h2 id="operational-playbook-from-change--notification-in-3-minutes">Operational Playbook: From Change → Notification in 3 Minutes</h2>
           <ol>
             <li><strong>Decide:</strong> Lead + ops confirm the change (who, what, where, when).</li>
             <li><strong>Update source of truth:</strong> Edit the session in FlowGrid (time/location) so the page reflects reality.</li>
@@ -210,7 +231,7 @@ export default function BlogPost() {
             <li><strong>Confirm:</strong> Coordinator verifies the new room is staffed, signage posted, first attendees redirected.</li>
           </ol>
 
-          <h2>Set Up Your Real-Time Update System</h2>
+          <h2 id="set-up-your-real-time-update-system">Set Up Your Real-Time Update System</h2>
           <h3>1) Make the Schedule the Source of Truth</h3>
           <p>
             Whatever you announce must match what people see. Centralize updates in one live schedule. With FlowGrid, changes publish instantly to the web view and push alerts.
@@ -229,7 +250,7 @@ export default function BlogPost() {
           <h3>4) Assign Roles</h3>
           <p>At MAC, one coordinator has the authority to publish updates; a second owns signage; volunteers handle wayfinding. Clear ownership prevents bottlenecks.</p>
 
-          <h2>Reducing Update Volume (So You Need Fewer Alerts)</h2>
+          <h2 id="reducing-update-volume-so-you-need-fewer-alerts">Reducing Update Volume (So You Need Fewer Alerts)</h2>
           <ul>
             <li><strong>Smart buffers:</strong> Add 10–15 min between sessions to absorb delays without cascading changes.</li>
             <li><strong>Conflict prevention:</strong> Use a tool that flags speaker/room clashes early. See our guide on <Link href="/blog/multi-day-festival-scheduling-tips" className="text-blue-600 hover:text-blue-700">multi-day scheduling</Link>.</li>
@@ -250,7 +271,7 @@ export default function BlogPost() {
             </Link>
           </div>
 
-          <h2>Frequently Asked Questions</h2>
+          <h2 id="frequently-asked-questions">Frequently Asked Questions</h2>
 
           <div className="space-y-4 mb-8">
             <details className="group bg-gray-50 rounded-lg">

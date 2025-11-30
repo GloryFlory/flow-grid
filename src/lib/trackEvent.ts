@@ -163,3 +163,129 @@ export async function trackFilterUsed(
     properties: { filterType, filterValue }
   })
 }
+
+/**
+ * Helper to track favourite added events
+ */
+export async function trackFavouriteAdded(
+  festivalId: string,
+  sessionId: string,
+  sessionTitle: string,
+  deviceId?: string,
+  anonUserId?: string
+) {
+  return trackEvent({
+    festivalId,
+    deviceId,
+    event: 'favourite_added',
+    properties: { sessionId, sessionTitle, anonUserId }
+  })
+}
+
+/**
+ * Helper to track favourite removed events
+ */
+export async function trackFavouriteRemoved(
+  festivalId: string,
+  sessionId: string,
+  deviceId?: string,
+  anonUserId?: string
+) {
+  return trackEvent({
+    festivalId,
+    deviceId,
+    event: 'favourite_removed',
+    properties: { sessionId, anonUserId }
+  })
+}
+
+/**
+ * Helper to track view mode change events (cards, grid, my-schedule)
+ */
+export async function trackViewModeChanged(
+  festivalId: string,
+  viewMode: 'cards' | 'grid' | 'my-schedule',
+  deviceId?: string
+) {
+  return trackEvent({
+    festivalId,
+    deviceId,
+    event: 'view_mode_changed',
+    properties: { viewMode }
+  })
+}
+
+/**
+ * Helper to track calendar export events
+ */
+export async function trackCalendarExport(
+  festivalId: string,
+  exportType: 'single_session' | 'single_day' | 'full_schedule',
+  method: 'ics_download' | 'google_calendar',
+  sessionCount: number,
+  deviceId?: string,
+  anonUserId?: string
+) {
+  return trackEvent({
+    festivalId,
+    deviceId,
+    event: 'calendar_exported',
+    properties: { exportType, method, sessionCount, anonUserId }
+  })
+}
+
+/**
+ * Helper to track teacher profile clicks
+ */
+export async function trackTeacherClick(
+  festivalId: string,
+  teacherName: string,
+  teacherId?: string,
+  deviceId?: string
+) {
+  return trackEvent({
+    festivalId,
+    deviceId,
+    event: 'teacher_clicked',
+    properties: { teacherName, teacherId }
+  })
+}
+
+/**
+ * Helper to track booking events
+ */
+export async function trackBookingCreated(
+  festivalId: string,
+  sessionId: string,
+  sessionTitle: string,
+  bookingId: string,
+  deviceId?: string,
+  userId?: string
+) {
+  return trackEvent({
+    festivalId,
+    deviceId,
+    userId,
+    event: 'booking_created',
+    properties: { sessionId, sessionTitle, bookingId }
+  })
+}
+
+/**
+ * Helper to track booking cancellation events
+ */
+export async function trackBookingCancelled(
+  festivalId: string,
+  sessionId: string,
+  bookingId: string,
+  deviceId?: string,
+  userId?: string
+) {
+  return trackEvent({
+    festivalId,
+    deviceId,
+    userId,
+    event: 'booking_cancelled',
+    properties: { sessionId, bookingId }
+  })
+}

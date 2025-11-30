@@ -1,11 +1,12 @@
 'use client'
 import React, { useState, useMemo, useEffect } from 'react'
-import { Share2, Link as LinkIcon, Facebook, Twitter, Check, Grid3x3 } from 'lucide-react'
+import { Share2, Link as LinkIcon, Facebook, Twitter, Check, Grid3x3, LayoutGrid, Star } from 'lucide-react'
 import Link from 'next/link'
 import { SessionCard } from './SessionCard'
 import { FilterBar } from './FilterBar'
 import { ScheduleTabs } from './ScheduleTabs'
 import { SessionModal } from './SessionModal'
+import { useFavourites } from '@/hooks/useFavourites'
 
 interface Session {
   id: string
@@ -112,6 +113,17 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
   const [activeDay, setActiveDay] = useState('All Days')
   const [showShareMenu, setShowShareMenu] = useState(false)
   const [copiedLink, setCopiedLink] = useState(false)
+
+  // Favourites hook for "My Schedule" feature
+  const { favourites, isFavourite, toggleFavourite } = useFavourites({ festivalId: festival.id })
+  
+  // Show favourites only filter
+  const [showFavouritesOnly, setShowFavouritesOnly] = useState(false)
+
+  // Handle favourite toggle
+  const handleFavouriteToggle = (sessionId: string) => {
+    toggleFavourite(sessionId, festival.id)
+  }
 
   // Smart day detection: Set active day to today if festival is currently running
   useEffect(() => {
@@ -319,6 +331,11 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
   const filteredSessions = useMemo(() => {
     let sessionsToFilter = activeDay === 'All Days' ? sessions : (sessionsByDay[activeDay] || [])
     
+    // Apply favourites filter
+    if (showFavouritesOnly) {
+      sessionsToFilter = sessionsToFilter.filter(session => favourites.has(session.id))
+    }
+    
     if (levelFilter) {
       sessionsToFilter = sessionsToFilter.filter(session => session.level === levelFilter)
     }
@@ -371,7 +388,7 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
       // Final tie-breaker: title
       return a.title.localeCompare(b.title)
     })
-  }, [sessions, sessionsByDay, activeDay, levelFilter, styleFilter, teacherFilter, searchFilter, festivalDayOrder])
+  }, [sessions, sessionsByDay, activeDay, levelFilter, styleFilter, teacherFilter, searchFilter, festivalDayOrder, showFavouritesOnly, favourites])
 
   // Apply custom branding colors via CSS variables
   const brandingStyles = {
@@ -393,15 +410,25 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
             )}
             <div className="title-section">
               <h1>{festival.name}</h1>
-              {festival.location && <p className="location-subtitle">{festival.location}</p>}
-              {festival.description && !festival.location && <p>{festival.description}</p>}
+              {festival.description && <p className="description-text">{festival.description}</p>}
             </div>
           </div>
           <div className="header-info">
-            <p>{formatDateRange(festival.startDate, festival.endDate)}</p>
+            {/* Row 1: Date */}
+            <p className="header-date">{formatDateRange(festival.startDate, festival.endDate)}</p>
             
-            <div className="flex items-center gap-3">
-              {/* Social Media Icons */}
+            {/* Row 2: Location */}
+            {festival.location && (
+              <p className="header-location">
+                <svg className="location-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+                {festival.location}
+              </p>
+            )}
+            
+            {/* Row 3: Social links + Share */}
+            <div className="header-social-row">
               {festival.whatsappLink && (
                 <a
                   href={festival.whatsappLink}
@@ -462,11 +489,10 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
               <div className="relative">
                 <button
                   onClick={() => setShowShareMenu(!showShareMenu)}
-                  className="share-button"
+                  className="social-icon-button"
                   aria-label="Share schedule"
                 >
                   <Share2 className="w-5 h-5" />
-                  <span className="ml-2 hidden sm:inline">Share</span>
                 </button>
 
                 {/* Share Menu Dropdown */}
@@ -524,16 +550,32 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
               )}
               </div>
             </div>
-            
-            {/* Full View Button - Separate Row */}
-            <div className="flex justify-end mt-2">
+
+            {/* Row 3: View toggles */}
+            <div className="header-view-row">
+              <Link
+                href={`/${festival.slug}/schedule`}
+                className="view-toggle-btn active"
+                aria-label="Card view"
+              >
+                <LayoutGrid className="w-4 h-4" />
+                <span>Cards</span>
+              </Link>
               <Link
                 href={`/${festival.slug}/schedule/grid`}
-                className="share-button text-sm"
-                aria-label="View full timetable"
+                className="view-toggle-btn"
+                aria-label="Grid view"
               >
                 <Grid3x3 className="w-4 h-4" />
-                <span className="ml-2">Full View</span>
+                <span>Grid</span>
+              </Link>
+              <Link
+                href={`/${festival.slug}/my-schedule`}
+                className="view-toggle-btn"
+                aria-label="My schedule"
+              >
+                <Star className="w-4 h-4" />
+                <span>My Schedule</span>
               </Link>
             </div>
           </div>
@@ -563,6 +605,9 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
           availableLevels={availableLevels}
           availableStyles={availableStyles}
           availableTeachers={availableTeachers}
+          showFavouritesOnly={showFavouritesOnly}
+          setShowFavouritesOnly={setShowFavouritesOnly}
+          favouritesCount={favourites.size}
         />
 
         {/* Session Grid */}
@@ -573,6 +618,8 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
             return festivalDayOrder.filter(day => sessionsByDay[day] && sessionsByDay[day].length > 0).map((day, dayIndex) => {
               const daySessions = sessionsByDay[day]
               const filteredDaySessions = daySessions.filter(session => {
+                // Apply favourites filter first
+                if (showFavouritesOnly && !favourites.has(session.id)) return false
                 if (levelFilter && session.level !== levelFilter) return false
                 if (styleFilter && !session.styles.includes(styleFilter)) return false
                 if (teacherFilter && !session.teachers.includes(teacherFilter)) return false
@@ -605,11 +652,13 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
                     {filteredDaySessions.map(session => (
                       <SessionCard
                         key={session.id}
-                        session={session}
+                        session={{ ...session, festivalId: festival.id }}
                         onClick={handleSessionClick}
                         onStyleClick={setStyleFilter}
                         onLevelClick={setLevelFilter}
                         onTeacherClick={setTeacherFilter}
+                        isFavourite={isFavourite(session.id)}
+                        onFavouriteToggle={handleFavouriteToggle}
                       />
                     ))}
                   </div>
@@ -636,11 +685,13 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
                 .map(session => (
                   <SessionCard
                     key={session.id}
-                    session={session}
+                    session={{ ...session, festivalId: festival.id }}
                     onClick={handleSessionClick}
                     onStyleClick={setStyleFilter}
                     onLevelClick={setLevelFilter}
                     onTeacherClick={setTeacherFilter}
+                    isFavourite={isFavourite(session.id)}
+                    onFavouriteToggle={handleFavouriteToggle}
                   />
                 ))}
             </div>
@@ -659,6 +710,8 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
         session={selectedSession} 
         onClose={() => setSelectedSession(null)}
         festivalSlug={festival.slug}
+        isFavourite={selectedSession ? isFavourite(selectedSession.id) : false}
+        onFavouriteToggle={handleFavouriteToggle}
       />
     </div>
   )

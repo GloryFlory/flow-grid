@@ -326,7 +326,98 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Featured Articles Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Learn from Event Experts
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Practical guides and tips from organizers who've been there.
+            </p>
+          </div>
 
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Article 1 */}
+            <Link href="/blog/get-festival-live-10-minutes" className="group">
+              <Card className="h-full hover:shadow-lg transition-all duration-300 group-hover:-translate-y-1">
+                <CardHeader>
+                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                    <Zap className="w-4 h-4 text-blue-600" />
+                    <span>Quick Start</span>
+                  </div>
+                  <CardTitle className="group-hover:text-blue-600 transition-colors">
+                    Get Your First Festival Live in 10 Minutes
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600">
+                    Skip the complexity. Create your festival schedule in minutes, not days.
+                  </p>
+                  <span className="inline-flex items-center text-blue-600 font-medium mt-4 group-hover:gap-2 transition-all">
+                    Read more <ArrowRight className="w-4 h-4 ml-1" />
+                  </span>
+                </CardContent>
+              </Card>
+            </Link>
+
+            {/* Article 2 */}
+            <Link href="/blog/hidden-costs-manual-event-scheduling" className="group">
+              <Card className="h-full hover:shadow-lg transition-all duration-300 group-hover:-translate-y-1">
+                <CardHeader>
+                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                    <DollarSign className="w-4 h-4 text-green-600" />
+                    <span>Budget & ROI</span>
+                  </div>
+                  <CardTitle className="group-hover:text-blue-600 transition-colors">
+                    Hidden Costs of Manual Event Scheduling
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600">
+                    That "free" spreadsheet might be costing you thousands. Here's how to calculate the true price.
+                  </p>
+                  <span className="inline-flex items-center text-blue-600 font-medium mt-4 group-hover:gap-2 transition-all">
+                    Read more <ArrowRight className="w-4 h-4 ml-1" />
+                  </span>
+                </CardContent>
+              </Card>
+            </Link>
+
+            {/* Article 3 */}
+            <Link href="/blog/how-to-create-yoga-retreat-schedule" className="group">
+              <Card className="h-full hover:shadow-lg transition-all duration-300 group-hover:-translate-y-1">
+                <CardHeader>
+                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                    <Heart className="w-4 h-4 text-pink-600" />
+                    <span>Retreat Planning</span>
+                  </div>
+                  <CardTitle className="group-hover:text-blue-600 transition-colors">
+                    How to Create the Perfect Yoga Retreat Schedule
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600">
+                    Balance practice, rest & community with proven retreat scheduling strategies.
+                  </p>
+                  <span className="inline-flex items-center text-blue-600 font-medium mt-4 group-hover:gap-2 transition-all">
+                    Read more <ArrowRight className="w-4 h-4 ml-1" />
+                  </span>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+
+          <div className="text-center mt-12">
+            <Link href="/blog">
+              <Button variant="outline" size="lg" className="text-lg">
+                View All Articles <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-[#2a468b] to-[#466d60]">

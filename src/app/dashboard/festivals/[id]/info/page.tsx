@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -14,9 +14,12 @@ import {
   Eye,
   AlertCircle,
   Check,
-  Share2
+  Share2,
+  Loader2
 } from 'lucide-react'
 import Link from 'next/link'
+import { TIMEZONE_GROUPS } from '@/lib/timezones'
+import TimezoneSelect from '@/components/ui/TimezoneSelect'
 
 interface Festival {
   id: string
@@ -38,6 +41,13 @@ interface Festival {
   }
 }
 
+interface TimezoneDetection {
+  id: string
+  abbreviation: string
+  offset: string
+  displayLabel: string
+}
+
 export default function FestivalInformation() {
   const params = useParams()
   const festivalId = params.id as string
@@ -46,6 +56,12 @@ export default function FestivalInformation() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
+  
+  // Timezone detection state
+  const [isDetectingTimezone, setIsDetectingTimezone] = useState(false)
+  const [suggestedTimezone, setSuggestedTimezone] = useState<TimezoneDetection | null>(null)
+  const [detectedLocation, setDetectedLocation] = useState<string | null>(null)
+  const locationDebounceRef = useRef<NodeJS.Timeout | null>(null)
   
   // Form state
   const [formData, setFormData] = useState({
@@ -89,6 +105,58 @@ export default function FestivalInformation() {
       })
     }
   }, [festival])
+
+  // Detect timezone from location
+  const detectTimezone = useCallback(async (location: string) => {
+    if (!location || location.trim().length < 3) {
+      setSuggestedTimezone(null)
+      setDetectedLocation(null)
+      return
+    }
+
+    setIsDetectingTimezone(true)
+    try {
+      const response = await fetch(`/api/timezone/detect?location=${encodeURIComponent(location)}`)
+      if (response.ok) {
+        const data = await response.json()
+        if (data.found && data.timezone) {
+          setSuggestedTimezone(data.timezone)
+          setDetectedLocation(data.displayName)
+        } else {
+          setSuggestedTimezone(null)
+          setDetectedLocation(null)
+        }
+      }
+    } catch (error) {
+      console.error('Error detecting timezone:', error)
+      setSuggestedTimezone(null)
+    } finally {
+      setIsDetectingTimezone(false)
+    }
+  }, [])
+
+  // Handle location change with debounce
+  const handleLocationChange = (value: string) => {
+    handleInputChange('location', value)
+    
+    // Clear previous timeout
+    if (locationDebounceRef.current) {
+      clearTimeout(locationDebounceRef.current)
+    }
+    
+    // Debounce the timezone detection (800ms delay)
+    locationDebounceRef.current = setTimeout(() => {
+      detectTimezone(value)
+    }, 800)
+  }
+
+  // Apply suggested timezone
+  const applySuggestedTimezone = () => {
+    if (suggestedTimezone) {
+      handleInputChange('timezone', suggestedTimezone.id)
+      setSuggestedTimezone(null)
+    }
+  }
 
   const fetchFestival = async () => {
     try {
@@ -154,19 +222,6 @@ export default function FestivalInformation() {
       setIsSaving(false)
     }
   }
-
-  const timezones = [
-    'UTC',
-    'America/New_York',
-    'America/Chicago', 
-    'America/Denver',
-    'America/Los_Angeles',
-    'Europe/London',
-    'Europe/Paris',
-    'Europe/Berlin',
-    'Asia/Tokyo',
-    'Australia/Sydney'
-  ]
 
   if (isLoading) {
     return (
@@ -350,15 +405,43 @@ export default function FestivalInformation() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Timezone
                   </label>
-                  <select
+                  <TimezoneSelect
                     value={formData.timezone}
-                    onChange={(e) => handleInputChange('timezone', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    {timezones.map(tz => (
-                      <option key={tz} value={tz}>{tz}</option>
-                    ))}
-                  </select>
+                    onChange={(value) => handleInputChange('timezone', value)}
+                    placeholder="Select timezone"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Session times will be exported in this timezone for calendar apps
+                  </p>
+                  
+                  {/* Timezone suggestion banner */}
+                  {suggestedTimezone && suggestedTimezone.id !== formData.timezone && (
+                    <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-blue-800">
+                            Suggested timezone based on location
+                          </p>
+                          <p className="text-sm text-blue-600 mt-0.5">
+                            {suggestedTimezone.displayLabel} ({suggestedTimezone.offset})
+                          </p>
+                          {detectedLocation && (
+                            <p className="text-xs text-blue-500 mt-1.5 leading-relaxed">
+                              <span className="font-medium">Detected:</span> {detectedLocation}
+                            </p>
+                          )}
+                        </div>
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={applySuggestedTimezone}
+                          className="bg-blue-600 hover:bg-blue-700 text-white shrink-0"
+                        >
+                          Apply
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -370,11 +453,17 @@ export default function FestivalInformation() {
                     <input
                       type="text"
                       value={formData.location}
-                      onChange={(e) => handleInputChange('location', e.target.value)}
-                      className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      onChange={(e) => handleLocationChange(e.target.value)}
+                      className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="City, venue, or address"
                     />
+                    {isDetectingTimezone && (
+                      <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-500 w-4 h-4 animate-spin" />
+                    )}
                   </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Enter a location to auto-detect the timezone
+                  </p>
                 </div>
               </CardContent>
             </Card>

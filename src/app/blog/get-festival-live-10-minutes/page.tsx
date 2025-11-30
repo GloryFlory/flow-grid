@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
 import AuthorBio from '@/components/blog/AuthorBio'
 import RelatedPosts from '@/components/blog/RelatedPosts'
+import Breadcrumbs, { getBreadcrumbSchema } from '@/components/blog/Breadcrumbs'
+import TableOfContents from '@/components/blog/TableOfContents'
 import type { Metadata } from 'next'
 import { ArrowLeft, CheckCircle, Clock, Zap } from 'lucide-react'
 
@@ -127,6 +129,20 @@ export default function BlogPost() {
     }
   ]
 
+  const breadcrumbSchema = getBreadcrumbSchema([
+    { name: 'Blog', href: '/blog' },
+    { name: 'Get Your First Festival Live in 10 Minutes' }
+  ])
+
+  const tocItems = [
+    { id: 'before-you-start', title: 'Before You Start' },
+    { id: 'step-1', title: 'Step 1: Create Your Account' },
+    { id: 'step-2', title: 'Step 2: Name Your Festival' },
+    { id: 'step-3', title: 'Step 3: Set Your Dates' },
+    { id: 'step-4', title: 'Step 4: Add Your First Session' },
+    { id: 'step-5', title: 'Step 5: Share Your Schedule' },
+  ]
+
   return (
     <div className="min-h-screen bg-white">
       <script
@@ -136,6 +152,10 @@ export default function BlogPost() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       
       {/* Navigation */}
@@ -168,10 +188,10 @@ export default function BlogPost() {
 
       {/* Article */}
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Link href="/blog" className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-8">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Blog
-        </Link>
+        <Breadcrumbs items={[
+          { name: 'Blog', href: '/blog' },
+          { name: 'Quick Start Guide' }
+        ]} />
 
         {/* Header */}
         <header className="mb-12">
@@ -196,6 +216,9 @@ export default function BlogPost() {
             Stop overthinking it. You don't need a perfect CSV file, a complete session list, or hours of planning to get started. Here's how to create your first festival schedule in under 10 minutes—really.
           </p>
         </header>
+
+        {/* Table of Contents */}
+        <TableOfContents items={tocItems} />
 
         {/* CTA Banner */}
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6 mb-12">

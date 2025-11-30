@@ -22,6 +22,7 @@ interface Session {
   CardType?: string // Handle casing variations from CSV imports
   bookingEnabled?: boolean
   bookingCapacity?: number | null
+  festivalId?: string
 }
 
 interface SessionCardProps {
@@ -30,6 +31,8 @@ interface SessionCardProps {
   onStyleClick: (style: string) => void
   onLevelClick: (level: string) => void
   onTeacherClick: (teacher: string) => void
+  isFavourite?: boolean
+  onFavouriteToggle?: (sessionId: string) => void
 }
 
 // Helper functions
@@ -89,7 +92,44 @@ const getTeacherLink = (teachers: string[]) => {
   return '#'
 }
 
-export function SessionCard({ session, onClick, onStyleClick, onLevelClick, onTeacherClick }: SessionCardProps) {
+// Favourite star button component
+const FavouriteButton = ({ 
+  isFavourite, 
+  onToggle, 
+  sessionId 
+}: { 
+  isFavourite: boolean
+  onToggle?: (sessionId: string) => void
+  sessionId: string 
+}) => {
+  if (!onToggle) return null
+  
+  return (
+    <button
+      className={`favourite-button ${isFavourite ? 'is-favourite' : ''}`}
+      onClick={(e) => {
+        e.stopPropagation()
+        onToggle(sessionId)
+      }}
+      title={isFavourite ? 'Remove from My Schedule' : 'Add to My Schedule'}
+      aria-label={isFavourite ? 'Remove from My Schedule' : 'Add to My Schedule'}
+    >
+      <svg 
+        width="18" 
+        height="18" 
+        viewBox="0 0 24 24" 
+        fill={isFavourite ? 'currentColor' : 'none'}
+        stroke="currentColor" 
+        strokeWidth="2"
+        className="star-icon"
+      >
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+      </svg>
+    </button>
+  )
+}
+
+export function SessionCard({ session, onClick, onStyleClick, onLevelClick, onTeacherClick, isFavourite = false, onFavouriteToggle }: SessionCardProps) {
   const size = getSessionSize(session)
   
   // Normalize and default safely - handle both cardType and CardType
@@ -108,22 +148,25 @@ export function SessionCard({ session, onClick, onStyleClick, onLevelClick, onTe
   // Simplified card for meals, demos, and special sessions
   if (isSimplified) {
     return (
-      <div className={`session-card session-card-${size} simple-card ${workshopClass}`} onClick={() => onClick(session)}>
+      <div className={`session-card session-card-${size} simple-card ${workshopClass} ${isFavourite ? 'is-favourited' : ''}`} onClick={() => onClick(session)}>
         <div className="session-header">
           <h3 className="session-title session-title-fixed-height">{session.title}</h3>
-          {session.bookingEnabled && session.bookingCapacity && session.bookingCapacity > 0 ? (
-            <button 
-              className="book-pill-button"
-              onClick={(e) => { e.stopPropagation(); onClick(session); }}
-              title="Book this session"
-            >
-              Book
-            </button>
-          ) : (
-            <button className="info-button" onClick={(e) => { e.stopPropagation(); onClick(session); }}>
-              <span>ℹ</span>
-            </button>
-          )}
+          <div className="session-actions">
+            <FavouriteButton isFavourite={isFavourite} onToggle={onFavouriteToggle} sessionId={session.id} />
+            {session.bookingEnabled && session.bookingCapacity && session.bookingCapacity > 0 ? (
+              <button 
+                className="book-pill-button"
+                onClick={(e) => { e.stopPropagation(); onClick(session); }}
+                title="Book this session"
+              >
+                Book
+              </button>
+            ) : (
+              <button className="info-button" onClick={(e) => { e.stopPropagation(); onClick(session); }}>
+                <span>ℹ</span>
+              </button>
+            )}
+          </div>
         </div>
         <div className="session-content">
           <div className="session-time-location">
@@ -138,22 +181,25 @@ export function SessionCard({ session, onClick, onStyleClick, onLevelClick, onTe
   // Photo-only card for special sessions (name, time, location, photo only)
   if (isPhotoOnly) {
     return (
-      <div className={`session-card session-card-${size} photo-only-card ${workshopClass}`} onClick={() => onClick(session)}>
+      <div className={`session-card session-card-${size} photo-only-card ${workshopClass} ${isFavourite ? 'is-favourited' : ''}`} onClick={() => onClick(session)}>
         <div className="session-header">
           <h3 className="session-title session-title-fixed-height">{session.title}</h3>
-          {session.bookingEnabled && session.bookingCapacity && session.bookingCapacity > 0 ? (
-            <button 
-              className="book-pill-button"
-              onClick={(e) => { e.stopPropagation(); onClick(session); }}
-              title="Book this session"
-            >
-              Book
-            </button>
-          ) : (
-            <button className="info-button" onClick={(e) => { e.stopPropagation(); onClick(session); }}>
-              <span>ℹ</span>
-            </button>
-          )}
+          <div className="session-actions">
+            <FavouriteButton isFavourite={isFavourite} onToggle={onFavouriteToggle} sessionId={session.id} />
+            {session.bookingEnabled && session.bookingCapacity && session.bookingCapacity > 0 ? (
+              <button 
+                className="book-pill-button"
+                onClick={(e) => { e.stopPropagation(); onClick(session); }}
+                title="Book this session"
+              >
+                Book
+              </button>
+            ) : (
+              <button className="info-button" onClick={(e) => { e.stopPropagation(); onClick(session); }}>
+                <span>ℹ</span>
+              </button>
+            )}
+          </div>
         </div>
         <div className="session-content">
           <div className="session-time-location">
@@ -244,24 +290,27 @@ export function SessionCard({ session, onClick, onStyleClick, onLevelClick, onTe
   
   // Full card for workshops with compact layout
   return (
-    <div className={`session-card session-card-${size} ${workshopClass}`} onClick={() => onClick(session)}>
+    <div className={`session-card session-card-${size} ${workshopClass} ${isFavourite ? 'is-favourited' : ''}`} onClick={() => onClick(session)}>
       <div className="session-card__inner">
         {/* Line 1: Name and Info button */}
         <div className="session-header">
           <h3 className="session-title session-title-fixed-height">{session.title}</h3>
-          {session.bookingEnabled && session.bookingCapacity && session.bookingCapacity > 0 ? (
-            <button 
-              className="book-pill-button"
-              onClick={(e) => { e.stopPropagation(); onClick(session); }}
-              title="Book this session"
-            >
-              Book
-            </button>
-          ) : (
-            <button className="info-button" onClick={(e) => { e.stopPropagation(); onClick(session); }}>
-              <span>ℹ</span>
-            </button>
-          )}
+          <div className="session-actions">
+            <FavouriteButton isFavourite={isFavourite} onToggle={onFavouriteToggle} sessionId={session.id} />
+            {session.bookingEnabled && session.bookingCapacity && session.bookingCapacity > 0 ? (
+              <button 
+                className="book-pill-button"
+                onClick={(e) => { e.stopPropagation(); onClick(session); }}
+                title="Book this session"
+              >
+                Book
+              </button>
+            ) : (
+              <button className="info-button" onClick={(e) => { e.stopPropagation(); onClick(session); }}>
+                <span>ℹ</span>
+              </button>
+            )}
+          </div>
         </div>
         
         <div className="session-content">

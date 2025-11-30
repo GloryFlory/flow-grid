@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react'
+import { Star } from 'lucide-react'
 
 interface Session {
   id: string
@@ -28,6 +29,8 @@ interface SessionModalProps {
   session: Session | null
   onClose: () => void
   festivalSlug: string
+  isFavourite?: boolean
+  onFavouriteToggle?: (sessionId: string) => void
 }
 
 // Helper functions
@@ -72,7 +75,7 @@ const getTeacherLink = (teachers: string[], index: number, session: Session) => 
   return session.teacherUrls[index]
 }
 
-export function SessionModal({ session, onClose, festivalSlug }: SessionModalProps) {
+export function SessionModal({ session, onClose, festivalSlug, isFavourite = false, onFavouriteToggle }: SessionModalProps) {
   const [showBookingForm, setShowBookingForm] = useState(false)
   const [bookingNames, setBookingNames] = useState('')
   const [bookingEmail, setBookingEmail] = useState('')
@@ -224,7 +227,26 @@ export function SessionModal({ session, onClose, festivalSlug }: SessionModalPro
               <span className="modal-meta-tag">{session.location}</span>
             </div>
           </div>
-          <button className="close-button" onClick={onClose}>&times;</button>
+          <div className="modal-header-actions">
+            {onFavouriteToggle && (
+              <button 
+                className={`favourite-button modal-favourite ${isFavourite ? 'is-favourite' : ''}`}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onFavouriteToggle(session.id)
+                }}
+                aria-label={isFavourite ? 'Remove from favourites' : 'Add to favourites'}
+                title={isFavourite ? 'Remove from favourites' : 'Add to favourites'}
+              >
+                <Star 
+                  size={20} 
+                  className="star-icon"
+                  fill={isFavourite ? 'currentColor' : 'none'}
+                />
+              </button>
+            )}
+            <button className="close-button" onClick={onClose}>&times;</button>
+          </div>
         </div>
         
         <div className="modal-body">

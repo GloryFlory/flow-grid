@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
 import AuthorBio from '@/components/blog/AuthorBio'
 import RelatedPosts from '@/components/blog/RelatedPosts'
+import Breadcrumbs, { getBreadcrumbSchema } from '@/components/blog/Breadcrumbs'
+import TableOfContents from '@/components/blog/TableOfContents'
 import type { Metadata } from 'next'
 import { ArrowLeft, Calendar, Zap } from 'lucide-react'
 
@@ -164,12 +166,21 @@ export default function BlogPost() {
         </div>
       </nav>
 
+      {/* Breadcrumb Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(getBreadcrumbSchema([
+          { name: 'Blog', href: '/blog' },
+          { name: 'QR Code Event Schedules' }
+        ])) }}
+      />
+
       {/* Article */}
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Link href="/blog" className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-8">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Blog
-        </Link>
+        <Breadcrumbs items={[
+          { name: 'Blog', href: '/blog' },
+          { name: 'QR Code Event Schedules' }
+        ]} />
 
         <header className="mb-12">
           <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
@@ -192,6 +203,17 @@ export default function BlogPost() {
           </p>
         </header>
 
+        <TableOfContents items={[
+          { id: 'why-qr-code-schedules-are-taking-over-event-planning', title: 'Why QR Code Schedules Are Taking Over' },
+          { id: 'how-to-create-a-qr-code-for-your-event-schedule', title: 'How to Create a QR Code Schedule' },
+          { id: 'qr-code-placement-strategies-that-actually-work', title: 'QR Code Placement Strategies' },
+          { id: 'static-vs-dynamic-qr-codes-which-should-you-use', title: 'Static vs Dynamic QR Codes' },
+          { id: 'common-qr-code-schedule-mistakes-and-how-to-avoid-them', title: 'Common Mistakes to Avoid' },
+          { id: 'advanced-tips-getting-more-value-from-qr-code-schedules', title: 'Advanced Tips' },
+          { id: 'the-future-of-event-schedules-is-mobile-first', title: 'The Future is Mobile-First' },
+          { id: 'frequently-asked-questions', title: 'FAQ' }
+        ]} />
+
   <div className="prose prose-lg max-w-none prose-headings:scroll-mt-24 prose-h2:mt-12 prose-h2:border-b prose-h2:pb-2 prose-h3:mt-8 prose-p:leading-relaxed prose-li:marker:text-blue-600">
           <p>
             Picture this: You've just finished printing 500 beautiful event programs. They're stacked in boxes, ready for registration. Then your keynote speaker cancels. Or the weather forces you to move an outdoor session indoors. Or you realize Workshop Track B conflicts with the lunch break.
@@ -209,7 +231,7 @@ export default function BlogPost() {
             In this comprehensive guide, I'll show you exactly how to create QR code schedules for your events, share the lessons we've learned organizing multi-day festivals, and help you avoid the pitfalls that trip up first-time implementers. For the complete event planning framework, check out our <Link href="/blog/event-planning-checklist" className="text-blue-600 hover:underline">event planning checklist</Link>.
           </p>
 
-          <h2>Why QR Code Schedules Are Taking Over Event Planning</h2>
+          <h2 id="why-qr-code-schedules-are-taking-over-event-planning">Why QR Code Schedules Are Taking Over Event Planning</h2>
 
           <p>
             The shift to QR code event schedules isn't just a trend—it's a fundamental improvement in how we deliver information to attendees. Here's why savvy organizers are making the switch:
@@ -265,7 +287,7 @@ export default function BlogPost() {
             Let's be honest: most event programs end up in the trash or recycling bin within hours. For eco-conscious events (yoga retreats, sustainability conferences, wellness festivals), eliminating hundreds of printed booklets aligns with your values and reduces waste.
           </p>
 
-          <h2>How to Create a QR Code for Your Event Schedule</h2>
+          <h2 id="how-to-create-a-qr-code-for-your-event-schedule">How to Create a QR Code for Your Event Schedule</h2>
 
           <p>
             Creating a QR code event schedule involves two main steps: building your digital schedule and generating the QR code that links to it. Here's the complete process:
@@ -368,7 +390,7 @@ export default function BlogPost() {
             <li><strong>Test before printing:</strong> Scan with multiple phone types (iPhone, Android) and QR reader apps</li>
           </ul>
 
-          <h2>QR Code Placement Strategies That Actually Work</h2>
+          <h2 id="qr-code-placement-strategies-that-actually-work">QR Code Placement Strategies That Actually Work</h2>
 
           <p>
             You've created your QR code—now where should you put it? Based on our experience with thousands of attendees, here are the highest-impact placements:
@@ -434,7 +456,7 @@ export default function BlogPost() {
             We see 40-50% of attendees accessing the schedule before they even arrive at the venue.
           </p>
 
-          <h2>Static vs. Dynamic QR Codes: Which Should You Use?</h2>
+          <h2 id="static-vs-dynamic-qr-codes-which-should-you-use">Static vs. Dynamic QR Codes: Which Should You Use?</h2>
 
           <p>
             This is a critical decision that affects your flexibility down the road.
@@ -500,7 +522,7 @@ export default function BlogPost() {
             <strong>Our recommendation:</strong> Use dynamic QR codes for anything beyond a simple one-off workshop. The peace of mind is worth far more than $10/month.
           </p>
 
-          <h2>Common QR Code Schedule Mistakes (And How to Avoid Them)</h2>
+          <h2 id="common-qr-code-schedule-mistakes-and-how-to-avoid-them">Common QR Code Schedule Mistakes (And How to Avoid Them)</h2>
 
           <p>
             We've learned these lessons the hard way so you don't have to:
@@ -564,7 +586,7 @@ export default function BlogPost() {
             Some free URL shorteners delete links after 30-90 days. If you're creating an annual event and want to reuse QR codes, choose a reliable service or your own custom domain redirect.
           </p>
 
-          <h2>Advanced Tips: Getting More Value from QR Code Schedules</h2>
+          <h2 id="advanced-tips-getting-more-value-from-qr-code-schedules">Advanced Tips: Getting More Value from QR Code Schedules</h2>
 
           <h3>Embed FlowGrid Features for Maximum Engagement</h3>
 
@@ -607,7 +629,7 @@ export default function BlogPost() {
             <li><strong>Feedback tools:</strong> Post-session survey links right in the schedule</li>
           </ul>
 
-          <h2>The Future of Event Schedules is Mobile-First</h2>
+          <h2 id="the-future-of-event-schedules-is-mobile-first">The Future of Event Schedules is Mobile-First</h2>
 
           <p>
             QR code event schedules aren't a novelty—they're the new standard. As someone who's organized events for thousands of attendees, I can confidently say that the benefits far outweigh any learning curve.
@@ -636,7 +658,7 @@ export default function BlogPost() {
             </Link>
           </div>
 
-          <h2>Frequently Asked Questions</h2>
+          <h2 id="frequently-asked-questions">Frequently Asked Questions</h2>
 
           <div className="space-y-4 mb-8">
             <details className="group bg-gray-50 rounded-lg">

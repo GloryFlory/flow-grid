@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
 import AuthorBio from '@/components/blog/AuthorBio'
 import RelatedPosts from '@/components/blog/RelatedPosts'
+import Breadcrumbs, { getBreadcrumbSchema } from '@/components/blog/Breadcrumbs'
+import TableOfContents from '@/components/blog/TableOfContents'
 import type { Metadata } from 'next'
 import { ArrowLeft, Calendar, CheckCircle } from 'lucide-react'
 
@@ -127,6 +129,20 @@ export default function BlogPost() {
     }
   ]
 
+  const breadcrumbSchema = getBreadcrumbSchema([
+    { name: 'Blog', href: '/blog' },
+    { name: 'How to Create the Perfect Yoga Retreat Schedule' }
+  ])
+
+  const tocItems = [
+    { id: 'daily-rhythm', title: 'Understanding the Daily Rhythm' },
+    { id: 'morning-sessions', title: 'Morning Sessions: Setting the Tone' },
+    { id: 'midday-break', title: 'The Essential Midday Break' },
+    { id: 'afternoon-activities', title: 'Afternoon Activities' },
+    { id: 'evening-wind-down', title: 'Evening Wind-Down' },
+    { id: 'common-mistakes', title: 'Common Scheduling Mistakes' },
+  ]
+
   return (
     <div className="min-h-screen bg-white">
       <script
@@ -136,6 +152,10 @@ export default function BlogPost() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       
       {/* Navigation */}
@@ -168,10 +188,10 @@ export default function BlogPost() {
 
       {/* Article */}
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Link href="/blog" className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-8">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Blog
-        </Link>
+        <Breadcrumbs items={[
+          { name: 'Blog', href: '/blog' },
+          { name: 'Yoga Retreat Schedule Guide' }
+        ]} />
 
         <header className="mb-12">
           <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
@@ -194,12 +214,15 @@ export default function BlogPost() {
           </p>
         </header>
 
+        {/* Table of Contents */}
+        <TableOfContents items={tocItems} />
+
   <div className="prose prose-lg max-w-none prose-headings:scroll-mt-24 prose-h2:mt-12 prose-h2:border-b prose-h2:pb-2 prose-h3:mt-8 prose-p:leading-relaxed prose-li:marker:text-blue-600">
           <p>
             Planning a yoga retreat schedule is both an art and a science. You need to create enough structure to give participants a transformative experience while leaving room for spontaneity, rest, and personal reflection. After years of helping retreat organizers create schedules, we've identified the key elements that make a retreat schedule truly exceptional. If you're new to event planning, our <Link href="/blog/event-planning-checklist" className="text-blue-600 hover:underline">event planning checklist</Link> provides a great foundation.
           </p>
 
-          <h2>Understanding the Rhythm of a Retreat Day</h2>
+          <h2 id="daily-rhythm">Understanding the Rhythm of a Retreat Day</h2>
           
           <p>
             Unlike a typical yoga class schedule, retreat days follow natural energy cycles. <a href="https://www.yogaalliance.org/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Research in yoga and wellness practices</a> shows that honoring these natural rhythms—rather than fighting against them—leads to deeper transformation and participant satisfaction.

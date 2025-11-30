@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
 import AuthorBio from '@/components/blog/AuthorBio'
 import RelatedPosts from '@/components/blog/RelatedPosts'
+import Breadcrumbs, { getBreadcrumbSchema } from '@/components/blog/Breadcrumbs'
+import TableOfContents from '@/components/blog/TableOfContents'
 import type { Metadata } from 'next'
 import { ArrowLeft, Calendar, CheckSquare } from 'lucide-react'
 
@@ -152,12 +154,21 @@ export default function BlogPost() {
         </div>
       </nav>
 
+      {/* Breadcrumb Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(getBreadcrumbSchema([
+          { name: 'Blog', href: '/blog' },
+          { name: 'Event Planning Checklist' }
+        ])) }}
+      />
+
       {/* Article */}
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Link href="/blog" className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-8">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Blog
-        </Link>
+        <Breadcrumbs items={[
+          { name: 'Blog', href: '/blog' },
+          { name: 'Event Planning Checklist' }
+        ]} />
 
         <header className="mb-12">
           <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
@@ -180,12 +191,25 @@ export default function BlogPost() {
           </p>
         </header>
 
+        <TableOfContents items={[
+          { id: '6-months-before-your-event', title: '6 Months Before' },
+          { id: '4-6-months-before', title: '4-6 Months Before' },
+          { id: '2-3-months-before', title: '2-3 Months Before' },
+          { id: '1-month-before', title: '1 Month Before' },
+          { id: '1-2-weeks-before', title: '1-2 Weeks Before' },
+          { id: 'day-before-event', title: 'Day Before' },
+          { id: 'event-day', title: 'Event Day' },
+          { id: 'post-event-within-1-week', title: 'Post-Event' },
+          { id: 'pro-tips-for-event-success', title: 'Pro Tips' },
+          { id: 'frequently-asked-questions', title: 'FAQ' }
+        ]} />
+
   <div className="prose prose-lg max-w-none prose-headings:scroll-mt-24 prose-h2:mt-12 prose-h2:border-b prose-h2:pb-2 prose-h3:mt-8 prose-p:leading-relaxed prose-li:marker:text-blue-600">
           <p>
             Planning an event—whether it's a festival, retreat, conference, or workshop—involves coordinating hundreds of details. Miss one, and it can cascade into bigger problems. This checklist will keep you organized and on track from start to finish.
           </p>
 
-          <h2>6 Months Before Your Event</h2>
+          <h2 id="6-months-before-your-event">6 Months Before Your Event</h2>
           
           <div className="space-y-3 my-6">
             <div className="flex gap-3 items-start">
@@ -214,7 +238,7 @@ export default function BlogPost() {
             </div>
           </div>
 
-          <h2>4-6 Months Before</h2>
+          <h2 id="4-6-months-before">4-6 Months Before</h2>
           
           <div className="space-y-3 my-6">
             <div className="flex gap-3 items-start">
@@ -243,7 +267,7 @@ export default function BlogPost() {
             </div>
           </div>
 
-          <h2>2-3 Months Before</h2>
+          <h2 id="2-3-months-before">2-3 Months Before</h2>
           
           <div className="space-y-3 my-6">
             <div className="flex gap-3 items-start">
@@ -272,7 +296,7 @@ export default function BlogPost() {
             </div>
           </div>
 
-          <h2>1 Month Before</h2>
+          <h2 id="1-month-before">1 Month Before</h2>
           
           <div className="space-y-3 my-6">
             <div className="flex gap-3 items-start">
@@ -301,7 +325,7 @@ export default function BlogPost() {
             </div>
           </div>
 
-          <h2>1-2 Weeks Before</h2>
+          <h2 id="1-2-weeks-before">1-2 Weeks Before</h2>
           
           <div className="space-y-3 my-6">
             <div className="flex gap-3 items-start">
@@ -330,7 +354,7 @@ export default function BlogPost() {
             </div>
           </div>
 
-          <h2>Day Before Event</h2>
+          <h2 id="day-before-event">Day Before Event</h2>
           
           <div className="space-y-3 my-6">
             <div className="flex gap-3 items-start">
@@ -355,7 +379,7 @@ export default function BlogPost() {
             </div>
           </div>
 
-          <h2>Event Day</h2>
+          <h2 id="event-day">Event Day</h2>
           
           <div className="space-y-3 my-6">
             <div className="flex gap-3 items-start">
@@ -388,7 +412,7 @@ export default function BlogPost() {
             </div>
           </div>
 
-          <h2>Post-Event (Within 1 Week)</h2>
+          <h2 id="post-event-within-1-week">Post-Event (Within 1 Week)</h2>
           
           <div className="space-y-3 my-6">
             <div className="flex gap-3 items-start">
@@ -435,7 +459,7 @@ export default function BlogPost() {
             </Link>
           </div>
 
-          <h2>Pro Tips for Event Success</h2>
+          <h2 id="pro-tips-for-event-success">Pro Tips for Event Success</h2>
           
           <ul>
             <li><strong>Build buffer time:</strong> Things always take longer than expected</li>
@@ -450,7 +474,7 @@ export default function BlogPost() {
             Event planning is complex, but with the right checklist and tools, you can stay organized and reduce stress. Remember that even the best-planned events will have unexpected moments—that's where your preparation and calm leadership make all the difference.
           </p>
 
-          <h2>Frequently Asked Questions</h2>
+          <h2 id="frequently-asked-questions">Frequently Asked Questions</h2>
 
           <div className="space-y-6 my-8">
             <div className="bg-gray-50 p-6 rounded-lg">

@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
 import AuthorBio from '@/components/blog/AuthorBio'
 import RelatedPosts from '@/components/blog/RelatedPosts'
+import Breadcrumbs, { getBreadcrumbSchema } from '@/components/blog/Breadcrumbs'
+import TableOfContents from '@/components/blog/TableOfContents'
 import type { Metadata } from 'next'
 import { ArrowLeft, Calendar, Music, Users, Clock } from 'lucide-react'
 
@@ -152,12 +154,21 @@ export default function BlogPost() {
         </div>
       </nav>
 
+      {/* Breadcrumb Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(getBreadcrumbSchema([
+          { name: 'Blog', href: '/blog' },
+          { name: 'Festival Schedule Template Guide' }
+        ])) }}
+      />
+
       {/* Article */}
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Link href="/blog" className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-8">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Blog
-        </Link>
+        <Breadcrumbs items={[
+          { name: 'Blog', href: '/blog' },
+          { name: 'Festival Schedule Template Guide' }
+        ]} />
 
         <header className="mb-12">
           <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
@@ -180,12 +191,24 @@ export default function BlogPost() {
           </p>
         </header>
 
+        <TableOfContents items={[
+          { id: 'why-your-festival-schedule-matters', title: 'Why Your Festival Schedule Matters' },
+          { id: 'types-of-festival-schedules', title: 'Types of Festival Schedules' },
+          { id: 'essential-elements-of-every-festival-schedule', title: 'Essential Elements' },
+          { id: 'building-your-festival-schedule-step-by-step', title: 'Building Your Schedule Step-by-Step' },
+          { id: 'common-festival-scheduling-mistakes', title: 'Common Mistakes' },
+          { id: 'festival-schedule-templates-by-type', title: 'Templates by Type' },
+          { id: 'making-your-schedule-easy-to-update', title: 'Making Updates Easy' },
+          { id: 'final-tips-for-festival-success', title: 'Final Tips' },
+          { id: 'frequently-asked-questions', title: 'FAQ' }
+        ]} />
+
   <div className="prose prose-lg max-w-none prose-headings:scroll-mt-24 prose-h2:mt-12 prose-h2:border-b prose-h2:pb-2 prose-h3:mt-8 prose-p:leading-relaxed prose-li:marker:text-blue-600">
           <p>
             Creating a festival schedule is one of the most critical tasks in event planning. A well-designed schedule ensures smooth operations, happy attendees, and successful performers. Whether you're organizing a music festival, arts celebration, or community gathering, this guide will walk you through everything you need to know.
           </p>
 
-          <h2>Why Your Festival Schedule Matters</h2>
+          <h2 id="why-your-festival-schedule-matters">Why Your Festival Schedule Matters</h2>
           
           <p>
             Your festival schedule is more than just a timetable—it's the backbone of your entire event. Here's why it's crucial:
@@ -198,7 +221,7 @@ export default function BlogPost() {
             <li><strong>Conflict Prevention:</strong> Proper scheduling prevents overlaps and ensures optimal resource allocation</li>
           </ul>
 
-          <h2>Types of Festival Schedules</h2>
+          <h2 id="types-of-festival-schedules">Types of Festival Schedules</h2>
           
           <h3>1. Single-Stage Festival Schedule</h3>
           
@@ -264,7 +287,7 @@ export default function BlogPost() {
             <strong>Best for:</strong> Large music festivals, retreat centers, conference series, celebration weeks
           </p>
 
-          <h2>Essential Elements of Every Festival Schedule</h2>
+          <h2 id="essential-elements-of-every-festival-schedule">Essential Elements of Every Festival Schedule</h2>
           
           <p>
             Regardless of format, every effective festival schedule should include:
@@ -304,7 +327,7 @@ export default function BlogPost() {
             </div>
           </div>
 
-          <h2>Building Your Festival Schedule: Step-by-Step</h2>
+          <h2 id="building-your-festival-schedule-step-by-step">Building Your Festival Schedule: Step-by-Step</h2>
           
           <h3>Step 1: Define Your Festival Hours</h3>
           
@@ -379,7 +402,7 @@ export default function BlogPost() {
             <li><strong>Recovery periods:</strong> Short breaks every few hours for attendees</li>
           </ul>
 
-          <h2>Common Festival Scheduling Mistakes</h2>
+          <h2 id="common-festival-scheduling-mistakes">Common Festival Scheduling Mistakes</h2>
           
           <h3>1. Overambitious Timing</h3>
           <p>
@@ -413,7 +436,7 @@ export default function BlogPost() {
             <li>Mobile-friendly design (most people view on phones)</li>
           </ul>
 
-          <h2>Festival Schedule Templates by Type</h2>
+          <h2 id="festival-schedule-templates-by-type">Festival Schedule Templates by Type</h2>
           
           <h3>Single-Day Workshop Festival Template</h3>
           
@@ -527,7 +550,7 @@ export default function BlogPost() {
             </div>
           </div>
 
-          <h2>Making Your Schedule Easy to Update</h2>
+          <h2 id="making-your-schedule-easy-to-update">Making Your Schedule Easy to Update</h2>
           
           <p>
             Festival schedules change constantly—acts cancel, times shift, venues change. Use tools that make updates easy:
@@ -554,7 +577,7 @@ export default function BlogPost() {
             </Link>
           </div>
 
-          <h2>Final Tips for Festival Success</h2>
+          <h2 id="final-tips-for-festival-success">Final Tips for Festival Success</h2>
           
           <ul>
             <li><strong>Test your schedule:</strong> Walk through it as if you're an attendee. Can you get from Stage A to Stage B in time?</li>
@@ -568,7 +591,7 @@ export default function BlogPost() {
             A great festival schedule is both an art and a science. It requires understanding your audience, respecting your performers, and creating a flow that makes the entire event feel effortless. Start with these templates, adjust for your specific needs, and don't be afraid to iterate as you learn what works for your festival.
           </p>
 
-          <h2>Frequently Asked Questions</h2>
+          <h2 id="frequently-asked-questions">Frequently Asked Questions</h2>
 
           <div className="space-y-6 my-8">
             <div className="bg-gray-50 p-6 rounded-lg">

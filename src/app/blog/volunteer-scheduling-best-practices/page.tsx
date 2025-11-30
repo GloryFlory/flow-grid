@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
 import AuthorBio from '@/components/blog/AuthorBio'
 import RelatedPosts from '@/components/blog/RelatedPosts'
+import Breadcrumbs, { getBreadcrumbSchema } from '@/components/blog/Breadcrumbs'
+import TableOfContents from '@/components/blog/TableOfContents'
 import type { Metadata } from 'next'
 import { ArrowLeft, Calendar, Users } from 'lucide-react'
 
@@ -161,12 +163,21 @@ export default function BlogPost() {
         </div>
       </nav>
 
+      {/* Breadcrumb Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(getBreadcrumbSchema([
+          { name: 'Blog', href: '/blog' },
+          { name: 'Volunteer Scheduling Best Practices' }
+        ])) }}
+      />
+
       {/* Article */}
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Link href="/blog" className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-8">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Blog
-        </Link>
+        <Breadcrumbs items={[
+          { name: 'Blog', href: '/blog' },
+          { name: 'Volunteer Scheduling Best Practices' }
+        ]} />
 
         <header className="mb-12">
           <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
@@ -189,6 +200,17 @@ export default function BlogPost() {
           </p>
         </header>
 
+        <TableOfContents items={[
+          { id: 'how-many-volunteers-do-you-actually-need', title: 'How Many Volunteers You Need' },
+          { id: 'creating-balanced-shift-schedules', title: 'Creating Balanced Shift Schedules' },
+          { id: 'communication-tools-that-keep-everyone-aligned', title: 'Communication Tools' },
+          { id: 'volunteer-retention-why-people-come-back-or-dont', title: 'Volunteer Retention' },
+          { id: 'technology-solutions-for-volunteer-management', title: 'Technology Solutions' },
+          { id: 'the-week-of-volunteer-coordinator-checklist', title: 'Week-Of Checklist' },
+          { id: 'common-volunteer-scheduling-mistakes-to-avoid', title: 'Common Mistakes' },
+          { id: 'frequently-asked-questions', title: 'FAQ' }
+        ]} />
+
   <div className="prose prose-lg max-w-none prose-headings:scroll-mt-24 prose-h2:mt-12 prose-h2:border-b prose-h2:pb-2 prose-h3:mt-8 prose-p:leading-relaxed prose-li:marker:text-blue-600">
           <p>
             The text message arrived at 6:47 AM on festival day: "Hey, I thought I was doing registration at 9 AM, but the schedule says info booth at 2 PM? Which one is right?"
@@ -206,7 +228,7 @@ export default function BlogPost() {
             Here's everything we've learned about <strong>volunteer scheduling</strong> for large-scale events—the systems, tools, and strategies that actually work when you're managing dozens or hundreds of people. For broader event planning guidance, see our <Link href="/blog/event-planning-checklist" className="text-blue-600 hover:underline">complete event planning checklist</Link>.
           </p>
 
-          <h2>How Many Volunteers Do You Actually Need?</h2>
+          <h2 id="how-many-volunteers-do-you-actually-need">How Many Volunteers Do You Actually Need?</h2>
 
           <p>
             Before you can schedule volunteers, you need to know how many you need. This is where most organizers either overestimate (wasting resources on recruitment) or underestimate (burning out their team).
@@ -263,7 +285,7 @@ export default function BlogPost() {
             <li><strong>Family events:</strong> 1 per 30-40 attendees (childcare, safety, more dynamic needs)</li>
           </ul>
 
-          <h2>Creating Balanced Shift Schedules</h2>
+          <h2 id="creating-balanced-shift-schedules">Creating Balanced Shift Schedules</h2>
 
           <p>
             Once you know your volunteer needs, the next challenge is scheduling shifts that feel fair, avoid burnout, and ensure adequate coverage.
@@ -315,7 +337,7 @@ export default function BlogPost() {
             <li><strong>Rotate fairly:</strong> If someone took a prime shift (morning registration), they cover at least one less popular slot</li>
           </ul>
 
-          <h2>Communication Tools That Keep Everyone Aligned</h2>
+          <h2 id="communication-tools-that-keep-everyone-aligned">Communication Tools That Keep Everyone Aligned</h2>
 
           <p>
             You can create the perfect volunteer schedule, but if people don't know when or where to show up, it's worthless. Communication infrastructure is critical.
@@ -398,7 +420,7 @@ export default function BlogPost() {
             More sophisticated version: use a Google Form with time-stamped responses or a dedicated volunteer management app like SignUpGenius or VolunteerLocal.
           </p>
 
-          <h2>Volunteer Retention: Why People Come Back (Or Don't)</h2>
+          <h2 id="volunteer-retention-why-people-come-back-or-dont">Volunteer Retention: Why People Come Back (Or Don't)</h2>
 
           <p>
             Finding volunteers for your first event is hard. Finding volunteers for your second event should be easy—if you treated the first group well.
@@ -467,7 +489,7 @@ export default function BlogPost() {
             When volunteers feel like valued team members instead of disposable helpers, they'll move mountains for you.
           </p>
 
-          <h2>Technology Solutions for Volunteer Management</h2>
+          <h2 id="technology-solutions-for-volunteer-management">Technology Solutions for Volunteer Management</h2>
 
           <p>
             Spreadsheets can work for 10-20 volunteers. Beyond that, you need better tools.
@@ -509,7 +531,7 @@ export default function BlogPost() {
             <li><strong>WhatsApp/Telegram:</strong> Free, everyone already has it, works internationally</li>
           </ul>
 
-          <h2>The Week-Of Volunteer Coordinator Checklist</h2>
+          <h2 id="the-week-of-volunteer-coordinator-checklist">The Week-Of Volunteer Coordinator Checklist</h2>
 
           <p>
             Even with perfect planning, the final week before your event is critical. Here's our day-by-day volunteer coordinator checklist:
@@ -557,7 +579,7 @@ export default function BlogPost() {
             <li>Start recruiting for next year (strike while enthusiasm is high!)</li>
           </ul>
 
-          <h2>Common Volunteer Scheduling Mistakes to Avoid</h2>
+          <h2 id="common-volunteer-scheduling-mistakes-to-avoid">Common Volunteer Scheduling Mistakes to Avoid</h2>
 
           <h3>Mistake #1: Over-Relying on "Core" Volunteers</h3>
 
@@ -614,7 +636,7 @@ export default function BlogPost() {
             </Link>
           </div>
 
-          <h2>Frequently Asked Questions</h2>
+          <h2 id="frequently-asked-questions">Frequently Asked Questions</h2>
 
           <div className="space-y-4 mb-8">
             <details className="group bg-gray-50 rounded-lg">

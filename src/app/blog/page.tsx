@@ -16,6 +16,30 @@ export const metadata: Metadata = {
 
 const blogPosts = [
   {
+    slug: 'event-app-community-building',
+    title: 'Beyond the Schedule: Using Event Apps to Build Community',
+    excerpt: 'Transform your event app from a schedule tool into a community hub. Strategies for fostering connections and building lasting relationships.',
+    date: '2025-11-29',
+    readTime: '14 min read',
+    category: 'Community & Engagement',
+  },
+  {
+    slug: 'hidden-costs-manual-event-scheduling',
+    title: 'Hidden Costs of Manual Event Scheduling: The True Price of Spreadsheets',
+    excerpt: 'Discover the hidden costs of manual event scheduling and how automation saves time, money, and prevents costly errors.',
+    date: '2025-11-29',
+    readTime: '10 min read',
+    category: 'Budget & ROI',
+  },
+  {
+    slug: 'wellness-retreat-scheduling',
+    title: 'Wellness Retreat Scheduling: Creating Flows That Actually Feel Relaxing',
+    excerpt: 'Design wellness retreat schedules that balance practice, rest, and community. Create flows that feel natural and rejuvenating.',
+    date: '2025-11-29',
+    readTime: '12 min read',
+    category: 'Wellness & Retreats',
+  },
+  {
     slug: 'get-festival-live-10-minutes',
     title: 'Get Your First Festival Live in 10 Minutes',
     excerpt: 'Skip the complexity. Create your festival schedule in minutes, not days. Step-by-step guide to launching your first event.',
