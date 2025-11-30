@@ -72,43 +72,75 @@ export type PlanType = 'FREE' | 'PRO' | 'ENTERPRISE'
 export interface PlanFeatures {
   festivalsLimit: number
   sessionsLimit: number
+  teamMembersLimit: number
   customBranding: boolean
+  customSubdomain: boolean
   customDomain: boolean
+  embedWidget: boolean
   advancedBooking: boolean
-  analytics: boolean
-  priority: boolean
+  basicAnalytics: boolean
+  advancedAnalytics: boolean
+  analyticsExport: boolean
+  cloneEvents: boolean
+  prioritySupport: boolean
+  dedicatedSupport: boolean
   whiteLabel: boolean
+  apiAccess: boolean
 }
 
 export const PLAN_FEATURES: Record<PlanType, PlanFeatures> = {
   FREE: {
     festivalsLimit: 1,
-    sessionsLimit: 50,
-    customBranding: false,
+    sessionsLimit: -1, // unlimited
+    teamMembersLimit: 1,
+    customBranding: true, // basic colors + logo
+    customSubdomain: false,
     customDomain: false,
+    embedWidget: false,
     advancedBooking: false,
-    analytics: false,
-    priority: false,
-    whiteLabel: false,
+    basicAnalytics: true,
+    advancedAnalytics: false,
+    analyticsExport: false,
+    cloneEvents: false,
+    prioritySupport: false,
+    dedicatedSupport: false,
+    whiteLabel: false, // shows "Powered by Flow Grid"
+    apiAccess: false,
   },
   PRO: {
-    festivalsLimit: 10,
+    festivalsLimit: 5,
     sessionsLimit: -1, // unlimited
+    teamMembersLimit: 5,
     customBranding: true,
-    customDomain: true,
-    advancedBooking: true,
-    analytics: true,
-    priority: true,
-    whiteLabel: false,
+    customSubdomain: true,
+    customDomain: false,
+    embedWidget: true,
+    advancedBooking: false,
+    basicAnalytics: true,
+    advancedAnalytics: true,
+    analyticsExport: false,
+    cloneEvents: true,
+    prioritySupport: true,
+    dedicatedSupport: false,
+    whiteLabel: true, // no "Powered by" branding
+    apiAccess: false,
   },
   ENTERPRISE: {
     festivalsLimit: -1, // unlimited
     sessionsLimit: -1, // unlimited
+    teamMembersLimit: -1, // unlimited
     customBranding: true,
+    customSubdomain: true,
     customDomain: true,
+    embedWidget: true,
     advancedBooking: true,
-    analytics: true,
-    priority: true,
+    basicAnalytics: true,
+    advancedAnalytics: true,
+    analyticsExport: true,
+    cloneEvents: true,
+    prioritySupport: true,
+    dedicatedSupport: true,
     whiteLabel: true,
+    apiAccess: true,
   },
 }

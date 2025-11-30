@@ -7,6 +7,7 @@ import { FilterBar } from './FilterBar'
 import { ScheduleTabs } from './ScheduleTabs'
 import { SessionModal } from './SessionModal'
 import { useFavourites } from '@/hooks/useFavourites'
+import { PoweredByFlowGrid } from '@/components/PoweredByFlowGrid'
 
 interface Session {
   id: string
@@ -50,6 +51,7 @@ interface Festival {
 interface ScheduleInterfaceProps {
   festival: Festival
   sessions: Session[]
+  showPoweredBy?: boolean // Show "Powered by Flow Grid" footer (default: true, hidden for Pro+)
 }
 
 // Helper function to group sessions by day
@@ -103,7 +105,7 @@ const formatDayHeader = (dateStr: string, showDates: boolean): string => {
   }
 }
 
-export default function ScheduleInterface({ festival, sessions }: ScheduleInterfaceProps) {
+export default function ScheduleInterface({ festival, sessions, showPoweredBy = true }: ScheduleInterfaceProps) {
   // State for filters and UI
   const [levelFilter, setLevelFilter] = useState('')
   const [styleFilter, setStyleFilter] = useState('')
@@ -713,6 +715,9 @@ export default function ScheduleInterface({ festival, sessions }: ScheduleInterf
         isFavourite={selectedSession ? isFavourite(selectedSession.id) : false}
         onFavouriteToggle={handleFavouriteToggle}
       />
+
+      {/* Powered by Flow Grid footer - shown for Free tier */}
+      {showPoweredBy && <PoweredByFlowGrid />}
     </div>
   )
 }

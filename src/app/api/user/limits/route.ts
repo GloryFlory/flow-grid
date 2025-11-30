@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { PLAN_FEATURES } from '@/types'
 
 export async function GET(request: NextRequest) {
   try {
@@ -33,16 +34,26 @@ export async function GET(request: NextRequest) {
     const currentPlan = user.subscription?.plan || 'FREE'
     const festivalsUsed = user.festivals.length
     
-    // All users now have unlimited access
-    const festivalsLimit = -1 // unlimited for everyone
-    const canCreateMore = true // everyone can create more
+    // Get limits from plan features
+    const planFeatures = PLAN_FEATURES[currentPlan]
+    const festivalsLimit = isAdmin ? -1 : planFeatures.festivalsLimit
+    const sessionsLimit = isAdmin ? -1 : planFeatures.sessionsLimit
+    
+    // Check if user can create more festivals
+    const canCreateMore = isAdmin || festivalsLimit === -1 || festivalsUsed < festivalsLimit
 
     return NextResponse.json({
       currentPlan,
       festivalsUsed,
       festivalsLimit,
+      sessionsLimit,
       isAdmin,
       canCreateMore,
+      features: planFeatures,
+      subscription: user.subscription ? {
+        status: user.subscription.status,
+        currentPeriodEnd: user.subscription.stripeCurrentPeriodEnd,
+      } : null,
       user: {
         name: user.name,
         email: user.email,

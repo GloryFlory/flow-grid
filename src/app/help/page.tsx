@@ -342,14 +342,14 @@ export default function HelpCenterPage() {
             <div className="border-l-4 border-indigo-200 pl-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Is Flow Grid free to use?</h3>
               <p className="text-gray-700">
-                Yes! Flow Grid is currently free for all users. You can create unlimited festivals and sessions without any cost.
+                Yes! Flow Grid has a generous Free plan that lets you create 1 festival with up to 50 sessions. For larger events or multiple festivals, check out our <a href="/pricing" className="text-indigo-600 hover:underline">Pro and Enterprise plans</a>.
               </p>
             </div>
 
             <div className="border-l-4 border-indigo-200 pl-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">How many festivals can I create?</h3>
               <p className="text-gray-700">
-                There's no limit! Create as many festivals as you need for different events, years, or organizations.
+                The Free plan includes 1 festival. Pro users can create up to 10 festivals, and Enterprise users have unlimited festivals. Visit our <a href="/pricing" className="text-indigo-600 hover:underline">pricing page</a> for details.
               </p>
             </div>
 
