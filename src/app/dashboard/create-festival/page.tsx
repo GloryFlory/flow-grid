@@ -1161,7 +1161,11 @@ export default function CreateFestivalPage() {
                     id="slug"
                     type="text"
                     value={festivalData.slug}
-                    onChange={(e) => setFestivalData(prev => ({ ...prev, slug: e.target.value }))}
+                    onChange={(e) => {
+                      // Auto-lowercase and remove invalid characters
+                      const cleanSlug = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '')
+                      setFestivalData(prev => ({ ...prev, slug: cleanSlug }))
+                    }}
                     className={`flex-1 px-3 py-2 border focus:outline-none focus:ring-2 focus:border-transparent ${
                       slugValidation.isChecking ? 'border-yellow-300 focus:ring-yellow-500' :
                       !slugValidation.isAvailable ? 'border-red-300 focus:ring-red-500' :
