@@ -35,6 +35,7 @@ interface SessionEditModalProps {
   onSave: (session: Session) => Promise<void>
   availableDays: Array<{value: string, label: string}>
   festivalDateRange?: { startDate: string; endDate: string }
+  presenterLabel?: string
 }
 
 const CARD_TYPES = [
@@ -72,7 +73,8 @@ export default function SessionEditModal({
   festivalId, 
   onSave, 
   availableDays,
-  festivalDateRange
+  festivalDateRange,
+  presenterLabel = 'Facilitator'
 }: SessionEditModalProps) {
   const [formData, setFormData] = useState<Session>({
     title: '',
@@ -373,7 +375,7 @@ export default function SessionEditModal({
               {/* Teachers */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Presenters / Facilitators
+                  {presenterLabel}s
                 </label>
                 <input
                   type="text"
@@ -383,7 +385,7 @@ export default function SessionEditModal({
                   placeholder="e.g., John Smith, Jane Doe"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Separate multiple presenters with commas
+                  Separate multiple {presenterLabel.toLowerCase()}s with commas
                 </p>
               </div>
             </div>

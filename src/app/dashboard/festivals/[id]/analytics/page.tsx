@@ -3,7 +3,9 @@
 import { useEffect, useState, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { BarChart3, Eye, Users, Heart, Calendar, MousePointerClick, User, Loader2, ChevronDown } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { BarChart3, Eye, Users, Heart, Calendar, MousePointerClick, User, Loader2, ChevronDown, ArrowLeft, PieChart } from 'lucide-react'
+import Link from 'next/link'
 
 const TIME_RANGE_OPTIONS = [
   { value: '24h', label: 'Last 24 hours' },
@@ -11,6 +13,13 @@ const TIME_RANGE_OPTIONS = [
   { value: '30d', label: 'Last 30 days' },
   { value: 'all', label: 'All time' },
 ]
+
+interface Festival {
+  id: string
+  name: string
+  slug: string
+  presenterLabel?: string
+}
 
 interface AnalyticsData {
   overview: {
@@ -46,6 +55,7 @@ interface AnalyticsData {
 export default function AnalyticsPage() {
   const params = useParams()
   const festivalId = params.id as string
+  const [festival, setFestival] = useState<Festival | null>(null)
   const [data, setData] = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -63,6 +73,21 @@ export default function AnalyticsPage() {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  useEffect(() => {
+    async function fetchFestival() {
+      try {
+        const res = await fetch(`/api/admin/festivals/${festivalId}`)
+        if (res.ok) {
+          const json = await res.json()
+          setFestival(json.festival)
+        }
+      } catch (err) {
+        console.error('Error fetching festival:', err)
+      }
+    }
+    fetchFestival()
+  }, [festivalId])
 
   useEffect(() => {
     async function fetchAnalytics() {
@@ -83,18 +108,24 @@ export default function AnalyticsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-purple-600 mx-auto" />
+          <p className="text-gray-600 mt-2">Loading analytics...</p>
+        </div>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="p-6">
-        <Card className="border-destructive">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="border-destructive max-w-md">
           <CardContent className="pt-6">
             <p className="text-destructive">Error: {error}</p>
+            <Link href={`/dashboard/festivals/${festivalId}`}>
+              <Button className="mt-4">Back to Event</Button>
+            </Link>
           </CardContent>
         </Card>
       </div>
@@ -117,45 +148,90 @@ export default function AnalyticsPage() {
   const viewModeTotal = Object.values(viewModes).reduce((a, b) => a + b, 0) || 1
 
   return (
-    <div className="p-4 sm:p-6 space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Analytics</h1>
-          <p className="text-muted-foreground">Track engagement and visitor activity</p>
-        </div>
-        <div className="relative" ref={dropdownRef}>
-          <button
-            type="button"
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="w-full sm:w-auto flex items-center justify-between gap-2 px-4 py-2.5 border border-gray-300 rounded-lg text-sm bg-white shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer min-w-[160px]"
-          >
-            <span>{TIME_RANGE_OPTIONS.find(o => o.value === timeRange)?.label}</span>
-            <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
-          </button>
-          {dropdownOpen && (
-            <div className="absolute right-0 mt-1 w-full sm:w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 py-1">
-              {TIME_RANGE_OPTIONS.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => {
-                    setTimeRange(option.value)
-                    setDropdownOpen(false)
-                  }}
-                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                    timeRange === option.value ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+          {/* Mobile: Back button on its own row */}
+          <div className="mb-3 sm:hidden">
+            <Link href={`/dashboard/festivals/${festivalId}`}>
+              <Button variant="outline" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Event
+              </Button>
+            </Link>
+          </div>
+          
+          {/* Main header content */}
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-3">
+            <div className="flex items-start gap-4 min-w-0 flex-1">
+              <div className="hidden sm:block flex-shrink-0">
+                <Link href={`/dashboard/festivals/${festivalId}`}>
+                  <Button variant="outline" size="sm">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to Event
+                  </Button>
+                </Link>
+              </div>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 break-words">Visitor Analytics</h1>
+                <p className="text-sm sm:text-base text-gray-600 mt-1 truncate">Track engagement and visitor activity</p>
+              </div>
             </div>
-          )}
+            
+            <div className="flex gap-2 flex-shrink-0 items-center">
+              <Link href={`/dashboard/festivals/${festivalId}/insights`}>
+                <Button variant="outline" size="sm">
+                  <PieChart className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Event Insights</span>
+                </Button>
+              </Link>
+              {festival && (
+                <Link href={`/${festival.slug}/schedule`} target="_blank">
+                  <Button variant="outline" size="sm">
+                    <Eye className="w-4 h-4 sm:mr-2" />
+                    <span className="hidden sm:inline">View Live</span>
+                  </Button>
+                </Link>
+              )}
+              {/* Time Range Dropdown */}
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="flex items-center justify-between gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer min-w-[140px]"
+                >
+                  <span>{TIME_RANGE_OPTIONS.find(o => o.value === timeRange)?.label}</span>
+                  <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 py-1">
+                    {TIME_RANGE_OPTIONS.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => {
+                          setTimeRange(option.value)
+                          setDropdownOpen(false)
+                        }}
+                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                          timeRange === option.value ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Metrics Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+        {/* Metrics Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {metrics.map((metric) => (
           <Card key={metric.label}>
             <CardContent className="pt-6">
@@ -261,8 +337,8 @@ export default function AnalyticsPage() {
       {data.popular.teachers.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Popular Teachers</CardTitle>
-            <CardDescription>Most clicked teacher profiles</CardDescription>
+            <CardTitle className="text-lg">Popular {festival?.presenterLabel || 'Teacher'}s</CardTitle>
+            <CardDescription>Most clicked {(festival?.presenterLabel || 'teacher').toLowerCase()} profiles</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
@@ -347,6 +423,7 @@ export default function AnalyticsPage() {
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   )
 }

@@ -5,11 +5,11 @@ import Footer from '@/components/Footer'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Help Center - Flow Grid Festival Scheduling Guide',
-  description: 'Learn how to create festival schedules, manage bookings, and delight participants with Flow Grid. Step-by-step guides and tutorials.',
+  title: 'Help Center - Flow Grid Event Scheduling Guide',
+  description: 'Learn how to create event schedules, manage bookings, and delight participants with Flow Grid. Step-by-step guides and tutorials.',
   openGraph: {
-    title: 'Flow Grid Help Center - Festival Scheduling Guide',
-    description: 'Transform your festival into a seamless experience with Flow Grid. Create schedules, manage bookings, and delight participants.',
+    title: 'Flow Grid Help Center - Event Scheduling Guide',
+    description: 'Transform your event into a seamless experience with Flow Grid. Create schedules, manage bookings, and delight participants.',
   },
 }
 
@@ -51,7 +51,7 @@ export default function HelpCenterPage() {
         <div className="mb-8 text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Help Center</h1>
           <p className="text-xl text-gray-600">
-            Get help with Flow Grid and learn how to create amazing festival schedules
+            Get help with Flow Grid and learn how to create amazing event schedules
           </p>
         </div>
 
@@ -63,14 +63,14 @@ export default function HelpCenterPage() {
               Quick Start
             </h2>
             <p className="text-blue-800 mb-4">
-              New to Flow Grid? See our <Link href="/glossary" className="text-blue-600 hover:text-blue-500 font-medium">Glossary</Link> for terminology. Below is a short overview of the <strong>Create festival</strong> flow.
+              New to Flow Grid? See our <Link href="/glossary" className="text-blue-600 hover:text-blue-500 font-medium">Glossary</Link> for terminology. Below is a short overview of the <strong>Create event</strong> flow.
             </p>
             <div className="mt-4 bg-white border rounded-lg p-4">
-              <h3 className="font-semibold">Create festival — 3 quick steps</h3>
+              <h3 className="font-semibold">Create event — 3 quick steps</h3>
               <ol className="list-decimal list-inside mt-3 text-sm text-gray-700">
-                <li><strong>Festival Details</strong> — Name, description, dates, and a unique slug. Keep the slug short and url-friendly.</li>
+                <li><strong>Event Details</strong> — Name, description, dates, and a unique slug. Keep the slug short and url-friendly.</li>
                 <li><strong>Schedule Setup</strong> — Upload a CSV (we provide a template) or add sessions manually. Choose card types (minimal, photo, detailed).</li>
-                <li><strong>Preview & Publish</strong> — Review imported sessions, set visibility, and publish your festival. Your festival will appear at <code>https://yourslug.tryflowgrid.com</code>.</li>
+                <li><strong>Preview & Publish</strong> — Review imported sessions, set visibility, and publish your event. Your event will appear at <code>https://yourslug.tryflowgrid.com</code>.</li>
               </ol>
               <div className="mt-4 flex gap-3">
                 <Link href="/dashboard/create-festival"><Button>Start Creating</Button></Link>
@@ -81,17 +81,17 @@ export default function HelpCenterPage() {
 
           <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-6 flex items-center">
             <Calendar className="w-6 h-6 mr-2 text-blue-600" />
-            Festival Setup
+            Event Setup
           </h2>
 
           <div className="space-y-6">
             <div className="border-l-4 border-blue-200 pl-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">How do I create my first festival?</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">How do I create my first event?</h3>
               <p className="text-gray-700 mb-2">
-                After signing up, click "Create New Festival" on your dashboard. You'll need to provide:
+                After signing up, click "Create New Event" on your dashboard. You'll need to provide:
               </p>
               <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
-                <li>Festival name and description</li>
+                <li>Event name and description</li>
                 <li>Start and end dates</li>
                 <li>A unique slug (URL identifier)</li>
                 <li>Location information</li>
@@ -99,23 +99,23 @@ export default function HelpCenterPage() {
             </div>
 
             <div className="border-l-4 border-blue-200 pl-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">What makes a good festival slug?</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">What makes a good event slug?</h3>
               <p className="text-gray-700">
-                Your slug becomes part of your public URL (e.g., yourfestival.tryflowgrid.com). Use lowercase letters, numbers, and hyphens only. Examples: "summer-dance-fest", "2025-tango-weekend", "montreal-swing-festival".
+                Your slug becomes part of your public URL (e.g., yourevent.tryflowgrid.com). Use lowercase letters, numbers, and hyphens only. Examples: "summer-dance-fest", "2025-tango-weekend", "montreal-swing-event".
               </p>
             </div>
 
             <div className="border-l-4 border-blue-200 pl-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Can I change my festival information later?</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Can I change my event information later?</h3>
               <p className="text-gray-700">
-                Yes! You can edit all festival details except the slug after creation. The slug is permanent to ensure your public links don't break.
+                Yes! You can edit all event details except the slug after creation. The slug is permanent to ensure your public links don't break.
               </p>
             </div>
 
             <div className="border-l-4 border-blue-200 pl-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">How do I make my festival public?</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">How do I make my event public?</h3>
               <p className="text-gray-700">
-                In your festival settings, toggle "Public" to "Yes". This makes your festival visible on your public URL and allows visitors to view the schedule.
+                In your event settings, toggle "Public" to "Yes". This makes your event visible on your public URL and allows visitors to view the schedule.
               </p>
             </div>
           </div>
@@ -132,7 +132,7 @@ export default function HelpCenterPage() {
                 Use the CSV import feature:
               </p>
               <ol className="list-decimal list-inside space-y-1 text-gray-700 ml-4">
-                <li>Download the CSV template from your festival dashboard</li>
+                <li>Download the CSV template from your event dashboard</li>
                 <li>Fill in your session information using Excel or Google Sheets</li>
                 <li>Upload the completed file</li>
                 <li>Review and edit individual sessions as needed</li>
@@ -142,7 +142,7 @@ export default function HelpCenterPage() {
             <div className="border-l-4 border-green-200 pl-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">How do I handle different time zones?</h3>
               <p className="text-gray-700">
-                Set your festival's time zone in the festival settings. All session times will be displayed in this time zone on your public page. Enter session times in your local time zone.
+                Set your event's time zone in the event settings. All session times will be displayed in this time zone on your public page. Enter session times in your local time zone.
               </p>
             </div>
 
@@ -170,7 +170,7 @@ export default function HelpCenterPage() {
             <div className="border-l-4 border-green-200 pl-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">How do I handle session cancellations or changes?</h3>
               <p className="text-gray-700">
-                Edit the session directly from your dashboard. Changes appear immediately on your public page. For major changes, consider adding an announcement to your festival description.
+                Edit the session directly from your dashboard. Changes appear immediately on your public page. For major changes, consider adding an announcement to your event description.
               </p>
             </div>
           </div>
@@ -223,26 +223,26 @@ export default function HelpCenterPage() {
 
           <div className="space-y-6">
             <div className="border-l-4 border-orange-200 pl-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">How do I upload my festival logo?</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">How do I upload my event logo?</h3>
               <p className="text-gray-700">
-                Go to Admin → Branding in your festival dashboard. Upload a high-resolution logo (PNG or JPG). It will appear on your public festival page header.
+                Go to Admin → Branding in your event dashboard. Upload a high-resolution logo (PNG or JPG). It will appear on your public event page header.
               </p>
             </div>
 
             <div className="border-l-4 border-orange-200 pl-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Can I customize the colors of my festival page?</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Can I customize the colors of my event page?</h3>
               <p className="text-gray-700">
-                Yes! In the Branding section, you can set custom colors for your festival's theme. Choose colors that match your brand and create a cohesive visual experience.
+                Yes! In the Branding section, you can set custom colors for your event's theme. Choose colors that match your brand and create a cohesive visual experience.
               </p>
             </div>
 
             <div className="border-l-4 border-orange-200 pl-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">What content appears on my public festival page?</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">What content appears on my public event page?</h3>
               <p className="text-gray-700 mb-2">
                 Your public page includes:
               </p>
               <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
-                <li>Festival name, dates, and description</li>
+                <li>Event name, dates, and description</li>
                 <li>Interactive schedule with filtering options</li>
                 <li>Teacher profiles with photos and bios</li>
                 <li>Session details with times and descriptions</li>
@@ -258,14 +258,14 @@ export default function HelpCenterPage() {
 
           <div className="space-y-6">
             <div className="border-l-4 border-red-200 pl-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">What's my festival's public URL?</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">What's my event's public URL?</h3>
               <p className="text-gray-700">
-                Your festival is available at yourslug.tryflowgrid.com (where "yourslug" is the slug you chose when creating the festival).
+                Your event is available at yourslug.tryflowgrid.com (where "yourslug" is the slug you chose when creating the event).
               </p>
             </div>
 
             <div className="border-l-4 border-red-200 pl-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">How do I share my festival on social media?</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">How do I share my event on social media?</h3>
               <p className="text-gray-700">
                 Simply share your public URL! Flow Grid automatically generates beautiful preview images and descriptions for Facebook, Twitter, and other social platforms.
               </p>
@@ -274,14 +274,14 @@ export default function HelpCenterPage() {
             <div className="border-l-4 border-red-200 pl-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Can I embed my schedule on another website?</h3>
               <p className="text-gray-700">
-                Currently, we don't offer embed codes, but you can always link to your Flow Grid festival page from your main website or social media.
+                Currently, we don't offer embed codes, but you can always link to your Flow Grid event page from your main website or social media.
               </p>
             </div>
 
             <div className="border-l-4 border-red-200 pl-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Is my festival mobile-friendly?</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Is my event mobile-friendly?</h3>
               <p className="text-gray-700">
-                Absolutely! All Flow Grid festival pages are fully responsive and work beautifully on phones, tablets, and desktops. Most festival participants view schedules on their phones.
+                Absolutely! All Flow Grid event pages are fully responsive and work beautifully on phones, tablets, and desktops. Most event participants view schedules on their phones.
               </p>
             </div>
           </div>
@@ -326,9 +326,9 @@ export default function HelpCenterPage() {
             </div>
 
             <div className="border-l-4 border-gray-200 pl-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Can I export my festival data?</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Can I export my event data?</h3>
               <p className="text-gray-700">
-                You can export your sessions to CSV format from your festival dashboard. This includes all session details, teachers, and scheduling information.
+                You can export your sessions to CSV format from your event dashboard. This includes all session details, teachers, and scheduling information.
               </p>
             </div>
           </div>
@@ -342,14 +342,14 @@ export default function HelpCenterPage() {
             <div className="border-l-4 border-indigo-200 pl-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Is Flow Grid free to use?</h3>
               <p className="text-gray-700">
-                Yes! Flow Grid has a generous Free plan that lets you create 1 festival with up to 50 sessions. For larger events or multiple festivals, check out our <a href="/pricing" className="text-indigo-600 hover:underline">Pro and Enterprise plans</a>.
+                Yes! Flow Grid has a generous Free plan that lets you create 1 event with up to 50 sessions. For larger events or multiple events, check out our <a href="/pricing" className="text-indigo-600 hover:underline">Pro and Enterprise plans</a>.
               </p>
             </div>
 
             <div className="border-l-4 border-indigo-200 pl-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">How many festivals can I create?</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">How many events can I create?</h3>
               <p className="text-gray-700">
-                The Free plan includes 1 festival. Pro users can create up to 10 festivals, and Enterprise users have unlimited festivals. Visit our <a href="/pricing" className="text-indigo-600 hover:underline">pricing page</a> for details.
+                The Free plan includes 1 event. Pro users can create up to 10 events, and Enterprise users have unlimited events. Visit our <a href="/pricing" className="text-indigo-600 hover:underline">pricing page</a> for details.
               </p>
             </div>
 
@@ -374,7 +374,7 @@ export default function HelpCenterPage() {
               Still Need Help?
             </h2>
             <p className="text-gray-700">
-              Can't find what you're looking for? Use the Contact page to send us a message and we'll help you through the Create festival flow.
+              Can't find what you're looking for? Use the Contact page to send us a message and we'll help you through the Create event flow.
             </p>
             <div className="space-y-2">
               <p className="text-gray-700">

@@ -182,7 +182,7 @@ export default function FestivalBranding() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Festival Not Found</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Event Not Found</h1>
           <Link href="/dashboard">
             <Button>Back to Dashboard</Button>
           </Link>
@@ -201,7 +201,7 @@ export default function FestivalBranding() {
             <Link href={`/dashboard/festivals/${festival.id}`}>
               <Button variant="outline" size="sm">
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Festival
+                Back to Event
               </Button>
             </Link>
           </div>
@@ -213,12 +213,12 @@ export default function FestivalBranding() {
                 <Link href={`/dashboard/festivals/${festival.id}`}>
                   <Button variant="outline" size="sm">
                     <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back to Festival
+                    Back to Event
                   </Button>
                 </Link>
               </div>
               <div className="min-w-0 flex-1">
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 break-words">Festival Branding</h1>
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 break-words">Event Branding</h1>
                 <p className="text-sm sm:text-base text-gray-600 mt-1 truncate">Customize logo and colors</p>
               </div>
             </div>
@@ -244,7 +244,7 @@ export default function FestivalBranding() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <ImageIcon className="w-5 h-5" />
-                  Festival Logo
+                  Event Logo
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -436,13 +436,13 @@ export default function FestivalBranding() {
                     {festival.logo && (
                       <img
                         src={festival.logo}
-                        alt="Festival logo"
+                        alt="Event logo"
                         className="w-12 h-12 object-contain bg-white rounded-lg p-1"
                       />
                     )}
                     <div>
                       <h2 className="text-xl font-bold">{festival.name}</h2>
-                      <p className="text-white/80">Festival Schedule</p>
+                      <p className="text-white/80">Event Schedule</p>
                     </div>
                   </div>
                 </div>

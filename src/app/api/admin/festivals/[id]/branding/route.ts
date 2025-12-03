@@ -17,11 +17,18 @@ export async function PATCH(
     const body = await request.json()
     const { primaryColor, secondaryColor, accentColor } = body
 
-    // Verify festival ownership
+    // Check if user is admin
+    const currentUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { role: true }
+    })
+    const isAdmin = currentUser?.role === 'ADMIN'
+
+    // Verify festival ownership (or admin access)
     const festival = await prisma.festival.findFirst({
       where: {
         id: festivalId,
-        userId: session.user.id,
+        ...(isAdmin ? {} : { userId: session.user.id }),
       },
     })
 

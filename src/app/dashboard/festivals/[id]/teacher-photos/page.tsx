@@ -49,6 +49,7 @@ interface Festival {
   id: string
   name: string
   slug: string
+  presenterLabel?: string
 }
 
 export default function FestivalTeacherPhotos() {
@@ -255,7 +256,7 @@ export default function FestivalTeacherPhotos() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Festival Not Found</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Event Not Found</h1>
           <Link href="/dashboard">
             <Button>Back to Dashboard</Button>
           </Link>
@@ -274,7 +275,7 @@ export default function FestivalTeacherPhotos() {
             <Link href={`/dashboard/festivals/${festival.id}`}>
               <Button variant="outline" size="sm">
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Festival
+                Back to Event
               </Button>
             </Link>
           </div>
@@ -286,7 +287,7 @@ export default function FestivalTeacherPhotos() {
                 <Link href={`/dashboard/festivals/${festival.id}`}>
                   <Button variant="outline" size="sm">
                     <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back to Festival
+                    Back to Event
                   </Button>
                 </Link>
               </div>
@@ -560,6 +561,7 @@ export default function FestivalTeacherPhotos() {
           setModalOpen(false)
           setEditingTeacher(null)
         }}
+        presenterLabel={festival?.presenterLabel || 'Teacher'}
         initial={editingTeacher?.teacherRecord ? {
           name: editingTeacher.teacherRecord.name,
           url: editingTeacher.teacherRecord.url,

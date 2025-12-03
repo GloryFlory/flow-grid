@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Papa from 'papaparse'
 import { Button } from '@/components/ui/button'
@@ -18,10 +18,9 @@ import {
   FileText,
   Image,
   Users,
-  Globe
+  MapPin,
+  Loader2
 } from 'lucide-react'
-import { TIMEZONE_GROUPS, COMMON_TIMEZONES } from '@/lib/timezones'
-import TimezoneSelect from '@/components/ui/TimezoneSelect'
 
 type Step = 'basic' | 'schedule' | 'preview'
 
@@ -45,6 +44,21 @@ export default function CreateFestivalPage() {
   const [currentStep, setCurrentStep] = useState<Step>('basic')
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  
+  // Plan/subscription state for limiting publishing
+  const [planInfo, setPlanInfo] = useState<{
+    plan: string
+    festivalsLimit: number
+    activeFestivals: number
+    canPublish: boolean
+  } | null>(null)
+  
+  // Location/timezone detection state
+  const [isDetectingLocation, setIsDetectingLocation] = useState(true) // Start true - detecting on load
+  const [isDetectingTimezone, setIsDetectingTimezone] = useState(false)
+  const [showLocationEditor, setShowLocationEditor] = useState(false)
+  const [detectedLocation, setDetectedLocation] = useState<string | null>(null)
+  const locationDebounceRef = useRef<NodeJS.Timeout | null>(null)
 
   // Form state
   const [festivalData, setFestivalData] = useState({
@@ -53,14 +67,130 @@ export default function CreateFestivalPage() {
     slug: '',
     startDate: '',
     endDate: '',
-    timezone: ''  // Will be set from user's browser timezone
+    timezone: '',
+    location: ''
   })
   
-  // Set timezone from browser on mount
+  // Fetch plan info on mount
   useEffect(() => {
-    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-    setFestivalData(prev => ({ ...prev, timezone: userTimezone || 'America/New_York' }))
+    const fetchPlanInfo = async () => {
+      try {
+        const response = await fetch('/api/user/subscription')
+        if (response.ok) {
+          const data = await response.json()
+          const totalFestivals = data.activeFestivals || 0
+          const festivalsLimit = data.subscription?.festivalsLimit || 1
+          setPlanInfo({
+            plan: data.subscription?.plan || 'FREE',
+            festivalsLimit,
+            activeFestivals: totalFestivals,
+            canPublish: totalFestivals < festivalsLimit // Actually means canCreate now
+          })
+        }
+      } catch (error) {
+        console.error('Error fetching plan info:', error)
+        // Default to FREE with limit reached to be safe
+        setPlanInfo({ plan: 'FREE', festivalsLimit: 1, activeFestivals: 1, canPublish: false })
+      }
+    }
+    fetchPlanInfo()
   }, [])
+  
+  // Auto-detect location and timezone on mount using browser geolocation
+  useEffect(() => {
+    const detectLocationAndTimezone = async () => {
+      // First, set timezone from browser as fallback
+      const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+      setFestivalData(prev => ({ ...prev, timezone: userTimezone || 'America/New_York' }))
+      
+      // Try to get location from browser geolocation
+      if ('geolocation' in navigator) {
+        try {
+          const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+              timeout: 5000,
+              maximumAge: 300000 // Cache for 5 minutes
+            })
+          })
+          
+          // Reverse geocode to get city name
+          const { latitude, longitude } = position.coords
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=en`
+          )
+          
+          if (response.ok) {
+            const data = await response.json()
+            const city = data.address?.city || data.address?.town || data.address?.village || data.address?.municipality
+            const country = data.address?.country
+            
+            if (city && country) {
+              const locationString = `${city}, ${country}`
+              setDetectedLocation(locationString)
+              setFestivalData(prev => ({ ...prev, location: locationString }))
+              
+              // Also detect timezone from this location
+              const tzResponse = await fetch(`/api/timezone/detect?location=${encodeURIComponent(locationString)}`)
+              if (tzResponse.ok) {
+                const tzData = await tzResponse.json()
+                if (tzData.found && tzData.timezone) {
+                  setFestivalData(prev => ({ ...prev, timezone: tzData.timezone.id }))
+                }
+              }
+            }
+          }
+        } catch (error) {
+          // Geolocation failed or denied - that's fine, we have the browser timezone as fallback
+          console.log('Geolocation not available or denied, using browser timezone')
+        }
+      }
+      
+      setIsDetectingLocation(false)
+    }
+    
+    detectLocationAndTimezone()
+  }, [])
+  
+  // Detect timezone from location when user types
+  const detectTimezone = useCallback(async (location: string) => {
+    if (!location || location.trim().length < 3) {
+      return
+    }
+
+    setIsDetectingTimezone(true)
+    try {
+      const response = await fetch(`/api/timezone/detect?location=${encodeURIComponent(location)}`)
+      if (response.ok) {
+        const data = await response.json()
+        if (data.found && data.timezone) {
+          // Auto-apply the timezone (no manual "Apply" button needed)
+          setFestivalData(prev => ({ ...prev, timezone: data.timezone.id }))
+          if (data.displayName) {
+            setDetectedLocation(data.displayName)
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error detecting timezone:', error)
+    } finally {
+      setIsDetectingTimezone(false)
+    }
+  }, [])
+
+  // Handle location change with debounce
+  const handleLocationChange = (value: string) => {
+    setFestivalData(prev => ({ ...prev, location: value }))
+    
+    // Clear previous timeout
+    if (locationDebounceRef.current) {
+      clearTimeout(locationDebounceRef.current)
+    }
+    
+    // Debounce the timezone detection (800ms delay)
+    locationDebounceRef.current = setTimeout(() => {
+      detectTimezone(value)
+    }, 800)
+  }
 
   const [csvFile, setCsvFile] = useState<File | null>(null)
   const [sessions, setSessions] = useState<ParsedSession[]>([])
@@ -81,9 +211,9 @@ export default function CreateFestivalPage() {
   const [skipSessions, setSkipSessions] = useState(false)
 
   const steps = [
-    { id: 'basic', title: 'Festival Details', description: 'Basic information about your festival' },
+    { id: 'basic', title: 'Event Details', description: 'Basic information about your event' },
     { id: 'schedule', title: 'Schedule Setup', description: 'Upload your CSV and configure display' },
-    { id: 'preview', title: 'Preview & Publish', description: 'Review and launch your festival' }
+    { id: 'preview', title: 'Preview & Publish', description: 'Review and launch your event' }
   ]
 
   const currentStepIndex = steps.findIndex(step => step.id === currentStep)
@@ -187,10 +317,39 @@ export default function CreateFestivalPage() {
         const errors: string[] = []
         const parsedSessions: ParsedSession[] = []
 
+        // Helper function to parse various date formats and normalize to YYYY-MM-DD
+        const parseDate = (dateStr: string): string => {
+          if (!dateStr || dateStr.trim() === '') return ''
+          
+          const trimmed = dateStr.trim()
+          
+          // Already in YYYY-MM-DD format
+          if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+            return trimmed
+          }
+          
+          // DD/MM/YYYY or DD-MM-YYYY format (European)
+          if (/^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}$/.test(trimmed)) {
+            const parts = trimmed.split(/[\/\-]/)
+            const day = parts[0].padStart(2, '0')
+            const month = parts[1].padStart(2, '0')
+            const year = parts[2]
+            return `${year}-${month}-${day}`
+          }
+          
+          // MM/DD/YYYY format (American) - harder to distinguish, we prioritize European
+          // Users should use YYYY-MM-DD for unambiguous dates
+          
+          return trimmed // Return as-is if we can't parse it
+        }
+
         results.data.forEach((row: any, index: number) => {
+          // Support both 'day' and 'date' column names
+          const dateValue = row.day || row.date || ''
+          
           // Validate required fields
-          if (!row.title || !row.day || !row.start || !row.end) {
-            errors.push(`Row ${index + 1}: Missing required fields (title, day, start, end)`)
+          if (!row.title || !dateValue || !row.start || !row.end) {
+            errors.push(`Row ${index + 1}: Missing required fields (title, day/date, start, end)`)
             return
           }
 
@@ -209,9 +368,12 @@ export default function CreateFestivalPage() {
             errors.push(`Row ${index + 1}: Invalid CardType "${row.CardType}". Must be "minimal", "photo", or "detailed" (or leave empty for default "detailed")`)
           }
 
+          // Parse the date (supports day or date column, and various formats)
+          const parsedDate = parseDate(dateValue)
+
           parsedSessions.push({
             id: row.id || `session-${index}`,
-            day: (row.day && row.day !== 'Invalid Date') ? row.day : '',
+            day: parsedDate !== 'Invalid Date' ? parsedDate : '',
             start: row.start || '',
             end: row.end || '',
             title: row.title || '',
@@ -243,9 +405,10 @@ export default function CreateFestivalPage() {
   const downloadCsvTemplate = () => {
     // Use semicolon delimiter for Windows Excel compatibility
     // Note: Using semicolon (;) instead of comma (,) because Excel on Windows expects this format
-    const csvContent = `id;date;start;end;title;level;capacity;types;CardType;teachers;location;Description;Prerequisites
+    // Column 'day' expects YYYY-MM-DD format (e.g., 2025-11-28) or DD/MM/YYYY
+    const csvContent = `id;day;start;end;title;level;capacity;types;CardType;teachers;location;Description;Prerequisites
 1;2025-11-28;08:00;09:00;Registration & Check-in;;50;Logistics;minimal;;Main Entrance;Welcome and registration desk;Event ticket required
-2;2025-11-28;09:00;10:30;Opening Keynote;;200;Presentation;photo;Dr. Sarah Chen;Main Auditorium;Welcome address and festival overview;
+2;2025-11-28;09:00;10:30;Opening Keynote;;200;Presentation;photo;Dr. Sarah Chen;Main Auditorium;Welcome address and event overview;
 3;2025-11-28;11:00;12:30;Workshop: Creative Writing;Beginner;25;Workshop;detailed;Alex Rivera;Room 101;Hands-on writing workshop exploring narrative techniques;Notebook and pen recommended
 4;2025-11-28;13:00;14:00;Lunch Break;;80;Break;minimal;;Garden Terrace;Catered lunch and networking time;
 5;2025-11-28;14:30;16:00;Panel Discussion;Intermediate;40;Panel;photo;Maria Lopez, John Smith;Conference Room;Industry experts discuss current trends;Basic familiarity with topic helpful
@@ -674,6 +837,79 @@ export default function CreateFestivalPage() {
     }
   }
 
+  // Save draft and then redirect to pricing (for users at their limit)
+  const handleSaveDraftAndUpgrade = async () => {
+    // Pre-flight validation
+    if (!festivalData.name || !festivalData.slug) {
+      alert('Please fill in at least the festival name.')
+      return
+    }
+    
+    setIsLoading(true)
+    
+    try {
+      const payload = {
+        ...festivalData,
+        isPublished: false,
+        sessions: sessions.map((session, index) => {
+          const startDate = new Date(festivalData.startDate)
+          const endDate = new Date(festivalData.endDate)
+          const dayToDateMap: Record<string, Date> = {}
+          const currentDate = new Date(startDate)
+          
+          while (currentDate <= endDate) {
+            const dayName = currentDate.toLocaleDateString('en-US', { weekday: 'long' })
+            if (!dayToDateMap[dayName]) {
+              dayToDateMap[dayName] = new Date(currentDate)
+            }
+            currentDate.setDate(currentDate.getDate() + 1)
+          }
+          
+          const sessionDate = dayToDateMap[session.day] || startDate
+          
+          return {
+            title: session.title,
+            description: session.description || '',
+            teachers: session.teachers || '',
+            teacherBio: '',
+            teacherPhoto: '',
+            startTime: `${sessionDate.toISOString().split('T')[0]}T${session.start}:00`,
+            endTime: `${sessionDate.toISOString().split('T')[0]}T${session.end}:00`,
+            duration: calculateDuration(session.start, session.end),
+            level: session.level || '',
+            maxParticipants: session.capacity || 20,
+            currentBookings: 0,
+            location: session.location || '',
+            requirements: session.prerequisites || '',
+            price: 0,
+            order: index,
+            cardType: session.cardType || 'detailed',
+            sessionTypes: session.types || ''
+          }
+        })
+      }
+      
+      const response = await fetch('/api/festivals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+
+      if (response.ok) {
+        // Draft saved, now redirect to pricing
+        router.push('/pricing')
+      } else {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to save draft')
+      }
+    } catch (error) {
+      console.error('Error saving draft:', error)
+      alert(`Error saving draft: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const calculateDuration = (start: string, end: string): number => {
     const [startHour, startMin] = start.split(':').map(Number)
     const [endHour, endMin] = end.split(':').map(Number)
@@ -727,14 +963,12 @@ export default function CreateFestivalPage() {
     }
   }
 
-
-
   return (
     <div className="container mx-auto px-4 py-6 sm:py-8 max-w-4xl">
       {/* Header */}
       <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Create New Festival</h1>
-        <p className="text-sm sm:text-base text-gray-600">Set up your festival in just a few steps</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Create New Event</h1>
+        <p className="text-sm sm:text-base text-gray-600">Set up your event in just a few steps</p>
       </div>
 
       {/* Progress Steps */}
@@ -786,7 +1020,7 @@ export default function CreateFestivalPage() {
             <form onSubmit={handleBasicSubmit} className="space-y-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                  Festival Name *
+                  Event Name *
                 </label>
                 <input
                   id="name"
@@ -812,7 +1046,7 @@ export default function CreateFestivalPage() {
                   onChange={(e) => setFestivalData(prev => ({ ...prev, description: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   rows={3}
-                  placeholder="A brief description of your festival..."
+                  placeholder="A brief description of your event..."
                 />
               </div>
 
@@ -846,19 +1080,70 @@ export default function CreateFestivalPage() {
                 </div>
               </div>
 
-              <div>
-                <label htmlFor="timezone" className="block text-sm font-medium text-gray-700 mb-2">
-                  <Globe className="inline-block w-4 h-4 mr-1" />
-                  Timezone *
-                </label>
-                <TimezoneSelect
-                  value={festivalData.timezone}
-                  onChange={(value) => setFestivalData(prev => ({ ...prev, timezone: value }))}
-                  placeholder="Select timezone"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  Session times will be displayed in this timezone. Attendees can add events to their calendar in their local time.
-                </p>
+              {/* Location & Timezone - auto-detected with option to change */}
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                {isDetectingLocation ? (
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Detecting your location...</span>
+                  </div>
+                ) : !showLocationEditor ? (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <MapPin className="w-4 h-4" />
+                        <span>
+                          Location: <span className="font-medium text-gray-900">
+                            {festivalData.location || 'Not set'}
+                          </span>
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowLocationEditor(true)}
+                        className="text-xs text-blue-600 hover:text-blue-800 underline"
+                      >
+                        Change
+                      </button>
+                    </div>
+                    <p className="mt-1 text-xs text-gray-500">
+                      Timezone: {festivalData.timezone}
+                    </p>
+                  </>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <label htmlFor="location" className="text-sm font-medium text-gray-700">
+                        Event Location
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setShowLocationEditor(false)}
+                        className="text-xs text-gray-500 hover:text-gray-700"
+                      >
+                        Done
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <input
+                        id="location"
+                        type="text"
+                        value={festivalData.location}
+                        onChange={(e) => handleLocationChange(e.target.value)}
+                        className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                        placeholder="City, venue, or address"
+                        autoFocus
+                      />
+                      {isDetectingTimezone && (
+                        <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-500 w-4 h-4 animate-spin" />
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      Timezone will auto-update: <span className="font-medium">{festivalData.timezone}</span>
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -889,7 +1174,7 @@ export default function CreateFestivalPage() {
                 </div>
                 <div className="flex items-center justify-between mt-1">
                   <p className="text-xs text-gray-500">
-                    This will be your public festival URL
+                    This will be your public event URL
                   </p>
                   {festivalData.slug && (
                     <p className={`text-xs ${
@@ -916,7 +1201,7 @@ export default function CreateFestivalPage() {
             <form onSubmit={handleScheduleSubmit} className="space-y-6">
               {/* Brief Introduction */}
               <div className="text-center max-w-2xl mx-auto">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Add Your Festival Schedule</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Add Your Event Schedule</h2>
                 <p className="text-gray-600">
                   Choose your preferred method: upload a CSV file or connect to a Google Sheet
                 </p>
@@ -1320,7 +1605,7 @@ export default function CreateFestivalPage() {
                       I'll add sessions later
                     </label>
                     <p className="text-sm text-blue-700 mt-1">
-                      Skip the CSV upload for now and create your festival. You can add sessions manually later from the festival dashboard.
+                      Skip the CSV upload for now and create your event. You can add sessions manually later from the event dashboard.
                     </p>
                   </div>
                 </div>
@@ -1345,9 +1630,9 @@ export default function CreateFestivalPage() {
 
           {currentStep === 'preview' && (
             <div className="space-y-6">
-              {/* Festival Summary */}
+              {/* Event Summary */}
               <div className="bg-gray-50 rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Festival Summary</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Event Summary</h3>
                 <div className="grid md:grid-cols-2 gap-4 text-sm">
                   <div>
                     <span className="font-medium text-gray-700">Name:</span>
@@ -1390,13 +1675,33 @@ export default function CreateFestivalPage() {
               {sessions.length === 0 && (
                 <div className="border-2 border-dashed border-blue-300 rounded-lg p-8 bg-blue-50 text-center">
                   <Calendar className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-blue-900 mb-2">You're creating an empty festival</h3>
+                  <h3 className="text-lg font-medium text-blue-900 mb-2">You're creating an empty event</h3>
                   <p className="text-blue-700 mb-4">
-                    Don't worry! After creating your festival, you can add sessions manually or upload a CSV from the festival dashboard.
+                    Don't worry! After creating your event, you can add sessions manually or upload a CSV from the event dashboard.
                   </p>
                   <div className="inline-flex items-center gap-2 text-sm text-blue-600 bg-white px-4 py-2 rounded-lg border border-blue-200">
                     <Info className="w-4 h-4" />
                     <span>Navigate to <strong>Manage Sessions</strong> to add your schedule</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Upgrade prompt for Free users at limit */}
+              {planInfo && !planInfo.canPublish && (
+                <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-purple-100 rounded-lg">
+                      <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-gray-900">Publishing Limit Reached</h4>
+                      <p className="text-sm text-gray-600 mt-1">
+                        You've published {planInfo.festivalsLimit} of {planInfo.festivalsLimit} event{planInfo.festivalsLimit > 1 ? 's' : ''} on the {planInfo.plan} plan. 
+                        Click "Save & Upgrade" to save your event as a draft and upgrade to Pro to publish up to 5 events.
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
@@ -1420,12 +1725,26 @@ export default function CreateFestivalPage() {
                     <Eye className="w-4 h-4 mr-2" />
                     {isLoading ? 'Saving...' : 'Save as Draft'}
                   </Button>
-                  <Button
-                    onClick={handlePublish}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Publishing...' : 'Publish Festival'}
-                  </Button>
+                  {/* Show Publish or Upgrade button based on plan limits */}
+                  {planInfo?.canPublish === false ? (
+                    <Button
+                      onClick={handleSaveDraftAndUpgrade}
+                      disabled={isLoading}
+                      className="bg-purple-600 hover:bg-purple-700"
+                    >
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      {isLoading ? 'Saving...' : 'Save & Upgrade'}
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handlePublish}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? 'Publishing...' : 'Publish Event'}
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>

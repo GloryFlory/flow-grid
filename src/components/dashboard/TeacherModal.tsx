@@ -21,9 +21,10 @@ interface TeacherModalProps {
     url?: string;
     photo?: TeacherPhoto;
   };
+  presenterLabel?: string;
 }
 
-export default function TeacherModal({ open, onClose, onSave, initial }: TeacherModalProps) {
+export default function TeacherModal({ open, onClose, onSave, initial, presenterLabel = 'Teacher' }: TeacherModalProps) {
   const [name, setName] = useState(initial?.name || '');
   const [url, setUrl] = useState(initial?.url || '');
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -262,7 +263,7 @@ export default function TeacherModal({ open, onClose, onSave, initial }: Teacher
       {/* Main Form Modal */}
       <Modal open={open && !showCropper} onClose={onClose}>
         <form onSubmit={handleSubmit} className="p-6 w-full max-w-lg">
-          <h2 className="text-2xl font-bold mb-6">{initial ? 'Edit Teacher' : 'Add Teacher'}</h2>
+          <h2 className="text-2xl font-bold mb-6">{initial ? `Edit ${presenterLabel}` : `Add ${presenterLabel}`}</h2>
           
           {error && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
@@ -284,7 +285,7 @@ export default function TeacherModal({ open, onClose, onSave, initial }: Teacher
                 disabled={isSubmitting}
               />
               <p className="text-xs text-gray-500 mt-1.5">
-                ⚠️ <strong>Case-sensitive!</strong> Must match exactly with CSV teacher names (e.g., "Andre and Daria" ≠ "andre and daria")
+                ⚠️ <strong>Case-sensitive!</strong> Must match exactly with CSV {presenterLabel.toLowerCase()} names (e.g., "Andre and Daria" ≠ "andre and daria")
               </p>
             </div>
 
@@ -374,7 +375,7 @@ export default function TeacherModal({ open, onClose, onSave, initial }: Teacher
               disabled={isSubmitting}
               className="flex-1"
             >
-              {isSubmitting ? 'Saving...' : (initial ? 'Save Changes' : 'Add Teacher')}
+              {isSubmitting ? 'Saving...' : (initial ? 'Save Changes' : `Add ${presenterLabel}`)}
             </Button>
           </div>
         </form>

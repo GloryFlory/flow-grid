@@ -18,7 +18,8 @@ import {
   Eye,
   ArrowLeft,
   FileText,
-  Share2
+  Share2,
+  PieChart
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -138,7 +139,7 @@ export default function FestivalManagement() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="text-gray-600 mt-2">Loading festival...</p>
+          <p className="text-gray-600 mt-2">Loading event...</p>
         </div>
       </div>
     )
@@ -164,7 +165,7 @@ export default function FestivalManagement() {
             )}
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            {error.type === 'forbidden' ? 'Access Denied' : 'Festival Not Found'}
+            {error.type === 'forbidden' ? 'Access Denied' : 'Event Not Found'}
           </h1>
           <p className="text-gray-600 mb-6">{error.message}</p>
           <Link href="/dashboard">
@@ -179,7 +180,7 @@ export default function FestivalManagement() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Festival Not Found</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Event Not Found</h1>
           <Link href="/dashboard">
             <Button>Back to Dashboard</Button>
           </Link>
@@ -338,7 +339,7 @@ export default function FestivalManagement() {
               <CardHeader className="pb-3 sm:pb-6">
                 <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                   <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
-                  Festival Content
+                  Event Content
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 sm:space-y-4">
@@ -361,7 +362,7 @@ export default function FestivalManagement() {
                   <div className="p-3 sm:p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all cursor-pointer">
                     <div className="flex items-start sm:items-center justify-between gap-3">
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 break-words">Festival Information</h3>
+                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 break-words">Event Information</h3>
                         <p className="text-xs sm:text-sm text-gray-600 mt-0.5">Update details and dates</p>
                       </div>
                       <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0" />
@@ -378,18 +379,29 @@ export default function FestivalManagement() {
                   Analytics & Insights
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-3">
                 <Link href={`/dashboard/festivals/${festival.id}/analytics`}>
                   <div className="p-3 sm:p-4 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 transition-all cursor-pointer">
                     <div className="flex items-start sm:items-center justify-between gap-3">
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 break-words">Festival Analytics</h3>
+                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 break-words">Visitor Analytics</h3>
                         <p className="text-xs sm:text-sm text-gray-600 mt-0.5">View engagement stats</p>
                       </div>
                       <div className="text-right flex-shrink-0">
                         <p className="text-base sm:text-lg font-bold text-green-600">{analytics?.uniqueVisitors || 0}</p>
                         <p className="text-xs text-gray-500">Visitors</p>
                       </div>
+                    </div>
+                  </div>
+                </Link>
+                <Link href={`/dashboard/festivals/${festival.id}/insights`}>
+                  <div className="p-3 sm:p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all cursor-pointer">
+                    <div className="flex items-start sm:items-center justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 break-words">Event Insights</h3>
+                        <p className="text-xs sm:text-sm text-gray-600 mt-0.5">Workshop & content breakdown</p>
+                      </div>
+                      <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0" />
                     </div>
                   </div>
                 </Link>
@@ -411,7 +423,7 @@ export default function FestivalManagement() {
                   <div className="p-3 sm:p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-all cursor-pointer">
                     <div className="flex items-start sm:items-center justify-between gap-3">
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 break-words">Festival Branding</h3>
+                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 break-words">Event Branding</h3>
                         <p className="text-xs sm:text-sm text-gray-600 mt-0.5">Customize logo and colors</p>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
@@ -450,7 +462,7 @@ export default function FestivalManagement() {
               <CardHeader className="pb-3 sm:pb-6">
                 <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                   <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
-                  Festival Settings
+                  Event Settings
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 sm:space-y-4">

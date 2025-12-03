@@ -2,7 +2,7 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
-import { BarChart3, Calendar, Users, Eye, TrendingUp, Clock, Heart, Download, MousePointerClick } from 'lucide-react'
+import { BarChart3, Calendar, Users, Eye, TrendingUp, Clock, Heart, Download, MousePointerClick, Layers, Grid3X3, CalendarDays, Star } from 'lucide-react'
 import Link from 'next/link'
 
 export default async function AnalyticsPage() {
@@ -29,7 +29,10 @@ export default async function AnalyticsPage() {
     totalPageViews,
     last7DaysViews,
     totalClicks,
-    calendarExports
+    calendarExports,
+    viewModeEvents,
+    calendarExportEvents,
+    sessionClickEvents
   ] = await Promise.all([
     prisma.festival.findMany({
       where: { userId: session.user.id },
@@ -109,7 +112,79 @@ export default async function AnalyticsPage() {
         event: 'calendar_exported',
       },
     }),
+    // Get all view mode events to parse
+    prisma.analytics.findMany({
+      where: {
+        festival: { userId: session.user.id },
+        event: 'view_mode_changed',
+      },
+      select: { properties: true },
+    }),
+    // Get all calendar export events to parse
+    prisma.analytics.findMany({
+      where: {
+        festival: { userId: session.user.id },
+        event: 'calendar_exported',
+      },
+      select: { properties: true },
+    }),
+    // Get session click events for top sessions
+    prisma.analytics.findMany({
+      where: {
+        festival: { userId: session.user.id },
+        event: 'session_clicked',
+      },
+      select: { properties: true },
+    }),
   ])
+
+  // Parse view mode counts from properties JSON
+  const viewModeCounts = { cards: 0, grid: 0, mySchedule: 0 }
+  viewModeEvents.forEach(e => {
+    const props = e.properties as { mode?: string } | null
+    if (props?.mode === 'cards') viewModeCounts.cards++
+    else if (props?.mode === 'grid') viewModeCounts.grid++
+    else if (props?.mode === 'mySchedule') viewModeCounts.mySchedule++
+  })
+
+  // Parse calendar export breakdown
+  const calendarBreakdown = { ics: 0, google: 0 }
+  calendarExportEvents.forEach(e => {
+    const props = e.properties as { method?: string } | null
+    if (props?.method === 'ics') calendarBreakdown.ics++
+    else if (props?.method === 'google') calendarBreakdown.google++
+  })
+
+  // Parse top sessions by clicks
+  const sessionClickCounts: Record<string, { id: string; title: string; clicks: number }> = {}
+  sessionClickEvents.forEach(e => {
+    const props = e.properties as { sessionId?: string; sessionTitle?: string } | null
+    if (props?.sessionId) {
+      if (!sessionClickCounts[props.sessionId]) {
+        sessionClickCounts[props.sessionId] = {
+          id: props.sessionId,
+          title: props.sessionTitle || 'Unknown',
+          clicks: 0,
+        }
+      }
+      sessionClickCounts[props.sessionId].clicks++
+    }
+  })
+  const topSessions = Object.values(sessionClickCounts)
+    .sort((a, b) => b.clicks - a.clicks)
+    .slice(0, 5)
+
+  // Estimate unique visitors from schedule views with deviceId
+  const scheduleViewEvents = await prisma.analytics.findMany({
+    where: {
+      festival: { userId: session.user.id },
+      event: 'schedule_viewed',
+      deviceId: { not: null },
+    },
+    select: { deviceId: true },
+    distinct: ['deviceId'],
+  })
+  const uniqueVisitors = scheduleViewEvents.length
 
   const publishedCount = festivals.filter((f: { isPublished: boolean }) => f.isPublished).length
   const draftCount = festivals.length - publishedCount
@@ -124,7 +199,7 @@ export default async function AnalyticsPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
-          <p className="text-gray-600 mt-2">Track your festivals' performance and engagement</p>
+          <p className="text-gray-600 mt-2">Track your events' performance and engagement</p>
         </div>
 
         {/* Key Metrics Grid - Row 1 */}
@@ -141,6 +216,20 @@ export default async function AnalyticsPage() {
               </div>
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                 <Eye className="w-6 h-6 text-blue-600" />
+              </div>
+            </div>
+          </div>
+
+          {/* Unique Visitors */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Unique Visitors</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">{uniqueVisitors.toLocaleString()}</p>
+                <p className="text-xs text-gray-500 mt-1">Distinct devices</p>
+              </div>
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <Users className="w-6 h-6 text-green-600" />
               </div>
             </div>
           </div>
@@ -190,11 +279,11 @@ export default async function AnalyticsPage() {
 
         {/* Key Metrics Grid - Row 2 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {/* Total Festivals */}
+          {/* Total Events */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Festivals</p>
+                <p className="text-sm font-medium text-gray-600">Total Events</p>
                 <p className="text-3xl font-bold text-gray-900 mt-2">{festivals.length}</p>
                 <p className="text-xs text-gray-500 mt-1">
                   {publishedCount} published, {draftCount} draft
@@ -212,7 +301,7 @@ export default async function AnalyticsPage() {
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Sessions</p>
                 <p className="text-3xl font-bold text-gray-900 mt-2">{totalSessions}</p>
-                <p className="text-xs text-gray-500 mt-1">Across all festivals</p>
+                <p className="text-xs text-gray-500 mt-1">Across all events</p>
               </div>
               <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
                 <Clock className="w-6 h-6 text-amber-600" />
@@ -251,24 +340,24 @@ export default async function AnalyticsPage() {
           </div>
         </div>
 
-        {/* Festival Performance Table */}
+        {/* Event Performance Table */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Festival Performance</h2>
-            <p className="text-sm text-gray-600 mt-1">Overview of all your festivals</p>
+            <h2 className="text-lg font-semibold text-gray-900">Event Performance</h2>
+            <p className="text-sm text-gray-600 mt-1">Overview of all your events</p>
           </div>
           <div className="overflow-x-auto">
             {festivals.length === 0 ? (
               <div className="p-12 text-center">
                 <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">No festivals created yet</p>
+                <p className="text-gray-600">No events created yet</p>
               </div>
             ) : (
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Festival Name
+                      Event Name
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
@@ -285,7 +374,7 @@ export default async function AnalyticsPage() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {festivals.map((festival: { id: string; name: string; slug: string; isPublished: boolean; _count: { sessions: number; bookings: number } }) => (
+                  {festivals.map((festival) => (
                     <tr key={festival.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">{festival.name}</div>
@@ -317,6 +406,105 @@ export default async function AnalyticsPage() {
                   ))}
                 </tbody>
               </table>
+            )}
+          </div>
+        </div>
+
+        {/* Engagement Insights Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* View Mode Preferences */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Layers className="w-5 h-5 text-purple-600" />
+              View Mode Usage
+            </h3>
+            {(viewModeCounts.cards + viewModeCounts.grid + viewModeCounts.mySchedule) === 0 ? (
+              <p className="text-gray-500 text-sm">No view mode data yet</p>
+            ) : (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Layers className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-700">Cards View</span>
+                  </div>
+                  <span className="text-sm font-medium text-gray-900">{viewModeCounts.cards}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Grid3X3 className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-700">Grid View</span>
+                  </div>
+                  <span className="text-sm font-medium text-gray-900">{viewModeCounts.grid}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <CalendarDays className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-700">My Schedule</span>
+                  </div>
+                  <span className="text-sm font-medium text-gray-900">{viewModeCounts.mySchedule}</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Top Sessions */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Star className="w-5 h-5 text-amber-500" />
+              Top Sessions
+            </h3>
+            {topSessions.length === 0 ? (
+              <p className="text-gray-500 text-sm">No session clicks yet</p>
+            ) : (
+              <div className="space-y-3">
+                {topSessions.map((session, idx) => (
+                  <div key={session.id} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <span className="text-xs font-medium text-gray-400 w-4">{idx + 1}.</span>
+                      <span className="text-sm text-gray-700 truncate">{session.title}</span>
+                    </div>
+                    <span className="text-sm font-medium text-gray-900 ml-2">{session.clicks} clicks</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Calendar Export Breakdown */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Download className="w-5 h-5 text-indigo-600" />
+              Calendar Exports
+            </h3>
+            {(calendarBreakdown.ics + calendarBreakdown.google) === 0 ? (
+              <p className="text-gray-500 text-sm">No calendar exports yet</p>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm text-gray-700">ICS Download</span>
+                    <span className="text-sm font-medium text-gray-900">{calendarBreakdown.ics}</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-indigo-600 h-2 rounded-full" 
+                      style={{ width: `${calendarExports > 0 ? (calendarBreakdown.ics / calendarExports) * 100 : 0}%` }}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm text-gray-700">Google Calendar</span>
+                    <span className="text-sm font-medium text-gray-900">{calendarBreakdown.google}</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-green-600 h-2 rounded-full" 
+                      style={{ width: `${calendarExports > 0 ? (calendarBreakdown.google / calendarExports) * 100 : 0}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -358,7 +546,6 @@ export default async function AnalyticsPage() {
             )}
           </div>
         </div>
-
         {/* Analytics Features */}
         <div className="grid md:grid-cols-2 gap-6">
           {/* Implemented Features */}

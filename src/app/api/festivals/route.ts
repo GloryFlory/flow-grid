@@ -59,12 +59,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check plan limits (skip for admins)
+    // Check plan limits
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       include: {
         subscription: true,
-        festivals: true
+        festivals: {
+          where: {
+            isPublished: true // Only count PUBLISHED festivals against limit
+          }
+        }
       }
     })
 
@@ -75,7 +79,28 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // All users now have unlimited access
+    // Enforce plan limits only when PUBLISHING (drafts are unlimited)
+    if (data.isPublished) {
+      const festivalsLimit = user.subscription?.festivalsLimit ?? 1
+      const publishedFestivals = user.festivals.length
+      
+      // Skip limit check for admins
+      const isAdmin = user.email === 'florian.hohenleitner@gmail.com' || 
+                      user.email === 'admin@tryflowgrid.com'
+      
+      if (!isAdmin && publishedFestivals >= festivalsLimit) {
+        return NextResponse.json(
+          { 
+            error: 'Publishing limit reached',
+            message: `You've published ${publishedFestivals} of ${festivalsLimit} festival${festivalsLimit > 1 ? 's' : ''} on your ${user.subscription?.plan || 'FREE'} plan. Upgrade to Pro to publish more.`,
+            limitReached: true,
+            currentCount: publishedFestivals,
+            limit: festivalsLimit
+          },
+          { status: 403 }
+        )
+      }
+    }
 
     // Create festival
     const festival = await prisma.festival.create({

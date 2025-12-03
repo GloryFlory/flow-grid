@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { 
@@ -15,11 +15,14 @@ import {
   AlertCircle,
   Check,
   Share2,
-  Loader2
+  Loader2,
+  Zap,
+  Users
 } from 'lucide-react'
 import Link from 'next/link'
 import { TIMEZONE_GROUPS } from '@/lib/timezones'
 import TimezoneSelect from '@/components/ui/TimezoneSelect'
+import { PRESENTER_LABELS, DEFAULT_PRESENTER_LABEL, asPresenterLabel } from '@/config/terminology'
 
 interface Festival {
   id: string
@@ -32,6 +35,7 @@ interface Festival {
   timezone: string
   isPublished: boolean
   customDomain?: string
+  presenterLabel?: string
   whatsappLink?: string
   telegramLink?: string
   facebookLink?: string
@@ -48,11 +52,20 @@ interface TimezoneDetection {
   displayLabel: string
 }
 
+interface PlanInfo {
+  canPublish: boolean
+  publishedFestivals: number
+  festivalsLimit: number
+  plan: string
+}
+
 export default function FestivalInformation() {
   const params = useParams()
+  const router = useRouter()
   const festivalId = params.id as string
   
   const [festival, setFestival] = useState<Festival | null>(null)
+  const [planInfo, setPlanInfo] = useState<PlanInfo | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
@@ -74,6 +87,7 @@ export default function FestivalInformation() {
     timezone: 'UTC',
     isPublished: false,
     customDomain: '',
+    presenterLabel: DEFAULT_PRESENTER_LABEL as string,
     whatsappLink: '',
     telegramLink: '',
     facebookLink: '',
@@ -83,8 +97,26 @@ export default function FestivalInformation() {
   useEffect(() => {
     if (festivalId) {
       fetchFestival()
+      fetchPlanInfo()
     }
   }, [festivalId])
+
+  const fetchPlanInfo = async () => {
+    try {
+      const response = await fetch('/api/user/subscription')
+      if (response.ok) {
+        const data = await response.json()
+        setPlanInfo({
+          canPublish: data.canPublish,
+          publishedFestivals: data.publishedFestivals,
+          festivalsLimit: data.subscription?.festivalsLimit || 1,
+          plan: data.subscription?.plan || 'FREE'
+        })
+      }
+    } catch (error) {
+      console.error('Error fetching plan info:', error)
+    }
+  }
 
   useEffect(() => {
     if (festival) {
@@ -98,6 +130,7 @@ export default function FestivalInformation() {
         timezone: festival.timezone,
         isPublished: festival.isPublished,
         customDomain: festival.customDomain || '',
+        presenterLabel: asPresenterLabel(festival.presenterLabel),
         whatsappLink: festival.whatsappLink || '',
         telegramLink: festival.telegramLink || '',
         facebookLink: festival.facebookLink || '',
@@ -211,13 +244,18 @@ export default function FestivalInformation() {
         }),
       })
 
+      const data = await response.json()
+
       if (response.ok) {
-        const updatedFestival = await response.json()
-        setFestival(updatedFestival.festival)
+        setFestival(data.festival)
         setHasChanges(false)
+      } else {
+        // Show error message (e.g., limit reached when publishing)
+        alert(data.error || 'Failed to save festival')
       }
     } catch (error) {
       console.error('Error saving festival:', error)
+      alert('An error occurred while saving')
     } finally {
       setIsSaving(false)
     }
@@ -238,7 +276,7 @@ export default function FestivalInformation() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Festival Not Found</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Event Not Found</h1>
           <Link href="/dashboard">
             <Button>Back to Dashboard</Button>
           </Link>
@@ -257,7 +295,7 @@ export default function FestivalInformation() {
             <Link href={`/dashboard/festivals/${festival.id}`}>
               <Button variant="outline" size="sm">
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Festival
+                Back to Event
               </Button>
             </Link>
           </div>
@@ -269,12 +307,12 @@ export default function FestivalInformation() {
                 <Link href={`/dashboard/festivals/${festival.id}`}>
                   <Button variant="outline" size="sm">
                     <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back to Festival
+                    Back to Event
                   </Button>
                 </Link>
               </div>
               <div className="min-w-0 flex-1">
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 break-words">Festival Information</h1>
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 break-words">Event Information</h1>
                 <p className="text-sm sm:text-base text-gray-600 mt-1">Basic details and settings</p>
               </div>
             </div>
@@ -318,14 +356,14 @@ export default function FestivalInformation() {
               <CardContent className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Festival Name *
+                    Event Name *
                   </label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => handleNameChange(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Enter festival name"
+                    placeholder="Enter event name"
                   />
                 </div>
 
@@ -343,7 +381,7 @@ export default function FestivalInformation() {
                       value={formData.slug}
                       onChange={(e) => handleInputChange('slug', e.target.value)}
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="festival-slug"
+                      placeholder="event-slug"
                     />
                   </div>
                   <p className="text-xs text-gray-500 mt-1">
@@ -360,7 +398,7 @@ export default function FestivalInformation() {
                     onChange={(e) => handleInputChange('description', e.target.value)}
                     rows={4}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Brief description of your festival (optional)"
+                    placeholder="Brief description of your event (optional)"
                   />
                 </div>
               </CardContent>
@@ -478,7 +516,7 @@ export default function FestivalInformation() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-sm text-gray-600">
-                  Add links to your festival's social media groups. These will appear on the public schedule.
+                  Add links to your event's social media groups. These will appear on the public schedule.
                 </p>
 
                 <div>
@@ -562,6 +600,48 @@ export default function FestivalInformation() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Terminology Settings */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  Terminology
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-gray-600">
+                  Customize how session leaders are labeled on your public schedule.
+                </p>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Session Leader Label
+                  </label>
+                  <select
+                    value={formData.presenterLabel}
+                    onChange={(e) => handleInputChange('presenterLabel', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    {PRESENTER_LABELS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.value}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 mt-2">
+                    {PRESENTER_LABELS.find(l => l.value === formData.presenterLabel)?.description || 
+                     'Choose the term that best fits your event type'}
+                  </p>
+                </div>
+
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-xs text-gray-500">
+                    <strong>Preview:</strong> Filter by {formData.presenterLabel} • All {formData.presenterLabel}s • {formData.presenterLabel} profiles
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Sidebar */}
@@ -569,7 +649,7 @@ export default function FestivalInformation() {
             {/* Status Overview */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Festival Status</CardTitle>
+                <CardTitle className="text-base">Event Status</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center gap-3">
@@ -588,21 +668,43 @@ export default function FestivalInformation() {
 
                 {/* Publish Toggle */}
                 <div className="pt-3 border-t">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700">Public Schedule</span>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.isPublished}
-                        onChange={(e) => handleInputChange('isPublished', e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
-                    </label>
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    Make your schedule visible to participants
-                  </p>
+                  {/* Show upgrade button if at limit and festival is not published */}
+                  {!formData.isPublished && planInfo && !planInfo.canPublish ? (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-700">Public Schedule</span>
+                        <Button
+                          size="sm"
+                          onClick={() => router.push('/pricing')}
+                          className="bg-purple-600 hover:bg-purple-700 text-xs px-2 py-1 h-7"
+                        >
+                          <Zap className="w-3 h-3 mr-1" />
+                          Upgrade
+                        </Button>
+                      </div>
+                      <p className="text-xs text-amber-600">
+                        Publishing limit reached ({planInfo.publishedFestivals}/{planInfo.festivalsLimit} events)
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-gray-700">Public Schedule</span>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={formData.isPublished}
+                            onChange={(e) => handleInputChange('isPublished', e.target.checked)}
+                            className="sr-only peer"
+                          />
+                          <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        Make your schedule visible to participants
+                      </p>
+                    </>
+                  )}
                 </div>
 
                 {formData.isPublished && (
@@ -636,7 +738,7 @@ export default function FestivalInformation() {
                 <Link href={`/dashboard/festivals/${festival.id}/branding`}>
                   <Button variant="outline" className="w-full justify-start">
                     <Settings className="w-4 h-4 mr-2" />
-                    Festival Branding
+                    Event Branding
                   </Button>
                 </Link>
 
@@ -659,7 +761,7 @@ export default function FestivalInformation() {
               <CardContent className="space-y-2">
                 <div className="flex items-center gap-2 text-sm">
                   <Check className="w-4 h-4 text-green-600" />
-                  <span>Festival information complete</span>
+                  <span>Event information complete</span>
                 </div>
                 <div className={`flex items-center gap-2 text-sm ${
                   festival._count.sessions > 0 ? 'text-green-600' : 'text-gray-400'

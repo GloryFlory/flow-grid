@@ -95,7 +95,7 @@ export default function ShareAndPromote() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Festival Not Found</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Event Not Found</h1>
           <Link href="/dashboard">
             <Button>Back to Dashboard</Button>
           </Link>
@@ -115,7 +115,7 @@ export default function ShareAndPromote() {
             <Link href={`/dashboard/festivals/${festival.id}`}>
               <Button variant="outline" size="sm">
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Festival Dashboard
+                Back to Event Dashboard
               </Button>
             </Link>
           </div>
@@ -136,13 +136,13 @@ export default function ShareAndPromote() {
                   <Share2 className="w-8 h-8 text-yellow-600" />
                 </div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                  Publish Your Festival First
+                  Publish Your Event First
                 </h2>
                 <p className="text-gray-600 mb-6">
-                  Your festival needs to be published before you can share it with attendees.
+                  Your event needs to be published before you can share it with attendees.
                 </p>
                 <Link href={`/dashboard/festivals/${festival.id}/settings`}>
-                  <Button>Go to Festival Settings</Button>
+                  <Button>Go to Event Settings</Button>
                 </Link>
               </div>
             </CardContent>

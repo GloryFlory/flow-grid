@@ -8,8 +8,9 @@ export async function GET(
   try {
     const { slug } = await params
     
-    // Optimized query - get published festival with all sessions and teachers
-    const festival = await prisma.festival.findUnique({
+    // Use findFirst since we're filtering by multiple conditions
+    // findUnique only works with the unique field alone
+    const festival = await prisma.festival.findFirst({
       where: { 
         slug,
         isPublished: true // Only show published festivals

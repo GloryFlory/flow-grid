@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react'
 import { TIMEZONE_GROUPS, TimezoneGroup } from '@/lib/timezones'
+import { createPortal } from 'react-dom'
 
 interface TimezoneSelectProps {
   value: string
@@ -12,9 +13,15 @@ interface TimezoneSelectProps {
 export default function TimezoneSelect({ value, onChange, placeholder = 'Select timezone', className }: TimezoneSelectProps) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
+  const [mounted, setMounted] = useState(false)
   const triggerRef = useRef<HTMLButtonElement | null>(null)
   const menuRef = useRef<HTMLDivElement | null>(null)
   const searchRef = useRef<HTMLInputElement | null>(null)
+
+  // For portal rendering
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Close on outside click / escape
   useEffect(() => {
@@ -66,6 +73,84 @@ export default function TimezoneSelect({ value, onChange, placeholder = 'Select 
     })).filter(group => group.options.length > 0)
   }, [search])
 
+  // Render dropdown in a portal to avoid overflow clipping
+  const dropdownContent = open && mounted ? createPortal(
+    <>
+      {/* Backdrop */}
+      <div 
+        className="fixed inset-0 bg-black/20 z-[9998]"
+        onClick={() => setOpen(false)}
+      />
+      {/* Dropdown */}
+      <div 
+        ref={menuRef} 
+        className="fixed inset-x-4 top-1/2 -translate-y-1/2 z-[9999] bg-white rounded-xl shadow-2xl border border-gray-200 max-h-[70vh] flex flex-col sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-md"
+        role="listbox"
+      >
+        {/* Header with search */}
+        <div className="sticky top-0 bg-white border-b border-gray-100 p-3 rounded-t-xl">
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-semibold text-gray-900">Select Timezone</span>
+            <button 
+              type="button"
+              onClick={() => setOpen(false)}
+              className="text-blue-600 font-medium"
+            >
+              Done
+            </button>
+          </div>
+          <input
+            ref={searchRef}
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search timezones..."
+            className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+
+        {/* Options */}
+        <div className="overflow-y-auto flex-1 overscroll-contain">
+          {filteredGroups.map((group) => (
+            <div key={group.label}>
+              <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 sticky top-0">
+                {group.label}
+              </div>
+              {group.options.map((tz) => (
+                <button
+                  key={tz.value}
+                  type="button"
+                  role="option"
+                  aria-selected={value === tz.value}
+                  className={`w-full px-4 py-3 text-left text-base hover:bg-blue-50 flex items-center justify-between ${
+                    value === tz.value ? 'bg-blue-50 text-blue-700' : 'text-gray-900'
+                  }`}
+                  onClick={() => {
+                    onChange(tz.value)
+                    setSearch('')
+                    setOpen(false)
+                  }}
+                >
+                  <span>{tz.label}</span>
+                  {value === tz.value && (
+                    <span className="text-blue-600">✓</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          ))}
+          
+          {filteredGroups.length === 0 && (
+            <div className="px-4 py-8 text-center text-gray-500">
+              No timezones found
+            </div>
+          )}
+        </div>
+      </div>
+    </>,
+    document.body
+  ) : null
+
   return (
     <div className={`relative ${className || ''}`}>
       <button
@@ -82,81 +167,7 @@ export default function TimezoneSelect({ value, onChange, placeholder = 'Select 
         <span className="text-gray-400">▾</span>
       </button>
 
-      {open && (
-        <div 
-          ref={menuRef} 
-          className="fixed inset-x-0 bottom-0 z-50 bg-white rounded-t-2xl shadow-2xl border-t border-gray-200 max-h-[70vh] flex flex-col md:absolute md:inset-auto md:top-full md:left-0 md:right-0 md:bottom-auto md:mt-1 md:rounded-lg md:max-h-80"
-          role="listbox"
-        >
-          {/* Header with search */}
-          <div className="sticky top-0 bg-white border-b border-gray-100 p-3 rounded-t-2xl md:rounded-t-lg">
-            <div className="flex items-center justify-between mb-2 md:hidden">
-              <span className="font-semibold text-gray-900">Select Timezone</span>
-              <button 
-                type="button"
-                onClick={() => setOpen(false)}
-                className="text-blue-600 font-medium"
-              >
-                Done
-              </button>
-            </div>
-            <input
-              ref={searchRef}
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search timezones..."
-              className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-
-          {/* Options */}
-          <div className="overflow-y-auto flex-1 overscroll-contain">
-            {filteredGroups.map((group) => (
-              <div key={group.label}>
-                <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 sticky top-0">
-                  {group.label}
-                </div>
-                {group.options.map((tz) => (
-                  <button
-                    key={tz.value}
-                    type="button"
-                    role="option"
-                    aria-selected={value === tz.value}
-                    className={`w-full px-4 py-3 text-left text-base hover:bg-blue-50 flex items-center justify-between ${
-                      value === tz.value ? 'bg-blue-50 text-blue-700' : 'text-gray-900'
-                    }`}
-                    onClick={() => {
-                      onChange(tz.value)
-                      setSearch('')
-                      setOpen(false)
-                    }}
-                  >
-                    <span>{tz.label}</span>
-                    {value === tz.value && (
-                      <span className="text-blue-600">✓</span>
-                    )}
-                  </button>
-                ))}
-              </div>
-            ))}
-            
-            {filteredGroups.length === 0 && (
-              <div className="px-4 py-8 text-center text-gray-500">
-                No timezones found
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Backdrop for mobile */}
-      {open && (
-        <div 
-          className="fixed inset-0 bg-black/20 z-40 md:hidden"
-          onClick={() => setOpen(false)}
-        />
-      )}
+      {dropdownContent}
     </div>
   )
 }

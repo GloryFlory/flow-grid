@@ -76,6 +76,7 @@ interface Festival {
   startDate: string
   endDate: string
   sessions: FestivalSession[]
+  presenterLabel?: string
 }
 
 // Sortable Row Component
@@ -185,7 +186,7 @@ function SortableSessionRow({
               <div className="relative group">
                 <AlertCircle className="w-4 h-4 text-amber-500 cursor-help flex-shrink-0" />
                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10 shadow-lg">
-                  Date outside festival range ({new Date(festival.startDate).toLocaleDateString()} - {new Date(festival.endDate).toLocaleDateString()})
+                  Date outside event range ({new Date(festival.startDate).toLocaleDateString()} - {new Date(festival.endDate).toLocaleDateString()})
                   <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45 -mt-1"></div>
                 </div>
               </div>
@@ -1143,7 +1144,7 @@ export default function SessionsManagement() {
               <div className="mb-4">
                 <Frown className="w-16 h-16 text-gray-400 mx-auto" />
               </div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">Festival Not Found</h1>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">Event Not Found</h1>
               <p className="text-gray-600 mb-6">{error.message}</p>
             </>
           ) : (
@@ -1170,7 +1171,7 @@ export default function SessionsManagement() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Festival Not Found</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Event Not Found</h1>
           <Link href="/dashboard">
             <Button>Back to Dashboard</Button>
           </Link>
@@ -1189,7 +1190,7 @@ export default function SessionsManagement() {
             <Link href={`/dashboard/festivals/${festival.id}`}>
               <Button variant="outline" size="sm">
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Festival
+                Back to Event
               </Button>
             </Link>
           </div>
@@ -1201,7 +1202,7 @@ export default function SessionsManagement() {
                 <Link href={`/dashboard/festivals/${festival.id}`}>
                   <Button variant="outline" size="sm">
                     <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back to Festival
+                    Back to Event
                   </Button>
                 </Link>
               </div>
@@ -1505,7 +1506,7 @@ export default function SessionsManagement() {
                 {festival && (
                   <div className="pt-3 border-t border-gray-200">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm text-gray-600">Festival Dates</span>
+                      <span className="text-sm text-gray-600">Event Dates</span>
                     </div>
                     <p className="text-xs text-gray-500">
                       {new Date(festival.startDate).toLocaleDateString()} - {new Date(festival.endDate).toLocaleDateString()}
@@ -1577,7 +1578,7 @@ export default function SessionsManagement() {
                       <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
                       <div className="flex-1">
                         <p className="text-sm font-medium text-amber-900">
-                          {outOfRangeSessions.length} session{outOfRangeSessions.length !== 1 ? 's' : ''} outside festival range
+                          {outOfRangeSessions.length} session{outOfRangeSessions.length !== 1 ? 's' : ''} outside event range
                         </p>
                         <p className="text-xs text-amber-800 mt-1">
                           These sessions have dates outside your festival period (
@@ -1627,7 +1628,7 @@ export default function SessionsManagement() {
                             <th className="w-8"></th>
                             <th className="text-left py-3 px-4 font-medium text-gray-900">Session</th>
                             <th className="text-left py-3 px-4 font-medium text-gray-900">Day & Time</th>
-                            <th className="text-left py-3 px-4 font-medium text-gray-900">Teachers</th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-900">{festival?.presenterLabel || 'Facilitator'}s</th>
                             <th className="text-left py-3 px-4 font-medium text-gray-900">Level</th>
                             <th className="text-left py-3 px-4 font-medium text-gray-900">Styles</th>
                             <th className="text-left py-3 px-4 font-medium text-gray-900">Bookings</th>
@@ -1785,6 +1786,7 @@ export default function SessionsManagement() {
         onSave={handleSaveSession}
         availableDays={getAvailableDays()}
         festivalDateRange={festival ? { startDate: festival.startDate, endDate: festival.endDate } : undefined}
+        presenterLabel={festival?.presenterLabel || 'Facilitator'}
       />
 
       {/* CSV Upload Preview Modal */}

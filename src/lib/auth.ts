@@ -228,6 +228,21 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
   },
+  events: {
+    async createUser({ user }) {
+      // Auto-create FREE subscription for new users
+      if (user.id) {
+        await prisma.subscription.create({
+          data: {
+            userId: user.id,
+            plan: 'FREE',
+            status: 'ACTIVE',
+            festivalsLimit: 1,
+          },
+        });
+      }
+    },
+  },
   pages: {
     signIn: '/auth/signin',
     error: '/auth/error',

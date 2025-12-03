@@ -152,6 +152,36 @@ export async function PATCH(
 
     const body = await request.json()
     
+    // Check plan limits when trying to publish
+    if (body.isPublished === true && !existingFestival.isPublished) {
+      // User is trying to publish a draft - check limits
+      const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        include: {
+          subscription: true,
+          festivals: {
+            where: { isPublished: true }
+          }
+        }
+      })
+
+      if (user && !isAdmin) {
+        const currentPlan = user.subscription?.plan || 'FREE'
+        const festivalsLimit = currentPlan === 'PRO' ? 5 : currentPlan === 'ENTERPRISE' ? -1 : 1
+        const publishedCount = user.festivals.length
+
+        if (festivalsLimit !== -1 && publishedCount >= festivalsLimit) {
+          return NextResponse.json(
+            { 
+              error: `Publishing limit reached. You've published ${publishedCount} of ${festivalsLimit} festival${festivalsLimit > 1 ? 's' : ''} on your ${currentPlan} plan. Upgrade to Pro to publish more.`,
+              code: 'LIMIT_REACHED'
+            },
+            { status: 403 }
+          )
+        }
+      }
+    }
+    
     // Validate the update data
     const updateData: any = {}
     
@@ -162,6 +192,7 @@ export async function PATCH(
     if (body.endDate !== undefined) updateData.endDate = new Date(body.endDate)
     if (body.timezone !== undefined) updateData.timezone = body.timezone
     if (body.isPublished !== undefined) updateData.isPublished = body.isPublished
+    if (body.presenterLabel !== undefined) updateData.presenterLabel = body.presenterLabel
     if (body.whatsappLink !== undefined) updateData.whatsappLink = body.whatsappLink
     if (body.telegramLink !== undefined) updateData.telegramLink = body.telegramLink
     if (body.facebookLink !== undefined) updateData.facebookLink = body.facebookLink

@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { ArrowLeft, Eye, EyeOff, Trash2, Globe, AlertTriangle, Download, Upload } from 'lucide-react'
+import { ArrowLeft, Eye, EyeOff, Trash2, Globe, AlertTriangle, Download, Upload, Zap } from 'lucide-react'
 
 interface Festival {
   id: string
@@ -15,6 +15,13 @@ interface Festival {
   customDomain?: string
 }
 
+interface PlanInfo {
+  canPublish: boolean
+  publishedFestivals: number
+  festivalsLimit: number
+  plan: string
+}
+
 export default function FestivalSettings() {
   const params = useParams()
   const router = useRouter()
@@ -22,6 +29,7 @@ export default function FestivalSettings() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   
   const [festival, setFestival] = useState<Festival | null>(null)
+  const [planInfo, setPlanInfo] = useState<PlanInfo | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
@@ -31,6 +39,7 @@ export default function FestivalSettings() {
   useEffect(() => {
     if (festivalId) {
       fetchFestival()
+      fetchPlanInfo()
     }
   }, [festivalId])
 
@@ -45,6 +54,23 @@ export default function FestivalSettings() {
       console.error('Error fetching festival:', error)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const fetchPlanInfo = async () => {
+    try {
+      const response = await fetch('/api/user/subscription')
+      if (response.ok) {
+        const data = await response.json()
+        setPlanInfo({
+          canPublish: data.canPublish,
+          publishedFestivals: data.publishedFestivals,
+          festivalsLimit: data.subscription?.festivalsLimit || 1,
+          plan: data.subscription?.plan || 'FREE'
+        })
+      }
+    } catch (error) {
+      console.error('Error fetching plan info:', error)
     }
   }
 
@@ -63,15 +89,17 @@ export default function FestivalSettings() {
         })
       })
 
+      const data = await response.json()
+
       if (response.ok) {
-        const data = await response.json()
         setFestival(data.festival)
         setMessage({
           type: 'success',
           text: `Festival ${data.festival.isPublished ? 'published' : 'unpublished'} successfully!`
         })
       } else {
-        setMessage({ type: 'error', text: 'Failed to update festival status' })
+        // Show the error message from the API
+        setMessage({ type: 'error', text: data.error || 'Failed to update festival status' })
       }
     } catch (error) {
       setMessage({ type: 'error', text: 'An error occurred' })
@@ -214,7 +242,7 @@ export default function FestivalSettings() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Festival Not Found</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Event Not Found</h1>
           <Link href="/dashboard">
             <Button>Back to Dashboard</Button>
           </Link>
@@ -233,7 +261,7 @@ export default function FestivalSettings() {
             <Link href={`/dashboard/festivals/${festival.id}`}>
               <Button variant="outline" size="sm">
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Festival
+                Back to Event
               </Button>
             </Link>
           </div>
@@ -244,12 +272,12 @@ export default function FestivalSettings() {
               <Link href={`/dashboard/festivals/${festival.id}`}>
                 <Button variant="outline" size="sm">
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Festival
+                  Back to Event
                 </Button>
               </Link>
             </div>
             <div className="min-w-0 flex-1">
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 break-words">Festival Settings</h1>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 break-words">Event Settings</h1>
               <p className="text-sm sm:text-base text-gray-600 mt-1 truncate">{festival.name}</p>
             </div>
           </div>
@@ -280,12 +308,12 @@ export default function FestivalSettings() {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <h3 className="font-semibold text-gray-900 mb-2">
-                  Festival Status: {festival.isPublished ? 'Published' : 'Draft'}
+                  Event Status: {festival.isPublished ? 'Published' : 'Draft'}
                 </h3>
                 <p className="text-sm text-gray-600 mb-4">
                   {festival.isPublished 
-                    ? `Your festival is live and accessible at /${festival.slug}/schedule`
-                    : 'Your festival is in draft mode and not visible to the public'
+                    ? `Your event is live and accessible at /${festival.slug}/schedule`
+                    : 'Your event is in draft mode and not visible to the public'
                   }
                 </p>
                 {festival.isPublished && (
@@ -297,13 +325,29 @@ export default function FestivalSettings() {
                   </Link>
                 )}
               </div>
-              <Button
-                onClick={togglePublish}
-                disabled={isSaving}
-                className={festival.isPublished ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-green-600 hover:bg-green-700'}
-              >
-                {isSaving ? 'Saving...' : festival.isPublished ? 'Unpublish' : 'Publish'}
-              </Button>
+              {/* Show Upgrade button if at limit and trying to publish a draft */}
+              {!festival.isPublished && planInfo && !planInfo.canPublish ? (
+                <div className="flex flex-col items-end gap-2">
+                  <Button
+                    onClick={() => router.push('/pricing')}
+                    className="bg-purple-600 hover:bg-purple-700"
+                  >
+                    <Zap className="w-4 h-4 mr-2" />
+                    Upgrade to Publish
+                  </Button>
+                  <p className="text-xs text-gray-500 text-right max-w-[200px]">
+                    You've published {planInfo.publishedFestivals}/{planInfo.festivalsLimit} events
+                  </p>
+                </div>
+              ) : (
+                <Button
+                  onClick={togglePublish}
+                  disabled={isSaving}
+                  className={festival.isPublished ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-green-600 hover:bg-green-700'}
+                >
+                  {isSaving ? 'Saving...' : festival.isPublished ? 'Unpublish' : 'Publish'}
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -321,11 +365,11 @@ export default function FestivalSettings() {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-gray-600 mb-4">
-              Connect your own domain name to your festival schedule (e.g., schedule.yourfestival.com)
+              Connect your own domain name to your event schedule (e.g., schedule.yourevent.com)
             </p>
             <input
               type="text"
-              placeholder="schedule.yourfestival.com"
+              placeholder="schedule.yourevent.com"
               disabled
               className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-400 cursor-not-allowed"
             />
@@ -335,7 +379,7 @@ export default function FestivalSettings() {
         {/* Slug/URL */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Festival URL</CardTitle>
+            <CardTitle>Event URL</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2 mb-2">
@@ -344,7 +388,7 @@ export default function FestivalSettings() {
               </code>
             </div>
             <p className="text-xs text-gray-500">
-              This is your festival's public URL. Changing slugs will be available in a future update.
+              This is your event's public URL. Changing slugs will be available in a future update.
             </p>
           </CardContent>
         </Card>
@@ -362,9 +406,9 @@ export default function FestivalSettings() {
               {/* Export */}
               <div className="flex items-start justify-between pb-4 border-b">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 mb-1">Export Festival Data</h3>
+                  <h3 className="font-semibold text-gray-900 mb-1">Export Event Data</h3>
                   <p className="text-sm text-gray-600 mb-2">
-                    Download a complete backup of your festival including all sessions, teachers, and settings.
+                    Download a complete backup of your event including all sessions, teachers, and settings.
                   </p>
                   <p className="text-xs text-gray-500">
                     Recommended before making major changes or deletions.
@@ -395,7 +439,7 @@ export default function FestivalSettings() {
                 <div className="flex-1">
                   <h3 className="font-semibold text-gray-900 mb-1">Restore from Backup</h3>
                   <p className="text-sm text-gray-600 mb-2">
-                    Restore your festival from a previous backup file. This will replace all current data.
+                    Restore your event from a previous backup file. This will replace all current data.
                   </p>
                   <p className="text-xs text-red-600 font-medium">
                     ⚠️ Warning: Teacher photos must be re-uploaded manually after restore.
@@ -445,9 +489,9 @@ export default function FestivalSettings() {
           <CardContent>
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="font-semibold text-gray-900 mb-1">Delete Festival</h3>
+                <h3 className="font-semibold text-gray-900 mb-1">Delete Event</h3>
                 <p className="text-sm text-gray-600">
-                  Permanently delete this festival and all its sessions. This action cannot be undone.
+                  Permanently delete this event and all its sessions. This action cannot be undone.
                 </p>
               </div>
               <Button

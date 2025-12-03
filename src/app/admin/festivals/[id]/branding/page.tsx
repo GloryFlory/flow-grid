@@ -201,7 +201,7 @@ export default function FestivalBranding() {
               <Link href={`/admin/festivals/${festival.id}/manage`}>
                 <Button variant="outline" size="sm">
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Festival
+                  Back to Event
                 </Button>
               </Link>
               <div>

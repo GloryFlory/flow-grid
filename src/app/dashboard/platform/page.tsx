@@ -124,7 +124,7 @@ export default function AdminAnalyticsDashboard() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Platform Analytics</h1>
-          <p className="text-gray-600 mt-1">Platform overview and festival health metrics</p>
+          <p className="text-gray-600 mt-1">Platform overview and event health metrics</p>
         </div>
 
         {/* Platform Overview Cards */}
@@ -136,7 +136,7 @@ export default function AdminAnalyticsDashboard() {
             color="blue"
           />
           <MetricCard
-            title="Total Festivals"
+            title="Total Events"
             value={overview.totalFestivals}
             icon={<Calendar className="w-6 h-6" />}
             color="purple"
@@ -175,7 +175,7 @@ export default function AdminAnalyticsDashboard() {
                     New Users
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    New Festivals
+                    New Events
                   </th>
                 </tr>
               </thead>
@@ -198,9 +198,9 @@ export default function AdminAnalyticsDashboard() {
           </div>
         </div>
 
-        {/* Festival Health Table */}
+        {/* Event Health Table */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Festival Health Scores</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Event Health Scores</h2>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead>
@@ -209,7 +209,7 @@ export default function AdminAnalyticsDashboard() {
                     
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Festival
+                    Event
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Owner
@@ -254,7 +254,7 @@ export default function AdminAnalyticsDashboard() {
                             <Link 
                               href={`/dashboard/festivals/${festival.id}`}
                               className="text-sm font-medium text-gray-900 hover:text-purple-600 transition-colors"
-                              title="View festival dashboard"
+                              title="View event dashboard"
                               onClick={(e) => e.stopPropagation()}
                             >
                               {festival.name}
@@ -325,7 +325,7 @@ export default function AdminAnalyticsDashboard() {
                                   achieved={festival.breakdown.published.achieved}
                                   points={festival.breakdown.published.points}
                                   maxPoints={25}
-                                  description={festival.breakdown.published.achieved ? "Festival is live" : "Festival not published"}
+                                  description={festival.breakdown.published.achieved ? "Event is live" : "Event not published"}
                                 />
                                 <BreakdownItem
                                   label="Sessions"

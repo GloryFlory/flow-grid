@@ -116,14 +116,22 @@ export async function GET(
       }
     }
 
-    // Get festival and verify ownership - support both ID and slug lookup
+    // Check if user is admin
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { role: true }
+    })
+    const isAdmin = user?.role === 'ADMIN'
+
+    // Get festival and verify ownership (or admin access) - support both ID and slug lookup
     const festival = await prisma.festival.findFirst({
       where: {
         OR: [
           { id: slug },
           { slug: slug }
         ],
-        userId: session.user.id
+        // Admins can access any festival, others only their own
+        ...(isAdmin ? {} : { userId: session.user.id })
       }
     })
 

@@ -81,7 +81,7 @@ export function DashboardClient({ user }: { user: User }) {
     )
   }
 
-  const activeFestivals = festivals.filter(f => f.isPublished).length
+  const publishedFestivals = festivals.filter(f => f.isPublished).length
 
   return (
     <div className="container mx-auto px-4 py-4 sm:py-8 max-w-7xl">
@@ -93,7 +93,7 @@ export function DashboardClient({ user }: { user: User }) {
               Welcome back, {user.name}!
             </h1>
             <p className="text-gray-600 mt-1 text-sm sm:text-base">
-              Manage your festivals and create amazing experiences
+              Manage your events and create amazing experiences
             </p>
           </div>
           
@@ -129,53 +129,49 @@ export function DashboardClient({ user }: { user: User }) {
       )}
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">
-              Active Festivals
+              Published Events
             </CardTitle>
             <Calendar className="w-4 h-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{activeFestivals}</div>
+            <div className="text-2xl font-bold">
+              {publishedFestivals}
+              {limits && !limits.isAdmin && (
+                <span className="text-base font-normal text-gray-400">
+                  /{limits.festivalsLimit === -1 ? '∞' : limits.festivalsLimit}
+                </span>
+              )}
+            </div>
+            {limits && !limits.isAdmin && limits.currentPlan === 'FREE' && (
+              <p className="text-xs text-gray-500 mt-1">Free plan limit</p>
+            )}
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">
-              Total Festivals
+              Total Sessions
             </CardTitle>
             <BarChart3 className="w-4 h-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{festivals.length}</div>
-          </CardContent>
-        </Card>
-        
-        <Card className="sm:col-span-2 md:col-span-1">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Usage
-            </CardTitle>
-            <Users className="w-4 h-4 text-purple-600" />
-          </CardHeader>
-          <CardContent>
             <div className="text-2xl font-bold">
-              {limits?.festivalsLimit === -1 
-                ? 'Unlimited' 
-                : `${limits?.festivalsUsed || 0}/${limits?.festivalsLimit || 1}`
-              }
+              {festivals.reduce((sum, f) => sum + (f._count?.sessions || 0), 0)}
             </div>
+            <p className="text-xs text-gray-500 mt-1">Across all events</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Festivals Grid */}
+      {/* Events Grid */}
       <div className="mb-4 sm:mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Your Festivals</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Your Events</h2>
           <div className="flex gap-2">
             {festivals.length > 3 && (
               <Link href="/dashboard/festivals">
@@ -186,7 +182,7 @@ export function DashboardClient({ user }: { user: User }) {
             )}
             <Button onClick={handleCreateFestival} size="sm">
               <Plus className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Create Festival</span>
+              <span className="hidden sm:inline">Create Event</span>
               <span className="sm:hidden">Create</span>
             </Button>
           </div>
@@ -201,22 +197,22 @@ export function DashboardClient({ user }: { user: User }) {
               <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
             </div>
             <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
-              Create your first festival
+              Create your first event
             </h3>
             <p className="text-sm sm:text-base text-gray-600 mb-6 max-w-md mx-auto px-4">
-              Get started by creating your first festival. Customize your schedule, add teachers, and share with participants.
+              Get started by creating your first event. Customize your schedule, add teachers, and share with participants.
             </p>
             <Button 
               size="lg" 
               onClick={handleCreateFestival}
             >
               <Plus className="w-5 h-5 mr-2" />
-              Create Your First Festival
+              Create Your First Event
             </Button>
           </CardContent>
         </Card>
       ) : (
-        // Festivals Grid - Show max 3
+        // Events Grid - Show max 3
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {festivals.slice(0, 3).map((festival) => (
             <Card key={festival.id} className="hover:shadow-lg transition-shadow">
@@ -254,7 +250,7 @@ export function DashboardClient({ user }: { user: User }) {
                   >
                     <Button variant="outline" className="w-full justify-start text-sm" size="sm">
                       <Settings className="w-4 h-4 mr-2" />
-                      Manage Festival
+                      Manage Event
                     </Button>
                   </Link>
                   

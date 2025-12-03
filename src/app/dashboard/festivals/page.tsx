@@ -32,30 +32,30 @@ export default async function FestivalsPage() {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">My Festivals</h1>
-            <p className="text-gray-600 mt-2">Manage your festival schedules and events</p>
+            <h1 className="text-3xl font-bold text-gray-900">My Events</h1>
+            <p className="text-gray-600 mt-2">Manage your event schedules</p>
           </div>
           <Link 
             href="/dashboard/create-festival"
             className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
           >
             <Plus className="w-5 h-5" />
-            Create Festival
+            Create Event
           </Link>
         </div>
 
-        {/* Festivals Grid */}
+        {/* Events Grid */}
         {festivals.length === 0 ? (
           <div className="bg-white rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
             <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No festivals yet</h3>
-            <p className="text-gray-600 mb-6">Get started by creating your first festival schedule</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No events yet</h3>
+            <p className="text-gray-600 mb-6">Get started by creating your first event schedule</p>
             <Link 
               href="/dashboard/create-festival"
               className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Plus className="w-5 h-5" />
-              Create Your First Festival
+              Create Your First Event
             </Link>
           </div>
         ) : (
@@ -65,7 +65,7 @@ export default async function FestivalsPage() {
                 key={festival.id}
                 className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
               >
-                {/* Festival Header with Color Bar */}
+                {/* Event Header with Color Bar */}
                 <div 
                   className="h-2" 
                   style={{ backgroundColor: festival.primaryColor || '#3b82f6' }}

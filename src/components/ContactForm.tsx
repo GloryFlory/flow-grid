@@ -84,17 +84,17 @@ export default function ContactForm() {
 
       <div>
         <label htmlFor="festival-url" className="block text-sm font-medium text-gray-700 mb-2">
-          Festival URL (if applicable)
+          Event URL (if applicable)
         </label>
         <input
           type="url"
           id="festival-url"
           name="festival-url"
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          placeholder="https://yourfestival.tryflowgrid.com"
+          placeholder="https://yourevent.tryflowgrid.com"
         />
         <p className="text-sm text-gray-500 mt-1">
-          Include this if your question is about a specific festival
+          Include this if your question is about a specific event
         </p>
       </div>
 

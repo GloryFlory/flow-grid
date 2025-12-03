@@ -15,13 +15,19 @@ export async function GET(
 
     const { id: festivalId } = await params;
 
-    // Verify user owns this festival
+    // Check if user is admin
+    const currentUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { role: true }
+    })
+    const isAdmin = currentUser?.role === 'ADMIN'
+
+    // Verify user owns this festival (or is admin)
     const festival = await prisma.festival.findFirst({
       where: {
         id: festivalId,
-        user: {
-          email: session.user.email
-        }
+        // Admins can access any festival, others only their own
+        ...(isAdmin ? {} : { user: { email: session.user.email } })
       }
     });
 

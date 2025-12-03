@@ -24,24 +24,24 @@ import {
 export default function GlossaryPage() {
   const searchableTerms = [
     {
-      category: "Festival Management",
+      category: "Event Management",
       icon: Calendar,
       color: "text-blue-600",
       terms: [
         {
-          term: "Festival",
-          definition: "A complete event with multiple sessions, teachers, and a schedule. Each festival gets its own subdomain (e.g., yourfestival.tryflowgrid.com)."
+          term: "Event",
+          definition: "A complete event with multiple sessions, teachers, and a schedule. Each event gets its own subdomain (e.g., yourevent.tryflowgrid.com)."
         },
         {
           term: "Slug",
-          definition: "The unique URL identifier for your festival that becomes part of your public URL. Must be lowercase, use hyphens for spaces, and be URL-friendly (e.g., 'summer-dance-fest')."
+          definition: "The unique URL identifier for your event that becomes part of your public URL. Must be lowercase, use hyphens for spaces, and be URL-friendly (e.g., 'summer-dance-fest')."
         },
         {
           term: "Published/Unpublished",
-          definition: "Published festivals are visible to the public at their subdomain. Unpublished festivals are only accessible to organizers in the dashboard."
+          definition: "Published events are visible to the public at their subdomain. Unpublished events are only accessible to organizers in the dashboard."
         },
         {
-          term: "Festival Settings",
+          term: "Event Settings",
           definition: "Configuration options including branding, timezone, contact information, and public visibility settings."
         }
       ]
@@ -53,7 +53,7 @@ export default function GlossaryPage() {
       terms: [
         {
           term: "Session",
-          definition: "An individual workshop, class, performance, or event within a festival. Contains details like title, description, teacher, time, location, and capacity."
+          definition: "An individual workshop, class, performance, or activity within an event. Contains details like title, description, teacher, time, location, and capacity."
         },
         {
           term: "Session Type",
@@ -73,7 +73,7 @@ export default function GlossaryPage() {
         },
         {
           term: "Room/Location",
-          definition: "Physical or virtual space where a session takes place. Helps participants navigate the festival venue."
+          definition: "Physical or virtual space where a session takes place. Helps participants navigate the event venue."
         }
       ]
     },
@@ -107,7 +107,7 @@ export default function GlossaryPage() {
       terms: [
         {
           term: "Theme/Branding",
-          definition: "Visual customization including colors, fonts, logos, and styling that matches your festival's identity."
+          definition: "Visual customization including colors, fonts, logos, and styling that matches your event's identity."
         },
         {
           term: "Card Types",
@@ -115,15 +115,15 @@ export default function GlossaryPage() {
         },
         {
           term: "Color Scheme",
-          definition: "Primary and secondary colors used throughout your festival's public pages and materials."
+          definition: "Primary and secondary colors used throughout your event's public pages and materials."
         },
         {
           term: "Logo Upload",
-          definition: "Custom festival logo that appears on your public schedule and branding materials."
+          definition: "Custom event logo that appears on your public schedule and branding materials."
         },
         {
           term: "Custom CSS",
-          definition: "Advanced styling options for further customization of your festival's appearance."
+          definition: "Advanced styling options for further customization of your event's appearance."
         }
       ]
     },
@@ -134,7 +134,7 @@ export default function GlossaryPage() {
       terms: [
         {
           term: "Public Schedule",
-          definition: "The main page visitors see at yourfestival.tryflowgrid.com, displaying all published sessions in an organized, filterable format."
+          definition: "The main page visitors see at yourevent.tryflowgrid.com, displaying all published sessions in an organized, filterable format."
         },
         {
           term: "Filtering",
@@ -146,11 +146,11 @@ export default function GlossaryPage() {
         },
         {
           term: "Responsive Design",
-          definition: "Festival pages automatically adapt to work perfectly on desktop, tablet, and mobile devices."
+          definition: "Event pages automatically adapt to work perfectly on desktop, tablet, and mobile devices."
         },
         {
           term: "SEO Optimization",
-          definition: "Search engine friendly URLs, metadata, and structure to help people discover your festival online."
+          definition: "Search engine friendly URLs, metadata, and structure to help people discover your event online."
         }
       ]
     },
@@ -161,7 +161,7 @@ export default function GlossaryPage() {
       terms: [
         {
           term: "CSV Import",
-          definition: "Bulk upload sessions from a spreadsheet file with predefined columns for efficient festival setup."
+          definition: "Bulk upload sessions from a spreadsheet file with predefined columns for efficient event setup."
         },
         {
           term: "Google Sheets Integration",
@@ -169,7 +169,7 @@ export default function GlossaryPage() {
         },
         {
           term: "Data Export",
-          definition: "Download festival information, sessions, and analytics in CSV or other formats."
+          definition: "Download event information, sessions, and analytics in CSV or other formats."
         },
         {
           term: "Bulk Operations",
@@ -184,7 +184,7 @@ export default function GlossaryPage() {
       terms: [
         {
           term: "Page Views",
-          definition: "Number of times your festival schedule has been viewed by visitors."
+          definition: "Number of times your event schedule has been viewed by visitors."
         },
         {
           term: "Popular Sessions",
@@ -192,11 +192,11 @@ export default function GlossaryPage() {
         },
         {
           term: "Traffic Sources",
-          definition: "Where your festival visitors are coming from (direct links, social media, search engines, etc.)."
+          definition: "Where your event visitors are coming from (direct links, social media, search engines, etc.)."
         },
         {
           term: "Engagement Metrics",
-          definition: "Data showing how participants interact with your festival schedule and session details."
+          definition: "Data showing how participants interact with your event schedule and session details."
         }
       ]
     },
