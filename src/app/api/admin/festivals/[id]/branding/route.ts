@@ -15,7 +15,7 @@ export async function PATCH(
 
     const { id: festivalId } = await context.params
     const body = await request.json()
-    const { primaryColor, secondaryColor, accentColor } = body
+    const { primaryColor, secondaryColor, accentColor, headerFont } = body
 
     // Check if user is admin
     const currentUser = await prisma.user.findUnique({
@@ -36,13 +36,14 @@ export async function PATCH(
       return NextResponse.json({ error: 'Festival not found' }, { status: 404 })
     }
 
-    // Update branding colors
+    // Update branding colors and font
     const updatedFestival = await prisma.festival.update({
       where: { id: festivalId },
       data: {
         primaryColor,
         secondaryColor,
         accentColor,
+        headerFont: headerFont || null,
       },
     })
 

@@ -4,8 +4,9 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import Modal from '@/components/ui/Modal'
 import Link from 'next/link'
-import { ArrowLeft, Eye, EyeOff, Trash2, Globe, AlertTriangle, Download, Upload, Zap } from 'lucide-react'
+import { ArrowLeft, Eye, EyeOff, Trash2, Globe, AlertTriangle, Download, Upload, Zap, Copy, X } from 'lucide-react'
 
 interface Festival {
   id: string
@@ -34,6 +35,8 @@ export default function FestivalSettings() {
   const [isSaving, setIsSaving] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
   const [isImporting, setIsImporting] = useState(false)
+  const [isDuplicating, setIsDuplicating] = useState(false)
+  const [showDuplicateModal, setShowDuplicateModal] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
 
   useEffect(() => {
@@ -126,6 +129,41 @@ export default function FestivalSettings() {
       }
     } catch (error) {
       setMessage({ type: 'error', text: 'An error occurred' })
+    }
+  }
+
+  const duplicateFestival = async () => {
+    if (!festival) return
+    
+    setShowDuplicateModal(false)
+    setIsDuplicating(true)
+    setMessage(null)
+
+    try {
+      const response = await fetch(`/api/festivals/${festival.id}/duplicate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setMessage({ 
+          type: 'success', 
+          text: data.message || 'Event duplicated successfully!'
+        })
+        // Navigate to the new festival after a short delay
+        setTimeout(() => {
+          router.push(`/dashboard/festivals/${data.festival.id}`)
+        }, 1500)
+      } else {
+        setMessage({ type: 'error', text: data.error || 'Failed to duplicate event' })
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'An error occurred while duplicating' })
+    } finally {
+      setIsDuplicating(false)
     }
   }
 
@@ -326,7 +364,7 @@ export default function FestivalSettings() {
                 )}
               </div>
               {/* Show Upgrade button if at limit and trying to publish a draft */}
-              {!festival.isPublished && planInfo && !planInfo.canPublish ? (
+              {!festival.isPublished && planInfo && !planInfo.canPublish && planInfo.festivalsLimit !== -1 ? (
                 <div className="flex flex-col items-end gap-2">
                   <Button
                     onClick={() => router.push('/pricing')}
@@ -478,6 +516,44 @@ export default function FestivalSettings() {
           </CardContent>
         </Card>
 
+        {/* Duplicate Event */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Copy className="w-5 h-5" />
+              Duplicate Event
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-1">Create a Copy</h3>
+                <p className="text-sm text-gray-600">
+                  Duplicate this event with all its sessions, teachers, and settings. 
+                  Great for recurring events or using as a template.
+                </p>
+              </div>
+              <Button
+                onClick={() => setShowDuplicateModal(true)}
+                disabled={isDuplicating}
+                className="bg-purple-600 hover:bg-purple-700"
+              >
+                {isDuplicating ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                    Duplicating...
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4 mr-2" />
+                    Duplicate
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Danger Zone */}
         <Card className="border-red-200">
           <CardHeader>
@@ -506,6 +582,73 @@ export default function FestivalSettings() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Duplicate Confirmation Modal */}
+      <Modal open={showDuplicateModal} onClose={() => setShowDuplicateModal(false)}>
+        <div className="p-2">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Copy className="w-5 h-5 text-purple-600" />
+              </div>
+              <h2 className="text-lg font-semibold text-gray-900">Duplicate Event</h2>
+            </div>
+            <button 
+              onClick={() => setShowDuplicateModal(false)}
+              className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <X className="w-5 h-5 text-gray-500" />
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="mb-6">
+            <p className="text-gray-600 mb-4">
+              Create a copy of <span className="font-medium text-gray-900">&quot;{festival?.name}&quot;</span>?
+            </p>
+            
+            <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+              <p className="text-sm font-medium text-gray-700">This will duplicate:</p>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-purple-500 rounded-full"></span>
+                  All event settings and branding
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-purple-500 rounded-full"></span>
+                  All sessions with their details
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-purple-500 rounded-full"></span>
+                  All teacher information
+                </li>
+              </ul>
+            </div>
+
+            <p className="text-sm text-gray-500 mt-3">
+              The copy will be saved as a draft so you can make changes before publishing.
+            </p>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-3 justify-end">
+            <Button
+              variant="outline"
+              onClick={() => setShowDuplicateModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={duplicateFestival}
+              className="bg-purple-600 hover:bg-purple-700"
+            >
+              <Copy className="w-4 h-4 mr-2" />
+              Create Copy
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

@@ -32,6 +32,7 @@ interface Festival {
   primaryColor?: string
   secondaryColor?: string
   accentColor?: string
+  headerFont?: string | null
   startDate: Date
   endDate: Date
   timezone: string
@@ -48,6 +49,7 @@ export default function FestivalSchedule() {
   
   const [festival, setFestival] = useState<Festival | null>(null)
   const [sessions, setSessions] = useState<Session[]>([])
+  const [showPoweredBy, setShowPoweredBy] = useState(true)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -68,6 +70,7 @@ export default function FestivalSchedule() {
         const data = await response.json()
         setFestival(data.festival)
         setSessions(data.sessions)
+        setShowPoweredBy(data.showPoweredBy ?? true)
       } catch (err) {
         console.error('Error fetching festival:', err)
         setError('Failed to load festival data')
@@ -115,6 +118,7 @@ export default function FestivalSchedule() {
       <ScheduleInterface 
         festival={festival}
         sessions={sessions}
+        showPoweredBy={showPoweredBy}
       />
     </div>
   )

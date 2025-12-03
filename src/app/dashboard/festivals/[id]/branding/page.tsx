@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import FontPicker from '@/components/FontPicker'
 import { 
   Palette, 
   Upload, 
@@ -10,9 +11,13 @@ import {
   Save,
   RefreshCw,
   Eye,
-  ArrowLeft
+  ArrowLeft,
+  Type,
+  Crown,
+  Lock
 } from 'lucide-react'
 import Link from 'next/link'
+import { usePlanLimits } from '@/hooks/usePlanLimits'
 
 interface Festival {
   id: string
@@ -22,11 +27,14 @@ interface Festival {
   primaryColor: string
   secondaryColor: string
   accentColor: string
+  headerFont?: string | null
 }
 
 export default function FestivalBranding() {
   const params = useParams()
   const festivalId = params.id as string
+  const { limits } = usePlanLimits()
+  const isPro = limits?.currentPlan && ['PRO', 'ENTERPRISE', 'EVENT_PASS'].includes(limits.currentPlan)
   
   const [festival, setFestival] = useState<Festival | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -37,6 +45,7 @@ export default function FestivalBranding() {
     secondary: '#7b68ee',
     accent: '#ff6b6b'
   })
+  const [headerFont, setHeaderFont] = useState<string | null>(null)
   const logoInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -52,6 +61,7 @@ export default function FestivalBranding() {
         secondary: festival.secondaryColor,
         accent: festival.accentColor
       })
+      setHeaderFont(festival.headerFont || null)
     }
   }, [festival])
 
@@ -112,6 +122,7 @@ export default function FestivalBranding() {
           primaryColor: previewColors.primary,
           secondaryColor: previewColors.secondary,
           accentColor: previewColors.accent,
+          headerFont: headerFont,
         }),
       })
 
@@ -121,6 +132,7 @@ export default function FestivalBranding() {
           primaryColor: previewColors.primary,
           secondaryColor: previewColors.secondary,
           accentColor: previewColors.accent,
+          headerFont: headerFont,
         } : null)
       }
     } catch (error) {
@@ -219,15 +231,23 @@ export default function FestivalBranding() {
               </div>
               <div className="min-w-0 flex-1">
                 <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 break-words">Event Branding</h1>
-                <p className="text-sm sm:text-base text-gray-600 mt-1 truncate">Customize logo and colors</p>
+                <p className="text-sm sm:text-base text-gray-600 mt-1 truncate">Customize logo, colors, and fonts</p>
               </div>
             </div>
             
-            <div className="flex-shrink-0">
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <Button
+                onClick={saveBranding}
+                disabled={isSaving}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <Save className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">{isSaving ? 'Saving...' : 'Save Changes'}</span>
+              </Button>
               <Link href={`/${festival.slug}/schedule`} target="_blank">
                 <Button variant="outline" size="sm">
                   <Eye className="w-4 h-4 sm:mr-2" />
-                  <span className="hidden sm:inline">View Live Schedule</span>
+                  <span className="hidden sm:inline">View Live</span>
                 </Button>
               </Link>
             </div>
@@ -398,39 +418,34 @@ export default function FestivalBranding() {
                 {/* Actions */}
                 <div className="flex gap-3 pt-4 border-t">
                   <Button
-                    onClick={saveBranding}
-                    disabled={isSaving}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700"
-                  >
-                    <Save className="w-4 h-4 mr-2" />
-                    {isSaving ? 'Saving...' : 'Save Changes'}
-                  </Button>
-                  <Button
                     onClick={resetColors}
                     variant="outline"
+                    className="flex-1"
                   >
                     <RefreshCw className="w-4 h-4 mr-2" />
-                    Reset
+                    Reset Colors
                   </Button>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Live Preview */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Eye className="w-5 h-5" />
-                Live Preview
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {/* Header Preview */}
-                <div 
-                  className="p-6 rounded-lg text-white"
-                  style={{ backgroundColor: previewColors.primary }}
+          {/* Right Column - Preview & Font */}
+          <div className="space-y-6">
+            {/* Live Preview */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Eye className="w-5 h-5" />
+                  Live Preview
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {/* Header Preview */}
+                  <div 
+                    className="p-6 rounded-lg text-white"
+                    style={{ backgroundColor: previewColors.primary }}
                 >
                   <div className="flex items-center gap-4 mb-4">
                     {festival.logo && (
@@ -441,7 +456,16 @@ export default function FestivalBranding() {
                       />
                     )}
                     <div>
-                      <h2 className="text-xl font-bold">{festival.name}</h2>
+                      <h2 
+                        className="text-xl font-bold"
+                        style={{ 
+                          fontFamily: headerFont 
+                            ? `"${headerFont.replace('custom:', '')}", serif` 
+                            : 'inherit'
+                        }}
+                      >
+                        {festival.name}
+                      </h2>
                       <p className="text-white/80">Event Schedule</p>
                     </div>
                   </div>
@@ -493,6 +517,56 @@ export default function FestivalBranding() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Header Font */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Type className="w-5 h-5" />
+                Header Font
+                {isPro ? (
+                  <span className="ml-auto flex items-center gap-1 text-xs bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-2 py-0.5 rounded-full">
+                    <Crown className="w-3 h-3" />
+                    Pro
+                  </span>
+                ) : (
+                  <Link href="/pricing" className="ml-auto flex items-center gap-1 text-xs text-purple-600 hover:text-purple-700 font-medium">
+                    <Lock className="w-3 h-3" />
+                    Pro Feature
+                  </Link>
+                )}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600 mb-4">
+                Choose a custom font for your event name and day headers. 
+                Session cards will keep their consistent styling.
+              </p>
+              {isPro ? (
+                <FontPicker
+                  value={headerFont || ''}
+                  onChange={setHeaderFont}
+                  festivalId={festivalId}
+                />
+              ) : (
+                <div className="space-y-3">
+                  <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg opacity-60">
+                    <div className="flex items-center gap-2 text-gray-500">
+                      <Lock className="w-4 h-4" />
+                      <span className="text-sm">Font customization is a Pro feature</span>
+                    </div>
+                  </div>
+                  <Link href="/pricing">
+                    <Button className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700">
+                      <Crown className="w-4 h-4 mr-2" />
+                      Upgrade to Pro
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+          </div>
         </div>
       </div>
     </div>

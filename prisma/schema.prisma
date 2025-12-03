@@ -73,6 +73,8 @@ model Festival {
   primaryColor   String             @default("#4a90e2")
   secondaryColor String             @default("#7b68ee")
   accentColor    String             @default("#ff6b6b")
+  headerFont     String?            // Google Font name for headers (e.g., "Playfair Display", "Oswald")
+  hideWatermark  Boolean            @default(false) // Hide "Powered by Flow Grid" (Pro feature)
   isPublished    Boolean            @default(false)
   customDomain   String?            @unique
   userId         String
@@ -151,6 +153,7 @@ model Subscription {
   status                 SubscriptionStatus @default(ACTIVE)
   festivalsUsed          Int                @default(0)
   festivalsLimit         Int                @default(1)
+  isFoundingMember       Boolean            @default(false)
   createdAt              DateTime           @default(now())
   updatedAt              DateTime           @updatedAt
   user                   User               @relation(fields: [userId], references: [id], onDelete: Cascade)

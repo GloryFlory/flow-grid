@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Footer from '@/components/Footer'
+import { PAYMENTS_ENABLED } from '@/config/payments'
 import { 
   Calendar, 
   Users, 
@@ -332,10 +333,12 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Simple, transparent pricing
+              {PAYMENTS_ENABLED ? 'Simple, transparent pricing' : 'Early Access — Free for 1 Year'}
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Start free and upgrade when you need more. No hidden fees.
+              {PAYMENTS_ENABLED 
+                ? 'Start free and upgrade when you need more. No hidden fees.'
+                : 'Get all Pro features free as an early adopter. Help shape FlowGrid.'}
             </p>
           </div>
 
@@ -378,7 +381,7 @@ export default function HomePage() {
             <Card className="relative hover:shadow-lg transition-shadow border-2" style={{ borderColor: '#ff7119' }}>
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                 <span className="text-white text-sm font-semibold px-4 py-1.5 rounded-full shadow-md" style={{ backgroundColor: '#ff7119' }}>
-                  One-Time
+                  {PAYMENTS_ENABLED ? 'One-Time' : 'Included Free'}
                 </span>
               </div>
               <CardHeader>
@@ -390,8 +393,17 @@ export default function HomePage() {
               </CardHeader>
               <CardContent>
                 <div className="mb-6">
-                  <span className="text-4xl font-bold text-gray-900">€29</span>
-                  <span className="text-gray-500"> one-time</span>
+                  {PAYMENTS_ENABLED ? (
+                    <>
+                      <span className="text-4xl font-bold text-gray-900">€29</span>
+                      <span className="text-gray-500"> one-time</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-4xl font-bold text-gray-400 line-through">€29</span>
+                      <span className="text-4xl font-bold text-green-600 ml-2">Free</span>
+                    </>
+                  )}
                 </div>
                 <ul className="space-y-3 text-sm text-gray-600 mb-6">
                   <li className="flex items-center gap-2">
@@ -407,9 +419,9 @@ export default function HomePage() {
                     <span className="text-green-500">✓</span> Priority support
                   </li>
                 </ul>
-                <Link href="/pricing">
+                <Link href={PAYMENTS_ENABLED ? "/pricing" : "/auth/signin"}>
                   <Button className="w-full text-white" style={{ backgroundColor: '#ff7119' }}>
-                    View Details <ArrowRight className="w-4 h-4 ml-1" />
+                    {PAYMENTS_ENABLED ? 'View Details' : 'Get Early Access'} <ArrowRight className="w-4 h-4 ml-1" />
                   </Button>
                 </Link>
               </CardContent>
@@ -419,7 +431,7 @@ export default function HomePage() {
             <Card className="relative border-2 hover:shadow-xl transition-shadow" style={{ borderColor: '#b40225' }}>
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                 <span className="text-white text-sm font-semibold px-4 py-1.5 rounded-full shadow-md" style={{ backgroundColor: '#b40225' }}>
-                  Most Popular
+                  {PAYMENTS_ENABLED ? 'Most Popular' : 'Free for 1 Year'}
                 </span>
               </div>
               <CardHeader>
@@ -431,8 +443,17 @@ export default function HomePage() {
               </CardHeader>
               <CardContent>
                 <div className="mb-6">
-                  <span className="text-4xl font-bold text-gray-900">€29</span>
-                  <span className="text-gray-500">/month</span>
+                  {PAYMENTS_ENABLED ? (
+                    <>
+                      <span className="text-4xl font-bold text-gray-900">€29</span>
+                      <span className="text-gray-500">/month</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-4xl font-bold text-gray-400 line-through">€29/mo</span>
+                      <span className="text-4xl font-bold text-green-600 ml-2">Free</span>
+                    </>
+                  )}
                 </div>
                 <ul className="space-y-3 text-sm text-gray-600 mb-6">
                   <li className="flex items-center gap-2">
@@ -448,9 +469,9 @@ export default function HomePage() {
                     <span className="text-green-500">✓</span> Priority support
                   </li>
                 </ul>
-                <Link href="/pricing">
+                <Link href={PAYMENTS_ENABLED ? "/pricing" : "/auth/signin"}>
                   <Button className="w-full text-white" style={{ backgroundColor: '#b40225' }}>
-                    View Details <ArrowRight className="w-4 h-4 ml-1" />
+                    {PAYMENTS_ENABLED ? 'View Details' : 'Get Early Access'} <ArrowRight className="w-4 h-4 ml-1" />
                   </Button>
                 </Link>
               </CardContent>

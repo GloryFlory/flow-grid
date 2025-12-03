@@ -197,6 +197,8 @@ export async function PATCH(
     if (body.telegramLink !== undefined) updateData.telegramLink = body.telegramLink
     if (body.facebookLink !== undefined) updateData.facebookLink = body.facebookLink
     if (body.instagramLink !== undefined) updateData.instagramLink = body.instagramLink
+    if (body.headerFont !== undefined) updateData.headerFont = body.headerFont
+    if (body.hideWatermark !== undefined) updateData.hideWatermark = body.hideWatermark
 
     const festival = await prisma.festival.update({
       where: {

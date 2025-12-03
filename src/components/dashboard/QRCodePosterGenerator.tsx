@@ -1,50 +1,140 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { Download, Image as ImageIcon, FileText } from 'lucide-react';
+import { Download, Image as ImageIcon, FileText, Crown, Lock } from 'lucide-react';
+import Link from 'next/link';
+import FontPicker from '@/components/FontPicker';
 
 interface QRCodePosterGeneratorProps {
   festivalName: string;
   festivalSlug: string;
+  festivalId: string;
   festivalDates?: string;
   logoUrl?: string;
   isPremium?: boolean;
   primaryColor?: string;
   secondaryColor?: string;
   accentColor?: string;
+  headerFont?: string | null;
 }
 
 export default function QRCodePosterGenerator({
   festivalName,
   festivalSlug,
+  festivalId,
   festivalDates,
   logoUrl,
   isPremium = false,
   primaryColor = '#4a90e2',
   secondaryColor = '#7b68ee',
   accentColor = '#ff6b6b',
+  headerFont = null,
 }: QRCodePosterGeneratorProps) {
   const posterRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [customPrimaryColor, setCustomPrimaryColor] = useState(primaryColor);
   const [customSecondaryColor, setCustomSecondaryColor] = useState(secondaryColor);
   const [customAccentColor, setCustomAccentColor] = useState(accentColor);
-  const [selectedFont, setSelectedFont] = useState('modern');
+  const [posterFont, setPosterFont] = useState<string | null>(headerFont);
+  const [fontLoaded, setFontLoaded] = useState(false);
+  const [hideWatermark, setHideWatermark] = useState(false);
+
+  // Sync posterFont with headerFont prop when it changes (e.g., async loading)
+  useEffect(() => {
+    // If headerFont is set from props and posterFont hasn't been manually changed
+    if (headerFont) {
+      setPosterFont(headerFont);
+    }
+  }, [headerFont]);
 
   const scheduleUrl = `https://tryflowgrid.com/${festivalSlug}/schedule`;
 
-  const fontOptions = [
-    { value: 'modern', label: 'Modern', font: 'var(--font-domine), serif', weight: 700, size: '48px', transform: 'uppercase' as const },
-    { value: 'bold', label: 'Bold', font: 'var(--font-space-grotesk), sans-serif', weight: 700, size: '48px', transform: 'uppercase' as const },
-    { value: 'futuristic', label: 'Futuristic', font: 'var(--font-metamorphous), cursive', weight: 400, size: '48px', transform: 'uppercase' as const },
-    { value: 'playful', label: 'Playful', font: 'var(--font-henny-penny), cursive', weight: 400, size: '48px', transform: 'uppercase' as const },
-    { value: 'handwritten', label: 'Handwritten', font: 'var(--font-italianno), cursive', weight: 400, size: '64px', transform: 'capitalize' as const },
-  ];
+  // Extract font name from FontPicker value
+  const getFontName = (fontValue: string | null): string => {
+    if (!fontValue) return '';
+    if (fontValue.startsWith('var(')) {
+      // Extract name from var(--font-name)
+      const match = fontValue.match(/var\(--font-([^)]+)\)/);
+      return match ? match[1].replace(/-/g, ' ') : '';
+    }
+    if (fontValue.startsWith('custom:')) {
+      // Extract name from custom:FontName|url or custom:FontName
+      const customPart = fontValue.replace('custom:', '');
+      return customPart.split('|')[0];
+    }
+    return fontValue; // Google Font name
+  };
 
-  const currentFont = fontOptions.find(f => f.value === selectedFont) || fontOptions[0];
+  // Convert FontPicker value to CSS font-family
+  const getFontFamily = (fontValue: string | null): string => {
+    if (!fontValue) return 'var(--font-domine), serif';
+    if (fontValue.startsWith('var(')) return fontValue;
+    if (fontValue.startsWith('custom:')) {
+      // Extract just the font name from custom:FontName|url
+      const customPart = fontValue.replace('custom:', '');
+      const fontName = customPart.split('|')[0];
+      return `"${fontName}", serif`;
+    }
+    return `"${fontValue}", serif`;
+  };
+
+  // Load Google Font dynamically
+  useEffect(() => {
+    if (!posterFont) {
+      setFontLoaded(true);
+      return;
+    }
+    
+    // Skip if it's a preset font (var(--font-xxx)) - already loaded
+    if (posterFont.startsWith('var(')) {
+      setFontLoaded(true);
+      return;
+    }
+    
+    // Handle custom fonts with URL
+    if (posterFont.startsWith('custom:') && posterFont.includes('|')) {
+      const [, rest] = posterFont.split('custom:');
+      const [fontName, fontUrl] = rest.split('|');
+      if (fontUrl) {
+        setFontLoaded(false);
+        const fontFace = new FontFace(fontName, `url(${fontUrl})`);
+        fontFace.load().then(loadedFont => {
+          document.fonts.add(loadedFont);
+          setFontLoaded(true);
+        }).catch(err => {
+          console.error('Failed to load custom font:', err);
+          setFontLoaded(true);
+        });
+      } else {
+        setFontLoaded(true);
+      }
+      return;
+    }
+    
+    // Handle custom fonts without URL (legacy)
+    if (posterFont.startsWith('custom:')) {
+      setFontLoaded(true);
+      return;
+    }
+    
+    // Load Google Font
+    setFontLoaded(false);
+    const link = document.createElement('link');
+    link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(posterFont)}:wght@400;700&display=swap`;
+    link.rel = 'stylesheet';
+    link.onload = () => setFontLoaded(true);
+    link.onerror = () => setFontLoaded(true);
+    document.head.appendChild(link);
+    
+    return () => {
+      if (link.parentNode) {
+        link.parentNode.removeChild(link);
+      }
+    };
+  }, [posterFont]);
 
   // Proxy logo URL to avoid CORS issues with html2canvas
   const proxiedLogoUrl = logoUrl && logoUrl.startsWith('http') 
@@ -192,22 +282,63 @@ export default function QRCodePosterGenerator({
           </div>
         </div>
 
-        {/* Font Chooser */}
-        <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-gray-700">
-            Font Style:
-          </label>
-          <select
-            value={selectedFont}
-            onChange={(e) => setSelectedFont(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            {fontOptions.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+        {/* Font Chooser - Pro Feature */}
+        <div className="py-3 px-4 bg-gray-50 rounded-lg border border-gray-200">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-sm font-medium text-gray-700">Poster Font</span>
+            {!fontLoaded && <span className="text-xs text-orange-500">(Loading...)</span>}
+            {isPremium ? (
+              <span className="text-xs bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-2 py-0.5 rounded-full">Pro</span>
+            ) : (
+              <Link href="/pricing" className="inline-flex items-center gap-1 text-xs text-purple-600 hover:text-purple-700 font-medium">
+                <Lock className="w-3 h-3" />
+                Pro Feature
+              </Link>
+            )}
+          </div>
+          {isPremium ? (
+            <FontPicker
+              value={posterFont || ''}
+              onChange={setPosterFont}
+              festivalId={festivalId}
+            />
+          ) : (
+            <div className="p-3 bg-white border border-gray-200 rounded-lg opacity-60">
+              <div className="flex items-center gap-2 text-gray-500">
+                <Lock className="w-4 h-4" />
+                <span className="text-sm">200+ Google Fonts available with Pro</span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Remove Watermark Toggle - Pro Feature */}
+        <div className="flex items-center justify-between py-3 px-4 bg-gray-50 rounded-lg border border-gray-200">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-700">Remove "Powered by Flow Grid"</span>
+            {isPremium && (
+              <span className="text-xs bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-2 py-0.5 rounded-full">Pro</span>
+            )}
+          </div>
+          {isPremium ? (
+            <button
+              onClick={() => setHideWatermark(!hideWatermark)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                hideWatermark ? 'bg-purple-600' : 'bg-gray-300'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  hideWatermark ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          ) : (
+            <Link href="/pricing" className="inline-flex items-center gap-1.5 text-sm font-medium text-purple-600 hover:text-purple-700">
+              <Lock className="w-4 h-4" />
+              Upgrade
+            </Link>
+          )}
         </div>
       </div>
 
@@ -261,12 +392,11 @@ export default function QRCodePosterGenerator({
                 style={{
                   color: customAccentColor,
                   textShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                  fontFamily: currentFont.font,
-                  fontWeight: currentFont.weight,
+                  fontFamily: getFontFamily(posterFont),
+                  fontWeight: 700,
                   letterSpacing: '0.08em',
                   lineHeight: '1.2',
-                  fontSize: currentFont.size,
-                  textTransform: currentFont.transform,
+                  fontSize: '48px',
                 }}
               >
                 Check the
@@ -275,49 +405,52 @@ export default function QRCodePosterGenerator({
               </div>
             </div>
 
-              {/* QR Code - 20% of A4 height, same as logo */}
-              <div className="flex justify-center">
-                <div
-                  className="p-4 bg-white rounded-lg"
-                  style={{
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
-                  }}
-                >
-                  <QRCodeSVG
-                    value={scheduleUrl}
-                    size={160}
-                    level="H"
-                    includeMargin={false}
-                    fgColor="#000000"
-                  />
-                </div>
-              </div>
-
-            {/* Footer - Powered by Flow Grid - with logo and frame */}
-            <div className="w-full flex justify-center items-center">
-              <div 
-                className="flex items-center gap-2 px-4 py-2 rounded-lg"
+            {/* QR Code - 20% of A4 height, same as logo */}
+            <div className="flex justify-center">
+              <div
+                className="p-4 bg-white rounded-lg"
                 style={{
-                  border: `2px solid ${customPrimaryColor}`,
-                  backgroundColor: 'rgb(255, 255, 255)',
-                  boxShadow: 'none',
-                  opacity: 1,
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
                 }}
               >
-                <span className="text-xs font-medium" style={{ color: '#374151' }}>
-                  Powered by
-                </span>
-                <img
-                  src="/flow-grid-logo.png"
-                  alt="Flow Grid"
-                  className="h-6 object-contain"
-                  style={{ opacity: 1 }}
-                  crossOrigin="anonymous"
+                <QRCodeSVG
+                  value={scheduleUrl}
+                  size={160}
+                  level="H"
+                  includeMargin={false}
+                  fgColor="#000000"
                 />
-                <span className="text-sm font-bold" style={{ color: '#1f2937' }}>
-                  Flow Grid
-                </span>
               </div>
+            </div>
+
+            {/* Footer - Powered by Flow Grid - with logo and frame (hidden for Pro with toggle) */}
+            {/* Always reserve space to prevent layout shift */}
+            <div className="w-full flex justify-center items-center" style={{ minHeight: '40px' }}>
+              {!(isPremium && hideWatermark) && (
+                <div 
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg"
+                  style={{
+                    border: `2px solid ${customPrimaryColor}`,
+                    backgroundColor: 'rgb(255, 255, 255)',
+                    boxShadow: 'none',
+                    opacity: 1,
+                  }}
+                >
+                  <span className="text-xs font-medium" style={{ color: '#374151' }}>
+                    Powered by
+                  </span>
+                  <img
+                    src="/flow-grid-logo.png"
+                    alt="Flow Grid"
+                    className="h-6 object-contain"
+                    style={{ opacity: 1 }}
+                    crossOrigin="anonymous"
+                  />
+                  <span className="text-sm font-bold" style={{ color: '#1f2937' }}>
+                    Flow Grid
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>

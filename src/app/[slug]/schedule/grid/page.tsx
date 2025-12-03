@@ -33,6 +33,7 @@ interface Festival {
   primaryColor?: string
   secondaryColor?: string
   accentColor?: string
+  headerFont?: string | null
   startDate: Date
   endDate: Date
   timezone: string

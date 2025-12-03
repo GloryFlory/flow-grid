@@ -20,33 +20,17 @@ const updates: Update[] = [
   {
     date: '2025-12-03',
     type: 'feature',
-    title: 'What\'s New Notifications',
-    description: 'Stay informed about new features with a friendly notification when you log in.',
+    title: 'December Feature Update',
+    description: 'A major update packed with new features for event organizers: duplicate events, custom fonts everywhere, watermark controls, and more.',
     details: [
-      'Non-intrusive toast notification',
-      'Links to this changelog page',
-      'Only shows once per update cycle',
-    ]
-  },
-  {
-    date: '2025-12-03',
-    type: 'improvement',
-    title: 'Better URL Slug Validation',
-    description: 'The event URL field now automatically converts uppercase letters to lowercase and shows instant feedback when invalid characters are entered.',
-    details: [
-      'Auto-lowercase and clean URL slugs',
-      'Orange highlight when invalid characters are typed',
-      'Helpful hint message appears instantly',
-    ]
-  },
-  {
-    date: '2025-12-03',
-    type: 'fix',
-    title: 'Improved Error Messages',
-    description: 'When something goes wrong during event creation, you now see clear, specific error messages instead of generic ones.',
-    details: [
-      'Shows exactly which field has an issue',
-      'Provides actionable guidance to fix problems',
+      'Founding Members Program: All early access users now have Pro features free for one year with special Founding Member status',
+      'Duplicate Events: One-click copy from the event dropdown menu, copies all sessions, locations, categories, and branding with a unique URL slug',
+      'Custom Fonts in QR Posters: Full FontPicker integration with support for preset, Google, and custom uploaded fonts',
+      'Remove Watermark (Pro): Toggle in Share & Promote settings to hide "Powered by Flow Grid" from public schedules',
+      'Google Fonts & Custom Font Upload: Choose from 200+ Google Fonts with search and category filters, or upload your own TTF, OTF, WOFF, or WOFF2 files',
+      'What\'s New Notifications: Non-intrusive toast notification when new features are available, links to changelog',
+      'Better URL Slug Validation: Auto-lowercase with orange highlight and instant feedback when invalid characters are entered',
+      'Improved Error Messages: Clear, specific errors with actionable guidance during event creation',
     ]
   },
   {
@@ -306,12 +290,25 @@ export default function UpdatesPage() {
                           </p>
                           {update.details && (
                             <ul className="space-y-1">
-                              {update.details.map((detail, i) => (
-                                <li key={i} className="flex items-center gap-2 text-sm text-gray-500">
-                                  <span className="w-1.5 h-1.5 bg-gray-300 rounded-full" />
-                                  {detail}
-                                </li>
-                              ))}
+                              {update.details.map((detail, i) => {
+                                // Check if detail has a header (text before colon)
+                                const colonIndex = detail.indexOf(':');
+                                const hasHeader = colonIndex > 0 && colonIndex < 40;
+                                
+                                return (
+                                  <li key={i} className="flex items-start gap-2 text-sm text-gray-500">
+                                    <span className="w-1.5 h-1.5 bg-gray-300 rounded-full mt-1.5 shrink-0" />
+                                    {hasHeader ? (
+                                      <span>
+                                        <strong className="text-gray-700">{detail.substring(0, colonIndex)}</strong>
+                                        {detail.substring(colonIndex)}
+                                      </span>
+                                    ) : (
+                                      detail
+                                    )}
+                                  </li>
+                                );
+                              })}
                             </ul>
                           )}
                         </div>

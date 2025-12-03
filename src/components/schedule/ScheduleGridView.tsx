@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { ChevronLeft, ChevronRight, LayoutGrid, Grid3x3, Star } from 'lucide-react'
 import Link from 'next/link'
 import { SessionModal } from './SessionModal'
@@ -39,6 +39,7 @@ interface Festival {
   primaryColor?: string
   secondaryColor?: string
   accentColor?: string
+  headerFont?: string | null
 }
 
 interface ScheduleGridViewProps {
@@ -128,6 +129,45 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
   
   // Show favourites only filter
   const [showFavouritesOnly, setShowFavouritesOnly] = useState(false)
+
+  // Load custom header font (Google Fonts or custom uploaded)
+  useEffect(() => {
+    if (!festival.headerFont) return
+    
+    // Handle custom uploaded fonts (format: "custom:FontName|url")
+    if (festival.headerFont.startsWith('custom:')) {
+      const rest = festival.headerFont.replace('custom:', '')
+      
+      // New format with URL: "FontName|https://..."
+      if (rest.includes('|')) {
+        const [fontName, fontUrl] = rest.split('|')
+        if (fontUrl) {
+          const font = new FontFace(fontName, `url(${fontUrl})`)
+          font.load().then(() => {
+            document.fonts.add(font)
+          }).catch(err => {
+            console.error('Failed to load custom font:', err)
+          })
+        }
+      }
+      return
+    }
+    
+    // Handle Google Fonts
+    const linkId = `google-font-${festival.headerFont.replace(/\s+/g, '-').toLowerCase()}`
+    if (document.getElementById(linkId)) return
+    
+    // Load the Google Font
+    const link = document.createElement('link')
+    link.id = linkId
+    link.rel = 'stylesheet'
+    link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(festival.headerFont)}:wght@400;500;600;700&display=swap`
+    document.head.appendChild(link)
+    
+    return () => {
+      // Cleanup on unmount (optional - fonts usually stay loaded)
+    }
+  }, [festival.headerFont])
 
   // Handle favourite toggle
   const handleFavouriteToggle = (sessionId: string, e: React.MouseEvent) => {
@@ -327,6 +367,23 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
     return overlappingSessionsCache[key] || []
   }
 
+  // Generate font-family CSS for custom header font
+  const getHeaderFontFamily = (font: string | null | undefined): string | undefined => {
+    if (!font) return undefined
+    
+    // Handle custom uploaded fonts (format: "custom:FontName|url")
+    if (font.startsWith('custom:')) {
+      const rest = font.replace('custom:', '')
+      const fontName = rest.includes('|') ? rest.split('|')[0] : rest
+      return `"${fontName}", serif`
+    }
+    
+    // Handle Google Fonts - use the font name directly
+    return `"${font}", serif`
+  }
+
+  const headerFontFamily = getHeaderFontFamily(festival.headerFont)
+
   // Apply custom branding
   const brandingStyles = {
     '--primary-color': festival.primaryColor || '#4a90e2',
@@ -344,7 +401,7 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
               <img src={festival.logo} alt={festival.name} className="festival-logo" />
             )}
             <div className="title-section">
-              <h1>{festival.name}</h1>
+              <h1 style={headerFontFamily ? { fontFamily: headerFontFamily } : undefined}>{festival.name}</h1>
             </div>
           </div>
           <div className="header-info">
@@ -591,7 +648,10 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
                         <div className="flex flex-col items-center gap-0.5 md:gap-1">
                           <div 
                             className="text-[10px] md:text-xs font-medium text-gray-600"
-                            style={{ fontWeight: isToday ? 'bold' : 'normal' }}
+                            style={{ 
+                              fontWeight: isToday ? 'bold' : 'normal',
+                              ...(headerFontFamily ? { fontFamily: headerFontFamily } : {})
+                            }}
                           >
                             {dayName}
                           </div>

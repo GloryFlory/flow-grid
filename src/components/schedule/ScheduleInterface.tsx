@@ -7,7 +7,6 @@ import { FilterBar } from './FilterBar'
 import { ScheduleTabs } from './ScheduleTabs'
 import { SessionModal } from './SessionModal'
 import { useFavourites } from '@/hooks/useFavourites'
-import { PoweredByFlowGrid } from '@/components/PoweredByFlowGrid'
 
 interface Session {
   id: string
@@ -42,6 +41,7 @@ interface Festival {
   primaryColor?: string
   secondaryColor?: string
   accentColor?: string
+  headerFont?: string | null
   whatsappLink?: string
   telegramLink?: string
   facebookLink?: string
@@ -161,6 +161,45 @@ export default function ScheduleInterface({ festival, sessions, showPoweredBy = 
 
     trackView()
   }, [festival.id])
+
+  // Load custom header font (Google Fonts or custom uploaded)
+  useEffect(() => {
+    if (!festival.headerFont) return
+    
+    // Handle custom uploaded fonts (format: "custom:FontName|url")
+    if (festival.headerFont.startsWith('custom:')) {
+      const rest = festival.headerFont.replace('custom:', '')
+      
+      // New format with URL: "FontName|https://..."
+      if (rest.includes('|')) {
+        const [fontName, fontUrl] = rest.split('|')
+        if (fontUrl) {
+          const font = new FontFace(fontName, `url(${fontUrl})`)
+          font.load().then(() => {
+            document.fonts.add(font)
+          }).catch(err => {
+            console.error('Failed to load custom font:', err)
+          })
+        }
+      }
+      return
+    }
+    
+    // Handle Google Fonts
+    const linkId = `google-font-${festival.headerFont.replace(/\s+/g, '-').toLowerCase()}`
+    if (document.getElementById(linkId)) return
+    
+    // Load the Google Font
+    const link = document.createElement('link')
+    link.id = linkId
+    link.rel = 'stylesheet'
+    link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(festival.headerFont)}:wght@400;500;600;700&display=swap`
+    document.head.appendChild(link)
+    
+    return () => {
+      // Cleanup on unmount (optional - fonts usually stay loaded)
+    }
+  }, [festival.headerFont])
 
   // Handle session click with tracking
   const handleSessionClick = async (session: Session) => {
@@ -392,6 +431,24 @@ export default function ScheduleInterface({ festival, sessions, showPoweredBy = 
     })
   }, [sessions, sessionsByDay, activeDay, levelFilter, styleFilter, teacherFilter, searchFilter, festivalDayOrder, showFavouritesOnly, favourites])
 
+  // Generate font-family CSS for custom header font
+  const getHeaderFontFamily = (font: string | null | undefined): string | undefined => {
+    if (!font) return undefined
+    
+    // Handle custom uploaded fonts
+    if (font.startsWith('custom:')) {
+      const rest = font.replace('custom:', '')
+      // Handle new format with URL: "FontName|https://..."
+      const fontName = rest.includes('|') ? rest.split('|')[0] : rest
+      return `"${fontName}", serif`
+    }
+    
+    // Handle Google Fonts - use the font name directly
+    return `"${font}", serif`
+  }
+
+  const headerFontFamily = getHeaderFontFamily(festival.headerFont)
+
   // Apply custom branding colors via CSS variables
   const brandingStyles = {
     '--primary-color': festival.primaryColor || '#4a90e2',
@@ -411,7 +468,7 @@ export default function ScheduleInterface({ festival, sessions, showPoweredBy = 
               <img src={festival.logo} alt={`${festival.name} logo`} className="festival-logo" />
             )}
             <div className="title-section">
-              <h1>{festival.name}</h1>
+              <h1 style={headerFontFamily ? { fontFamily: headerFontFamily } : undefined}>{festival.name}</h1>
               {festival.description && <p className="description-text">{festival.description}</p>}
             </div>
           </div>
@@ -580,6 +637,25 @@ export default function ScheduleInterface({ festival, sessions, showPoweredBy = 
                 <span>My Schedule</span>
               </Link>
             </div>
+
+            {/* Powered by Flow Grid - below view toggles (Free tier only) */}
+            {showPoweredBy && (
+              <div className="flex items-center justify-center gap-1.5 py-2 mt-1">
+                <a 
+                  href="https://tryflowgrid.com?ref=powered-by"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <img 
+                    src="/flow-grid-logo.png" 
+                    alt="Flow Grid" 
+                    className="h-3.5 opacity-70"
+                  />
+                  <span>Powered by <span className="font-medium">Flow Grid</span></span>
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -649,7 +725,12 @@ export default function ScheduleInterface({ festival, sessions, showPoweredBy = 
 
               return (
                 <div key={`day-${dayIndex}-${day}`} className="day-section">
-                  <h2 className="day-header">{formatDayHeader(day, true)}</h2>
+                  <h2 
+                    className="day-header"
+                    style={headerFontFamily ? { fontFamily: headerFontFamily } : undefined}
+                  >
+                    {formatDayHeader(day, true)}
+                  </h2>
                   <div className="sessions-grid">
                     {filteredDaySessions.map(session => (
                       <SessionCard
@@ -715,9 +796,6 @@ export default function ScheduleInterface({ festival, sessions, showPoweredBy = 
         isFavourite={selectedSession ? isFavourite(selectedSession.id) : false}
         onFavouriteToggle={handleFavouriteToggle}
       />
-
-      {/* Powered by Flow Grid footer - shown for Free tier */}
-      {showPoweredBy && <PoweredByFlowGrid />}
     </div>
   )
 }

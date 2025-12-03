@@ -29,6 +29,9 @@ export async function GET() {
       )
     }
 
+    // Check if user is admin
+    const isAdmin = user.role === 'ADMIN'
+
     const totalFestivals = user.festivals.length
     const publishedFestivals = user.festivals.filter(f => f.isPublished).length
     const draftFestivals = totalFestivals - publishedFestivals
@@ -39,7 +42,8 @@ export async function GET() {
       status: 'ACTIVE'
     }
     
-    const festivalsLimit = subscription.festivalsLimit ?? 1
+    // Admins get unlimited festivals
+    const festivalsLimit = isAdmin ? -1 : (subscription.festivalsLimit ?? 1)
 
     return NextResponse.json({
       subscription: {
@@ -50,7 +54,8 @@ export async function GET() {
       totalFestivals,
       publishedFestivals,
       draftFestivals,
-      canPublish: publishedFestivals < festivalsLimit
+      canPublish: isAdmin || publishedFestivals < festivalsLimit,
+      isAdmin
     })
   } catch (error) {
     console.error('Error fetching subscription:', error)

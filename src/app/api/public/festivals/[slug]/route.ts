@@ -17,7 +17,12 @@ export async function GET(
       },
       include: {
         sessions: true,
-        teachers: true
+        teachers: true,
+        user: {
+          include: {
+            subscription: true
+          }
+        }
       }
     })
 
@@ -226,6 +231,12 @@ export async function GET(
         return (a.title || '').localeCompare(b.title || '')
       })
 
+    // Determine if "Powered by Flow Grid" should be shown
+    // Auto-hide for Pro/Enterprise/Event Pass holders
+    const subscription = (festival as any).user?.subscription
+    const isPaidPlan = subscription?.plan && ['PRO', 'ENTERPRISE', 'EVENT_PASS'].includes(subscription.plan)
+    const showPoweredBy = !isPaidPlan
+
     const response = {
       festival: {
         id: festival.id,
@@ -237,6 +248,7 @@ export async function GET(
         primaryColor: festival.primaryColor,
         secondaryColor: festival.secondaryColor,
         accentColor: festival.accentColor,
+        headerFont: (festival as any).headerFont,
         startDate: festival.startDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
         endDate: festival.endDate.toISOString().split('T')[0],
         timezone: festival.timezone,
@@ -245,7 +257,8 @@ export async function GET(
         facebookLink: (festival as any).facebookLink,
         instagramLink: (festival as any).instagramLink
       },
-      sessions: transformedSessions
+      sessions: transformedSessions,
+      showPoweredBy
     }
 
     // Add cache headers for better performance

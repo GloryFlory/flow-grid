@@ -70,7 +70,7 @@ export function WhatsNewBanner({ variant = 'banner' }: WhatsNewBannerProps) {
             <div>
               <h4 className="font-semibold text-gray-900 text-sm">New features available! ✨</h4>
               <p className="text-sm text-gray-600 mt-1">
-                We've added Event Insights, better error messages, and more.
+                Founding Member perks, duplicate events, custom fonts, and more.
               </p>
               <Link 
                 href="/updates"

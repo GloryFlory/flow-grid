@@ -230,14 +230,20 @@ export const authOptions: NextAuthOptions = {
   },
   events: {
     async createUser({ user }) {
-      // Auto-create FREE subscription for new users
+      // Auto-create PRO subscription for new users (Early Access / Founding Member)
+      // This gives everyone PRO for 1 year during the pre-launch phase
       if (user.id) {
+        const oneYearFromNow = new Date();
+        oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+        
         await prisma.subscription.create({
           data: {
             userId: user.id,
-            plan: 'FREE',
+            plan: 'PRO',
             status: 'ACTIVE',
-            festivalsLimit: 1,
+            festivalsLimit: 5,
+            stripeCurrentPeriodEnd: oneYearFromNow,
+            isFoundingMember: true,
           },
         });
       }

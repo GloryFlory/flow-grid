@@ -4,9 +4,10 @@ import React, { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, QrCode, Share2, Link as LinkIcon, Code, Image as ImageIcon } from 'lucide-react'
+import { ArrowLeft, QrCode, Share2, Link as LinkIcon, Code } from 'lucide-react'
 import Link from 'next/link'
 import QRCodePosterGenerator from '@/components/dashboard/QRCodePosterGenerator'
+import { usePlanLimits } from '@/hooks/usePlanLimits'
 
 interface Festival {
   id: string
@@ -21,11 +22,14 @@ interface Festival {
   primaryColor: string
   secondaryColor: string
   accentColor: string
+  headerFont?: string | null
 }
 
 export default function ShareAndPromote() {
   const params = useParams()
   const festivalId = params.id as string
+  const { limits } = usePlanLimits()
+  const isPro = limits?.currentPlan && ['PRO', 'ENTERPRISE', 'EVENT_PASS'].includes(limits.currentPlan)
   
   const [festival, setFestival] = useState<Festival | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -193,12 +197,14 @@ export default function ShareAndPromote() {
                 <QRCodePosterGenerator
                   festivalName={festival.name}
                   festivalSlug={festival.slug}
+                  festivalId={festival.id}
                   festivalDates={`${formatDate(festival.startDate)} - ${formatDate(festival.endDate)}`}
                   logoUrl={festival.logo || undefined}
-                  isPremium={false} // TODO: Connect to subscription tier
+                  isPremium={isPro || false}
                   primaryColor={festival.primaryColor}
                   secondaryColor={festival.secondaryColor}
                   accentColor={festival.accentColor}
+                  headerFont={festival.headerFont}
                 />
               </CardContent>
             </Card>

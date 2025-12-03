@@ -669,7 +669,7 @@ export default function FestivalInformation() {
                 {/* Publish Toggle */}
                 <div className="pt-3 border-t">
                   {/* Show upgrade button if at limit and festival is not published */}
-                  {!formData.isPublished && planInfo && !planInfo.canPublish ? (
+                  {!formData.isPublished && planInfo && !planInfo.canPublish && planInfo.festivalsLimit !== -1 ? (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium text-gray-700">Public Schedule</span>
