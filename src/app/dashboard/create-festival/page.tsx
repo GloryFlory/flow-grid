@@ -86,11 +86,14 @@ export default function CreateFestivalPage() {
             activeFestivals: totalFestivals,
             canPublish: totalFestivals < festivalsLimit // Actually means canCreate now
           })
+        } else {
+          // API returned error - allow creation, limit will be enforced server-side
+          setPlanInfo({ plan: 'FREE', festivalsLimit: 1, activeFestivals: 0, canPublish: true })
         }
       } catch (error) {
         console.error('Error fetching plan info:', error)
-        // Default to FREE with limit reached to be safe
-        setPlanInfo({ plan: 'FREE', festivalsLimit: 1, activeFestivals: 1, canPublish: false })
+        // Network error - allow creation, limit will be enforced server-side
+        setPlanInfo({ plan: 'FREE', festivalsLimit: 1, activeFestivals: 0, canPublish: true })
       }
     }
     fetchPlanInfo()
