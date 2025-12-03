@@ -147,8 +147,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       console.error('Zod validation error:', JSON.stringify(error.errors, null, 2))
+      // Build a human-readable error message
+      const fieldErrors = error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
       return NextResponse.json(
-        { error: 'Invalid input', details: error.errors },
+        { error: `Invalid input: ${fieldErrors}`, details: error.errors },
         { status: 400 }
       )
     }
