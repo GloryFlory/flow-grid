@@ -16,6 +16,18 @@ interface Update {
 }
 
 const updates: Update[] = [
+  // December 2025
+  {
+    date: '2025-12-03',
+    type: 'feature',
+    title: 'What\'s New Notifications',
+    description: 'Stay informed about new features with a friendly notification when you log in.',
+    details: [
+      'Non-intrusive toast notification',
+      'Links to this changelog page',
+      'Only shows once per update cycle',
+    ]
+  },
   {
     date: '2025-12-03',
     type: 'improvement',
@@ -56,6 +68,8 @@ const updates: Update[] = [
     title: 'Analytics Performance Boost',
     description: 'Analytics pages now load up to 10x faster thanks to optimized database queries.',
   },
+
+  // November 2025
   {
     date: '2025-11-30',
     type: 'feature',
@@ -74,6 +88,23 @@ const updates: Update[] = [
     description: 'Choose how to label your presenters: Teachers, Instructors, Speakers, or create your own custom label.',
   },
   {
+    date: '2025-11-27',
+    type: 'feature',
+    title: 'Share & Promote Tools',
+    description: 'New promotional tools to help spread the word about your event.',
+    details: [
+      'QR code posters with custom branding',
+      'Social media share buttons',
+      'Embeddable schedule widgets',
+    ]
+  },
+  {
+    date: '2025-11-26',
+    type: 'feature',
+    title: 'Quick Create Mode',
+    description: 'Create events faster by skipping the session upload step and adding sessions later.',
+  },
+  {
     date: '2025-11-25',
     type: 'feature',
     title: 'Multiple View Modes',
@@ -82,19 +113,90 @@ const updates: Update[] = [
       'Grid view for visual overview',
       'List view for compact reading',
       'Timeline view for chronological planning',
+      'Full View with Day/3-Day/Week modes',
     ]
   },
   {
-    date: '2025-11-20',
+    date: '2025-11-24',
+    type: 'feature',
+    title: 'Advanced Filtering',
+    description: 'Powerful filters to help attendees find exactly what they\'re looking for.',
+    details: [
+      'Filter by level (Beginner, Intermediate, Advanced)',
+      'Filter by session type',
+      'Filter by presenter',
+      'Search across all fields',
+    ]
+  },
+  {
+    date: '2025-11-23',
     type: 'feature',
     title: 'Session Favorites',
     description: 'Attendees can now save their favorite sessions and filter to see only what they\'ve saved.',
   },
   {
-    date: '2025-11-15',
+    date: '2025-11-22',
+    type: 'feature',
+    title: 'Drag & Drop Session Reordering',
+    description: 'Easily rearrange your sessions with intuitive drag-and-drop controls.',
+  },
+  {
+    date: '2025-11-21',
+    type: 'feature',
+    title: 'Booking System',
+    description: 'Allow attendees to book their spots in capacity-limited sessions.',
+    details: [
+      'Set capacity limits per session',
+      'Real-time availability updates',
+      'Manage bookings from dashboard',
+    ]
+  },
+  {
+    date: '2025-11-20',
+    type: 'feature',
+    title: 'Blog & SEO Improvements',
+    description: 'New blog with helpful articles about event management, plus major SEO improvements.',
+    details: [
+      '9 SEO-optimized articles',
+      'Schema markup for better Google visibility',
+      'Improved meta descriptions',
+    ]
+  },
+  {
+    date: '2025-11-18',
     type: 'feature',
     title: 'Multi-Week Festival Support',
     description: 'Create festivals that span multiple weeks with sessions properly assigned to the correct dates.',
+  },
+  {
+    date: '2025-11-17',
+    type: 'feature',
+    title: 'Help Center',
+    description: 'New help dropdown in the dashboard with quick access to documentation and support.',
+  },
+  {
+    date: '2025-11-15',
+    type: 'feature',
+    title: 'Backup & Restore',
+    description: 'Export your event data and restore it if needed. Peace of mind for your important schedules.',
+  },
+  {
+    date: '2025-11-14',
+    type: 'improvement',
+    title: 'Larger Photo Uploads',
+    description: 'Upload presenter photos up to 20MB (increased from 5MB) for higher quality images.',
+  },
+  {
+    date: '2025-11-12',
+    type: 'feature',
+    title: 'Amplitude Analytics',
+    description: 'Better insights into how attendees use your schedule to help us improve the platform.',
+  },
+  {
+    date: '2025-11-10',
+    type: 'improvement',
+    title: 'Mobile Experience',
+    description: 'Improved mobile layout with collapsible filters and better touch interactions.',
   },
 ]
 
