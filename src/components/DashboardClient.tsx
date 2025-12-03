@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PlanLimitsBanner } from '@/components/PlanLimitsBanner'
 import { UpgradePrompt } from '@/components/UpgradePrompt'
+import { WhatsNewBanner } from '@/components/WhatsNewBanner'
 import { usePlanLimits } from '@/hooks/usePlanLimits'
 import { 
   Calendar, 
@@ -279,6 +280,9 @@ export function DashboardClient({ user }: { user: User }) {
           <UpgradePrompt dismissible storageKey="dashboard-upgrade-dismissed" />
         </div>
       )}
+
+      {/* What's New Toast */}
+      <WhatsNewBanner variant="toast" />
     </div>
   )
 }
