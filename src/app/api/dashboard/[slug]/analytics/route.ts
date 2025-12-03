@@ -238,18 +238,22 @@ export async function GET(
     })
 
     // Combine popular sessions data
-    const allSessionIds = new Set([
+    const allSessionIds = Array.from(new Set([
       ...Object.keys(sessionClicks),
       ...sessionFavourites.map((f: { sessionId: string }) => f.sessionId),
       ...sessionBookings.map((b: { sessionId: string }) => b.sessionId)
-    ])
+    ]))
+
+    // Batch fetch all sessions at once instead of N+1 queries
+    const sessions = await prisma.festivalSession.findMany({
+      where: { id: { in: allSessionIds } },
+      select: { id: true, title: true }
+    })
+    const sessionMap = new Map(sessions.map(s => [s.id, s]))
 
     const popularSessions: PopularSession[] = []
     for (const sessionId of allSessionIds) {
-      const sessionData = await prisma.festivalSession.findUnique({
-        where: { id: sessionId },
-        select: { id: true, title: true }
-      })
+      const sessionData = sessionMap.get(sessionId)
       if (sessionData) {
         const favCount = sessionFavourites.find((f: { sessionId: string; _count: { sessionId: number } }) => f.sessionId === sessionId)?._count.sessionId || 0
         const bookCount = sessionBookings.find((b: { sessionId: string; _count: number }) => b.sessionId === sessionId)?._count || 0
