@@ -2,6 +2,7 @@
 
 import { ArrowLeft, Sparkles, Zap, Bug, Wrench } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 type UpdateType = 'feature' | 'improvement' | 'fix' | 'maintenance'
 
@@ -114,6 +115,8 @@ function formatDate(dateString: string): string {
 }
 
 export default function UpdatesPage() {
+  const router = useRouter()
+
   // Group updates by month
   const groupedUpdates = updates.reduce((acc, update) => {
     const date = new Date(update.date)
@@ -125,18 +128,27 @@ export default function UpdatesPage() {
     return acc
   }, {} as Record<string, Update[]>)
 
+  const handleBack = () => {
+    // Check if there's browser history to go back to
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      router.back()
+    } else {
+      router.push('/')
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Header */}
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link 
-            href="/"
+          <button 
+            onClick={handleBack}
             className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Back to Flow Grid</span>
-          </Link>
+            <span>Go back</span>
+          </button>
         </div>
       </header>
 
