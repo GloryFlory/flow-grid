@@ -73,17 +73,25 @@ export async function POST(request: NextRequest) {
 
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const userId = session.metadata?.userId
-  const plan = session.metadata?.plan as PlanType
+  const plan = session.metadata?.plan
+  const billingPeriod = session.metadata?.billingPeriod
 
   if (!userId || !plan) {
     console.error('Missing metadata in checkout session')
     return
   }
 
+  // Handle Event Pass one-time purchase
+  if (plan === 'EVENT_PASS') {
+    await handleEventPassPurchase(userId, session.customer as string)
+    return
+  }
+
+  // Handle subscription (Pro plan)
   const subscriptionId = session.subscription as string
   const stripeSubscription = await stripe.subscriptions.retrieve(subscriptionId)
 
-  const planFeatures = PLAN_FEATURES[plan]
+  const planFeatures = PLAN_FEATURES[plan as PlanType]
 
   await prisma.subscription.upsert({
     where: { userId },
@@ -93,7 +101,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       stripeSubscriptionId: subscriptionId,
       stripePriceId: stripeSubscription.items.data[0]?.price.id,
       stripeCurrentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000),
-      plan,
+      plan: plan as PlanType,
       status: 'ACTIVE',
       festivalsLimit: planFeatures.festivalsLimit,
     },
@@ -101,13 +109,47 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       stripeSubscriptionId: subscriptionId,
       stripePriceId: stripeSubscription.items.data[0]?.price.id,
       stripeCurrentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000),
-      plan,
+      plan: plan as PlanType,
       status: 'ACTIVE',
       festivalsLimit: planFeatures.festivalsLimit,
     },
   })
 
   console.log(`✅ User ${userId} upgraded to ${plan}`)
+}
+
+async function handleEventPassPurchase(userId: string, customerId: string) {
+  // Event Pass: add 1 to festivalsLimit
+  // TODO: Also increment eventPassCount once the migration is applied
+  const existingSubscription = await prisma.subscription.findUnique({
+    where: { userId }
+  })
+
+  if (existingSubscription) {
+    // User has existing subscription - increment festivals limit
+    await prisma.subscription.update({
+      where: { userId },
+      data: {
+        stripeCustomerId: customerId,
+        // eventPassCount: { increment: 1 },  // TODO: Uncomment after migration
+        festivalsLimit: { increment: 1 },
+      },
+    })
+    console.log(`✅ User ${userId} purchased Event Pass (festivalsLimit: ${existingSubscription.festivalsLimit + 1})`)
+  } else {
+    // Create new subscription with Event Pass
+    await prisma.subscription.create({
+      data: {
+        userId,
+        stripeCustomerId: customerId,
+        plan: 'FREE', // Event Pass doesn't change the plan type
+        status: 'ACTIVE',
+        // eventPassCount: 1,  // TODO: Uncomment after migration
+        festivalsLimit: 2, // 1 free + 1 from Event Pass
+      },
+    })
+    console.log(`✅ User ${userId} purchased first Event Pass`)
+  }
 }
 
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {

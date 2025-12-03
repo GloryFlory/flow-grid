@@ -1,0 +1,49 @@
+---
+description: CRITICAL - Prevents destructive database commands that can wipe production data
+globs: *
+alwaysApply: true
+---
+
+# ABSOLUTE DATABASE SAFETY RULES
+
+## NEVER EXECUTE THESE COMMANDS - THEY WILL DESTROY PRODUCTION DATA:
+
+### Prisma Commands - BANNED:
+- `prisma db push --force-reset` ❌ WIPES ENTIRE DATABASE
+- `prisma db push --accept-data-loss` ❌ CAN DESTROY DATA
+- `prisma migrate reset` ❌ WIPES ENTIRE DATABASE
+- `prisma migrate dev --create-only` with reset prompts ❌
+
+### SQL Commands - BANNED:
+- `DROP TABLE` ❌
+- `DROP DATABASE` ❌
+- `TRUNCATE` ❌
+- `DELETE FROM table_name` without WHERE clause ❌
+
+### Flags - BANNED:
+- `--force-reset` ❌
+- `--reset` ❌
+- `--force` on any database operation ❌
+
+## SAFE ALTERNATIVES:
+
+### For schema changes, ALWAYS provide SQL for manual execution:
+```sql
+ALTER TABLE tablename ADD COLUMN IF NOT EXISTS "columnName" TYPE DEFAULT 'value';
+```
+
+### Safe Prisma commands:
+- `npx prisma generate` ✅ (only updates TypeScript client)
+- `npx prisma db pull` ✅ (only reads schema, doesn't write)
+- `npx prisma studio` ✅ (GUI, read-only by default)
+
+## REQUIRED BEFORE ANY DATABASE OPERATION:
+
+1. STOP and ASK the user explicitly
+2. EXPLAIN exactly what the command will do
+3. WAIT for explicit "yes" confirmation
+4. For schema changes: provide SQL, let user run it in Supabase Dashboard
+
+## THIS RULE EXISTS BECAUSE:
+
+On December 2, 2025, a `prisma db push --force-reset` command destroyed the entire production database - all users, all festivals, all sessions. This must NEVER happen again.

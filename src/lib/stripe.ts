@@ -16,6 +16,9 @@ export const STRIPE_PRICES = {
     monthly: process.env.STRIPE_PRO_MONTHLY_PRICE_ID || 'price_pro_monthly',
     yearly: process.env.STRIPE_PRO_YEARLY_PRICE_ID || 'price_pro_yearly',
   },
+  EVENT_PASS: {
+    'one-time': process.env.STRIPE_EVENT_PASS_PRICE_ID || 'price_1SZSae32MfN66Ysq73UlzbBl',
+  },
 } as const
 
-export type BillingPeriod = 'monthly' | 'yearly'
+export type BillingPeriod = 'monthly' | 'yearly' | 'one-time'

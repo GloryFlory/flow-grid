@@ -61,40 +61,41 @@ model Session {
 }
 
 model Festival {
-  id             String            @id @default(cuid())
+  id             String             @id @default(cuid())
   name           String
-  slug           String            @unique
+  slug           String             @unique
   description    String?
   location       String?
   startDate      DateTime
   endDate        DateTime
-  timezone       String            @default("UTC")
+  timezone       String             @default("UTC")
   logo           String?
-  primaryColor   String            @default("#4a90e2")
-  secondaryColor String            @default("#7b68ee")
-  accentColor    String            @default("#ff6b6b")
-  isPublished    Boolean           @default(false)
-  customDomain   String?           @unique
-  googleSheetUrl String?
+  primaryColor   String             @default("#4a90e2")
+  secondaryColor String             @default("#7b68ee")
+  accentColor    String             @default("#ff6b6b")
+  isPublished    Boolean            @default(false)
+  customDomain   String?            @unique
   userId         String
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
   facebookLink   String?
   instagramLink  String?
   telegramLink   String?
   whatsappLink   String?
+  googleSheetUrl String?
+  presenterLabel String             @default("Facilitator")
   analytics      Analytics[]
   bookings       Booking[]
-  favourites     SessionFavourite[]
   sessions       FestivalSession[]
-  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user           User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  favourites     SessionFavourite[]
   teachers       Teacher[]
 
   @@map("festivals")
 }
 
 model FestivalSession {
-  id              String    @id @default(cuid())
+  id              String             @id @default(cuid())
   title           String
   description     String?
   day             String
@@ -107,18 +108,18 @@ model FestivalSession {
   capacity        Int?
   teachers        String[]
   teacherBios     String[]
-  cardType        String    @default("full")
+  cardType        String             @default("full")
   festivalId      String
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  displayOrder    Decimal   @default(0)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  displayOrder    Decimal            @default(0)
   bookingCapacity Int?
-  bookingEnabled  Boolean   @default(false)
+  bookingEnabled  Boolean            @default(false)
   price           Decimal?
-  requirePayment  Boolean   @default(false)
+  requirePayment  Boolean            @default(false)
   bookings        Booking[]
+  festival        Festival           @relation(fields: [festivalId], references: [id], onDelete: Cascade)
   favourites      SessionFavourite[]
-  festival        Festival  @relation(fields: [festivalId], references: [id], onDelete: Cascade)
 
   @@map("festival_sessions")
 }
@@ -207,9 +208,8 @@ model SessionFavourite {
   sessionId  String
   festivalId String
   createdAt  DateTime        @default(now())
-
-  session    FestivalSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   festival   Festival        @relation(fields: [festivalId], references: [id], onDelete: Cascade)
+  session    FestivalSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@unique([anonUserId, sessionId])
   @@index([anonUserId])
@@ -240,6 +240,38 @@ model WebAuthnCredential {
 
   @@index([userId])
   @@map("webauthn_credentials")
+}
+
+model SalesInquiry {
+  id                  String        @id @default(cuid())
+  name                String
+  email               String
+  phone               String?
+  company             String?
+  role                String?
+  festivalsPerYear    String?
+  typicalFestivalSize String?
+  currentSolution     String?
+  biggestChallenge    String?
+  timeline            String?
+  additionalNotes     String?
+  status              InquiryStatus @default(NEW)
+  source              String?
+  meetingBooked       Boolean       @default(false)
+  meetingTime         DateTime?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  @@map("sales_inquiries")
+}
+
+enum InquiryStatus {
+  NEW
+  CONTACTED
+  MEETING_SCHEDULED
+  PROPOSAL_SENT
+  WON
+  LOST
 }
 
 enum UserRole {

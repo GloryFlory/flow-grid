@@ -16,21 +16,29 @@ export async function POST(request: NextRequest) {
     }
 
     const { plan, billingPeriod } = await request.json() as {
-      plan: 'PRO'
+      plan: 'PRO' | 'EVENT_PASS'
       billingPeriod: BillingPeriod
     }
 
-    // Only PRO is self-serve, Enterprise requires contact
-    if (plan !== 'PRO') {
+    // Only PRO and EVENT_PASS are self-serve, Enterprise requires contact
+    if (plan !== 'PRO' && plan !== 'EVENT_PASS') {
       return NextResponse.json(
         { error: 'Invalid plan. For Enterprise, please contact sales.' },
         { status: 400 }
       )
     }
 
-    if (!billingPeriod || !['monthly', 'yearly'].includes(billingPeriod)) {
+    // Validate billing period based on plan
+    if (plan === 'EVENT_PASS' && billingPeriod !== 'one-time') {
       return NextResponse.json(
-        { error: 'Invalid billing period' },
+        { error: 'Event Pass is a one-time purchase' },
+        { status: 400 }
+      )
+    }
+
+    if (plan === 'PRO' && !['monthly', 'yearly'].includes(billingPeriod)) {
+      return NextResponse.json(
+        { error: 'Invalid billing period for Pro' },
         { status: 400 }
       )
     }
@@ -78,9 +86,37 @@ export async function POST(request: NextRequest) {
     }
 
     // Get the correct price ID
-    const priceId = STRIPE_PRICES[plan][billingPeriod]
+    const priceId = plan === 'EVENT_PASS' 
+      ? STRIPE_PRICES.EVENT_PASS['one-time']
+      : STRIPE_PRICES.PRO[billingPeriod as 'monthly' | 'yearly']
 
     // Create Stripe checkout session
+    // Event Pass is a one-time payment, Pro is a subscription
+    if (plan === 'EVENT_PASS') {
+      const checkoutSession = await stripe.checkout.sessions.create({
+        customer: customerId,
+        mode: 'payment',
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        success_url: `${process.env.NEXTAUTH_URL}/dashboard?upgrade=success&plan=${plan}`,
+        cancel_url: `${process.env.NEXTAUTH_URL}/pricing?upgrade=cancelled`,
+        metadata: {
+          userId: user.id,
+          plan,
+          billingPeriod: 'one-time',
+        },
+        allow_promotion_codes: true,
+      })
+
+      return NextResponse.json({ url: checkoutSession.url })
+    }
+
+    // Pro subscription
     const checkoutSession = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: 'subscription',

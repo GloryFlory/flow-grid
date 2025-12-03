@@ -16,12 +16,13 @@ import {
   ArrowRight,
   Heart,
   Music,
-  Briefcase
+  Briefcase,
+  Ticket
 } from 'lucide-react'
 
 const heroMessages = [
   {
-    title: "Create Beautiful Festival Schedules in Minutes",
+    title: "Create Beautiful Event Schedules in Minutes",
     subtitle: "Professional scheduling software for yoga retreats, music festivals, workshops & conferences. Stop wrestling with spreadsheets.",
   },
   {
@@ -102,7 +103,7 @@ export default function HomePage() {
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 transition-all duration-500 min-h-[160px] md:min-h-[200px] flex items-center justify-center">
               <span className="inline-block">
                 {heroMessages[currentMessageIndex].title.split(' ').map((word, i) => {
-                  const isHighlight = word === 'Festival' || word === 'Schedules' || word === 'Spreadsheets' || word === 'Brand.' || word === 'Clarity'
+                  const isHighlight = word === 'Event' || word === 'Schedules' || word === 'Spreadsheets' || word === 'Brand.' || word === 'Clarity'
                   return (
                     <span key={i} className="inline-block mx-1">
                       {isHighlight ? (
@@ -326,8 +327,179 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured Articles Section */}
+      {/* Pricing Section */}
       <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Simple, transparent pricing
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Start free and upgrade when you need more. No hidden fees.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            {/* Free */}
+            <Card className="relative hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mb-4">
+                  <Zap className="w-6 h-6 text-gray-600" />
+                </div>
+                <CardTitle>Free</CardTitle>
+                <p className="text-gray-500 text-sm">Best for trying out Flow Grid</p>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold text-gray-900">€0</span>
+                  <span className="text-gray-500">/month</span>
+                </div>
+                <ul className="space-y-3 text-sm text-gray-600 mb-6">
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span> 1 published event
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span> Unlimited sessions
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span> Custom colors & logo
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span> QR code poster
+                  </li>
+                </ul>
+                <Link href="/auth/signin">
+                  <Button variant="outline" className="w-full">Get Started Free</Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            {/* Event Pass */}
+            <Card className="relative hover:shadow-lg transition-shadow border-2" style={{ borderColor: '#ff7119' }}>
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                <span className="text-white text-sm font-semibold px-4 py-1.5 rounded-full shadow-md" style={{ backgroundColor: '#ff7119' }}>
+                  One-Time
+                </span>
+              </div>
+              <CardHeader>
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ backgroundColor: '#ff711915' }}>
+                  <Ticket className="w-6 h-6" style={{ color: '#ff7119' }} />
+                </div>
+                <CardTitle>Event Pass</CardTitle>
+                <p className="text-gray-500 text-sm">Pro features for 1 event</p>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold text-gray-900">€29</span>
+                  <span className="text-gray-500"> one-time</span>
+                </div>
+                <ul className="space-y-3 text-sm text-gray-600 mb-6">
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span> 1 Pro event (forever)
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span> Remove "Powered by" badge
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span> Detailed analytics
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span> Priority support
+                  </li>
+                </ul>
+                <Link href="/pricing">
+                  <Button className="w-full text-white" style={{ backgroundColor: '#ff7119' }}>
+                    View Details <ArrowRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            {/* Pro - Highlighted */}
+            <Card className="relative border-2 hover:shadow-xl transition-shadow" style={{ borderColor: '#b40225' }}>
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                <span className="text-white text-sm font-semibold px-4 py-1.5 rounded-full shadow-md" style={{ backgroundColor: '#b40225' }}>
+                  Most Popular
+                </span>
+              </div>
+              <CardHeader>
+                <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-4">
+                  <Zap className="w-6 h-6" style={{ color: '#b40225' }} />
+                </div>
+                <CardTitle>Pro</CardTitle>
+                <p className="text-gray-500 text-sm">For multiple events per year</p>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold text-gray-900">€29</span>
+                  <span className="text-gray-500">/month</span>
+                </div>
+                <ul className="space-y-3 text-sm text-gray-600 mb-6">
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span> Up to 5 published events
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span> Remove "Powered by" badge
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span> Detailed analytics
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span> Priority support
+                  </li>
+                </ul>
+                <Link href="/pricing">
+                  <Button className="w-full text-white" style={{ backgroundColor: '#b40225' }}>
+                    View Details <ArrowRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            {/* Enterprise */}
+            <Card className="relative hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ backgroundColor: '#466d6015' }}>
+                  <Briefcase className="w-6 h-6" style={{ color: '#466d60' }} />
+                </div>
+                <CardTitle>Enterprise</CardTitle>
+                <p className="text-gray-500 text-sm">For agencies & organizations</p>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold text-gray-900">Custom</span>
+                </div>
+                <ul className="space-y-3 text-sm text-gray-600 mb-6">
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span> Unlimited events
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span> White-label & custom domain
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span> Team collaboration
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span> Dedicated support
+                  </li>
+                </ul>
+                <Link href="/contact/sales">
+                  <Button variant="outline" className="w-full">Contact Sales</Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="text-center mt-8">
+            <Link href="/pricing" className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-1">
+              Compare all features <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Articles Section */}
+      <section className="py-20 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -348,12 +520,12 @@ export default function HomePage() {
                     <span>Quick Start</span>
                   </div>
                   <CardTitle className="group-hover:text-blue-600 transition-colors">
-                    Get Your First Festival Live in 10 Minutes
+                    Get Your First Event Live in 10 Minutes
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600">
-                    Skip the complexity. Create your festival schedule in minutes, not days.
+                    Skip the complexity. Create your event schedule in minutes, not days.
                   </p>
                   <span className="inline-flex items-center text-blue-600 font-medium mt-4 group-hover:gap-2 transition-all">
                     Read more <ArrowRight className="w-4 h-4 ml-1" />

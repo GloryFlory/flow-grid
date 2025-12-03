@@ -22,6 +22,8 @@ ALTER TABLE teachers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE analytics ENABLE ROW LEVEL SECURITY;
 ALTER TABLE verification_tokens ENABLE ROW LEVEL SECURITY;
 ALTER TABLE webauthn_credentials ENABLE ROW LEVEL SECURITY;
+ALTER TABLE session_favourites ENABLE ROW LEVEL SECURITY;
+ALTER TABLE sales_inquiries ENABLE ROW LEVEL SECURITY;
 
 -- ============================================================================
 -- STEP 2: USERS TABLE POLICIES
@@ -406,6 +408,69 @@ CREATE POLICY "Users can delete own credentials"
 ON webauthn_credentials FOR DELETE
 USING (
   auth.jwt() ->> 'email' = (SELECT email FROM users WHERE id = "userId")
+);
+
+-- ============================================================================
+-- STEP 11: SESSION FAVOURITES TABLE POLICIES
+-- Anonymous users can manage their own favourites
+-- ============================================================================
+
+-- Anyone can view favourites for published festivals
+CREATE POLICY "Favourites for published festivals are viewable"
+ON session_favourites FOR SELECT
+USING (
+  EXISTS (
+    SELECT 1 FROM festivals 
+    WHERE festivals.id = "festivalId" 
+    AND festivals."isPublished" = true
+  )
+  OR EXISTS (
+    SELECT 1 FROM festivals 
+    WHERE festivals.id = "festivalId" 
+    AND auth.jwt() ->> 'email' = (SELECT email FROM users WHERE id = festivals."userId")
+  )
+);
+
+-- Anyone can create favourites
+CREATE POLICY "Anyone can create favourites"
+ON session_favourites FOR INSERT
+WITH CHECK (true);
+
+-- Anyone can delete their own favourites (by anonUserId match)
+CREATE POLICY "Users can delete own favourites"
+ON session_favourites FOR DELETE
+USING (true);
+
+-- ============================================================================
+-- STEP 12: SALES INQUIRIES TABLE POLICIES
+-- Admin-only access (public can submit)
+-- ============================================================================
+
+-- Only admins can view sales inquiries
+CREATE POLICY "Admins can view sales inquiries"
+ON sales_inquiries FOR SELECT
+USING (
+  EXISTS (
+    SELECT 1 FROM users 
+    WHERE auth.jwt() ->> 'email' = email 
+    AND role = 'ADMIN'
+  )
+);
+
+-- Anyone can submit a sales inquiry
+CREATE POLICY "Anyone can submit sales inquiry"
+ON sales_inquiries FOR INSERT
+WITH CHECK (true);
+
+-- Only admins can update sales inquiries
+CREATE POLICY "Admins can update sales inquiries"
+ON sales_inquiries FOR UPDATE
+USING (
+  EXISTS (
+    SELECT 1 FROM users 
+    WHERE auth.jwt() ->> 'email' = email 
+    AND role = 'ADMIN'
+  )
 );
 
 -- ============================================================================

@@ -32,11 +32,17 @@ export async function GET(request: NextRequest) {
 
     const isAdmin = user.role === 'ADMIN'
     const currentPlan = user.subscription?.plan || 'FREE'
-    const festivalsUsed = user.festivals.length
+    // Only count published festivals against the limit
+    const festivalsUsed = user.festivals.filter(f => f.isPublished).length
     
-    // Get limits from plan features
+    // Get limits from plan features as defaults
     const planFeatures = PLAN_FEATURES[currentPlan]
-    const festivalsLimit = isAdmin ? -1 : planFeatures.festivalsLimit
+    
+    // Use the actual festivalsLimit from subscription if available (includes Event Pass purchases)
+    // Otherwise fall back to plan defaults
+    const festivalsLimit = isAdmin 
+      ? -1 
+      : (user.subscription?.festivalsLimit ?? planFeatures.festivalsLimit)
     const sessionsLimit = isAdmin ? -1 : planFeatures.sessionsLimit
     
     // Check if user can create more festivals

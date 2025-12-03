@@ -35,7 +35,7 @@ export function PlanLimitsBanner({
             <div className="flex-1">
               <h3 className="font-semibold text-purple-900">Admin Access</h3>
               <p className="text-sm text-purple-700">
-                You have unlimited access to all features and can manage any festival.
+                You have unlimited access to all features and can manage any event.
               </p>
             </div>
           </div>
@@ -53,9 +53,9 @@ export function PlanLimitsBanner({
             <div className="flex items-center gap-3">
               <AlertTriangle className="w-6 h-6 text-amber-600" />
               <div>
-                <h3 className="font-semibold text-amber-900">Festival Limit Reached</h3>
+                <h3 className="font-semibold text-amber-900">Publishing Limit Reached</h3>
                 <p className="text-sm text-amber-700">
-                  You've used {festivalsUsed} of {festivalsLimit} festival{festivalsLimit !== 1 ? 's' : ''} on the {currentPlan} plan.
+                  You've published {festivalsUsed} of {festivalsLimit} event{festivalsLimit !== 1 ? 's' : ''} on the {currentPlan} plan.
                 </p>
               </div>
             </div>
@@ -73,27 +73,9 @@ export function PlanLimitsBanner({
     )
   }
 
-  // Show usage for paid plans
+  // Pro/Enterprise users - don't show a banner, the pill is enough
   if (currentPlan !== 'FREE') {
-    const usageText = festivalsLimit === -1 
-      ? `${festivalsUsed} festival${festivalsUsed !== 1 ? 's' : ''} (unlimited)` 
-      : `${festivalsUsed} of ${festivalsLimit} festivals`
-    
-    return (
-      <Card className="border-green-200 bg-gradient-to-r from-green-50 to-emerald-50">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <CheckCircle className="w-6 h-6 text-green-600" />
-            <div className="flex-1">
-              <h3 className="font-semibold text-green-900">{currentPlan} Plan</h3>
-              <p className="text-sm text-green-700">
-                {usageText}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    )
+    return null
   }
 
   // Free plan with usage remaining - show upgrade prompt
@@ -109,13 +91,13 @@ export function PlanLimitsBanner({
               <h3 className="font-bold text-slate-900 text-lg">You're on the Free Plan</h3>
               <p className="text-sm text-slate-600 mt-0.5">
                 {festivalsUsed === 0 
-                  ? `Create your first festival for free!`
-                  : `${festivalsLimit - festivalsUsed} festival${festivalsLimit - festivalsUsed !== 1 ? 's' : ''} remaining`
+                  ? `Create your first event for free!`
+                  : `${festivalsLimit - festivalsUsed} event${festivalsLimit - festivalsUsed !== 1 ? 's' : ''} remaining`
                 }
               </p>
               <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-slate-500">
                 <span className="flex items-center gap-1">
-                  <CheckCircle className="w-3 h-3 text-green-500" /> 1 festival
+                  <CheckCircle className="w-3 h-3 text-green-500" /> 1 event
                 </span>
                 <span className="flex items-center gap-1">
                   <CheckCircle className="w-3 h-3 text-green-500" /> Basic customization
@@ -136,7 +118,7 @@ export function PlanLimitsBanner({
               <ArrowRight className="w-4 h-4" />
             </Link>
             <span className="text-xs text-slate-500 text-center sm:text-right">
-              5 festivals, custom branding & more
+              5 events, custom branding & more
             </span>
           </div>
         </div>

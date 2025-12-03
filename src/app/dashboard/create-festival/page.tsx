@@ -731,14 +731,29 @@ export default function CreateFestivalPage() {
         console.error('API Error Response:', errorData)
         console.error('Validation errors details:', JSON.stringify(errorData.details, null, 2))
         console.error('Request payload was:', payload)
-        throw new Error(errorData.error || `HTTP ${response.status}: Failed to create festival`)
+        
+        // Build a user-friendly error message
+        let userMessage = 'Failed to create event. '
+        if (errorData.details && Array.isArray(errorData.details)) {
+          const fieldErrors = errorData.details.map((d: any) => {
+            const field = d.path?.join(' → ') || 'Unknown field'
+            return `• ${field}: ${d.message}`
+          }).join('\n')
+          userMessage += 'Please fix the following:\n\n' + fieldErrors
+        } else if (errorData.message) {
+          userMessage += errorData.message
+        } else if (errorData.error) {
+          userMessage += errorData.error
+        }
+        
+        throw new Error(userMessage)
       }
     } catch (error) {
       console.error('Error creating festival:', error)
       if (error instanceof Error) {
-        alert(`Error creating festival: ${error.message}`)
+        alert(error.message)
       } else {
-        alert('An unexpected error occurred. Please check the console for details.')
+        alert('An unexpected error occurred. Please try again or contact support.')
       }
     } finally {
       setIsLoading(false)
