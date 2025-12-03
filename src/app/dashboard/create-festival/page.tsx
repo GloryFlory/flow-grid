@@ -200,6 +200,7 @@ export default function CreateFestivalPage() {
   const [csvErrors, setCsvErrors] = useState<string[]>([])
   const [isParsingCsv, setIsParsingCsv] = useState(false)
   const [slugValidation, setSlugValidation] = useState({ isChecking: false, isAvailable: true, message: '' })
+  const [slugHint, setSlugHint] = useState<string | null>(null)
   
   // Google Sheets state
   const [googleSheetUrl, setGoogleSheetUrl] = useState('')
@@ -1162,11 +1163,20 @@ export default function CreateFestivalPage() {
                     type="text"
                     value={festivalData.slug}
                     onChange={(e) => {
+                      const rawValue = e.target.value
                       // Auto-lowercase and remove invalid characters
-                      const cleanSlug = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '')
+                      const cleanSlug = rawValue.toLowerCase().replace(/[^a-z0-9-]/g, '')
                       setFestivalData(prev => ({ ...prev, slug: cleanSlug }))
+                      
+                      // Show hint if characters were filtered out
+                      if (rawValue !== cleanSlug) {
+                        setSlugHint('Only lowercase letters, numbers, and hyphens allowed')
+                        // Clear hint after 3 seconds
+                        setTimeout(() => setSlugHint(null), 3000)
+                      }
                     }}
                     className={`flex-1 px-3 py-2 border focus:outline-none focus:ring-2 focus:border-transparent ${
+                      slugHint ? 'border-orange-300 focus:ring-orange-500' :
                       slugValidation.isChecking ? 'border-yellow-300 focus:ring-yellow-500' :
                       !slugValidation.isAvailable ? 'border-red-300 focus:ring-red-500' :
                       festivalData.slug && slugValidation.isAvailable ? 'border-green-300 focus:ring-green-500' :
@@ -1183,7 +1193,14 @@ export default function CreateFestivalPage() {
                   <p className="text-xs text-gray-500">
                     This will be your public event URL
                   </p>
-                  {festivalData.slug && (
+                  {slugHint ? (
+                    <p className="text-xs text-orange-600 flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {slugHint}
+                    </p>
+                  ) : festivalData.slug && (
                     <p className={`text-xs ${
                       slugValidation.isChecking ? 'text-yellow-600' :
                       !slugValidation.isAvailable ? 'text-red-600' :
