@@ -20,6 +20,21 @@ const updates: Update[] = [
   {
     date: '2025-12-04',
     type: 'feature',
+    title: 'Waitlist Automation',
+    description: 'Smart waitlist system that automatically notifies attendees when spots become available.',
+    details: [
+      'Auto-notify: When someone cancels, waitlisted attendees are instantly emailed',
+      'Offer expiry: Claimed offers expire after 24 hours if not used',
+      'Multi-spot support: If 3 spots open, 3 waitlist offers go out',
+      'Race condition protection: Only first to claim gets the spot',
+      'Manual notify option: Admins can trigger notifications anytime',
+      'Improved email styling with branded headers',
+      'Toast notifications replace browser alerts for better UX',
+    ]
+  },
+  {
+    date: '2025-12-04',
+    type: 'feature',
     title: 'Export Analytics as CSV',
     description: 'Download your complete analytics data as a CSV file for offline analysis or reporting.',
     details: [
