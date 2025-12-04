@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { BarChart3, Eye, Users, Heart, Calendar, MousePointerClick, User, Loader2, ChevronDown, ArrowLeft, PieChart } from 'lucide-react'
 import Link from 'next/link'
+import { ExportAnalyticsButton } from '@/components/dashboard/ExportAnalyticsButton'
 
 const TIME_RANGE_OPTIONS = [
   { value: '24h', label: 'Last 24 hours' },
@@ -180,6 +181,7 @@ export default function AnalyticsPage() {
             </div>
             
             <div className="flex gap-2 flex-shrink-0 items-center">
+              <ExportAnalyticsButton festivalId={festivalId} festivalName={festival?.name} />
               <Link href={`/dashboard/festivals/${festivalId}/insights`}>
                 <Button variant="outline" size="sm">
                   <PieChart className="w-4 h-4 sm:mr-2" />

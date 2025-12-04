@@ -5,6 +5,8 @@ import { prisma } from '@/lib/prisma'
 import { BarChart3, Calendar, Users, Eye, TrendingUp, Clock, Heart, Download, MousePointerClick, Layers, Grid3X3, CalendarDays, Star } from 'lucide-react'
 import Link from 'next/link'
 
+import { ExportAnalyticsButton } from '@/components/dashboard/ExportAnalyticsButton'
+
 export default async function AnalyticsPage() {
   const session = await getServerSession(authOptions)
   
@@ -197,9 +199,12 @@ export default async function AnalyticsPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
-          <p className="text-gray-600 mt-2">Track your events' performance and engagement</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
+            <p className="text-gray-600 mt-2">Track your events' performance and engagement</p>
+          </div>
+          <ExportAnalyticsButton />
         </div>
 
         {/* Key Metrics Grid - Row 1 */}
@@ -261,7 +266,10 @@ export default async function AnalyticsPage() {
               </div>
             </div>
           </div>
+        </div>
 
+        {/* Key Metrics Grid - Row 2 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Calendar Exports */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
@@ -275,10 +283,7 @@ export default async function AnalyticsPage() {
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Key Metrics Grid - Row 2 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Total Events */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
@@ -315,7 +320,7 @@ export default async function AnalyticsPage() {
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Bookings</p>
                 <p className="text-3xl font-bold text-gray-900 mt-2">{totalBookings}</p>
-                <p className="text-xs text-gray-500 mt-1">All-time reservations</p>
+                <p className="text-xs text-gray-500 mt-1">RSVP reservations</p>
               </div>
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                 <Users className="w-6 h-6 text-green-600" />
@@ -612,10 +617,6 @@ export default async function AnalyticsPage() {
                   <li className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
                     <span>Custom date range reports</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                    <span>Data exports (CSV/Excel)</span>
                   </li>
                 </ul>
               </div>

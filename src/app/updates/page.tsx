@@ -18,6 +18,19 @@ interface Update {
 const updates: Update[] = [
   // December 2025
   {
+    date: '2025-12-04',
+    type: 'feature',
+    title: 'Export Analytics as CSV',
+    description: 'Download your complete analytics data as a CSV file for offline analysis or reporting.',
+    details: [
+      'One-click export from the Analytics Dashboard',
+      'Includes summary stats, page views, session clicks, and favourites',
+      'View mode usage and calendar export breakdown',
+      'Recent events log with timestamps',
+      'Available to all users',
+    ]
+  },
+  {
     date: '2025-12-03',
     type: 'feature',
     title: 'December Feature Update',

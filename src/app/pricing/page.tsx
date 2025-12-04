@@ -440,7 +440,7 @@ export default function PricingPage() {
               <ComparisonRow icon={<Layers className="w-4 h-4" />} feature="Filter usage analytics" tooltip="Understand which filters and teachers are most searched" free={false} eventPass={true} pro={true} enterprise={true} />
               <ComparisonRow icon={<Clock className="w-4 h-4" />} feature="Hourly & daily trends" tooltip="See peak viewing times and daily traffic patterns" free={false} eventPass={true} pro={true} enterprise={true} />
               <ComparisonRow icon={<BarChart3 className="w-4 h-4" />} feature="Conversion rates" tooltip="Track favourite and booking conversion metrics" free={false} eventPass={true} pro={true} enterprise={true} />
-              <ComparisonRow icon={<Download className="w-4 h-4" />} feature="Export reports" tooltip="Download analytics data as CSV" free={false} eventPass={false} pro={false} enterprise={true} comingSoon />
+              <ComparisonRow icon={<Download className="w-4 h-4" />} feature="Export reports" tooltip="Download analytics data as CSV" free={false} eventPass={true} pro={true} enterprise={true} />
             </FeatureSection>
 
             {/* Data Import */}
