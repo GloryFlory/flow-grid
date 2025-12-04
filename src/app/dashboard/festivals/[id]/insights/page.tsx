@@ -23,6 +23,7 @@ interface Festival {
   id: string
   name: string
   slug: string
+  presenterLabel?: string
 }
 
 interface InsightsData {
@@ -320,11 +321,13 @@ function DonutChartComponent({
 function TeacherChart({ 
   byTeacher, 
   maxTeacherCount,
-  summary 
+  summary,
+  presenterLabel = 'Facilitator'
 }: { 
   byTeacher: Array<{ name: string; count: number; hours: number; sessions: string[] }>
   maxTeacherCount: number
   summary: { uniqueTeachers: number; totalHours: number }
+  presenterLabel?: string
 }) {
   const [showAll, setShowAll] = useState(false)
   const [viewMode, setViewMode] = useState<'bars' | 'grid'>('bars')
@@ -346,10 +349,10 @@ function TeacherChart({
           <div>
             <CardTitle className="flex items-center gap-2 text-lg">
               <Users className="h-5 w-5 text-green-600" />
-              Sessions by Teacher
+              Sessions by {presenterLabel}
             </CardTitle>
             <CardDescription>
-              {summary.uniqueTeachers} teacher{summary.uniqueTeachers !== 1 ? 's' : ''} • {summary.totalHours} total hours
+              {summary.uniqueTeachers} {presenterLabel.toLowerCase()}{summary.uniqueTeachers !== 1 ? 's' : ''} • {summary.totalHours} total hours
             </CardDescription>
           </div>
           {/* Always show view toggle when there are 2+ teachers */}
@@ -375,19 +378,19 @@ function TeacherChart({
       </CardHeader>
       <CardContent>
         {byTeacher.length === 0 ? (
-          <p className="text-muted-foreground text-sm">No teacher data available</p>
+          <p className="text-muted-foreground text-sm">No {presenterLabel.toLowerCase()} data available</p>
         ) : (
           <>
             {/* Quick stats for many teachers */}
             {hasMany && (
               <div className="flex gap-4 mb-4 p-3 bg-gray-50 rounded-lg text-sm">
                 <div>
-                  <span className="text-muted-foreground">Top teacher:</span>{' '}
+                  <span className="text-muted-foreground">Top {presenterLabel.toLowerCase()}:</span>{' '}
                   <span className="font-medium">{topTeacher?.name}</span>
                   <span className="text-muted-foreground"> ({topTeacher?.count} sessions)</span>
                 </div>
                 <div className="hidden sm:block">
-                  <span className="text-muted-foreground">Avg per teacher:</span>{' '}
+                  <span className="text-muted-foreground">Avg per {presenterLabel.toLowerCase()}:</span>{' '}
                   <span className="font-medium">{avgSessionsPerTeacher}</span>
                 </div>
               </div>
@@ -443,7 +446,7 @@ function TeacherChart({
                 {showAll ? (
                   <>Show less</>
                 ) : (
-                  <>Show all {byTeacher.length} teachers</>
+                  <>Show all {byTeacher.length} {presenterLabel.toLowerCase()}s</>
                 )}
               </button>
             )}
@@ -656,10 +659,12 @@ export default function InsightsPage() {
   const maxTeacherCount = Math.max(...byTeacher.map(t => t.count), 1)
   const maxDayCount = Math.max(...byDay.map(d => d.count), 1)
   const totalLevelCount = byLevel.reduce((a, b) => a + b.count, 0) || 1
+  
+  const presenterLabel = festival.presenterLabel || 'Facilitator'
 
   const metrics = [
     { label: 'Total Sessions', value: summary.totalSessions, icon: Calendar, color: 'text-blue-600' },
-    { label: 'Unique Teachers', value: summary.uniqueTeachers, icon: Users, color: 'text-green-600' },
+    { label: `Unique ${presenterLabel}s`, value: summary.uniqueTeachers, icon: Users, color: 'text-green-600' },
     { label: 'Session Types', value: summary.uniqueStyles, icon: Layers, color: 'text-purple-600' },
     { label: 'Event Days', value: summary.uniqueDays, icon: BarChart3, color: 'text-orange-600' },
     { label: 'Total Hours', value: summary.totalHours, icon: Clock, color: 'text-indigo-600', suffix: 'hrs' },
@@ -773,6 +778,7 @@ export default function InsightsPage() {
             byTeacher={byTeacher} 
             maxTeacherCount={maxTeacherCount}
             summary={summary}
+            presenterLabel={presenterLabel}
           />
 
           {/* By Style - Donut chart */}
