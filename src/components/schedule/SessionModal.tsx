@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import { Star } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface Session {
   id: string
@@ -32,6 +33,8 @@ interface SessionModalProps {
   festivalSlug: string
   isFavourite?: boolean
   onFavouriteToggle?: (sessionId: string) => void
+  primaryColor?: string
+  accentColor?: string
 }
 
 // Helper functions
@@ -60,6 +63,16 @@ const getLevelColor = (level: string) => {
   }
 }
 
+// Helper to darken a hex color
+const darkenColor = (hex: string, percent: number): string => {
+  const num = parseInt(hex.replace('#', ''), 16)
+  const amt = Math.round(2.55 * percent)
+  const R = Math.max((num >> 16) - amt, 0)
+  const G = Math.max((num >> 8 & 0x00FF) - amt, 0)
+  const B = Math.max((num & 0x0000FF) - amt, 0)
+  return '#' + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1)
+}
+
 const getTeacherImageSrc = (session: Session, teacher: string, index: number) => {
   // Use the individual teacher's photo from the teacherPhotos array if available
   if (session.teacherPhotos && session.teacherPhotos[index]) {
@@ -76,7 +89,7 @@ const getTeacherLink = (teachers: string[], index: number, session: Session) => 
   return session.teacherUrls[index]
 }
 
-export function SessionModal({ session, onClose, festivalSlug, isFavourite = false, onFavouriteToggle }: SessionModalProps) {
+export function SessionModal({ session, onClose, festivalSlug, isFavourite = false, onFavouriteToggle, primaryColor = '#4a90e2', accentColor = '#ff6b6b' }: SessionModalProps) {
   const [showBookingForm, setShowBookingForm] = useState(false)
   const [bookingNames, setBookingNames] = useState('')
   const [bookingEmail, setBookingEmail] = useState('')
@@ -196,7 +209,7 @@ export function SessionModal({ session, onClose, festivalSlug, isFavourite = fal
       const data = await response.json()
       
       if (!response.ok) {
-        alert(data.error || 'Failed to join waitlist')
+        toast.error(data.error || 'Failed to join waitlist')
         return
       }
       
@@ -205,9 +218,10 @@ export function SessionModal({ session, onClose, festivalSlug, isFavourite = fal
       setShowWaitlistForm(false)
       setWaitlistName('')
       setWaitlistEmail('')
+      toast.success(`You're #${data.position} on the waitlist! We'll email you when a spot opens.`)
     } catch (error) {
       console.error('Error joining waitlist:', error)
-      alert('Failed to join waitlist. Please try again.')
+      toast.error('Failed to join waitlist. Please try again.')
     } finally {
       setIsJoiningWaitlist(false)
     }
@@ -223,15 +237,16 @@ export function SessionModal({ session, onClose, festivalSlug, isFavourite = fal
       )
       
       if (!response.ok) {
-        alert('Failed to leave waitlist')
+        toast.error('Failed to leave waitlist')
         return
       }
       
       setIsOnWaitlist(false)
       setWaitlistPosition(null)
+      toast.success('You have left the waitlist')
     } catch (error) {
       console.error('Error leaving waitlist:', error)
-      alert('Failed to leave waitlist')
+      toast.error('Failed to leave waitlist')
     }
   }
   
@@ -257,7 +272,7 @@ export function SessionModal({ session, onClose, festivalSlug, isFavourite = fal
       
       if (!response.ok) {
         const error = await response.json()
-        alert(error.error || 'Failed to book session')
+        toast.error(error.error || 'Failed to book session')
         return
       }
       
@@ -266,9 +281,10 @@ export function SessionModal({ session, onClose, festivalSlug, isFavourite = fal
       setBookingNames('')
       setBookingEmail('')
       setCurrentBookings(prev => prev + names.length)
+      toast.success('🎉 Booking confirmed!')
     } catch (error) {
       console.error('Error booking session:', error)
-      alert('Failed to book session. Please try again.')
+      toast.error('Failed to book session. Please try again.')
     } finally {
       setIsBooking(false)
     }
@@ -284,7 +300,7 @@ export function SessionModal({ session, onClose, festivalSlug, isFavourite = fal
       )
       
       if (!response.ok) {
-        alert('Failed to cancel booking')
+        toast.error('Failed to cancel booking')
         return
       }
       
@@ -293,9 +309,10 @@ export function SessionModal({ session, onClose, festivalSlug, isFavourite = fal
       
       setIsBooked(false)
       setCurrentBookings(prev => Math.max(0, prev - namesCount))
+      toast.success('Booking cancelled')
     } catch (error) {
       console.error('Error canceling booking:', error)
-      alert('Failed to cancel booking')
+      toast.error('Failed to cancel booking')
     }
   }
   
@@ -447,14 +464,17 @@ export function SessionModal({ session, onClose, festivalSlug, isFavourite = fal
           {/* Booking Section */}
           {session.bookingEnabled && (
             <div className="modal-booking-section">
-              <h3 className="modal-section-title">Booking</h3>
+              <div className="booking-header">
+                <h3 className="modal-section-title">Booking</h3>
+                {isFull && (
+                  <span className="session-full-pill">Session Full</span>
+                )}
+              </div>
               
               {/* Capacity Display */}
-              {capacity > 0 && (
+              {capacity > 0 && !isFull && (
                 <div className="booking-capacity">
-                  {isFull ? (
-                    <span className="capacity-full">⚠️ Session Full</span>
-                  ) : spotsLeft !== null && spotsLeft <= 5 ? (
+                  {spotsLeft !== null && spotsLeft <= 5 ? (
                     <span className="capacity-low">🔥 Only {spotsLeft} spot{spotsLeft !== 1 ? 's' : ''} left!</span>
                   ) : (
                     <span className="capacity-available">
@@ -465,7 +485,7 @@ export function SessionModal({ session, onClose, festivalSlug, isFavourite = fal
               )}
               
               {/* Booking Status / Actions */}
-              <div className="booking-actions">
+              <div className="booking-actions" style={{ alignItems: 'flex-start' }}>
                 {isBooked ? (
                   <div className="booking-confirmed">
                     <div className="booking-confirmed-badge">
@@ -479,14 +499,14 @@ export function SessionModal({ session, onClose, festivalSlug, isFavourite = fal
                     </button>
                   </div>
                 ) : isFull ? (
-                  <div className="booking-full-section">
+                  <div className="booking-full-section" style={{ alignItems: 'flex-start' }}>
                     {isOnWaitlist ? (
-                      <div className="waitlist-status">
+                      <div className="waitlist-status" style={{ textAlign: 'left' }}>
                         <div className="waitlist-position-badge">
-                          📋 You're #{waitlistPosition} on the waitlist
+                          You're #{waitlistPosition} on the waitlist
                         </div>
                         <p className="waitlist-info">
-                          We'll email you if a spot opens up!
+                          We'll email you if a spot opens up.
                         </p>
                         <button 
                           onClick={handleLeaveWaitlist}
@@ -496,18 +516,18 @@ export function SessionModal({ session, onClose, festivalSlug, isFavourite = fal
                         </button>
                       </div>
                     ) : !showWaitlistForm ? (
-                      <div className="waitlist-offer">
-                        <p className="booking-full-message">
-                          This session is currently full.
-                        </p>
+                      <div className="waitlist-offer" style={{ textAlign: 'left' }}>
                         <button 
                           onClick={() => setShowWaitlistForm(true)}
                           className="join-waitlist-btn"
+                          style={{
+                            background: `linear-gradient(135deg, ${primaryColor} 0%, ${darkenColor(primaryColor, 15)} 100%)`
+                          }}
                         >
-                          📋 Join Waitlist
+                          Join Waitlist
                         </button>
                         <p className="waitlist-hint">
-                          Get notified if a spot opens up
+                          Get notified if a spot opens up.
                         </p>
                       </div>
                     ) : (
@@ -545,6 +565,9 @@ export function SessionModal({ session, onClose, festivalSlug, isFavourite = fal
                             type="submit" 
                             disabled={isJoiningWaitlist}
                             className="submit-booking-btn"
+                            style={{
+                              background: `linear-gradient(135deg, ${primaryColor} 0%, ${darkenColor(primaryColor, 15)} 100%)`
+                            }}
                           >
                             {isJoiningWaitlist ? 'Joining...' : 'Join Waitlist'}
                           </button>

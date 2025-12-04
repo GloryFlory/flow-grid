@@ -1,6 +1,7 @@
 import './globals.css';
 import { Providers } from '@/components/providers';
 import { AmplitudeScript } from '@/components/AmplitudeScript';
+import { Toaster } from 'sonner';
 import type { Metadata } from 'next';
 import { Domine, Lora, Metamorphous, Henny_Penny, Space_Grotesk, Italianno } from 'next/font/google';
 
@@ -132,6 +133,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           {children}
         </Providers>
+        <Toaster 
+          position="top-center" 
+          richColors 
+          closeButton
+          toastOptions={{
+            duration: 4000,
+          }}
+        />
       </body>
     </html>
   );

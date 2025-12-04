@@ -795,6 +795,8 @@ export default function ScheduleInterface({ festival, sessions, showPoweredBy = 
         festivalSlug={festival.slug}
         isFavourite={selectedSession ? isFavourite(selectedSession.id) : false}
         onFavouriteToggle={handleFavouriteToggle}
+        primaryColor={festival.primaryColor}
+        accentColor={festival.accentColor}
       />
     </div>
   )

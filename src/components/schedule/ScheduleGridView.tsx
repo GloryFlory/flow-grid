@@ -684,7 +684,11 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
                     const sorted = [...sessions].sort((a, b) => {
                       const timeCompare = timeToMinutes(a.start) - timeToMinutes(b.start)
                       if (timeCompare !== 0) return timeCompare
-                      return a.id.localeCompare(b.id)
+                      // Use displayOrder for parallel sessions, then title as final tie-breaker
+                      const orderA = a.displayOrder || 0
+                      const orderB = b.displayOrder || 0
+                      if (orderA !== orderB) return orderA - orderB
+                      return a.title.localeCompare(b.title)
                     })
                     
                     const groups: Session[][] = []
@@ -739,7 +743,11 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
                         const sortedGroup = [...group].sort((a, b) => {
                           const timeCompare = timeToMinutes(a.start) - timeToMinutes(b.start)
                           if (timeCompare !== 0) return timeCompare
-                          return a.id.localeCompare(b.id)
+                          // Use displayOrder for parallel sessions, then title as final tie-breaker
+                          const orderA = a.displayOrder || 0
+                          const orderB = b.displayOrder || 0
+                          if (orderA !== orderB) return orderA - orderB
+                          return a.title.localeCompare(b.title)
                         })
                         
                         sortedGroup.forEach(session => {
@@ -1028,6 +1036,8 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
         festivalSlug={festival.slug}
         isFavourite={selectedSession ? isFavourite(selectedSession.id) : false}
         onFavouriteToggle={(sessionId) => toggleFavourite(sessionId, festival.id)}
+        primaryColor={festival.primaryColor}
+        accentColor={festival.accentColor}
       />
     </div>
   )

@@ -73,6 +73,38 @@ export async function POST(
           { status: 400 }
         );
       }
+
+      // Check if there's anyone on the waitlist with an active offer
+      // They have priority over new bookings
+      const activeWaitlistOffers = await prisma.sessionWaitlist.findFirst({
+        where: {
+          sessionId,
+          status: 'OFFERED',
+          offerExpiresAt: { gt: new Date() }
+        }
+      });
+
+      if (activeWaitlistOffers) {
+        return NextResponse.json(
+          { error: 'Spots are currently reserved for waitlist members. Please try again later or join the waitlist.' },
+          { status: 400 }
+        );
+      }
+
+      // Also check if session is full and has waitlist entries
+      // In this case, new users should join the waitlist instead
+      if (totalBookedSpots >= session.bookingCapacity) {
+        const waitlistCount = await prisma.sessionWaitlist.count({
+          where: { sessionId, status: 'WAITING' }
+        });
+        
+        if (waitlistCount > 0) {
+          return NextResponse.json(
+            { error: 'Session is full. Please join the waitlist.' },
+            { status: 400 }
+          );
+        }
+      }
     }
 
     // Check if already booked
@@ -157,10 +189,22 @@ export async function DELETE(
       }
     });
 
-    // Notify next person on waitlist (fire and forget)
-    notifyNextInWaitlist(sessionId).catch(err => {
-      console.error('Failed to notify waitlist:', err);
-    });
+    // Notify waitlist members - one person per freed spot
+    // This runs in background so we don't block the response
+    (async () => {
+      for (let i = 0; i < namesCount; i++) {
+        try {
+          const notified = await notifyNextInWaitlist(sessionId);
+          if (!notified) {
+            // No more people waiting
+            break;
+          }
+          console.log(`Notified waitlist member ${i + 1}/${namesCount}: ${notified.email}`);
+        } catch (err) {
+          console.error(`Failed to notify waitlist member ${i + 1}:`, err);
+        }
+      }
+    })();
 
     return NextResponse.json({ success: true, namesCount });
   } catch (error) {

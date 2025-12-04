@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { X, Clock, MapPin, Users, Star, AlertCircle, Save, Plus, Settings } from 'lucide-react'
+import { X, Clock, MapPin, Users, Star, AlertCircle, Save, Plus, Settings, Info } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface Session {
@@ -504,7 +504,13 @@ export default function SessionEditModal({
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <Users className="w-4 h-4 inline mr-1" />
-                  Capacity
+                  Event Capacity
+                  <span className="relative inline-block ml-1 group">
+                    <Info className="w-3.5 h-3.5 inline text-gray-400 cursor-help" />
+                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+                      Physical capacity of the venue/room (shown on schedule)
+                    </span>
+                  </span>
                 </label>
                 <input
                   type="number"
@@ -579,6 +585,12 @@ export default function SessionEditModal({
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Booking Capacity *
+                      <span className="relative inline-block ml-1 group">
+                        <Info className="w-3.5 h-3.5 inline text-gray-400 cursor-help" />
+                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+                          Number of spots available for online booking
+                        </span>
+                      </span>
                     </label>
                     <input
                       type="number"
@@ -590,7 +602,7 @@ export default function SessionEditModal({
                       required
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      Maximum number of spots available
+                      Can be less than event capacity for walk-ins
                     </p>
                   </div>
                   

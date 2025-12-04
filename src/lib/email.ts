@@ -225,18 +225,18 @@ export async function sendWaitlistSpotEmail({
                 Someone cancelled their booking, and you're first in line for:
               </p>
               
-              <!-- Session Card with Brand Colors -->
-              <div style="background: linear-gradient(135deg, ${primaryLighter} 0%, ${primaryLight} 100%); border: 1px solid ${primaryColor}40; border-radius: 12px; padding: 20px; margin: 24px 0;">
-                <h2 style="margin: 0 0 8px 0; color: ${primaryDark}; font-size: 20px; font-weight: 600;">${sessionTitle}</h2>
-                <p style="margin: 4px 0; color: ${primaryDark}; font-size: 15px;">
+              <!-- Session Card - Neutral styling -->
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin: 24px 0;">
+                <h2 style="margin: 0 0 8px 0; color: #1e293b; font-size: 20px; font-weight: 600;">${sessionTitle}</h2>
+                <p style="margin: 4px 0; color: #475569; font-size: 15px;">
                   📅 ${sessionDate} at ${sessionTime}
                 </p>
-                <p style="margin: 4px 0; color: ${primaryColor}; font-size: 14px;">
+                <p style="margin: 4px 0; color: #64748b; font-size: 14px;">
                   📍 ${festivalName}
                 </p>
               </div>
               
-              <!-- CTA Button with Brand Colors -->
+              <!-- CTA Button with Brand Color -->
               <div style="text-align: center; margin: 32px 0;">
                 <a href="${claimUrl}" 
                    style="background: linear-gradient(135deg, ${primaryColor} 0%, ${primaryDark} 100%); 
@@ -252,11 +252,11 @@ export async function sendWaitlistSpotEmail({
                 </a>
               </div>
               
-              <!-- Urgency Notice -->
-              <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; padding: 16px; text-align: center;">
-                <p style="font-size: 14px; color: #dc2626; margin: 0;">
+              <!-- Urgency Notice - Neutral red/amber -->
+              <div style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 10px; padding: 16px; text-align: center;">
+                <p style="font-size: 14px; color: #92400e; margin: 0;">
                   ⏰ <strong>This offer expires in ${expiresIn}.</strong><br>
-                  <span style="color: #991b1b;">If you don't claim it, the spot goes to the next person.</span>
+                  <span style="color: #a16207;">If you don't claim it, the spot goes to the next person.</span>
                 </p>
               </div>
               

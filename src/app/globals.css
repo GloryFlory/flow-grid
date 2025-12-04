@@ -2423,14 +2423,37 @@ body {
 }
 
 /* Waitlist Styles */
+.booking-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.booking-header .modal-section-title {
+  margin-bottom: 0;
+}
+
+.session-full-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
 .booking-full-section {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .waitlist-offer {
-  text-align: center;
+  text-align: left;
   width: 100%;
 }
 
@@ -2459,25 +2482,25 @@ body {
 }
 
 .waitlist-status {
-  text-align: center;
+  text-align: left;
   width: 100%;
 }
 
 .waitlist-position-badge {
   display: inline-block;
-  padding: 0.75rem 1.5rem;
+  padding: 0.5rem 1rem;
   background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
   border: 1px solid #93c5fd;
   border-radius: 8px;
   color: #1e40af;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
 .waitlist-info {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #6b7280;
-  margin-top: 0.75rem;
+  margin-top: 0.5rem;
 }
 
 .leave-waitlist-btn {

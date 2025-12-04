@@ -33,7 +33,7 @@ export async function DELETE(
       );
     }
 
-    // Get the booking to know the sessionId before deleting
+    // Get the booking to know the sessionId and names count before deleting
     const booking = await prisma.booking.findUnique({
       where: {
         id: bookingId,
@@ -41,6 +41,7 @@ export async function DELETE(
       },
       select: {
         sessionId: true,
+        names: true,
       }
     });
 
@@ -52,11 +53,25 @@ export async function DELETE(
       }
     });
 
-    // Notify next person on waitlist (fire and forget)
+    // Notify waitlist members - one person per freed spot
     if (booking?.sessionId) {
-      notifyNextInWaitlist(booking.sessionId).catch(err => {
-        console.error('Failed to notify waitlist:', err);
-      });
+      const spotsFreed = booking.names?.length || 1;
+      
+      // Run in background so we don't block the response
+      (async () => {
+        for (let i = 0; i < spotsFreed; i++) {
+          try {
+            const notified = await notifyNextInWaitlist(booking.sessionId);
+            if (!notified) {
+              // No more people waiting
+              break;
+            }
+            console.log(`Notified waitlist member ${i + 1}/${spotsFreed}: ${notified.email}`);
+          } catch (err) {
+            console.error(`Failed to notify waitlist member ${i + 1}:`, err);
+          }
+        }
+      })();
     }
 
     return NextResponse.json({ success: true });

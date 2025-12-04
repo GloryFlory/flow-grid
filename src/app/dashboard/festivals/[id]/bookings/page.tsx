@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 
 interface Booking {
   id: string;
@@ -23,6 +24,7 @@ export default function FestivalBookingsPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [waitlistCount, setWaitlistCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [festivalName, setFestivalName] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -36,6 +38,7 @@ export default function FestivalBookingsPage() {
 
     if (status === 'authenticated') {
       fetchBookings();
+      fetchWaitlistCount();
     }
   }, [status, router, params.id]);
 
@@ -52,6 +55,18 @@ export default function FestivalBookingsPage() {
       alert('Failed to load bookings');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchWaitlistCount = async () => {
+    try {
+      const response = await fetch(`/api/admin/festivals/${params.id}/waitlist`);
+      if (response.ok) {
+        const data = await response.json();
+        setWaitlistCount(data.waitlist?.length || 0);
+      }
+    } catch (error) {
+      console.error('Error fetching waitlist count:', error);
     }
   };
 
@@ -112,14 +127,30 @@ export default function FestivalBookingsPage() {
     <div className="dashboard-container">
       <div className="dashboard-header">
         <div>
-          <h1 className="dashboard-title">Bookings</h1>
+          <h1 className="dashboard-title">Bookings & Waitlist</h1>
           <p className="dashboard-subtitle">
-            {festivalName} • {filteredBookings.length} booking{filteredBookings.length !== 1 ? 's' : ''} • {totalSpots} total spot{totalSpots !== 1 ? 's' : ''}
+            {festivalName}
           </p>
         </div>
         <button onClick={handleExportCSV} className="btn-primary">
           Export CSV
         </button>
+      </div>
+
+      {/* Tabs */}
+      <div className="tabs-container">
+        <Link 
+          href={`/dashboard/festivals/${params.id}/bookings`}
+          className="tab active"
+        >
+          Bookings ({bookings.length})
+        </Link>
+        <Link 
+          href={`/dashboard/festivals/${params.id}/waitlist`}
+          className="tab"
+        >
+          Waitlist ({waitlistCount})
+        </Link>
       </div>
 
       <div className="bookings-filters">
@@ -212,6 +243,34 @@ export default function FestivalBookingsPage() {
       )}
 
       <style jsx>{`
+        .tabs-container {
+          display: flex;
+          gap: 0.5rem;
+          margin-bottom: 1.5rem;
+          border-bottom: 1px solid #e5e7eb;
+          padding-bottom: 0;
+        }
+
+        .tab {
+          padding: 0.75rem 1.25rem;
+          font-size: 0.95rem;
+          font-weight: 500;
+          color: #6b7280;
+          text-decoration: none;
+          border-bottom: 2px solid transparent;
+          margin-bottom: -1px;
+          transition: all 0.15s ease;
+        }
+
+        .tab:hover {
+          color: #4b5563;
+        }
+
+        .tab.active {
+          color: #7c3aed;
+          border-bottom-color: #7c3aed;
+        }
+
         .bookings-filters {
           display: flex;
           gap: 1rem;

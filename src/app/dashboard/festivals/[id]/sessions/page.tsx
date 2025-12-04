@@ -22,7 +22,9 @@ import {
   Eye,
   GripVertical,
   Lock,
-  Frown
+  Frown,
+  UserCheck,
+  Bell
 } from 'lucide-react'
 import Link from 'next/link'
 import SessionEditModal from '@/components/dashboard/SessionEditModal'
@@ -252,7 +254,6 @@ function SortableSessionRow({
           >
             <Users className="w-3.5 h-3.5 mr-1.5" />
             {totalBooked}/{capacity}
-            {isFullyBooked && <span className="ml-1.5">FULL</span>}
           </button>
         ) : (
           <span className="text-sm text-gray-400">-</span>
@@ -288,7 +289,8 @@ export default function SessionsManagement() {
   const [festival, setFestival] = useState<Festival | null>(null)
   const [sessions, setSessions] = useState<FestivalSession[]>([])
   const [bookings, setBookings] = useState<any[]>([])
-  const [activeTab, setActiveTab] = useState<'sessions' | 'bookings'>('sessions')
+  const [waitlist, setWaitlist] = useState<any[]>([])
+  const [activeTab, setActiveTab] = useState<'sessions' | 'bookings' | 'waitlist'>('sessions')
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<{ type: 'not-found' | 'forbidden' | 'error'; message: string } | null>(null)
   const [isUploading, setIsUploading] = useState(false)
@@ -359,6 +361,7 @@ export default function SessionsManagement() {
     if (festivalId) {
       fetchFestival()
       fetchBookings() // Always fetch bookings for the count
+      fetchWaitlist() // Fetch waitlist entries
     }
   }, [festivalId])
 
@@ -423,6 +426,18 @@ export default function SessionsManagement() {
       }
     } catch (error) {
       console.error('Error fetching bookings:', error)
+    }
+  }
+
+  const fetchWaitlist = async () => {
+    try {
+      const response = await fetch(`/api/admin/festivals/${festivalId}/waitlist`)
+      if (response.ok) {
+        const data = await response.json()
+        setWaitlist(data.waitlist || [])
+      }
+    } catch (error) {
+      console.error('Error fetching waitlist:', error)
     }
   }
 
@@ -950,6 +965,36 @@ export default function SessionsManagement() {
     window.URL.revokeObjectURL(url)
   }
 
+  const exportWaitlistCSV = () => {
+    const csv = [
+      ['Session', 'Day', 'Time', 'Name', 'Email', 'Position', 'Status', 'Joined At'].join(','),
+      ...waitlist.map(entry => {
+        const displayDay = entry.session?.day === 'Invalid Date' 
+          ? (entry.session?.startTime ? new Date(entry.session.startTime).toLocaleDateString('en-US', { weekday: 'long' }) : 'TBD')
+          : (entry.session?.day || 'TBD');
+        
+        return [
+          `"${entry.session?.title || 'Unknown Session'}"`,
+          displayDay,
+          `${entry.session?.startTime?.substring(0, 5) || ''}-${entry.session?.endTime?.substring(0, 5) || ''}`,
+          `"${entry.name}"`,
+          entry.email || 'N/A',
+          entry.position || 1,
+          entry.status || 'WAITING',
+          new Date(entry.createdAt).toLocaleString()
+        ].join(',')
+      })
+    ].join('\n')
+
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${festival?.name}-waitlist-${new Date().toISOString().split('T')[0]}.csv`
+    a.click()
+    window.URL.revokeObjectURL(url)
+  }
+
   const handleDeleteBooking = async (bookingId: string) => {
     if (!confirm('Are you sure you want to delete this booking?')) return
     
@@ -1006,9 +1051,28 @@ export default function SessionsManagement() {
     
     // Sort by day+time, then by displayOrder for parallel sessions
     return filtered.sort((a, b) => {
-      // First, sort by day and time
-      const dateTimeA = a.day && a.startTime ? `${a.day}T${a.startTime}` : a.day || ''
-      const dateTimeB = b.day && b.startTime ? `${b.day}T${b.startTime}` : b.day || ''
+      // Extract proper datetime for sorting
+      // startTime can be either "HH:mm" format or full datetime "2025-06-30T08:00:00"
+      const getFullDatetime = (session: FestivalSession): string => {
+        if (!session.startTime) return ''
+        
+        // If startTime contains 'T', it's already a full datetime
+        if (session.startTime.includes('T')) {
+          return session.startTime
+        }
+        
+        // Otherwise, try to construct from day field
+        // day could be a day name like "Tuesday" or a date string
+        if (session.day && !isNaN(Date.parse(session.day))) {
+          return `${session.day}T${session.startTime}`
+        }
+        
+        // Fallback: just use the time (will sort by time within same/unknown day)
+        return `0000-00-00T${session.startTime}`
+      }
+      
+      const dateTimeA = getFullDatetime(a)
+      const dateTimeB = getFullDatetime(b)
       
       if (dateTimeA !== dateTimeB) {
         return dateTimeA.localeCompare(dateTimeB)
@@ -1237,6 +1301,12 @@ export default function SessionsManagement() {
                   <span className="hidden sm:inline">Export Bookings</span>
                 </Button>
               )}
+              {activeTab === 'waitlist' && waitlist.length > 0 && (
+                <Button onClick={exportWaitlistCSV} variant="outline" size="sm">
+                  <Download className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Export Waitlist</span>
+                </Button>
+              )}
             </div>
           </div>
           
@@ -1265,6 +1335,19 @@ export default function SessionsManagement() {
             >
               Bookings ({bookings.length})
               {activeTab === 'bookings' && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600"></div>
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab('waitlist')}
+              className={`px-4 py-2 text-sm font-medium transition-colors relative ${
+                activeTab === 'waitlist'
+                  ? 'text-purple-600'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Waitlist ({waitlist.length})
+              {activeTab === 'waitlist' && (
                 <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600"></div>
               )}
             </button>
@@ -1664,7 +1747,7 @@ export default function SessionsManagement() {
             </Card>
           </div>
         </div>
-        ) : (
+        ) : activeTab === 'bookings' ? (
           /* Bookings Tab Content */
           <div className="space-y-6">
             {/* Filters */}
@@ -1771,7 +1854,170 @@ export default function SessionsManagement() {
               </Card>
             )}
           </div>
-        )}
+        ) : activeTab === 'waitlist' ? (
+          /* Waitlist Tab Content */
+          <div className="space-y-6">
+            {/* Filters */}
+            <div className="flex gap-4">
+              <input
+                type="text"
+                placeholder="Search by name, email, or session..."
+                value={bookingSearchTerm}
+                onChange={(e) => setBookingSearchTerm(e.target.value)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+              />
+              <select
+                value={bookingFilterSession}
+                onChange={(e) => setBookingFilterSession(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent min-w-[250px]"
+              >
+                <option value="all">All Sessions ({waitlist.length})</option>
+                {Array.from(new Set(waitlist.map(w => w.session?.id))).filter(Boolean).map(sessionId => {
+                  const entry = waitlist.find(w => w.session?.id === sessionId)!
+                  const count = waitlist.filter(w => w.session?.id === sessionId).length
+                  return (
+                    <option key={sessionId} value={sessionId}>
+                      {entry.session?.title} ({count})
+                    </option>
+                  )
+                })}
+              </select>
+            </div>
+
+            {/* Waitlist Table */}
+            {(() => {
+              const filteredWaitlist = waitlist.filter(entry => {
+                const searchLower = bookingSearchTerm.toLowerCase()
+                const matchesSearch = !bookingSearchTerm || 
+                  entry.name?.toLowerCase().includes(searchLower) ||
+                  entry.email?.toLowerCase().includes(searchLower) ||
+                  entry.session?.title?.toLowerCase().includes(searchLower)
+                const matchesSession = bookingFilterSession === 'all' || entry.session?.id === bookingFilterSession
+                return matchesSearch && matchesSession
+              })
+              
+              return filteredWaitlist.length === 0 ? (
+                <Card>
+                  <CardContent className="text-center py-12">
+                    <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600">No waitlist entries found</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card>
+                  <CardContent className="p-0">
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead className="bg-gray-50 border-b border-gray-200">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Session</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Day & Time</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined At</th>
+                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {filteredWaitlist.map((entry: any) => (
+                            <tr key={entry.id} className="hover:bg-gray-50">
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm font-medium text-gray-900">{entry.session?.title || 'Unknown Session'}</div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-900">
+                                  {entry.session?.day || 'TBD'}
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                  {entry.session?.startTime?.substring(0, 5)} - {entry.session?.endTime?.substring(0, 5)}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm font-medium text-gray-900">{entry.name}</div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-900">{entry.email || <span className="text-gray-400 italic">No email</span>}</div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                  #{entry.position || 1}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                  entry.status === 'WAITING' ? 'bg-yellow-100 text-yellow-800' :
+                                  entry.status === 'OFFERED' ? 'bg-blue-100 text-blue-800' :
+                                  entry.status === 'CLAIMED' ? 'bg-green-100 text-green-800' :
+                                  entry.status === 'EXPIRED' ? 'bg-gray-100 text-gray-800' :
+                                  'bg-gray-100 text-gray-800'
+                                }`}>
+                                  {entry.status || 'WAITING'}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-900">{new Date(entry.createdAt).toLocaleDateString()}</div>
+                                <div className="text-sm text-gray-500">
+                                  {new Date(entry.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-right">
+                                <div className="flex items-center justify-end gap-2">
+                                  {entry.status === 'WAITING' && entry.position === 1 && (
+                                    <button
+                                      onClick={async () => {
+                                        try {
+                                          const response = await fetch(`/api/admin/festivals/${festivalId}/sessions/${entry.session?.id}/notify-waitlist`, {
+                                            method: 'POST',
+                                          });
+                                          if (!response.ok) throw new Error('Failed to notify');
+                                          const data = await response.json();
+                                          alert(data.message || 'Notification sent!');
+                                          fetchWaitlist();
+                                        } catch (error) {
+                                          console.error('Error notifying:', error);
+                                          alert('Failed to send notification');
+                                        }
+                                      }}
+                                      className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
+                                      title="Notify this person (send offer email)"
+                                    >
+                                      <Bell className="w-4 h-4" />
+                                    </button>
+                                  )}
+                                  <button
+                                    onClick={async () => {
+                                      if (!confirm('Remove this person from the waitlist?')) return;
+                                      try {
+                                        const response = await fetch(`/api/admin/festivals/${festivalId}/waitlist/${entry.id}`, {
+                                          method: 'DELETE',
+                                        });
+                                        if (!response.ok) throw new Error('Failed to remove');
+                                        fetchWaitlist();
+                                      } catch (error) {
+                                        console.error('Error removing:', error);
+                                        alert('Failed to remove from waitlist');
+                                      }
+                                    }}
+                                    className="p-1.5 text-red-600 hover:bg-red-50 rounded"
+                                    title="Remove from waitlist"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+              )
+            })()}
+          </div>
+        ) : null}
       </div>
 
       {/* Session Edit Modal */}
