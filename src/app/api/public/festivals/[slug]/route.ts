@@ -216,7 +216,8 @@ export async function GET(
           cardType: session.cardType || 'detailed',
           bookingEnabled: session.bookingEnabled || false,
           bookingCapacity: session.bookingCapacity || null,
-          displayOrder: session.displayOrder || 0
+          displayOrder: session.displayOrder || 0,
+          festivalId: festival.id
         }
       })
       .sort((a: any, b: any) => {

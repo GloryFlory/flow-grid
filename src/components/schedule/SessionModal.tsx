@@ -23,6 +23,7 @@ interface Session {
   cardType: string
   bookingEnabled?: boolean
   bookingCapacity?: number | null
+  festivalId?: string
 }
 
 interface SessionModalProps {
@@ -84,6 +85,14 @@ export function SessionModal({ session, onClose, festivalSlug, isFavourite = fal
   const [deviceId, setDeviceId] = useState('')
   const [currentBookings, setCurrentBookings] = useState(0)
   
+  // Waitlist state
+  const [showWaitlistForm, setShowWaitlistForm] = useState(false)
+  const [waitlistName, setWaitlistName] = useState('')
+  const [waitlistEmail, setWaitlistEmail] = useState('')
+  const [isJoiningWaitlist, setIsJoiningWaitlist] = useState(false)
+  const [waitlistPosition, setWaitlistPosition] = useState<number | null>(null)
+  const [isOnWaitlist, setIsOnWaitlist] = useState(false)
+  
   // Initialize device ID
   useEffect(() => {
     let id = localStorage.getItem('deviceId')
@@ -138,6 +147,93 @@ export function SessionModal({ session, onClose, festivalSlug, isFavourite = fal
       fetchBookingCount()
     }
   }, [session, festivalSlug])
+  
+  // Check waitlist status
+  useEffect(() => {
+    if (!session?.id || !deviceId || !session.bookingEnabled) return
+    
+    const checkWaitlistStatus = async () => {
+      try {
+        const response = await fetch(
+          `/api/waitlist/status?sessionId=${session.id}&deviceId=${deviceId}`
+        )
+        if (response.ok) {
+          const data = await response.json()
+          if (data.position) {
+            setIsOnWaitlist(true)
+            setWaitlistPosition(data.position)
+          } else {
+            setIsOnWaitlist(false)
+            setWaitlistPosition(null)
+          }
+        }
+      } catch (error) {
+        console.error('Error checking waitlist status:', error)
+      }
+    }
+    
+    checkWaitlistStatus()
+  }, [session, deviceId])
+  
+  const handleJoinWaitlist = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!session || isJoiningWaitlist) return
+    
+    setIsJoiningWaitlist(true)
+    try {
+      const response = await fetch('/api/waitlist/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId: session.id,
+          festivalId: session.festivalId,
+          deviceId,
+          name: waitlistName.trim(),
+          email: waitlistEmail.trim()
+        })
+      })
+      
+      const data = await response.json()
+      
+      if (!response.ok) {
+        alert(data.error || 'Failed to join waitlist')
+        return
+      }
+      
+      setIsOnWaitlist(true)
+      setWaitlistPosition(data.position)
+      setShowWaitlistForm(false)
+      setWaitlistName('')
+      setWaitlistEmail('')
+    } catch (error) {
+      console.error('Error joining waitlist:', error)
+      alert('Failed to join waitlist. Please try again.')
+    } finally {
+      setIsJoiningWaitlist(false)
+    }
+  }
+  
+  const handleLeaveWaitlist = async () => {
+    if (!session || !confirm('Are you sure you want to leave the waitlist?')) return
+    
+    try {
+      const response = await fetch(
+        `/api/waitlist/status?sessionId=${session.id}&deviceId=${deviceId}`,
+        { method: 'DELETE' }
+      )
+      
+      if (!response.ok) {
+        alert('Failed to leave waitlist')
+        return
+      }
+      
+      setIsOnWaitlist(false)
+      setWaitlistPosition(null)
+    } catch (error) {
+      console.error('Error leaving waitlist:', error)
+      alert('Failed to leave waitlist')
+    }
+  }
   
   const handleBookSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -383,8 +479,85 @@ export function SessionModal({ session, onClose, festivalSlug, isFavourite = fal
                     </button>
                   </div>
                 ) : isFull ? (
-                  <div className="booking-full-message">
-                    This session is currently full. Check back later in case spots open up!
+                  <div className="booking-full-section">
+                    {isOnWaitlist ? (
+                      <div className="waitlist-status">
+                        <div className="waitlist-position-badge">
+                          📋 You're #{waitlistPosition} on the waitlist
+                        </div>
+                        <p className="waitlist-info">
+                          We'll email you if a spot opens up!
+                        </p>
+                        <button 
+                          onClick={handleLeaveWaitlist}
+                          className="leave-waitlist-btn"
+                        >
+                          Leave Waitlist
+                        </button>
+                      </div>
+                    ) : !showWaitlistForm ? (
+                      <div className="waitlist-offer">
+                        <p className="booking-full-message">
+                          This session is currently full.
+                        </p>
+                        <button 
+                          onClick={() => setShowWaitlistForm(true)}
+                          className="join-waitlist-btn"
+                        >
+                          📋 Join Waitlist
+                        </button>
+                        <p className="waitlist-hint">
+                          Get notified if a spot opens up
+                        </p>
+                      </div>
+                    ) : (
+                      <form onSubmit={handleJoinWaitlist} className="waitlist-form">
+                        <h4 className="waitlist-form-title">Join the Waitlist</h4>
+                        <p className="waitlist-form-desc">
+                          We'll email you if a spot becomes available.
+                        </p>
+                        <div className="form-group">
+                          <label htmlFor="waitlist-name">Your Name</label>
+                          <input
+                            id="waitlist-name"
+                            type="text"
+                            value={waitlistName}
+                            onChange={(e) => setWaitlistName(e.target.value)}
+                            placeholder="Your Name"
+                            required
+                            className="booking-input"
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label htmlFor="waitlist-email">Email</label>
+                          <input
+                            id="waitlist-email"
+                            type="email"
+                            value={waitlistEmail}
+                            onChange={(e) => setWaitlistEmail(e.target.value)}
+                            placeholder="your.email@example.com"
+                            required
+                            className="booking-input"
+                          />
+                        </div>
+                        <div className="booking-form-actions">
+                          <button 
+                            type="submit" 
+                            disabled={isJoiningWaitlist}
+                            className="submit-booking-btn"
+                          >
+                            {isJoiningWaitlist ? 'Joining...' : 'Join Waitlist'}
+                          </button>
+                          <button 
+                            type="button"
+                            onClick={() => setShowWaitlistForm(false)}
+                            className="cancel-form-btn"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    )}
                   </div>
                 ) : !showBookingForm ? (
                   <button 
