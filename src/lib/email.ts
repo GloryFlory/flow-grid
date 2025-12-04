@@ -96,3 +96,193 @@ export async function sendPasswordResetEmail({ to, resetUrl, userName }: Passwor
     throw error;
   }
 }
+
+export interface WaitlistSpotEmailProps {
+  to: string;
+  userName: string;
+  sessionTitle: string;
+  sessionDate: string;
+  sessionTime: string;
+  festivalName: string;
+  festivalLogo?: string;
+  primaryColor?: string; // Festival's primary brand color
+  accentColor?: string;  // Festival's accent color
+  claimUrl: string;
+  expiresIn: string; // e.g., "2 hours", "30 minutes"
+  isPro?: boolean; // If true, hide Flow Grid branding (white-label)
+}
+
+export async function sendWaitlistSpotEmail({
+  to,
+  userName,
+  sessionTitle,
+  sessionDate,
+  sessionTime,
+  festivalName,
+  festivalLogo,
+  primaryColor = '#4a90e2', // Default blue
+  accentColor = '#ff6b6b',  // Default coral
+  claimUrl,
+  expiresIn,
+  isPro = false,
+}: WaitlistSpotEmailProps) {
+  if (!process.env.RESEND_API_KEY) {
+    console.error('RESEND_API_KEY is not configured');
+    throw new Error('Email service not configured');
+  }
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const fromEmail = process.env.FROM_EMAIL || 'onboarding@resend.dev';
+
+  // Helper to darken a hex color
+  const darkenColor = (hex: string, percent: number): string => {
+    const num = parseInt(hex.replace('#', ''), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = Math.max((num >> 16) - amt, 0);
+    const G = Math.max((num >> 8 & 0x00FF) - amt, 0);
+    const B = Math.max((num & 0x0000FF) - amt, 0);
+    return `#${(0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1)}`;
+  };
+
+  // Helper to lighten a hex color (for backgrounds)
+  const lightenColor = (hex: string, percent: number): string => {
+    const num = parseInt(hex.replace('#', ''), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = Math.min((num >> 16) + amt, 255);
+    const G = Math.min((num >> 8 & 0x00FF) + amt, 255);
+    const B = Math.min((num & 0x0000FF) + amt, 255);
+    return `#${(0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1)}`;
+  };
+
+  // Helper to add alpha to hex color
+  const hexToRgba = (hex: string, alpha: number): string => {
+    const num = parseInt(hex.replace('#', ''), 16);
+    const R = (num >> 16);
+    const G = (num >> 8 & 0x00FF);
+    const B = (num & 0x0000FF);
+    return `rgba(${R}, ${G}, ${B}, ${alpha})`;
+  };
+
+  // Generate color variants from primary color
+  const primaryDark = darkenColor(primaryColor, 15);
+  const primaryLight = lightenColor(primaryColor, 45);
+  const primaryLighter = lightenColor(primaryColor, 50);
+
+  // Build event logo HTML if available
+  const eventLogoHtml = festivalLogo 
+    ? `<img src="${festivalLogo}" alt="${festivalName}" style="max-height: 60px; max-width: 200px; margin-bottom: 15px;" />`
+    : '';
+
+  // Flow Grid branding - only show for non-Pro users
+  const flowGridHeader = isPro ? '' : `
+          <!-- Flow Grid Header (Free tier branding) -->
+          <div style="text-align: center; padding: 16px 0 8px 0;">
+            <a href="https://tryflowgrid.com" style="text-decoration: none;">
+              <img src="https://tryflowgrid.com/flow-grid-logo.png" alt="Flow Grid" style="height: 24px;" onerror="this.outerHTML='<span style=\\'font-size: 18px; font-weight: 600; color: #6366f1;\\'>Flow Grid</span>'" />
+            </a>
+          </div>`;
+
+  const flowGridFooter = isPro ? '' : `
+          <!-- Footer (Free tier branding) -->
+          <div style="text-align: center; padding: 24px 0;">
+            <p style="font-size: 12px; color: #9ca3af; margin: 0;">
+              Powered by <a href="https://tryflowgrid.com" style="color: #6366f1; text-decoration: none; font-weight: 500;">Flow Grid</a>
+            </p>
+          </div>`;
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: fromEmail,
+      to,
+      subject: `🎉 A spot opened up in "${sessionTitle}"!`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>A spot opened up!</title>
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb;">
+          ${flowGridHeader}
+          
+          <!-- Main Card -->
+          <div style="background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.1);">
+            <!-- Header with Festival Brand Colors -->
+            <div style="background: linear-gradient(135deg, ${primaryColor} 0%, ${primaryDark} 100%); padding: 30px; text-align: center;">
+              ${eventLogoHtml}
+              <h1 style="color: white; margin: 0; font-size: 24px; font-weight: 600;">🎉 Great news!</h1>
+              <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; font-size: 16px;">A spot just opened up</p>
+            </div>
+            
+            <!-- Content -->
+            <div style="padding: 30px;">
+              <p style="font-size: 16px; margin: 0 0 20px 0; color: #374151;">
+                Hi ${userName},
+              </p>
+              
+              <p style="font-size: 16px; margin: 0 0 20px 0; color: #374151;">
+                Someone cancelled their booking, and you're first in line for:
+              </p>
+              
+              <!-- Session Card with Brand Colors -->
+              <div style="background: linear-gradient(135deg, ${primaryLighter} 0%, ${primaryLight} 100%); border: 1px solid ${primaryColor}40; border-radius: 12px; padding: 20px; margin: 24px 0;">
+                <h2 style="margin: 0 0 8px 0; color: ${primaryDark}; font-size: 20px; font-weight: 600;">${sessionTitle}</h2>
+                <p style="margin: 4px 0; color: ${primaryDark}; font-size: 15px;">
+                  📅 ${sessionDate} at ${sessionTime}
+                </p>
+                <p style="margin: 4px 0; color: ${primaryColor}; font-size: 14px;">
+                  📍 ${festivalName}
+                </p>
+              </div>
+              
+              <!-- CTA Button with Brand Colors -->
+              <div style="text-align: center; margin: 32px 0;">
+                <a href="${claimUrl}" 
+                   style="background: linear-gradient(135deg, ${primaryColor} 0%, ${primaryDark} 100%); 
+                          color: white; 
+                          padding: 16px 40px; 
+                          text-decoration: none; 
+                          border-radius: 10px; 
+                          font-size: 17px;
+                          font-weight: 600;
+                          display: inline-block;
+                          box-shadow: 0 4px 14px ${hexToRgba(primaryColor, 0.35)};">
+                  Claim Your Spot →
+                </a>
+              </div>
+              
+              <!-- Urgency Notice -->
+              <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; padding: 16px; text-align: center;">
+                <p style="font-size: 14px; color: #dc2626; margin: 0;">
+                  ⏰ <strong>This offer expires in ${expiresIn}.</strong><br>
+                  <span style="color: #991b1b;">If you don't claim it, the spot goes to the next person.</span>
+                </p>
+              </div>
+              
+              <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 28px 0;">
+              
+              <p style="font-size: 13px; color: #6b7280; text-align: center; margin: 0;">
+                Already booked on another device? You can ignore this email.<br>
+                <span style="color: #9ca3af;">Having trouble? Just reply to this email.</span>
+              </p>
+            </div>
+          </div>
+          ${flowGridFooter}
+        </body>
+        </html>
+      `,
+    });
+
+    if (error) {
+      console.error('Resend email error:', error);
+      throw new Error('Failed to send waitlist notification email');
+    }
+
+    console.log('✅ Waitlist spot email sent successfully:', data);
+    return data;
+  } catch (error) {
+    console.error('❌ Failed to send waitlist spot email:', error);
+    throw error;
+  }
+}

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { notifyNextInWaitlist } from '@/lib/waitlist';
 
 // Create a booking
 export async function POST(
@@ -154,6 +155,11 @@ export async function DELETE(
           deviceId
         }
       }
+    });
+
+    // Notify next person on waitlist (fire and forget)
+    notifyNextInWaitlist(sessionId).catch(err => {
+      console.error('Failed to notify waitlist:', err);
     });
 
     return NextResponse.json({ success: true, namesCount });

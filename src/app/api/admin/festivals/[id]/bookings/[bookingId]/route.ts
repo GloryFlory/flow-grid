@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { notifyNextInWaitlist } from '@/lib/waitlist';
 
 export async function DELETE(
   request: NextRequest,
@@ -32,6 +33,17 @@ export async function DELETE(
       );
     }
 
+    // Get the booking to know the sessionId before deleting
+    const booking = await prisma.booking.findUnique({
+      where: {
+        id: bookingId,
+        festivalId
+      },
+      select: {
+        sessionId: true,
+      }
+    });
+
     // Delete the booking
     await prisma.booking.delete({
       where: {
@@ -39,6 +51,13 @@ export async function DELETE(
         festivalId
       }
     });
+
+    // Notify next person on waitlist (fire and forget)
+    if (booking?.sessionId) {
+      notifyNextInWaitlist(booking.sessionId).catch(err => {
+        console.error('Failed to notify waitlist:', err);
+      });
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

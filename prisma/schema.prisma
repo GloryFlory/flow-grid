@@ -92,6 +92,7 @@ model Festival {
   user           User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   favourites     SessionFavourite[]
   teachers       Teacher[]
+  waitlist       SessionWaitlist[]
 
   @@map("festivals")
 }
@@ -122,6 +123,7 @@ model FestivalSession {
   bookings        Booking[]
   festival        Festival           @relation(fields: [festivalId], references: [id], onDelete: Cascade)
   favourites      SessionFavourite[]
+  waitlist        SessionWaitlist[]
 
   @@map("festival_sessions")
 }
@@ -140,6 +142,39 @@ model Booking {
 
   @@unique([sessionId, deviceId])
   @@map("bookings")
+}
+
+model SessionWaitlist {
+  id              String           @id @default(cuid())
+  sessionId       String
+  festivalId      String
+  deviceId        String
+  name            String
+  email           String
+  position        Int              // Queue position (1 = first in line)
+  status          WaitlistStatus   @default(WAITING)
+  offerToken      String?          @unique // Token for claiming the spot
+  offerExpiresAt  DateTime?        // When the offer expires
+  offeredAt       DateTime?        // When the offer was sent
+  claimedAt       DateTime?        // When they claimed the spot
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  festival        Festival         @relation(fields: [festivalId], references: [id], onDelete: Cascade)
+  session         FestivalSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, deviceId])
+  @@unique([sessionId, email])
+  @@index([sessionId, status])
+  @@index([offerToken])
+  @@map("session_waitlist")
+}
+
+enum WaitlistStatus {
+  WAITING    // In the queue
+  OFFERED    // Spot offered, awaiting claim
+  CLAIMED    // Successfully claimed the spot
+  EXPIRED    // Offer expired, moved to next person
+  CANCELLED  // User cancelled their waitlist spot
 }
 
 model Subscription {
