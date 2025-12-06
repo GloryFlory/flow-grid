@@ -249,12 +249,15 @@ export default function SettingsPage() {
   const handleBuyEventPass = async () => {
     setIsPurchasingEventPass(true)
     try {
+      // Use discounted price for Pro users
+      const billingPeriod = limits?.currentPlan === 'PRO' ? 'one-time-pro-discount' : 'one-time'
+      
       const response = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           plan: 'EVENT_PASS', 
-          billingPeriod: 'one-time' 
+          billingPeriod
         }),
       })
 
@@ -533,7 +536,17 @@ export default function SettingsPage() {
                       <h4 className="font-medium text-gray-900">
                         {isPurchasingEventPass ? 'Starting checkout...' : 'Buy Event Pass'}
                       </h4>
-                      <p className="text-sm text-gray-500">€29 one-time for 1 extra event</p>
+                      <p className="text-sm text-gray-500">
+                        {limits?.currentPlan === 'PRO' ? (
+                          <>
+                            <span className="line-through text-gray-400">€69</span>
+                            <span className="text-green-600 font-medium ml-1">€39</span>
+                            <span className="text-gray-400 ml-1">Pro discount</span>
+                          </>
+                        ) : (
+                          '€69 one-time for 1 extra event'
+                        )}
+                      </p>
                     </div>
                     <ArrowRight className="w-4 h-4 text-gray-400 ml-auto group-hover:text-orange-600 transition-colors" />
                   </button>

@@ -29,11 +29,24 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate billing period based on plan
-    if (plan === 'EVENT_PASS' && billingPeriod !== 'one-time') {
+    if (plan === 'EVENT_PASS' && !['one-time', 'one-time-pro-discount'].includes(billingPeriod)) {
       return NextResponse.json(
         { error: 'Event Pass is a one-time purchase' },
         { status: 400 }
       )
+    }
+
+    // Verify Pro discount eligibility
+    if (billingPeriod === 'one-time-pro-discount') {
+      const subscription = await prisma.subscription.findUnique({
+        where: { userId: session.user.id }
+      })
+      if (subscription?.plan !== 'PRO') {
+        return NextResponse.json(
+          { error: 'Pro discount only available for Pro subscribers' },
+          { status: 403 }
+        )
+      }
     }
 
     if (plan === 'PRO' && !['monthly', 'yearly'].includes(billingPeriod)) {
@@ -87,7 +100,7 @@ export async function POST(request: NextRequest) {
 
     // Get the correct price ID
     const priceId = plan === 'EVENT_PASS' 
-      ? STRIPE_PRICES.EVENT_PASS['one-time']
+      ? STRIPE_PRICES.EVENT_PASS[billingPeriod as 'one-time' | 'one-time-pro-discount']
       : STRIPE_PRICES.PRO[billingPeriod as 'monthly' | 'yearly']
 
     // Create Stripe checkout session

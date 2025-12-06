@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react'
+import { PlanFeatures } from '@/types'
 
 interface PlanLimits {
   currentPlan: 'FREE' | 'PRO' | 'ENTERPRISE'
   festivalsUsed: number
   festivalsLimit: number
+  sessionsLimit: number
   isAdmin: boolean
   canCreateMore: boolean
+  features: PlanFeatures
 }
 
 export function usePlanLimits() {

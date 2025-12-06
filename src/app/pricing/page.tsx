@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
 import { Check, X, Zap, Building, Sparkles, ArrowRight, Mail, HelpCircle, Calendar, FileText, Layers, Users, Palette, Globe, Type, QrCode, Code, Copy, Smartphone, Eye, Download, Bookmark, BarChart3, Heart, Shield, Headphones, Ticket, MousePointerClick, Clock, Gift } from 'lucide-react'
-import { PAYMENTS_ENABLED, EARLY_ACCESS_CONFIG } from '@/config/payments'
+import { PAYMENTS_ENABLED, EARLY_ACCESS_CONFIG, PRICING } from '@/config/payments'
 
 export default function PricingPage() {
   const { data: session } = useSession()
@@ -139,19 +139,19 @@ export default function PricingPage() {
         {/* Hero */}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-            {PAYMENTS_ENABLED ? 'Simple, transparent pricing' : 'Early Access — Free for Founding Members'}
+            {PAYMENTS_ENABLED ? 'Simple, transparent pricing' : 'Your First 5 Events Are On Us'}
           </h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
             {PAYMENTS_ENABLED 
               ? 'Start free and upgrade when you need more. No hidden fees, no surprises.'
-              : 'Get Pro features free for 1 year. Be one of our first users and help shape FlowGrid.'}
+              : 'Get started with Pro features free. No credit card required.'}
           </p>
 
           {/* Early Access Badge */}
           {!PAYMENTS_ENABLED && (
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-100 to-orange-100 border border-amber-200 text-amber-800 px-4 py-2 rounded-full text-sm font-medium mb-8">
               <Gift className="w-4 h-4" />
-              Limited time: All Pro features free for founding members
+              Early Access: 5 free events for founding members
             </div>
           )}
 
@@ -233,18 +233,18 @@ export default function PricingPage() {
                 <Ticket className="w-5 h-5 text-orange-600" />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-1">Event Pass</h3>
-              <p className="text-slate-500 text-sm">One time, Pro features</p>
+              <p className="text-slate-500 text-sm">One event, Pro features</p>
             </div>
 
             <div className="mb-5">
               {PAYMENTS_ENABLED ? (
                 <>
-                  <span className="text-3xl font-bold text-slate-900">€29</span>
+                  <span className="text-3xl font-bold text-slate-900">€{PRICING.EVENT_PASS.regular}</span>
                   <p className="text-sm text-slate-500 mt-1">One-time purchase</p>
                 </>
               ) : (
                 <>
-                  <span className="text-3xl font-bold text-slate-900 line-through text-slate-400">€29</span>
+                  <span className="text-3xl font-bold text-slate-900 line-through text-slate-400">€{PRICING.EVENT_PASS.regular}</span>
                   <span className="text-3xl font-bold text-green-600 ml-2">Free</span>
                   <p className="text-sm text-green-600 mt-1">Included with Early Access</p>
                 </>
@@ -267,15 +267,12 @@ export default function PricingPage() {
               </Link>
             )}
 
-            <p className="text-xs text-slate-500 mb-3">Unlock Pro features for 1 event:</p>
+            <p className="text-xs text-slate-500 mb-3">Unlock for 1 event:</p>
             <ul className="space-y-3 text-sm">
               <FeatureItem included>Yours to keep, no expiry</FeatureItem>
-              <FeatureItem included>No watermark</FeatureItem>
-              <FeatureItem included>Detailed analytics</FeatureItem>
+              <FeatureItem included>Basic analytics</FeatureItem>
               <FeatureItem included>Google Fonts</FeatureItem>
-              <FeatureItem included>Embeddable widget</FeatureItem>
-              <FeatureItem included>Priority support</FeatureItem>
-              <FeatureItem included>Stack multiple passes</FeatureItem>
+              <FeatureItem included>Standard support</FeatureItem>
             </ul>
           </div>
 
@@ -283,7 +280,7 @@ export default function PricingPage() {
           <div className="bg-white rounded-2xl border-2 border-[#b40225] p-6 shadow-lg relative">
             <div className="absolute -top-3 left-1/2 -translate-x-1/2">
               <span className="bg-[#b40225] text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
-                {PAYMENTS_ENABLED ? 'Most Popular' : 'Free for 1 Year'}
+                {PAYMENTS_ENABLED ? 'Most Popular' : '5 Free Events'}
               </span>
             </div>
 
@@ -313,7 +310,7 @@ export default function PricingPage() {
                 <>
                   <span className="text-3xl font-bold text-slate-400 line-through">€{prices.pro}/mo</span>
                   <span className="text-3xl font-bold text-green-600 ml-2">Free</span>
-                  <p className="text-sm text-green-600 mt-1">Free for 1 year with Early Access</p>
+                  <p className="text-sm text-green-600 mt-1">5 events included with Early Access</p>
                 </>
               )}
             </div>
@@ -330,17 +327,20 @@ export default function PricingPage() {
                 href={session ? '/dashboard' : '/auth/signin'}
                 className="block w-full text-center bg-[#b40225] text-white py-2.5 px-4 rounded-lg font-semibold hover:bg-[#8a011c] transition-colors mb-6"
               >
-                {session ? 'Go to Dashboard' : 'Get Early Access'} <ArrowRight className="inline w-4 h-4 ml-1" />
+                {session ? 'Go to Dashboard' : 'Get Started Free'} <ArrowRight className="inline w-4 h-4 ml-1" />
               </Link>
             )}
 
             <p className="text-xs text-slate-500 mb-3">Everything in Event Pass, plus:</p>
             <ul className="space-y-3 text-sm">
               <FeatureItem included>Up to 5 published events</FeatureItem>
-              <FeatureItem included>Team collaboration (3 members)</FeatureItem>
+              <FeatureItem included>Up to 3 team members <span className="text-xs text-purple-600">(coming soon)</span></FeatureItem>
+              <FeatureItem included>Watermark removed</FeatureItem>
+              <FeatureItem included>Embeddable widget</FeatureItem>
+              <FeatureItem included>Detailed analytics & export</FeatureItem>
               <FeatureItem included>Duplicate events</FeatureItem>
-              <FeatureItem included>Cancel anytime</FeatureItem>
-              <FeatureItem included>Priority email support</FeatureItem>
+              <FeatureItem included>Priority support</FeatureItem>
+              <FeatureItem included>Discounted Event Passes (€{PRICING.EVENT_PASS.proDiscount})</FeatureItem>
             </ul>
           </div>
 
@@ -402,7 +402,7 @@ export default function PricingPage() {
               <ComparisonRow icon={<Calendar className="w-4 h-4" />} feature="Published events" tooltip="The number of events you can make publicly visible. Free plan resets annually." free="1 / year" eventPass="1 (per pass)" pro="5" enterprise="Unlimited" />
               <ComparisonRow icon={<FileText className="w-4 h-4" />} feature="Draft events" tooltip="Create unlimited drafts to plan future events" free="Unlimited" eventPass="Unlimited" pro="Unlimited" enterprise="Unlimited" />
               <ComparisonRow icon={<Layers className="w-4 h-4" />} feature="Sessions per event" tooltip="Classes, workshops, talks - no limit on how many you can add" free="Unlimited" eventPass="Unlimited" pro="Unlimited" enterprise="Unlimited" />
-              <ComparisonRow icon={<Users className="w-4 h-4" />} feature="Team members" tooltip="Invite collaborators to help manage your events" free="1" eventPass="1" pro="1" enterprise="Unlimited" />
+              <ComparisonRow icon={<Users className="w-4 h-4" />} feature="Team members" tooltip="Invite collaborators to help manage your events" free="1" eventPass="1" pro="3" enterprise="Unlimited" comingSoon />
             </FeatureSection>
 
             {/* Customization & Branding */}
@@ -410,7 +410,7 @@ export default function PricingPage() {
               <ComparisonRow icon={<Palette className="w-4 h-4" />} feature="Custom colors" tooltip="Match your schedule to your brand with custom color schemes" free={true} eventPass={true} pro={true} enterprise={true} />
               <ComparisonRow icon={<Globe className="w-4 h-4" />} feature="Logo upload" tooltip="Display your organization's logo on the schedule" free={true} eventPass={true} pro={true} enterprise={true} />
               <ComparisonRow icon={<Type className="w-4 h-4" />} feature="Google Fonts" tooltip="Choose from 200+ fonts or upload your own custom fonts" free={false} eventPass={true} pro={true} enterprise={true} />
-              <ComparisonRow icon={<X className="w-4 h-4" />} feature="Remove watermark" tooltip="Hide the Flow Grid attribution from your public schedule" free={false} eventPass={true} pro={true} enterprise={true} />
+              <ComparisonRow icon={<X className="w-4 h-4" />} feature="Remove watermark" tooltip="Hide the Flow Grid attribution from your public schedule" free={false} eventPass={false} pro={true} enterprise={true} />
               <ComparisonRow icon={<Globe className="w-4 h-4" />} feature="White-label experience" tooltip="Complete rebranding - your schedule looks 100% yours" free={false} eventPass={false} pro={false} enterprise={true} comingSoon />
               <ComparisonRow icon={<Globe className="w-4 h-4" />} feature="Custom domain" tooltip="Use your own domain like schedule.yourevent.com" free={false} eventPass={false} pro={false} enterprise={true} comingSoon />
             </FeatureSection>
@@ -419,8 +419,9 @@ export default function PricingPage() {
             <FeatureSection title="Publishing & Sharing">
               <ComparisonRow icon={<Globe className="w-4 h-4" />} feature="Shareable public link" tooltip="Get a unique URL to share your schedule with attendees" free={true} eventPass={true} pro={true} enterprise={true} />
               <ComparisonRow icon={<QrCode className="w-4 h-4" />} feature="QR code poster" tooltip="Generate printable QR code posters for your venue" free={true} eventPass={true} pro={true} enterprise={true} />
-              <ComparisonRow icon={<Code className="w-4 h-4" />} feature="Embeddable widget" tooltip="Add your schedule directly to your website with an embed code" free={false} eventPass={true} pro={true} enterprise={true} />
+              <ComparisonRow icon={<Code className="w-4 h-4" />} feature="Embeddable widget" tooltip="Add your schedule directly to your website with an embed code" free={false} eventPass={false} pro={true} enterprise={true} />
               <ComparisonRow icon={<Copy className="w-4 h-4" />} feature="Duplicate events" tooltip="Clone an entire event to quickly set up recurring events" free={false} eventPass={false} pro={true} enterprise={true} />
+              <ComparisonRow icon={<Layers className="w-4 h-4" />} feature="Multiple published events" tooltip="Have more than one event live at the same time" free={false} eventPass={false} pro={true} enterprise={true} />
             </FeatureSection>
 
             {/* Attendee Experience */}
@@ -434,13 +435,13 @@ export default function PricingPage() {
             {/* Analytics & Insights */}
             <FeatureSection title="Analytics & Insights">
               <ComparisonRow icon={<BarChart3 className="w-4 h-4" />} feature="Page views & unique visitors" tooltip="Track how many people view your schedule and unique visitor counts" free={true} eventPass={true} pro={true} enterprise={true} />
-              <ComparisonRow icon={<MousePointerClick className="w-4 h-4" />} feature="Session clicks & popularity" tooltip="See which sessions get the most clicks and engagement" free="Basic" eventPass="Detailed" pro="Detailed" enterprise="Detailed" />
-              <ComparisonRow icon={<Heart className="w-4 h-4" />} feature="Favourites tracking" tooltip="Track which sessions attendees save to their personal schedule" free="Basic" eventPass="Detailed" pro="Detailed" enterprise="Detailed" />
-              <ComparisonRow icon={<Eye className="w-4 h-4" />} feature="View mode usage" tooltip="See how attendees prefer to view your schedule (Cards, Grid, My Schedule)" free={false} eventPass={true} pro={true} enterprise={true} />
-              <ComparisonRow icon={<Layers className="w-4 h-4" />} feature="Filter usage analytics" tooltip="Understand which filters and teachers are most searched" free={false} eventPass={true} pro={true} enterprise={true} />
-              <ComparisonRow icon={<Clock className="w-4 h-4" />} feature="Hourly & daily trends" tooltip="See peak viewing times and daily traffic patterns" free={false} eventPass={true} pro={true} enterprise={true} />
-              <ComparisonRow icon={<BarChart3 className="w-4 h-4" />} feature="Conversion rates" tooltip="Track favourite and booking conversion metrics" free={false} eventPass={true} pro={true} enterprise={true} />
-              <ComparisonRow icon={<Download className="w-4 h-4" />} feature="Export reports" tooltip="Download analytics data as CSV" free={false} eventPass={true} pro={true} enterprise={true} />
+              <ComparisonRow icon={<MousePointerClick className="w-4 h-4" />} feature="Session clicks & popularity" tooltip="See which sessions get the most clicks and engagement" free="Basic" eventPass="Basic" pro="Detailed" enterprise="Detailed" />
+              <ComparisonRow icon={<Heart className="w-4 h-4" />} feature="Favourites tracking" tooltip="Track which sessions attendees save to their personal schedule" free="Basic" eventPass="Basic" pro="Detailed" enterprise="Detailed" />
+              <ComparisonRow icon={<Eye className="w-4 h-4" />} feature="View mode usage" tooltip="See how attendees prefer to view your schedule (Cards, Grid, My Schedule)" free={false} eventPass={false} pro={true} enterprise={true} />
+              <ComparisonRow icon={<Layers className="w-4 h-4" />} feature="Filter usage analytics" tooltip="Understand which filters and teachers are most searched" free={false} eventPass={false} pro={true} enterprise={true} />
+              <ComparisonRow icon={<Clock className="w-4 h-4" />} feature="Hourly & daily trends" tooltip="See peak viewing times and daily traffic patterns" free={false} eventPass={false} pro={true} enterprise={true} />
+              <ComparisonRow icon={<BarChart3 className="w-4 h-4" />} feature="Conversion rates" tooltip="Track favourite and booking conversion metrics" free={false} eventPass={false} pro={true} enterprise={true} />
+              <ComparisonRow icon={<Download className="w-4 h-4" />} feature="Export reports" tooltip="Download analytics data as CSV" free={false} eventPass={false} pro={true} enterprise={true} />
             </FeatureSection>
 
             {/* Data Import */}
@@ -458,7 +459,7 @@ export default function PricingPage() {
             {/* Support */}
             <FeatureSection title="Support">
               <ComparisonRow icon={<Headphones className="w-4 h-4" />} feature="Help center & docs" tooltip="Access guides, tutorials, and documentation" free={true} eventPass={true} pro={true} enterprise={true} />
-              <ComparisonRow icon={<Headphones className="w-4 h-4" />} feature="Email support" tooltip="Get help from our support team via email" free="Standard" eventPass="Priority" pro="Priority" enterprise="Priority" />
+              <ComparisonRow icon={<Headphones className="w-4 h-4" />} feature="Email support" tooltip="Get help from our support team via email" free="Standard" eventPass="Standard" pro="Priority" enterprise="Priority" />
               <ComparisonRow icon={<Users className="w-4 h-4" />} feature="Dedicated success manager" tooltip="A personal contact to help you get the most from Flow Grid" free={false} eventPass={false} pro={false} enterprise={true} />
             </FeatureSection>
             
@@ -477,23 +478,23 @@ export default function PricingPage() {
           <div className="space-y-6">
             <FAQItem 
               question="What does Early Access include?"
-              answer="During Early Access, you get full Pro features completely free for one year. This includes up to 5 published events, custom domains, Google Sheets sync, analytics, and everything else Pro offers. No credit card required."
+              answer="During Early Access, you get Pro features for up to 5 events completely free. This includes team collaboration, watermark removal, embed widgets, detailed analytics, and everything else Pro offers. No credit card required."
             />
             <FAQItem 
               question="Why is it free?"
-              answer="We're building Flow Grid with the community. Early Access users help shape the product with their feedback. In return, you get a full year of Pro features free and Founding Member status when we launch paid plans."
+              answer="We're building Flow Grid with the community. Early Access users help shape the product with their feedback. In return, your first 5 events are on us — and you get Founding Member status."
             />
             <FAQItem 
-              question="What happens after my free year?"
-              answer="When Early Access ends, you'll have the option to continue with a paid plan. As a Founding Member, you'll get special pricing. Your data and events stay yours regardless of what you decide."
+              question="What happens after my 5 free events?"
+              answer="When you need more events, you can purchase additional Event Passes (€69 each, or €39 with a Pro subscription). Your existing events and data stay yours regardless of what you decide."
             />
             <FAQItem 
               question="Do I need a credit card to sign up?"
               answer="No! Early Access is completely free with no credit card required. Just sign up and start creating your event schedules immediately."
             />
             <FAQItem 
-              question="What are Founding Member benefits?"
-              answer="Founding Members who join during Early Access will receive special perks when we launch paid plans, including discounted pricing and priority access to new features. The earlier you join, the better the benefits."
+              question="What's the difference between Event Pass and Pro?"
+              answer="Event Pass is a one-time purchase for a single event with basic features. Pro includes premium features like watermark removal, embed widgets, detailed analytics with export, up to 3 team members, and discounted Event Passes (€39 instead of €69)."
             />
             <FAQItem 
               question="What happens to my data if I don't continue?"
@@ -501,7 +502,7 @@ export default function PricingPage() {
             />
             <FAQItem 
               question="How many events can I create?"
-              answer="During Early Access, you can have up to 5 published events with full Pro features. Need more? Contact us about Enterprise options."
+              answer="During Early Access, you can have up to 5 published events with full Pro features. Need more? Purchase additional Event Passes or contact us about Enterprise options."
             />
             <FAQItem 
               question="Can my team use Flow Grid too?"

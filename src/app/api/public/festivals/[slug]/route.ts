@@ -233,10 +233,11 @@ export async function GET(
       })
 
     // Determine if "Powered by Flow Grid" should be shown
-    // Auto-hide for Pro/Enterprise/Event Pass holders
+    // Only hide for Pro/Enterprise subscribers (whiteLabel feature)
+    // Event Pass holders stay on FREE plan and still see the watermark
     const subscription = (festival as any).user?.subscription
-    const isPaidPlan = subscription?.plan && ['PRO', 'ENTERPRISE', 'EVENT_PASS'].includes(subscription.plan)
-    const showPoweredBy = !isPaidPlan
+    const hasWhiteLabel = subscription?.plan && ['PRO', 'ENTERPRISE'].includes(subscription.plan)
+    const showPoweredBy = !hasWhiteLabel
 
     const response = {
       festival: {

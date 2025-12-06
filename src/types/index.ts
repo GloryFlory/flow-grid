@@ -110,7 +110,7 @@ export const PLAN_FEATURES: Record<PlanType, PlanFeatures> = {
   PRO: {
     festivalsLimit: 5,
     sessionsLimit: -1, // unlimited
-    teamMembersLimit: 5,
+    teamMembersLimit: 3, // Pricing page says "Up to 3 team members"
     customBranding: true,
     customSubdomain: true,
     customDomain: false,
@@ -118,7 +118,7 @@ export const PLAN_FEATURES: Record<PlanType, PlanFeatures> = {
     advancedBooking: false,
     basicAnalytics: true,
     advancedAnalytics: true,
-    analyticsExport: false,
+    analyticsExport: true, // Pro includes analytics export
     cloneEvents: true,
     prioritySupport: true,
     dedicatedSupport: false,

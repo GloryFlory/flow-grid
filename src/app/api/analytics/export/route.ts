@@ -2,12 +2,30 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
+import { PLAN_FEATURES } from '@/types'
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
   
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // Check if user has analytics export feature (Pro+ only)
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    include: { subscription: true }
+  })
+
+  const currentPlan = user?.subscription?.plan || 'FREE'
+  const isAdmin = user?.role === 'ADMIN'
+  const planFeatures = PLAN_FEATURES[currentPlan]
+  
+  if (!isAdmin && !planFeatures.analyticsExport) {
+    return NextResponse.json(
+      { error: 'Analytics export is a Pro feature. Please upgrade to continue.' },
+      { status: 403 }
+    )
   }
 
   const { searchParams } = new URL(request.url)

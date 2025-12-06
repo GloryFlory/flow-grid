@@ -6,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Modal from '@/components/ui/Modal'
 import Link from 'next/link'
-import { ArrowLeft, Eye, EyeOff, Trash2, Globe, AlertTriangle, Download, Upload, Zap, Copy, X } from 'lucide-react'
+import { ArrowLeft, Eye, EyeOff, Trash2, Globe, AlertTriangle, Download, Upload, Zap, Copy, X, Crown } from 'lucide-react'
+import { usePlanLimits } from '@/hooks/usePlanLimits'
 
 interface Festival {
   id: string
@@ -28,6 +29,10 @@ export default function FestivalSettings() {
   const router = useRouter()
   const festivalId = params.id as string
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const { limits } = usePlanLimits()
+  
+  // Pro features: duplicate events
+  const canDuplicateEvents = limits?.features?.cloneEvents || limits?.currentPlan === 'PRO' || limits?.currentPlan === 'ENTERPRISE'
   
   const [festival, setFestival] = useState<Festival | null>(null)
   const [planInfo, setPlanInfo] = useState<PlanInfo | null>(null)
@@ -516,12 +521,15 @@ export default function FestivalSettings() {
           </CardContent>
         </Card>
 
-        {/* Duplicate Event */}
-        <Card>
+        {/* Duplicate Event - Pro Feature */}
+        <Card className={!canDuplicateEvents ? 'opacity-75' : ''}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Copy className="w-5 h-5" />
               Duplicate Event
+              {!canDuplicateEvents && (
+                <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium">Pro</span>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -533,23 +541,32 @@ export default function FestivalSettings() {
                   Great for recurring events or using as a template.
                 </p>
               </div>
-              <Button
-                onClick={() => setShowDuplicateModal(true)}
-                disabled={isDuplicating}
-                className="bg-purple-600 hover:bg-purple-700"
-              >
-                {isDuplicating ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                    Duplicating...
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4 mr-2" />
-                    Duplicate
-                  </>
-                )}
-              </Button>
+              {canDuplicateEvents ? (
+                <Button
+                  onClick={() => setShowDuplicateModal(true)}
+                  disabled={isDuplicating}
+                  className="bg-purple-600 hover:bg-purple-700"
+                >
+                  {isDuplicating ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                      Duplicating...
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4 mr-2" />
+                      Duplicate
+                    </>
+                  )}
+                </Button>
+              ) : (
+                <Link href="/pricing">
+                  <Button className="bg-purple-600 hover:bg-purple-700">
+                    <Crown className="w-4 h-4 mr-2" />
+                    Upgrade to Pro
+                  </Button>
+                </Link>
+              )}
             </div>
           </CardContent>
         </Card>

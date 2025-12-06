@@ -34,7 +34,12 @@ export default function FestivalBranding() {
   const params = useParams()
   const festivalId = params.id as string
   const { limits } = usePlanLimits()
-  const isPro = limits?.currentPlan && ['PRO', 'ENTERPRISE', 'EVENT_PASS'].includes(limits.currentPlan)
+  // Font customization available for:
+  // - Pro/Enterprise subscribers
+  // - Event Pass holders (FREE with festivalsLimit > 1)
+  // - During Early Access, everyone with 5 free events
+  const hasEventPass = limits?.currentPlan === 'FREE' && (limits?.festivalsLimit ?? 1) > 1
+  const canUseFonts = limits?.currentPlan === 'PRO' || limits?.currentPlan === 'ENTERPRISE' || hasEventPass
   
   const [festival, setFestival] = useState<Festival | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -524,7 +529,7 @@ export default function FestivalBranding() {
               <CardTitle className="flex items-center gap-2">
                 <Type className="w-5 h-5" />
                 Header Font
-                {isPro ? (
+                {canUseFonts ? (
                   <span className="ml-auto flex items-center gap-1 text-xs bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-2 py-0.5 rounded-full">
                     <Crown className="w-3 h-3" />
                     Pro
@@ -542,7 +547,7 @@ export default function FestivalBranding() {
                 Choose a custom font for your event name and day headers. 
                 Session cards will keep their consistent styling.
               </p>
-              {isPro ? (
+              {canUseFonts ? (
                 <FontPicker
                   value={headerFont || ''}
                   onChange={setHeaderFont}

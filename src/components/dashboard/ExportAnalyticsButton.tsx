@@ -13,10 +13,11 @@ interface ExportAnalyticsButtonProps {
 export function ExportAnalyticsButton({ festivalId, festivalName }: ExportAnalyticsButtonProps) {
   const [isExporting, setIsExporting] = useState(false)
   const { limits, isLoading: limitsLoading } = usePlanLimits()
-  const isPro = limits?.currentPlan && ['PRO', 'ENTERPRISE', 'EVENT_PASS'].includes(limits.currentPlan)
+  // Analytics export is a Pro-only feature (Event Pass stays on FREE plan)
+  const canExport = limits?.features?.analyticsExport || limits?.currentPlan === 'PRO' || limits?.currentPlan === 'ENTERPRISE'
 
   const handleExport = async () => {
-    if (!isPro) return
+    if (!canExport) return
     
     setIsExporting(true)
     try {
@@ -58,7 +59,7 @@ export function ExportAnalyticsButton({ festivalId, festivalName }: ExportAnalyt
     )
   }
 
-  if (!isPro) {
+  if (!canExport) {
     return (
       <Link
         href="/pricing"

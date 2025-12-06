@@ -29,7 +29,9 @@ export default function ShareAndPromote() {
   const params = useParams()
   const festivalId = params.id as string
   const { limits } = usePlanLimits()
-  const isPro = limits?.currentPlan && ['PRO', 'ENTERPRISE', 'EVENT_PASS'].includes(limits.currentPlan)
+  // Pro features: embed widget, watermark removal, etc.
+  const isPro = limits?.currentPlan && ['PRO', 'ENTERPRISE'].includes(limits.currentPlan)
+  const canUseEmbed = isPro || limits?.features?.embedWidget
   
   const [festival, setFestival] = useState<Festival | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -209,45 +211,63 @@ export default function ShareAndPromote() {
               </CardContent>
             </Card>
 
-            {/* Embed Code Card */}
-            <Card>
+            {/* Embed Code Card - Pro Feature */}
+            <Card className={!canUseEmbed ? 'opacity-75' : ''}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Code className="w-5 h-5" />
                   Embed Schedule on Your Website
+                  {!canUseEmbed && (
+                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium">Pro</span>
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-gray-600 mb-4">
-                  Copy this code and paste it into your website to display your live schedule in an iframe
-                </p>
-                
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
-                  <code className="text-xs text-gray-800 font-mono break-all">
-                    {`<iframe src="${scheduleUrl}" width="100%" height="800" frameborder="0" style="border-radius: 8px;"></iframe>`}
-                  </code>
-                </div>
+                {canUseEmbed ? (
+                  <>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Copy this code and paste it into your website to display your live schedule in an iframe
+                    </p>
+                    
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+                      <code className="text-xs text-gray-800 font-mono break-all">
+                        {`<iframe src="${scheduleUrl}" width="100%" height="800" frameborder="0" style="border-radius: 8px;"></iframe>`}
+                      </code>
+                    </div>
 
-                <div className="flex gap-3 mb-4">
-                  <Button
-                    onClick={() => copyEmbedCode(`<iframe src="${scheduleUrl}" width="100%" height="800" frameborder="0" style="border-radius: 8px;"></iframe>`)}
-                    variant={embedCopied ? "default" : "outline"}
-                    className="flex-1"
-                  >
-                    {embedCopied ? 'Copied!' : 'Copy Embed Code'}
-                  </Button>
-                </div>
+                    <div className="flex gap-3 mb-4">
+                      <Button
+                        onClick={() => copyEmbedCode(`<iframe src="${scheduleUrl}" width="100%" height="800" frameborder="0" style="border-radius: 8px;"></iframe>`)}
+                        variant={embedCopied ? "default" : "outline"}
+                        className="flex-1"
+                      >
+                        {embedCopied ? 'Copied!' : 'Copy Embed Code'}
+                      </Button>
+                    </div>
 
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-sm font-medium text-blue-900 mb-1">
-                    💡 Customization Tips
-                  </p>
-                  <ul className="text-xs text-blue-800 space-y-1">
-                    <li>• Adjust <code className="bg-blue-100 px-1 rounded">height="800"</code> to fit your page layout</li>
-                    <li>• The schedule updates automatically when you make changes</li>
-                    <li>• Works on WordPress, Squarespace, Wix, and custom websites</li>
-                  </ul>
-                </div>
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <p className="text-sm font-medium text-blue-900 mb-1">
+                        💡 Customization Tips
+                      </p>
+                      <ul className="text-xs text-blue-800 space-y-1">
+                        <li>• Adjust <code className="bg-blue-100 px-1 rounded">height="800"</code> to fit your page layout</li>
+                        <li>• The schedule updates automatically when you make changes</li>
+                        <li>• Works on WordPress, Squarespace, Wix, and custom websites</li>
+                      </ul>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-4">
+                    <p className="text-sm text-gray-600 mb-4">
+                      Embed your schedule directly on your website with a simple iframe code.
+                    </p>
+                    <Link href="/pricing">
+                      <Button className="bg-purple-600 hover:bg-purple-700">
+                        Upgrade to Pro
+                      </Button>
+                    </Link>
+                  </div>
+                )}
               </CardContent>
             </Card>
 

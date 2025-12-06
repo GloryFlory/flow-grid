@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { PLAN_FEATURES } from '@/types'
 
 /**
  * Duplicate a festival with all its sessions and teachers
@@ -22,6 +23,23 @@ export async function POST(
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
+      )
+    }
+
+    // Check if user has cloneEvents feature (Pro+ only)
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: { subscription: true }
+    })
+
+    const currentPlan = user?.subscription?.plan || 'FREE'
+    const isAdmin = user?.role === 'ADMIN'
+    const planFeatures = PLAN_FEATURES[currentPlan]
+    
+    if (!isAdmin && !planFeatures.cloneEvents) {
+      return NextResponse.json(
+        { error: 'Duplicate events is a Pro feature. Please upgrade to continue.' },
+        { status: 403 }
       )
     }
 
