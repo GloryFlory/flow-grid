@@ -333,12 +333,12 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              {PAYMENTS_ENABLED ? 'Simple, transparent pricing' : 'Early Access — Free for 1 Year'}
+              {PAYMENTS_ENABLED ? 'Simple, transparent pricing' : 'Your First 5 Events Are On Us'}
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               {PAYMENTS_ENABLED 
                 ? 'Start free and upgrade when you need more. No hidden fees.'
-                : 'Get all Pro features free as an early adopter. Help shape FlowGrid.'}
+                : 'Get Pro features completely free during Early Access. No credit card required.'}
             </p>
           </div>
 
@@ -389,34 +389,34 @@ export default function HomePage() {
                   <Ticket className="w-6 h-6" style={{ color: '#ff7119' }} />
                 </div>
                 <CardTitle>Event Pass</CardTitle>
-                <p className="text-gray-500 text-sm">Pro features for 1 event</p>
+                <p className="text-gray-500 text-sm">Unlock 1 additional event</p>
               </CardHeader>
               <CardContent>
                 <div className="mb-6">
                   {PAYMENTS_ENABLED ? (
                     <>
-                      <span className="text-4xl font-bold text-gray-900">€29</span>
+                      <span className="text-4xl font-bold text-gray-900">€69</span>
                       <span className="text-gray-500"> one-time</span>
                     </>
                   ) : (
                     <>
-                      <span className="text-4xl font-bold text-gray-400 line-through">€29</span>
+                      <span className="text-4xl font-bold text-gray-400 line-through">€69</span>
                       <span className="text-4xl font-bold text-green-600 ml-2">Free</span>
                     </>
                   )}
                 </div>
                 <ul className="space-y-3 text-sm text-gray-600 mb-6">
                   <li className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> 1 Pro event (forever)
+                    <span className="text-green-500">✓</span> 1 published event
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Remove "Powered by" badge
+                    <span className="text-green-500">✓</span> Google Fonts
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Detailed analytics
+                    <span className="text-green-500">✓</span> Basic analytics
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Priority support
+                    <span className="text-green-500">✓</span> Yours forever
                   </li>
                 </ul>
                 <Link href={PAYMENTS_ENABLED ? "/pricing" : "/auth/signin"}>
@@ -431,7 +431,7 @@ export default function HomePage() {
             <Card className="relative border-2 hover:shadow-xl transition-shadow" style={{ borderColor: '#b40225' }}>
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                 <span className="text-white text-sm font-semibold px-4 py-1.5 rounded-full shadow-md" style={{ backgroundColor: '#b40225' }}>
-                  {PAYMENTS_ENABLED ? 'Most Popular' : 'Free for 1 Year'}
+                  {PAYMENTS_ENABLED ? 'Most Popular' : '5 Free Events'}
                 </span>
               </div>
               <CardHeader>
@@ -439,7 +439,7 @@ export default function HomePage() {
                   <Zap className="w-6 h-6" style={{ color: '#b40225' }} />
                 </div>
                 <CardTitle>Pro</CardTitle>
-                <p className="text-gray-500 text-sm">For multiple events per year</p>
+                <p className="text-gray-500 text-sm">For serious event organizers</p>
               </CardHeader>
               <CardContent>
                 <div className="mb-6">
@@ -460,13 +460,13 @@ export default function HomePage() {
                     <span className="text-green-500">✓</span> Up to 5 published events
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Remove "Powered by" badge
+                    <span className="text-green-500">✓</span> Watermark removed
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Detailed analytics
+                    <span className="text-green-500">✓</span> Embed widget & duplicate
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Priority support
+                    <span className="text-green-500">✓</span> Detailed analytics & export
                   </li>
                 </ul>
                 <Link href={PAYMENTS_ENABLED ? "/pricing" : "/auth/signin"}>
