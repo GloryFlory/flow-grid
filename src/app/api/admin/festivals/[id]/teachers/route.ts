@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireFestivalAccess } from '@/lib/festival-access'
 
 export async function GET(
   request: NextRequest,
@@ -14,6 +15,10 @@ export async function GET(
         { status: 400 }
       )
     }
+
+    // Check festival access - any team member can view teachers
+    const { error } = await requireFestivalAccess(festivalId)
+    if (error) return error
 
     // Get all unique facilitators from sessions for this festival
     const sessions = await prisma.festivalSession.findMany({

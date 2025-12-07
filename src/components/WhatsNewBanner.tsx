@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { X, Sparkles } from 'lucide-react'
 
 // Update this date whenever you want to show the banner again
-const LATEST_UPDATE_DATE = '2025-12-04'
+const LATEST_UPDATE_DATE = '2025-12-07'
 const STORAGE_KEY = 'flowgrid_last_seen_update'
 
 interface WhatsNewBannerProps {
@@ -70,7 +70,7 @@ export function WhatsNewBanner({ variant = 'banner' }: WhatsNewBannerProps) {
             <div>
               <h4 className="font-semibold text-gray-900 text-sm">New features available! ✨</h4>
               <p className="text-sm text-gray-600 mt-1">
-                Export analytics as CSV, duplicate events, custom fonts, and more.
+                Team collaboration with role-based permissions is now live!
               </p>
               <Link 
                 href="/updates"

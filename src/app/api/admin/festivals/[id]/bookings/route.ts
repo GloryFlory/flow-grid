@@ -1,41 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { requireFestivalAccess } from '@/lib/festival-access';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const { id: festivalId } = await params;
 
-    // Check if user is admin
-    const currentUser = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      select: { role: true }
-    })
-    const isAdmin = currentUser?.role === 'ADMIN'
+    // Check festival access - any team member can view bookings
+    const { error } = await requireFestivalAccess(festivalId);
+    if (error) return error;
 
-    // Verify user owns this festival (or is admin)
-    const festival = await prisma.festival.findFirst({
-      where: {
-        id: festivalId,
-        // Admins can access any festival, others only their own
-        ...(isAdmin ? {} : { user: { email: session.user.email } })
-      }
+    // Get festival name
+    const festival = await prisma.festival.findUnique({
+      where: { id: festivalId },
+      select: { name: true }
     });
 
     if (!festival) {
-      return NextResponse.json(
-        { error: 'Festival not found or access denied' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Festival not found' }, { status: 404 });
     }
 
     // Get all bookings for this festival

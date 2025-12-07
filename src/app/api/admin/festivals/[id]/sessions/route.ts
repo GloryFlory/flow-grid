@@ -2,47 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { requireFestivalAccess } from '@/lib/festival-access'
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
     const { id: festivalId } = await params
 
-    // Verify festival ownership or admin access
-    const festival = await prisma.festival.findUnique({
-      where: { id: festivalId },
-      include: {
-        user: {
-          select: {
-            id: true,
-            role: true
-          }
-        }
-      }
-    })
-
-    if (!festival) {
-      return NextResponse.json({ error: 'Festival not found' }, { status: 404 })
-    }
-
-    // Authorization check
-    const isOwner = festival.user.id === session.user.id
-    const isAdmin = (session.user as any).role === 'ADMIN'
-    
-    if (!isOwner && !isAdmin) {
-      return NextResponse.json(
-        { error: 'Forbidden - You do not have permission to view sessions for this festival' },
-        { status: 403 }
-      )
-    }
+    // Check access - any team member can view sessions
+    const { error } = await requireFestivalAccess(festivalId)
+    if (error) return error
 
     // Get all sessions for this festival with bookings to count participants
     const sessions = await prisma.festivalSession.findMany({
@@ -131,41 +102,11 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
     const { id: festivalId } = await params
 
-    // Verify festival ownership or admin access
-    const festival = await prisma.festival.findUnique({
-      where: { id: festivalId },
-      include: {
-        user: {
-          select: {
-            id: true,
-            role: true
-          }
-        }
-      }
-    })
-
-    if (!festival) {
-      return NextResponse.json({ error: 'Festival not found' }, { status: 404 })
-    }
-
-    // Authorization check
-    const isOwner = festival.user.id === session.user.id
-    const isAdmin = (session.user as any).role === 'ADMIN'
-    
-    if (!isOwner && !isAdmin) {
-      return NextResponse.json(
-        { error: 'Forbidden - You do not have permission to create sessions for this festival' },
-        { status: 403 }
-      )
-    }
+    // Check access - require edit permission (OWNER, ADMIN, or EDITOR)
+    const { error } = await requireFestivalAccess(festivalId, { requireEdit: true })
+    if (error) return error
 
     const data = await request.json()
 

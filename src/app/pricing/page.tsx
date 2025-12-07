@@ -270,6 +270,7 @@ export default function PricingPage() {
             <p className="text-xs text-slate-500 mb-3">Unlock for 1 event:</p>
             <ul className="space-y-3 text-sm">
               <FeatureItem included>Yours to keep, no expiry</FeatureItem>
+              <FeatureItem included>1 team member</FeatureItem>
               <FeatureItem included>Basic analytics</FeatureItem>
               <FeatureItem included>Google Fonts</FeatureItem>
               <FeatureItem included>Standard support</FeatureItem>
@@ -334,7 +335,7 @@ export default function PricingPage() {
             <p className="text-xs text-slate-500 mb-3">Everything in Event Pass, plus:</p>
             <ul className="space-y-3 text-sm">
               <FeatureItem included>Up to 5 published events</FeatureItem>
-              <FeatureItem included>Up to 3 team members <span className="text-xs text-purple-600">(coming soon)</span></FeatureItem>
+              <FeatureItem included>Up to 3 team members</FeatureItem>
               <FeatureItem included>Watermark removed</FeatureItem>
               <FeatureItem included>Embeddable widget</FeatureItem>
               <FeatureItem included>Detailed analytics & export</FeatureItem>
@@ -371,7 +372,7 @@ export default function PricingPage() {
             <ul className="space-y-3 text-sm">
               <FeatureItem included>Unlimited events</FeatureItem>
               <FeatureItem included>White-label & custom domain</FeatureItem>
-              <FeatureItem included>Team members</FeatureItem>
+              <FeatureItem included>Unlimited team members</FeatureItem>
               <FeatureItem included>API access</FeatureItem>
               <FeatureItem included>Dedicated success manager</FeatureItem>
             </ul>
@@ -402,7 +403,7 @@ export default function PricingPage() {
               <ComparisonRow icon={<Calendar className="w-4 h-4" />} feature="Published events" tooltip="The number of events you can make publicly visible. Free plan resets annually." free="1 / year" eventPass="1 (per pass)" pro="5" enterprise="Unlimited" />
               <ComparisonRow icon={<FileText className="w-4 h-4" />} feature="Draft events" tooltip="Create unlimited drafts to plan future events" free="Unlimited" eventPass="Unlimited" pro="Unlimited" enterprise="Unlimited" />
               <ComparisonRow icon={<Layers className="w-4 h-4" />} feature="Sessions per event" tooltip="Classes, workshops, talks - no limit on how many you can add" free="Unlimited" eventPass="Unlimited" pro="Unlimited" enterprise="Unlimited" />
-              <ComparisonRow icon={<Users className="w-4 h-4" />} feature="Team members" tooltip="Invite collaborators to help manage your events" free="1" eventPass="1" pro="3" enterprise="Unlimited" comingSoon />
+              <ComparisonRow icon={<Users className="w-4 h-4" />} feature="Team members" tooltip="Invite collaborators to help manage your events" free="Owner only" eventPass="1" pro="3" enterprise="Unlimited" />
             </FeatureSection>
 
             {/* Customization & Branding */}
@@ -494,7 +495,7 @@ export default function PricingPage() {
             />
             <FAQItem 
               question="What's the difference between Event Pass and Pro?"
-              answer="Event Pass is a one-time purchase for a single event with basic features. Pro includes premium features like watermark removal, embed widgets, detailed analytics with export, up to 3 team members, and discounted Event Passes (€39 instead of €69)."
+              answer="Event Pass is a one-time purchase for a single event with basic features including 1 team member. Pro includes premium features like watermark removal, embed widgets, detailed analytics with export, up to 3 team members, and discounted Event Passes (€39 instead of €69)."
             />
             <FAQItem 
               question="What happens to my data if I don't continue?"
@@ -506,7 +507,7 @@ export default function PricingPage() {
             />
             <FAQItem 
               question="Can my team use Flow Grid too?"
-              answer="Yes! Pro includes team collaboration for up to 3 members. Enterprise plans offer unlimited team members and advanced permissions."
+              answer="Yes! Event Pass includes 1 team member, Pro includes team collaboration for up to 3 members, and Enterprise plans offer unlimited team members with advanced role-based permissions."
             />
             <FAQItem 
               question="What's included in Enterprise?"

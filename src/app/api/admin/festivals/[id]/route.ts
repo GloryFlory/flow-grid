@@ -2,26 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { requireFestivalAccess } from '@/lib/festival-access'
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Authentication check
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      console.error('[Festival GET] Authentication failed:', { 
-        hasSession: !!session, 
-        hasUser: !!session?.user,
-        userId: session?.user?.id 
-      })
-      return NextResponse.json(
-        { error: 'Unauthorized - Please sign in' },
-        { status: 401 }
-      )
-    }
-
     const { id: festivalId } = await params
 
     if (!festivalId) {
@@ -30,6 +17,10 @@ export async function GET(
         { status: 400 }
       )
     }
+
+    // Check festival access - any team member can view
+    const { error } = await requireFestivalAccess(festivalId)
+    if (error) return error
 
     const festival = await prisma.festival.findUnique({
       where: {
@@ -41,6 +32,14 @@ export async function GET(
             id: true,
             email: true,
             role: true
+          }
+        },
+        teamMembers: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+            acceptedAt: true
           }
         },
         _count: {
@@ -55,17 +54,6 @@ export async function GET(
       return NextResponse.json(
         { error: 'Festival not found' },
         { status: 404 }
-      )
-    }
-
-    // Authorization check - user must own the festival or be an admin
-    const isOwner = festival.user.id === session.user.id
-    const isAdmin = (session.user as any).role === 'ADMIN'
-    
-    if (!isOwner && !isAdmin) {
-      return NextResponse.json(
-        { error: 'Forbidden - You do not have permission to access this festival' },
-        { status: 403 }
       )
     }
 
@@ -101,15 +89,6 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Authentication check
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized - Please sign in' },
-        { status: 401 }
-      )
-    }
-
     const { id: festivalId } = await params
 
     if (!festivalId) {
@@ -119,7 +98,20 @@ export async function PATCH(
       )
     }
 
-    // Check festival ownership before updating
+    // Check festival access - require manage settings permission
+    const { error } = await requireFestivalAccess(festivalId, { requireManageSettings: true })
+    if (error) return error
+
+    // Get session for subscription check
+    const session = await getServerSession(authOptions)
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    // Check festival exists
     const existingFestival = await prisma.festival.findUnique({
       where: { id: festivalId },
       include: {
@@ -139,16 +131,7 @@ export async function PATCH(
       )
     }
 
-    // Authorization check - user must own the festival or be an admin
-    const isOwner = existingFestival.user.id === session.user.id
     const isAdmin = (session.user as any).role === 'ADMIN'
-    
-    if (!isOwner && !isAdmin) {
-      return NextResponse.json(
-        { error: 'Forbidden - You do not have permission to update this festival' },
-        { status: 403 }
-      )
-    }
 
     const body = await request.json()
     

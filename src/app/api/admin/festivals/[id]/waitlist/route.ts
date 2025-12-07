@@ -1,31 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { requireFestivalAccess } from '@/lib/festival-access'
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
     const { id } = await params
 
-    // Verify the user owns this festival
-    const festival = await prisma.festival.findFirst({
-      where: {
-        id,
-        userId: session.user.id
-      },
-      select: {
-        id: true,
-        name: true
-      }
+    // Check festival access - any team member can view waitlist
+    const { access, error } = await requireFestivalAccess(id)
+    if (error) return error
+
+    // Get festival name
+    const festival = await prisma.festival.findUnique({
+      where: { id },
+      select: { name: true }
     })
 
     if (!festival) {
@@ -36,7 +27,7 @@ export async function GET(
     const waitlist = await prisma.sessionWaitlist.findMany({
       where: {
         session: {
-          festivalId: festival.id
+          festivalId: id
         }
       },
       include: {

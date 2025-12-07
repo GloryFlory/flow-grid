@@ -27,6 +27,7 @@ model User {
   sessions               Session[]
   subscription           Subscription?
   webAuthnCredentials    WebAuthnCredential[]
+  teamMemberships        TeamMember[]
 
   @@map("users")
 }
@@ -93,6 +94,7 @@ model Festival {
   favourites     SessionFavourite[]
   teachers       Teacher[]
   waitlist       SessionWaitlist[]
+  teamMembers    TeamMember[]
 
   @@map("festivals")
 }
@@ -301,6 +303,35 @@ model SalesInquiry {
   updatedAt           DateTime      @updatedAt
 
   @@map("sales_inquiries")
+}
+
+model TeamMember {
+  id         String    @id @default(cuid())
+  festivalId String
+  userId     String?   // Nullable until invite is accepted
+  email      String    // Email of invitee
+  role       TeamRole
+  inviteToken String?  @unique // Token for accepting invite
+  invitedAt  DateTime  @default(now())
+  acceptedAt DateTime? // When they accepted the invite
+  invitedBy  String    // User ID of who sent the invite
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  festival   Festival  @relation(fields: [festivalId], references: [id], onDelete: Cascade)
+  user       User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([festivalId, email]) // Can't invite same email twice to same festival
+  @@index([festivalId])
+  @@index([userId])
+  @@index([inviteToken])
+  @@map("team_members")
+}
+
+enum TeamRole {
+  OWNER   // Festival creator, full control
+  ADMIN   // Can manage team and all content
+  EDITOR  // Can edit sessions/teachers but not manage team
+  VIEWER  // Read-only access to admin area
 }
 
 enum InquiryStatus {

@@ -174,8 +174,34 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Get user's email to check team memberships
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { email: true }
+    })
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      )
+    }
+
+    // Fetch festivals where user is owner OR a team member
     const festivals = await prisma.festival.findMany({
-      where: { userId: session.user.id },
+      where: {
+        OR: [
+          { userId: session.user.id }, // Owned by user
+          {
+            teamMembers: {
+              some: {
+                email: user.email,
+                acceptedAt: { not: null } // Only accepted invitations
+              }
+            }
+          }
+        ]
+      },
       include: {
         sessions: {
           select: {
@@ -184,6 +210,15 @@ export async function GET(request: NextRequest) {
             teachers: true,
             startTime: true,
             capacity: true
+          }
+        },
+        teamMembers: {
+          where: {
+            email: user.email,
+            acceptedAt: { not: null }
+          },
+          select: {
+            role: true
           }
         },
         _count: {
@@ -195,7 +230,16 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' }
     })
 
-    return NextResponse.json(festivals)
+    // Add isShared flag and user's role to each festival
+    const festivalsWithRole = festivals.map(festival => ({
+      ...festival,
+      isShared: festival.userId !== session.user.id,
+      userRole: festival.userId === session.user.id 
+        ? 'OWNER' 
+        : festival.teamMembers[0]?.role || null
+    }))
+
+    return NextResponse.json(festivalsWithRole)
   } catch (error) {
     console.error('Error fetching festivals:', error)
     return NextResponse.json(

@@ -18,6 +18,21 @@ interface Update {
 const updates: Update[] = [
   // December 2025
   {
+    date: '2025-12-07',
+    type: 'feature',
+    title: 'Team Collaboration',
+    description: 'Invite team members to help manage your events with role-based permissions and email invitations.',
+    details: [
+      'Role-based access: ADMIN, EDITOR, and VIEWER roles with different permission levels',
+      'Email invitations: Send branded invites with festival logo and role descriptions',
+      'Secure acceptance flow: Token-based invites with email verification',
+      'Permission enforcement: All API routes and UI elements respect role permissions',
+      'Team management UI: View, invite, and remove team members from a dedicated page',
+      'Shared festivals: See events where you\'re a team member in your dashboard',
+      'Plan-based limits: FREE (owner only), Event Pass (1 member), PRO (3 members), Enterprise (unlimited)',
+    ]
+  },
+  {
     date: '2025-12-04',
     type: 'feature',
     title: 'Waitlist Automation',

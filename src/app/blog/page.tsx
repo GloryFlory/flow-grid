@@ -16,6 +16,30 @@ export const metadata: Metadata = {
 
 const blogPosts = [
   {
+    slug: 'many-ways-to-use-flow-grid',
+    title: 'The Many Ways to Use Flow Grid: From Yoga Festivals to Corporate Retreats',
+    excerpt: 'Flow Grid isn\'t just for yoga festivals. Discover how event organizers use this flexible platform for wellness festivals, dance conventions, workshops, corporate retreats, conferences, and more.',
+    date: '2025-12-07',
+    readTime: '10 min read',
+    category: 'Platform Overview',
+  },
+  {
+    slug: 'export-master-event-analytics',
+    title: 'Data-Driven Decisions: Export and Master Your Event Analytics',
+    excerpt: 'Stop guessing what worked. Export your event data to Excel or Google Sheets for powerful analysis, stakeholder reports, and year-over-year comparisons.',
+    date: '2025-12-07',
+    readTime: '12 min read',
+    category: 'Analytics & Data',
+  },
+  {
+    slug: 'waitlist-automation-maximizes-attendance',
+    title: 'Never Miss a Sold-Out Session: How Waitlist Automation Reduces No-Shows',
+    excerpt: 'Sold-out sessions don\'t have to mean wasted opportunities. Learn how automated waitlists maximize attendance and create better attendee experiences.',
+    date: '2025-12-07',
+    readTime: '8 min read',
+    category: 'Features & Tools',
+  },
+  {
     slug: 'event-app-community-building',
     title: 'Beyond the Schedule: Using Event Apps to Build Community',
     excerpt: 'Transform your event app from a schedule tool into a community hub. Strategies for fostering connections and building lasting relationships.',

@@ -1,38 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { Decimal } from '@prisma/client/runtime/library'
+import { requireFestivalAccess } from '@/lib/festival-access'
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
-
     const { id: festivalId } = await params
 
-    // Verify festival ownership
-    const existingFestival = await prisma.festival.findFirst({
-      where: {
-        id: festivalId,
-        user: {
-          email: session.user.email
-        }
-      }
+    // Check festival access - require edit permission to import
+    const { error } = await requireFestivalAccess(festivalId, { requireEdit: true })
+    if (error) return error
+
+    // Verify festival exists
+    const existingFestival = await prisma.festival.findUnique({
+      where: { id: festivalId }
     })
 
     if (!existingFestival) {
       return NextResponse.json(
-        { error: 'Festival not found or access denied' },
+        { error: 'Festival not found' },
         { status: 404 }
       )
     }

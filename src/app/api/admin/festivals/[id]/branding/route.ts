@@ -2,39 +2,21 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { requireFestivalAccess } from '@/lib/festival-access'
 
 export async function PATCH(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
     const { id: festivalId } = await context.params
+
+    // Check access - require manage settings permission (OWNER or ADMIN role)
+    const { error } = await requireFestivalAccess(festivalId, { requireManageSettings: true })
+    if (error) return error
+
     const body = await request.json()
     const { primaryColor, secondaryColor, accentColor, headerFont } = body
-
-    // Check if user is admin
-    const currentUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { role: true }
-    })
-    const isAdmin = currentUser?.role === 'ADMIN'
-
-    // Verify festival ownership (or admin access)
-    const festival = await prisma.festival.findFirst({
-      where: {
-        id: festivalId,
-        ...(isAdmin ? {} : { userId: session.user.id }),
-      },
-    })
-
-    if (!festival) {
-      return NextResponse.json({ error: 'Festival not found' }, { status: 404 })
-    }
 
     // Update branding colors and font
     const updatedFestival = await prisma.festival.update({

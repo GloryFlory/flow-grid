@@ -28,6 +28,8 @@ interface Festival {
   logo?: string
   isPublished: boolean
   createdAt: string
+  isShared?: boolean
+  userRole?: string | null
   _count: {
     sessions: number
   }
@@ -40,7 +42,23 @@ interface User {
   role: string
 }
 
-export function DashboardClient({ user }: { user: User }) {
+interface PendingInvite {
+  id: string
+  inviteToken: string | null
+  role: string
+  festival: {
+    id: string
+    name: string
+  }
+}
+
+export function DashboardClient({ 
+  user,
+  pendingInvites = []
+}: { 
+  user: User
+  pendingInvites?: PendingInvite[]
+}) {
   const [festivals, setFestivals] = useState<Festival[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const { limits, isLoading: limitsLoading } = usePlanLimits()
@@ -115,6 +133,49 @@ export function DashboardClient({ user }: { user: User }) {
           )}
         </div>
       </div>
+
+      {/* Pending Invitations Banner */}
+      {pendingInvites.length > 0 && (
+        <div className="mb-6 sm:mb-8">
+          <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                  <Users className="w-5 h-5 text-blue-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                    You've Been Invited to Collaborate!
+                  </h3>
+                  <p className="text-sm text-gray-700 mb-4">
+                    You have {pendingInvites.length} pending team invitation{pendingInvites.length !== 1 ? 's' : ''}
+                  </p>
+                  <div className="space-y-2">
+                    {pendingInvites.map((invite) => (
+                      <div 
+                        key={invite.id}
+                        className="flex items-center justify-between p-3 bg-white rounded-lg border border-blue-100"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-gray-900">{invite.festival.name}</div>
+                          <div className="text-sm text-gray-600">
+                            Role: <span className="font-medium">{invite.role}</span>
+                          </div>
+                        </div>
+                        <Link href={`/team/accept/${invite.inviteToken}`}>
+                          <Button size="sm" className="ml-4">
+                            Accept Invite
+                          </Button>
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Plan Limits Banner */}
       {limits && (
@@ -233,12 +294,22 @@ export function DashboardClient({ user }: { user: User }) {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
                       <CardTitle className="text-base sm:text-lg truncate">{festival.name}</CardTitle>
-                      <div className={`w-3 h-3 rounded-full flex-shrink-0 ${
-                        festival.isPublished ? 'bg-green-500' : 'bg-yellow-500'
-                      }`} />
+                      <div className="flex items-center gap-2">
+                        {festival.isShared && (
+                          <div className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs font-medium rounded-full flex-shrink-0">
+                            Shared
+                          </div>
+                        )}
+                        <div className={`w-3 h-3 rounded-full flex-shrink-0 ${
+                          festival.isPublished ? 'bg-green-500' : 'bg-yellow-500'
+                        }`} />
+                      </div>
                     </div>
                     <p className="text-xs sm:text-sm text-gray-600">
                       {festival.isPublished ? 'Published' : 'Draft'} • {festival._count?.sessions || 0} sessions
+                      {festival.isShared && festival.userRole && (
+                        <span className="ml-1">• {festival.userRole}</span>
+                      )}
                     </p>
                   </div>
                 </div>

@@ -286,3 +286,127 @@ export async function sendWaitlistSpotEmail({
     throw error;
   }
 }
+
+export interface TeamInviteEmailProps {
+  to: string;
+  festivalName: string;
+  festivalLogoUrl?: string;
+  inviterName: string;
+  role: string;
+  acceptUrl: string;
+}
+
+export async function sendTeamInviteEmail({
+  to,
+  festivalName,
+  festivalLogoUrl,
+  inviterName,
+  role,
+  acceptUrl
+}: TeamInviteEmailProps) {
+  if (!process.env.RESEND_API_KEY) {
+    console.error('RESEND_API_KEY is not configured');
+    throw new Error('Email service not configured');
+  }
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const fromEmail = process.env.FROM_EMAIL || 'onboarding@resend.dev';
+
+  // Role descriptions
+  const roleDescriptions: Record<string, string> = {
+    ADMIN: 'Full access to manage the festival, team members, and all settings',
+    EDITOR: 'Can edit sessions, teachers, and content (cannot manage team or settings)',
+    VIEWER: 'Read-only access to view the dashboard and analytics'
+  };
+
+  const flowGridFooter = `
+    <div style="text-align: center; padding: 24px 0; margin-top: 30px; border-top: 1px solid #e5e7eb;">
+      <p style="font-size: 12px; color: #9ca3af; margin: 0;">
+        Powered by <a href="https://tryflowgrid.com" style="color: #6366f1; text-decoration: none; font-weight: 500;">Flow Grid</a>
+      </p>
+    </div>`;
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: fromEmail,
+      to,
+      subject: `You've been invited to collaborate on ${festivalName}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Team Invitation</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+            ${festivalLogoUrl ? `
+              <div style="margin-bottom: 20px;">
+                <img src="${festivalLogoUrl}" 
+                     alt="${festivalName} logo" 
+                     style="max-width: 150px; max-height: 150px; border-radius: 8px;">
+              </div>
+            ` : ''}
+            <h1 style="color: white; margin: 0; font-size: 28px;">You're Invited!</h1>
+          </div>
+          
+          <div style="background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px;">
+            <p style="font-size: 16px; margin-bottom: 20px;">
+              <strong>${inviterName}</strong> has invited you to collaborate on <strong>${festivalName}</strong> on Flow Grid.
+            </p>
+            
+            <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #667eea;">
+              <p style="margin: 0 0 10px 0; font-size: 14px; color: #666;">Your role:</p>
+              <p style="margin: 0; font-size: 18px; font-weight: bold; color: #667eea;">${role}</p>
+              <p style="margin: 10px 0 0 0; font-size: 14px; color: #666;">${roleDescriptions[role] || ''}</p>
+            </div>
+
+            <p style="font-size: 16px; margin-bottom: 25px;">
+              Accept this invitation to start collaborating with your team on Flow Grid.
+            </p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${acceptUrl}" 
+                 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                        color: white; 
+                        padding: 14px 32px; 
+                        text-decoration: none; 
+                        border-radius: 6px; 
+                        font-weight: bold; 
+                        font-size: 16px;
+                        display: inline-block;">
+                Accept Invitation
+              </a>
+            </div>
+            
+            <p style="font-size: 14px; color: #666; margin-top: 30px; text-align: center;">
+              Or copy and paste this link into your browser:<br>
+              <a href="${acceptUrl}" style="color: #667eea; word-break: break-all;">${acceptUrl}</a>
+            </p>
+
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
+              <p style="font-size: 14px; color: #666; margin: 0;">
+                If you didn't expect this invitation, you can safely ignore this email.
+              </p>
+            </div>
+          </div>
+          
+          ${flowGridFooter}
+        </body>
+        </html>
+      `,
+    });
+
+    if (error) {
+      console.error('Resend team invite email error:', error);
+      throw new Error('Failed to send team invitation email');
+    }
+
+    console.log('✅ Team invitation email sent successfully:', data);
+    return data;
+  } catch (error) {
+    console.error('❌ Failed to send team invitation email:', error);
+    throw error;
+  }
+}

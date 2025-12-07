@@ -13,10 +13,41 @@ export default async function FestivalsPage() {
     redirect('/auth/signin')
   }
 
-  // Fetch all festivals for the current user with session counts
+  // Get user's email for team membership check
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { email: true }
+  })
+
+  if (!user) {
+    redirect('/auth/signin')
+  }
+
+  // Fetch all festivals for the current user (owned OR team member) with session counts
   const festivals = await prisma.festival.findMany({
-    where: { userId: session.user.id },
+    where: {
+      OR: [
+        { userId: session.user.id }, // Owned by user
+        {
+          teamMembers: {
+            some: {
+              email: user.email,
+              acceptedAt: { not: null } // Only accepted invitations
+            }
+          }
+        }
+      ]
+    },
     include: {
+      teamMembers: {
+        where: {
+          email: user.email,
+          acceptedAt: { not: null }
+        },
+        select: {
+          role: true
+        }
+      },
       _count: {
         select: {
           sessions: true,
@@ -25,6 +56,15 @@ export default async function FestivalsPage() {
     },
     orderBy: { createdAt: 'desc' },
   })
+
+  // Add isShared and userRole to each festival
+  const festivalsWithRole = festivals.map(festival => ({
+    ...festival,
+    isShared: festival.userId !== session.user.id,
+    userRole: festival.userId === session.user.id 
+      ? 'OWNER' 
+      : festival.teamMembers[0]?.role || null
+  }))
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -45,7 +85,7 @@ export default async function FestivalsPage() {
         </div>
 
         {/* Events Grid */}
-        {festivals.length === 0 ? (
+        {festivalsWithRole.length === 0 ? (
           <div className="bg-white rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
             <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">No events yet</h3>
@@ -60,7 +100,7 @@ export default async function FestivalsPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {festivals.map((festival) => (
+            {festivalsWithRole.map((festival) => (
               <div 
                 key={festival.id}
                 className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
@@ -93,14 +133,26 @@ export default async function FestivalsPage() {
                         <h3 className="text-xl font-bold text-gray-900 truncate">
                           {festival.name}
                         </h3>
-                        <span className={`px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${
-                          festival.isPublished 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {festival.isPublished ? 'Published' : 'Draft'}
-                        </span>
+                        <div className="flex flex-col gap-1 items-end">
+                          <span className={`px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${
+                            festival.isPublished 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {festival.isPublished ? 'Published' : 'Draft'}
+                          </span>
+                          {festival.isShared && (
+                            <span className="px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap bg-purple-100 text-purple-700">
+                              Shared
+                            </span>
+                          )}
+                        </div>
                       </div>
+                      {festival.isShared && festival.userRole && (
+                        <p className="text-xs text-purple-600 font-medium mt-1">
+                          Role: {festival.userRole}
+                        </p>
+                      )}
                     </div>
                   </div>
 

@@ -19,7 +19,23 @@ import { Redis } from '@upstash/redis';
 import type { Redis as UpstashRedis } from '@upstash/redis';
 import { randomUUID } from 'crypto';
 
-export const rpID = process.env.WEBAUTHN_RP_ID || 'localhost';
+// Automatically set rpID based on environment
+// In development, use localhost. In production, use the actual domain.
+const getDefaultRpID = () => {
+  if (process.env.NODE_ENV === 'development') {
+    return 'localhost';
+  }
+  // Extract domain from NEXT_PUBLIC_APP_URL or use env var
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
+  try {
+    const url = new URL(appUrl);
+    return url.hostname;
+  } catch {
+    return 'localhost';
+  }
+};
+
+export const rpID = process.env.WEBAUTHN_RP_ID || getDefaultRpID();
 export const rpName = process.env.WEBAUTHN_RP_NAME || 'Flow Grid';
 export const origin = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 

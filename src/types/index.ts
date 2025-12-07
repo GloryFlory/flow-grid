@@ -92,7 +92,7 @@ export const PLAN_FEATURES: Record<PlanType, PlanFeatures> = {
   FREE: {
     festivalsLimit: 1,
     sessionsLimit: -1, // unlimited
-    teamMembersLimit: 1,
+    teamMembersLimit: 0, // 0 by default, 1 with Event Pass
     customBranding: true, // basic colors + logo
     customSubdomain: false,
     customDomain: false,

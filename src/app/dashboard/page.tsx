@@ -30,6 +30,26 @@ export default async function DashboardPage() {
     redirect('/auth/signin')
   }
 
+  // Check for pending invitations
+  const pendingInvites = await prisma.teamMember.findMany({
+    where: {
+      email: user.email,
+      acceptedAt: null,
+      inviteToken: { not: null },
+    },
+    include: {
+      festival: {
+        select: {
+          id: true,
+          name: true,
+        }
+      }
+    },
+    orderBy: {
+      invitedAt: 'desc'
+    }
+  })
+
   const hasPasskey = user.webAuthnCredentials.length > 0
 
   // Ensure user.name is always a string for the client
@@ -40,7 +60,7 @@ export default async function DashboardPage() {
       user={clientUser}
       hasPasskey={hasPasskey}
     >
-      <DashboardClient user={clientUser} />
+      <DashboardClient user={clientUser} pendingInvites={pendingInvites} />
     </DashboardWithPasskeySetup>
   )
 }
