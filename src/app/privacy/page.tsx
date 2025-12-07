@@ -116,7 +116,7 @@ export default function PrivacyPolicyPage() {
             <li><strong>Objection:</strong> Opt out of certain data processing</li>
           </ul>
 
-          <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">Cookies and Tracking</h2>
+          <h2 id="cookies" className="text-2xl font-semibold text-gray-900 mt-8 mb-4">Cookies and Tracking</h2>
           <p className="text-gray-700 mb-4">
             We use cookies and similar technologies to provide and improve our service. Here's a complete breakdown of the cookies we use:
           </p>

@@ -157,8 +157,9 @@ export default function CookieBanner() {
             {/* Footer link */}
             <div className="mt-4 text-center">
               <a 
-                href="/privacy" 
+                href="/privacy#cookies" 
                 className="text-xs text-gray-500 hover:text-gray-700 underline decoration-dotted underline-offset-2"
+                onClick={handleReject}
               >
                 View Cookie Policy
               </a>
