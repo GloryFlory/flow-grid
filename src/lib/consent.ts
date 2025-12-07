@@ -1,6 +1,5 @@
 /**
  * Analytics consent and tracking utilities
- * Stub implementation - integrate with your analytics provider
  */
 
 type AnalyticsEvent = 
@@ -14,20 +13,20 @@ interface EventProperties {
   [key: string]: string | number | boolean | undefined;
 }
 
+const COOKIE_CONSENT_KEY = 'flow-grid-cookie-consent';
+
 /**
- * Check if user has consented to analytics
- * Default to true for now - implement proper consent management
+ * Check if user has consented to analytics cookies
  */
 export const hasAnalyticsConsent = (): boolean => {
   if (typeof window === 'undefined') return false;
   
-  // TODO: Implement proper consent check
-  // e.g., localStorage.getItem('analytics_consent') === 'true'
-  return true;
+  const consent = localStorage.getItem(COOKIE_CONSENT_KEY);
+  return consent === 'accepted';
 };
 
 /**
- * Track an analytics event (guarded by consent)
+ * Track an analytics event (only if user has consented)
  */
 export const track = (event: AnalyticsEvent, properties?: EventProperties): void => {
   if (!hasAnalyticsConsent()) return;

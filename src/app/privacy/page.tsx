@@ -118,16 +118,58 @@ export default function PrivacyPolicyPage() {
 
           <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">Cookies and Tracking</h2>
           <p className="text-gray-700 mb-4">
-            We use cookies and similar technologies to:
+            We use cookies and similar technologies to provide and improve our service. Here's a complete breakdown of the cookies we use:
           </p>
-          <ul className="list-disc list-inside space-y-2 text-gray-700">
-            <li>Keep you logged in to your account</li>
-            <li>Remember your preferences</li>
-            <li>Analyze platform usage and performance</li>
-            <li>Provide a personalized experience</li>
+          
+          <div className="space-y-4 mb-6">
+            <div className="border-l-4 border-green-500 pl-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Essential Cookies (Always Active)</h3>
+              <p className="text-gray-700 mb-2">
+                These cookies are necessary for the platform to function and cannot be disabled.
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-gray-700 text-sm">
+                <li><strong>Session Cookies</strong> (NextAuth.js) - Keep you logged in securely</li>
+                <li><strong>Duration:</strong> Session-based (expires when you close your browser)</li>
+                <li><strong>Purpose:</strong> Authentication and security</li>
+              </ul>
+            </div>
+
+            <div className="border-l-4 border-blue-500 pl-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Analytics Cookies (Optional)</h3>
+              <p className="text-gray-700 mb-2">
+                These cookies help us understand how you use our platform so we can improve it.
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-gray-700 text-sm">
+                <li><strong>device_id</strong> - Anonymous device identifier for analytics</li>
+                <li><strong>Duration:</strong> 1 year</li>
+                <li><strong>Purpose:</strong> Track anonymous usage patterns (view modes, calendar exports, share clicks)</li>
+                <li><strong>Third-party:</strong> No - this is a first-party cookie</li>
+                <li><strong>Personal data:</strong> None - this cookie doesn't identify you personally</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 p-4 rounded-lg mb-4">
+            <h4 className="font-semibold text-gray-900 mb-2">What We DON'T Use:</h4>
+            <ul className="list-disc list-inside space-y-1 text-gray-700 text-sm">
+              <li>No advertising cookies</li>
+              <li>No cross-site tracking</li>
+              <li>No data sold to third parties</li>
+              <li>No social media tracking pixels</li>
+            </ul>
+          </div>
+
+          <p className="text-gray-700 mb-2">
+            <strong>Managing Cookies:</strong>
+          </p>
+          <ul className="list-disc list-inside space-y-2 text-gray-700 mb-4">
+            <li>You can change your cookie preferences at any time using our cookie banner</li>
+            <li>Clear your browser cookies to reset your choice</li>
+            <li>Most browsers allow you to block cookies entirely (this may affect functionality)</li>
           </ul>
+          
           <p className="text-gray-700">
-            You can control cookies through your browser settings, but this may affect platform functionality.
+            If you reject analytics cookies, we'll only use essential cookies required for the platform to function.
           </p>
 
           <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">Data Retention</h2>

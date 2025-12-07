@@ -1,6 +1,7 @@
 import './globals.css';
 import { Providers } from '@/components/providers';
 import { AmplitudeScript } from '@/components/AmplitudeScript';
+import CookieBanner from '@/components/CookieBanner';
 import { Toaster } from 'sonner';
 import type { Metadata } from 'next';
 import { Domine, Lora, Metamorphous, Henny_Penny, Space_Grotesk, Italianno } from 'next/font/google';
@@ -133,6 +134,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           {children}
         </Providers>
+        <CookieBanner />
         <Toaster 
           position="top-center" 
           richColors 

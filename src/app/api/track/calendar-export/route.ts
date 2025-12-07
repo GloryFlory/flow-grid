@@ -18,24 +18,30 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get device ID from cookie
+    // Check for cookie consent
+    const cookieConsent = request.cookies.get('flow-grid-cookie-consent')?.value
+    const hasConsent = cookieConsent === 'accepted'
+
+    // Get device ID from cookie or generate one
     const deviceId = request.cookies.get('device_id')?.value || 
                     request.cookies.get('deviceId')?.value ||
                     `device_${Date.now()}_${Math.random().toString(36).substring(7)}`
 
-    // Track the calendar export
-    await trackCalendarExport(
-      festivalId,
-      exportType,
-      method,
-      sessionCount || 1,
-      deviceId,
-      anonUserId
-    )
+    // Only track if user has consented to analytics
+    if (hasConsent) {
+      await trackCalendarExport(
+        festivalId,
+        exportType,
+        method,
+        sessionCount || 1,
+        deviceId,
+        anonUserId
+      )
+    }
 
-    // Set device ID cookie if not already set
+    // Set device ID cookie if not already set AND user has consented
     const response = NextResponse.json({ success: true })
-    if (!request.cookies.get('device_id') && !request.cookies.get('deviceId')) {
+    if (hasConsent && !request.cookies.get('device_id') && !request.cookies.get('deviceId')) {
       response.cookies.set('device_id', deviceId, {
         maxAge: 60 * 60 * 24 * 365, // 1 year
         httpOnly: true,
