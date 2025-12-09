@@ -71,7 +71,8 @@ export async function GET(
       { 
         status: 200,
         headers: {
-          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300'
+          // Don't cache admin API - always get fresh data for publish status
+          'Cache-Control': 'no-store, max-age=0'
         }
       }
     )
@@ -131,8 +132,6 @@ export async function PATCH(
       )
     }
 
-    const isAdmin = (session.user as any).role === 'ADMIN'
-
     const body = await request.json()
     
     // Check plan limits when trying to publish
@@ -147,6 +146,9 @@ export async function PATCH(
           }
         }
       })
+
+      // Check if user is admin (check both session role AND database role for reliability)
+      const isAdmin = (session.user as any).role === 'ADMIN' || user?.role === 'ADMIN'
 
       if (user && !isAdmin) {
         const currentPlan = user.subscription?.plan || 'FREE'

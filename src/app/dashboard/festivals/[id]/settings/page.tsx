@@ -105,6 +105,9 @@ export default function FestivalSettings() {
           type: 'success',
           text: `Festival ${data.festival.isPublished ? 'published' : 'unpublished'} successfully!`
         })
+        
+        // Immediately refetch to ensure UI is in sync (fixes caching delay)
+        await fetchFestival()
       } else {
         // Show the error message from the API
         setMessage({ type: 'error', text: data.error || 'Failed to update festival status' })
