@@ -70,11 +70,23 @@ export default function FestivalTeacherPhotos() {
 
   useEffect(() => {
     if (festivalId) {
-      fetchFestival()
-      fetchPhotos()
-      fetchTeachers()
+      loadAllData()
     }
   }, [festivalId])
+
+  const loadAllData = async () => {
+    setIsLoading(true)
+    try {
+      // Load all data in parallel, but don't stop loading until ALL are done
+      await Promise.all([
+        fetchFestival(),
+        fetchPhotos(),
+        fetchTeachers()
+      ])
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const fetchFestival = async () => {
     try {
@@ -109,8 +121,6 @@ export default function FestivalTeacherPhotos() {
       }
     } catch (error) {
       console.error('Error fetching teachers:', error)
-    } finally {
-      setIsLoading(false)
     }
   }
 
