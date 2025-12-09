@@ -82,18 +82,13 @@ export async function GET(
     // Create maps for ONLY this festival's teachers (privacy fix!)
     const f: any = festival as any
     
-    // Fetch teacher photos for this festival's teachers
-    const teacherNames = (f.teachers as any[]).map((t: any) => t.name)
+    // CRITICAL: Only fetch teacher photos that are linked to THIS festival's Teacher records
+    // This prevents photo leakage between festivals with teachers of the same name
     const teacherPhotos = await prisma.teacherPhoto.findMany({
       where: {
-        OR: [
-          { teacherName: { in: teacherNames } },
-          { 
-            teacher: {
-              festivalId: festival.id
-            }
-          } as any
-        ]
+        teacher: {
+          festivalId: festival.id
+        }
       }
     })
     

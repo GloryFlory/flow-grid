@@ -33,13 +33,13 @@ export async function GET(
       )
     }
 
-    // Fetch teacher photos separately (for this festival)
+    // Fetch teacher photos separately (for this festival ONLY)
     const allTeacherIds = festival.teachers.map((t: any) => t.id)
     const teacherPhotos = (allTeacherIds.length > 0
       ? await prisma.teacherPhoto.findMany({
           where: {
-            teacherName: {
-              in: festival.teachers.map((t: any) => t.name)
+            teacher: {
+              festivalId: festivalId
             }
           }
         })
