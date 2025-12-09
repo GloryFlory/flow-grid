@@ -36,13 +36,13 @@ export const metadata: Metadata = {
     'multi-track event management',
     'flexible scheduling platform'
   ],
-  authors: [{ name: 'Flow Grid Team' }],
+  authors: [{ name: 'Florian Hohenleitner' }],
   openGraph: {
     title,
     description,
     type: 'article',
     publishedTime: publishDate,
-    authors: ['Flow Grid Team'],
+    authors: ['Florian Hohenleitner'],
     tags: ['Event Types', 'Use Cases', 'Versatility'],
   },
   alternates: {
@@ -63,22 +63,22 @@ const sections = [
 
 const relatedPosts = [
   {
-    slug: 'waitlist-automation-maximizes-attendance',
-    title: 'Never Miss a Sold-Out Session: How Waitlist Automation Reduces No-Shows',
-    excerpt: 'Learn how automated waitlists work across all event types.',
-    category: 'Features'
+    slug: 'wellness-retreat-scheduling',
+    title: 'Wellness Retreat Scheduling Made Simple: A Complete Guide',
+    excerpt: 'Everything you need to know about organizing transformative wellness retreats.',
+    category: 'Event Management'
   },
   {
-    slug: 'multi-day-festival-scheduling-tips',
-    title: 'Multi-Day Festival Scheduling: Tips from the Pros',
-    excerpt: 'Best practices for complex multi-day events.',
+    slug: 'volunteer-scheduling-best-practices',
+    title: 'Festival Volunteer Scheduling: Best Practices for Success',
+    excerpt: 'Master volunteer coordination with proven scheduling strategies.',
     category: 'Best Practices'
   },
   {
-    slug: 'export-master-event-analytics',
-    title: 'Data-Driven Decisions: Export and Master Your Event Analytics',
-    excerpt: 'Analyze your event data to improve future experiences.',
-    category: 'Analytics'
+    slug: 'get-festival-live-10-minutes',
+    title: 'Get Your Festival Schedule Live in 10 Minutes (Seriously)',
+    excerpt: 'The fastest way to publish a professional event schedule.',
+    category: 'Getting Started'
   }
 ]
 
@@ -87,19 +87,19 @@ export default function BlogPost() {
     <>
       <article className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
         {/* Header */}
-        <header className="bg-gradient-to-r from-[#2a468b] to-[#466d60] text-white py-20">
+        <header className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 text-white py-20">
           <div className="max-w-4xl mx-auto px-6">
             <Breadcrumbs 
               items={[
                 { name: 'Blog', href: '/blog' },
-                { name: 'Use Cases', href: '/blog?category=use-cases' },
+                { name: 'Getting Started', href: '/blog?category=getting-started' },
                 { name: title }
               ]} 
             />
             
             <div className="mt-8 mb-6">
               <span className="inline-block bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-                Platform Overview
+                Getting Started
               </span>
             </div>
             
@@ -116,7 +116,7 @@ export default function BlogPost() {
               <span>•</span>
               <span>10 min read</span>
               <span>•</span>
-              <span>Use Cases</span>
+              <span>Getting Started</span>
             </div>
           </div>
         </header>

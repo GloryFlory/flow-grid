@@ -36,13 +36,13 @@ export const metadata: Metadata = {
     'event cancellation management',
     'session attendance optimization'
   ],
-  authors: [{ name: 'Flow Grid Team' }],
+  authors: [{ name: 'Florian Hohenleitner' }],
   openGraph: {
     title,
     description,
     type: 'article',
     publishedTime: publishDate,
-    authors: ['Flow Grid Team'],
+    authors: ['Florian Hohenleitner'],
     tags: ['Event Management', 'Automation', 'Attendance', 'Waitlist'],
   },
   alternates: {
@@ -62,9 +62,9 @@ const sections = [
 
 const relatedPosts = [
   {
-    slug: 'event-booking-systems-2025',
-    title: 'The Complete Guide to Event Booking Systems in 2025',
-    excerpt: 'Everything you need to know about managing session capacity and attendee registration.',
+    slug: 'event-app-community-building',
+    title: 'Why Every Festival Needs an Event App for Community Building',
+    excerpt: 'How modern event apps transform festivals from one-time gatherings into lasting communities.',
     category: 'Event Management'
   },
   {
@@ -74,9 +74,9 @@ const relatedPosts = [
     category: 'Features'
   },
   {
-    slug: 'multi-day-festival-scheduling-tips',
-    title: 'Multi-Day Festival Scheduling: Tips from the Pros',
-    excerpt: 'Master the art of creating seamless multi-day event experiences.',
+    slug: 'wellness-retreat-scheduling',
+    title: 'Wellness Retreat Scheduling: Creating the Perfect Balance',
+    excerpt: 'Learn how to design retreat schedules that balance structure with flexibility.',
     category: 'Best Practices'
   }
 ]
@@ -86,19 +86,19 @@ export default function BlogPost() {
     <>
       <article className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
         {/* Header */}
-        <header className="bg-gradient-to-r from-[#2a468b] to-[#466d60] text-white py-20">
+        <header className="bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 text-white py-20">
           <div className="max-w-4xl mx-auto px-6">
             <Breadcrumbs 
               items={[
                 { name: 'Blog', href: '/blog' },
-                { name: 'New Features', href: '/blog?category=features' },
+                { name: 'Features', href: '/blog?category=features' },
                 { name: title }
               ]} 
             />
             
             <div className="mt-8 mb-6">
               <span className="inline-block bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-                New Feature Deep Dive
+                Features
               </span>
             </div>
             
@@ -115,7 +115,7 @@ export default function BlogPost() {
               <span>•</span>
               <span>8 min read</span>
               <span>•</span>
-              <span>Event Management</span>
+              <span>Features</span>
             </div>
           </div>
         </header>

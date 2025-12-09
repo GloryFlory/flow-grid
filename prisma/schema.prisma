@@ -96,6 +96,8 @@ model Festival {
   waitlist       SessionWaitlist[]
   teamMembers    TeamMember[]
 
+  @@index([slug, isPublished])
+  @@index([userId])
   @@map("festivals")
 }
 
@@ -127,6 +129,8 @@ model FestivalSession {
   favourites      SessionFavourite[]
   waitlist        SessionWaitlist[]
 
+  @@index([festivalId, day, startTime])
+  @@index([festivalId, displayOrder])
   @@map("festival_sessions")
 }
 
@@ -143,6 +147,8 @@ model Booking {
   session    FestivalSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@unique([sessionId, deviceId])
+  @@index([festivalId])
+  @@index([sessionId])
   @@map("bookings")
 }
 

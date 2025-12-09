@@ -36,13 +36,13 @@ export const metadata: Metadata = {
     'festival analytics',
     'event data visualization'
   ],
-  authors: [{ name: 'Flow Grid Team' }],
+  authors: [{ name: 'Florian Hohenleitner' }],
   openGraph: {
     title,
     description,
     type: 'article',
     publishedTime: publishDate,
-    authors: ['Flow Grid Team'],
+    authors: ['Florian Hohenleitner'],
     tags: ['Analytics', 'Data', 'Event Management', 'Reporting'],
   },
   alternates: {
@@ -69,16 +69,16 @@ const relatedPosts = [
     category: 'Features'
   },
   {
-    slug: 'multi-day-festival-scheduling-tips',
-    title: 'Multi-Day Festival Scheduling: Tips from the Pros',
-    excerpt: 'Master the art of creating seamless multi-day event experiences.',
-    category: 'Best Practices'
+    slug: 'event-app-community-building',
+    title: 'Why Every Festival Needs an Event App for Community Building',
+    excerpt: 'How modern event apps transform festivals from one-time gatherings into lasting communities.',
+    category: 'Event Management'
   },
   {
-    slug: 'real-time-schedule-updates',
-    title: 'Real-Time Schedule Updates: Keep Your Attendees in the Loop',
-    excerpt: 'How instant updates improve attendee experience and reduce confusion.',
-    category: 'Features'
+    slug: 'hidden-costs-manual-event-scheduling',
+    title: 'The Hidden Costs of Manual Event Scheduling (And How to Avoid Them)',
+    excerpt: 'Discover the true price of managing events manually and why automation pays for itself.',
+    category: 'Best Practices'
   }
 ]
 
@@ -87,19 +87,19 @@ export default function BlogPost() {
     <>
       <article className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
         {/* Header */}
-        <header className="bg-gradient-to-r from-[#2a468b] to-[#466d60] text-white py-20">
+        <header className="bg-gradient-to-br from-cyan-600 via-cyan-700 to-blue-800 text-white py-20">
           <div className="max-w-4xl mx-auto px-6">
             <Breadcrumbs 
               items={[
                 { name: 'Blog', href: '/blog' },
-                { name: 'New Features', href: '/blog?category=features' },
+                { name: 'Analytics', href: '/blog?category=analytics' },
                 { name: title }
               ]} 
             />
             
             <div className="mt-8 mb-6">
               <span className="inline-block bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-                New Feature Deep Dive
+                Analytics
               </span>
             </div>
             
@@ -116,7 +116,7 @@ export default function BlogPost() {
               <span>•</span>
               <span>12 min read</span>
               <span>•</span>
-              <span>Analytics & Data</span>
+              <span>Analytics</span>
             </div>
           </div>
         </header>

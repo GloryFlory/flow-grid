@@ -10,17 +10,63 @@ export async function GET(
     
     // Use findFirst since we're filtering by multiple conditions
     // findUnique only works with the unique field alone
+    // Only select fields we actually need to reduce data transfer
     const festival = await prisma.festival.findFirst({
       where: { 
         slug,
         isPublished: true // Only show published festivals
       },
-      include: {
-        sessions: true,
-        teachers: true,
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        location: true,
+        logo: true,
+        primaryColor: true,
+        secondaryColor: true,
+        accentColor: true,
+        headerFont: true,
+        startDate: true,
+        endDate: true,
+        timezone: true,
+        whatsappLink: true,
+        telegramLink: true,
+        facebookLink: true,
+        instagramLink: true,
+        sessions: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            day: true,
+            startTime: true,
+            endTime: true,
+            location: true,
+            level: true,
+            styles: true,
+            prerequisites: true,
+            capacity: true,
+            teachers: true,
+            cardType: true,
+            bookingEnabled: true,
+            bookingCapacity: true,
+            displayOrder: true,
+          }
+        },
+        teachers: {
+          select: {
+            name: true,
+            url: true,
+          }
+        },
         user: {
-          include: {
-            subscription: true
+          select: {
+            subscription: {
+              select: {
+                plan: true,
+              }
+            }
           }
         }
       }

@@ -158,65 +158,41 @@ export default function BlogPost() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center">
-              <Link href="/" className="flex items-center">
-                <img 
-                  src="/flow-grid-logo.png" 
-                  alt="Flow Grid Logo" 
-                  className="h-10 w-auto"
-                />
-                <span className="ml-3 text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
-                  Flow Grid
-                </span>
-              </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/auth/signin">
-                <Button variant="outline">Sign In</Button>
-              </Link>
-              <Link href="/auth/signin">
-                <Button>Get Started</Button>
-              </Link>
-            </div>
+      {/* Hero Header */}
+      <header className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 text-white py-20">
+        <div className="max-w-4xl mx-auto px-6">
+          <Breadcrumbs items={[
+            { name: 'Blog', href: '/blog' },
+            { name: 'Getting Started', href: '/blog?category=getting-started' },
+            { name: 'Get Your First Festival Live in 10 Minutes' }
+          ]} />
+          
+          <div className="mt-8 mb-6">
+            <span className="inline-block bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium">
+              Getting Started
+            </span>
+          </div>
+          
+          <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6">
+            Get Your First Festival Live in 10 Minutes
+          </h1>
+          
+          <p className="text-xl text-white/90 leading-relaxed mb-8">
+            Stop overthinking it. You don't need a perfect CSV file, a complete session list, or hours of planning to get started. Here's how to create your first festival schedule in under 10 minutes—really.
+          </p>
+          
+          <div className="flex items-center gap-6 text-sm text-white/80">
+            <time dateTime="2025-11-14">November 14, 2025</time>
+            <span>•</span>
+            <span>8 min read</span>
+            <span>•</span>
+            <span>Getting Started</span>
           </div>
         </div>
-      </nav>
+      </header>
 
       {/* Article */}
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Breadcrumbs items={[
-          { name: 'Blog', href: '/blog' },
-          { name: 'Quick Start Guide' }
-        ]} />
-
-        {/* Header */}
-        <header className="mb-12">
-          <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-            <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">
-              Quick Start Guide
-            </span>
-            <span>•</span>
-            <div className="flex items-center">
-              <Clock className="w-4 h-4 mr-1" />
-              <span>8 min read</span>
-            </div>
-            <span>•</span>
-            <time dateTime="2025-11-14">November 14, 2025</time>
-          </div>
-
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Get Your First Festival Live in 10 Minutes
-          </h1>
-
-          <p className="text-xl text-gray-600 leading-relaxed">
-            Stop overthinking it. You don't need a perfect CSV file, a complete session list, or hours of planning to get started. Here's how to create your first festival schedule in under 10 minutes—really.
-          </p>
-        </header>
-
         {/* Table of Contents */}
         <TableOfContents items={tocItems} />
 

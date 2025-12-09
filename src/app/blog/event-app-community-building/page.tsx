@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     description: 'Transform your event app from a schedule tool into a community hub. Strategies for fostering connections and building lasting relationships.',
     type: 'article',
     publishedTime: '2025-11-29T00:00:00.000Z',
-    authors: ['Flow Grid Team'],
+    authors: ['Florian Hohenleitner'],
     images: [
       {
         url: '/og/event-app-community-building.png',
@@ -50,8 +50,8 @@ const jsonLd = {
   datePublished: '2025-11-29T00:00:00.000Z',
   dateModified: '2025-11-29T00:00:00.000Z',
   author: {
-    '@type': 'Organization',
-    name: 'Flow Grid',
+    '@type': 'Person',
+    name: 'Florian Hohenleitner',
   },
   publisher: {
     '@type': 'Organization',
@@ -139,24 +139,25 @@ export default function EventAppCommunityBuildingPage() {
       />
 
       {/* Hero Section */}
-      <header className="bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 text-white py-16 md:py-24">
+      <header className="bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 text-white py-16 md:py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <Breadcrumbs items={[
             { name: 'Blog', href: '/blog' },
+            { name: 'Features', href: '/blog?category=features' },
             { name: 'Event App Community Building' }
           ]} />
           <div className="mt-4">
-            <span className="text-purple-200 text-sm font-medium bg-purple-800/50 px-3 py-1 rounded-full">
-              Community & Engagement
+            <span className="text-white/90 text-sm font-medium bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full">
+              Features
             </span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mt-6 leading-tight">
             Beyond the Schedule: Using Event Apps to Build Community
           </h1>
-          <p className="text-xl text-purple-100 mt-6 leading-relaxed">
+          <p className="text-xl text-white/90 mt-6 leading-relaxed">
             Your event app shouldn&apos;t just show what&apos;s happening when. Here&apos;s how to transform it into a community hub that keeps attendees connected year-round.
           </p>
-          <div className="flex items-center gap-6 mt-8 text-sm text-purple-200">
+          <div className="flex items-center gap-6 mt-8 text-sm text-white/80">
             <span className="flex items-center gap-2">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />

@@ -2,6 +2,12 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Heart, Users, Globe, Lightbulb, Target, Calendar } from 'lucide-react'
 import Footer from '@/components/Footer'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'About Flow Grid | Event Scheduling Software Built for Organizers',
+  description: 'Learn how Flow Grid helps event organizers create beautiful schedules, manage team collaboration, and deliver seamless experiences for festivals, retreats, and conferences.',
+}
 
 export default function AboutPage() {
   return (

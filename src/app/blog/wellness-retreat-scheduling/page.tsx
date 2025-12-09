@@ -134,33 +134,40 @@ export default function BlogPost() {
       
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200">
-          <div className="max-w-4xl mx-auto px-4 py-4">
+        <header className="bg-gradient-to-br from-green-600 via-green-700 to-teal-800 text-white py-20">
+          <div className="max-w-4xl mx-auto px-6">
             <Breadcrumbs items={[
               { name: 'Blog', href: '/blog' },
+              { name: 'Best Practices', href: '/blog?category=best-practices' },
               { name: 'Wellness Retreat Scheduling' }
             ]} />
+            
+            <div className="mt-8 mb-6">
+              <span className="inline-block bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium">
+                Best Practices
+              </span>
+            </div>
+            
+            <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6">
+              Wellness Retreat Scheduling: Creating Flows That Actually Feel Relaxing
+            </h1>
+            
+            <p className="text-xl text-white/90 leading-relaxed mb-8">
+              The irony of most wellness retreats? The schedule itself is stressful. Here's how to design flows that feel as nourishing as the practices themselves.
+            </p>
+            
+            <div className="flex items-center gap-6 text-sm text-white/80">
+              <time dateTime="2025-11-29">November 29, 2025</time>
+              <span>•</span>
+              <span>12 min read</span>
+              <span>•</span>
+              <span>Best Practices</span>
+            </div>
           </div>
         </header>
 
         {/* Article */}
         <article className="max-w-4xl mx-auto px-4 py-12">
-          {/* Article Header */}
-          <header className="mb-12">
-            <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
-              <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium">Wellness & Retreats</span>
-              <span>•</span>
-              <time dateTime="2025-11-29">November 29, 2025</time>
-              <span>•</span>
-              <span>12 min read</span>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-              Wellness Retreat Scheduling: Creating Flows That Actually Feel Relaxing
-            </h1>
-            <p className="text-xl text-gray-600 leading-relaxed">
-              The irony of most wellness retreats? The schedule itself is stressful. Here's how to design flows that feel as nourishing as the practices themselves.
-            </p>
-          </header>
 
           {/* Table of Contents */}
           <TableOfContents items={tocItems} />

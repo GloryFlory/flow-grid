@@ -40,7 +40,7 @@ export default function TermsOfServicePage() {
         {/* Page Header */}
         <div className="mb-8 text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Terms of Service</h1>
-          <p className="text-gray-600">Last updated: 29 October 2025</p>
+          <p className="text-gray-600">Last updated: 8 December 2025</p>
         </div>
 
         <div className="prose prose-lg max-w-none">
@@ -64,6 +64,7 @@ export default function TermsOfServicePage() {
             <li>Publish public-facing festival websites</li>
             <li>Manage teacher profiles and photos</li>
             <li>Customize branding and styling</li>
+            <li>Collaborate with team members using role-based permissions</li>
           </ul>
 
           <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">3. User Accounts</h2>
@@ -81,6 +82,7 @@ export default function TermsOfServicePage() {
             <li>Keep your login credentials confidential</li>
             <li>Notify us immediately of any unauthorized access</li>
             <li>You're responsible for all activities under your account</li>
+            <li>Manage team member access appropriately and remove access when no longer needed</li>
           </ul>
 
           <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">4. Acceptable Use</h2>

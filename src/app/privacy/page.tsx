@@ -40,7 +40,7 @@ export default function PrivacyPolicyPage() {
         {/* Page Header */}
         <div className="mb-8 text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Privacy Policy</h1>
-          <p className="text-gray-600">Last updated: 29 October 2025</p>
+          <p className="text-gray-600">Last updated: 8 December 2025</p>
         </div>
 
         <div className="prose prose-lg max-w-none">
@@ -55,6 +55,7 @@ export default function PrivacyPolicyPage() {
             <li>Name and email address when you create an account</li>
             <li>Profile information you choose to provide</li>
             <li>Authentication data (encrypted passwords or OAuth tokens)</li>
+            <li>Team member invitations and collaboration preferences</li>
           </ul>
 
           <h3 className="text-xl font-semibold text-gray-800 mt-6 mb-3">Festival Data</h3>
@@ -63,6 +64,7 @@ export default function PrivacyPolicyPage() {
             <li>Session information (schedules, teacher details, descriptions)</li>
             <li>Photos and images you upload for teachers and festivals</li>
             <li>Custom branding and styling preferences</li>
+            <li>Team member roles and access permissions</li>
           </ul>
 
           <h3 className="text-xl font-semibold text-gray-800 mt-6 mb-3">Usage Information</h3>
@@ -77,7 +79,8 @@ export default function PrivacyPolicyPage() {
           <ul className="list-disc list-inside space-y-2 text-gray-700">
             <li><strong>Provide Services:</strong> Enable you to create and manage festival schedules</li>
             <li><strong>Account Management:</strong> Authenticate users and maintain accounts</li>
-            <li><strong>Communication:</strong> Send important updates about your account or festivals</li>
+            <li><strong>Team Collaboration:</strong> Facilitate team member invitations and role-based access control</li>
+            <li><strong>Communication:</strong> Send important updates, team invitations, and notifications about your account or festivals</li>
             <li><strong>Improvement:</strong> Analyze usage to improve our platform</li>
             <li><strong>Support:</strong> Provide customer support and troubleshooting</li>
             <li><strong>Security:</strong> Protect against fraud and unauthorized access</li>

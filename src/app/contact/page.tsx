@@ -3,6 +3,12 @@ import { Button } from '@/components/ui/button'
 import { ArrowLeft, Mail, MessageCircle, Clock, MapPin, HelpCircle } from 'lucide-react'
 import ContactForm from '@/components/ContactForm'
 import Footer from '@/components/Footer'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Contact Flow Grid | Get Help with Event Scheduling',
+  description: 'Have questions about Flow Grid? Contact our support team for help with event scheduling, team collaboration, or technical issues. We respond within 24 hours.',
+}
 
 export default function ContactPage() {
   return (

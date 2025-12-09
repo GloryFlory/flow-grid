@@ -167,38 +167,46 @@ export default function BlogPost() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(getBreadcrumbSchema([
           { name: 'Blog', href: '/blog' },
+          { name: 'Tools', href: '/blog?category=tools' },
           { name: 'Spreadsheets vs Scheduling Software' }
         ])) }}
       />
 
-      {/* Article */}
-      <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Breadcrumbs items={[
-          { name: 'Blog', href: '/blog' },
-          { name: 'Spreadsheets vs Scheduling Software' }
-        ]} />
-
-        <header className="mb-12">
-          <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-            <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full font-medium">
-              Event Management
+      {/* Hero Header */}
+      <header className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-20">
+        <div className="max-w-4xl mx-auto px-6">
+          <Breadcrumbs items={[
+            { name: 'Blog', href: '/blog' },
+            { name: 'Tools', href: '/blog?category=tools' },
+            { name: 'Spreadsheets vs Scheduling Software' }
+          ]} />
+          
+          <div className="mt-8 mb-6">
+            <span className="inline-block bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium">
+              Tools
             </span>
-            <span className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" />
-              November 6, 2025
-            </span>
-            <span>• 7 min read</span>
           </div>
           
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6">
             Spreadsheets vs Scheduling Software: What's Best for Your Event?
           </h1>
           
-          <p className="text-xl text-gray-600">
+          <p className="text-xl text-white/90 leading-relaxed mb-8">
             A detailed comparison of managing event schedules in spreadsheets versus dedicated scheduling software. Real-world examples and honest pros & cons included.
           </p>
-        </header>
+          
+          <div className="flex items-center gap-6 text-sm text-white/80">
+            <time dateTime="2025-11-06">November 6, 2025</time>
+            <span>•</span>
+            <span>7 min read</span>
+            <span>•</span>
+            <span>Tools</span>
+          </div>
+        </div>
+      </header>
 
+      {/* Article */}
+      <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <TableOfContents items={[
           { id: 'the-spreadsheet-reality-check', title: 'The Spreadsheet Reality Check' },
           { id: 'real-world-scenario-festival-organizers-journey', title: 'Real-World Scenario' },

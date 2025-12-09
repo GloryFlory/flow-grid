@@ -131,36 +131,42 @@ export default function BlogPost() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-        {/* Header */}
-        <header className="bg-white border-b border-gray-200">
-          <div className="max-w-4xl mx-auto px-4 py-4">
-            <Breadcrumbs items={[
-              { name: 'Blog', href: '/blog' },
-              { name: 'Hidden Costs of Manual Scheduling' }
-            ]} />
+      {/* Hero Header */}
+      <header className="bg-gradient-to-br from-orange-600 via-orange-700 to-red-700 text-white py-20">
+        <div className="max-w-4xl mx-auto px-6">
+          <Breadcrumbs items={[
+            { name: 'Blog', href: '/blog' },
+            { name: 'Event Management', href: '/blog?category=event-management' },
+            { name: 'Hidden Costs of Manual Scheduling' }
+          ]} />
+          
+          <div className="mt-8 mb-6">
+            <span className="inline-block bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium">
+              Event Management
+            </span>
           </div>
-        </header>
-
+          
+          <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6">
+            Hidden Costs of Manual Event Scheduling: The True Price of Spreadsheets
+          </h1>
+          
+          <p className="text-xl text-white/90 leading-relaxed mb-8">
+            That "free" spreadsheet might be costing you thousands. Here's how to calculate the true price of manual scheduling—and why automation pays for itself.
+          </p>
+          
+          <div className="flex items-center gap-6 text-sm text-white/80">
+            <time dateTime="2025-11-29">November 29, 2025</time>
+            <span>•</span>
+            <span>10 min read</span>
+            <span>•</span>
+            <span>Event Management</span>
+          </div>
+        </div>
+      </header>
+      
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
         {/* Article */}
         <article className="max-w-4xl mx-auto px-4 py-12">
-          {/* Article Header */}
-          <header className="mb-12">
-            <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
-              <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full font-medium">Budget & ROI</span>
-              <span>•</span>
-              <time dateTime="2025-11-29">November 29, 2025</time>
-              <span>•</span>
-              <span>10 min read</span>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-              Hidden Costs of Manual Event Scheduling: The True Price of Spreadsheets
-            </h1>
-            <p className="text-xl text-gray-600 leading-relaxed">
-              That "free" spreadsheet might be costing you thousands. Here's how to calculate the true price of manual scheduling—and why automation pays for itself.
-            </p>
-          </header>
-
           {/* Table of Contents */}
           <TableOfContents items={tocItems} />
 

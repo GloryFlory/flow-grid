@@ -158,57 +158,42 @@ export default function BlogPost() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center">
-              <Link href="/" className="flex items-center">
-                <img 
-                  src="/flow-grid-logo.png" 
-                  alt="Flow Grid Logo" 
-                  className="h-10 w-auto"
-                />
-                <span className="ml-3 text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
-                  Flow Grid
-                </span>
-              </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/auth/signin">
-                <Button variant="outline">Sign In</Button>
-              </Link>
-              <Link href="/auth/signin">
-                <Button>Get Started</Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Article */}
-      <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Breadcrumbs items={[
-          { name: 'Blog', href: '/blog' },
-          { name: 'Yoga Retreat Schedule Guide' }
-        ]} />
-
-        <header className="mb-12">
-          <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-            <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full font-medium">
-              Retreat Planning
+      {/* Hero Header */}
+      <header className="bg-gradient-to-br from-green-600 via-green-700 to-teal-800 text-white py-20">
+        <div className="max-w-4xl mx-auto px-6">
+          <Breadcrumbs items={[
+            { name: 'Blog', href: '/blog' },
+            { name: 'Best Practices', href: '/blog?category=best-practices' },
+            { name: 'Yoga Retreat Schedule Guide' }
+          ]} />
+          
+          <div className="mt-8 mb-6">
+            <span className="inline-block bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium">
+              Best Practices
             </span>
-            <span className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" />
-              November 8, 2025
-            </span>
-            <span>• 10 min read</span>
           </div>
           
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6">
             How to Create the Perfect Yoga Retreat Schedule
           </h1>
           
+          <p className="text-xl text-white/90 leading-relaxed mb-8">
+            Design a yoga retreat schedule that balances practice, rest, community, and personal time. Learn the essential elements that create transformative experiences.
+          </p>
+          
+          <div className="flex items-center gap-6 text-sm text-white/80">
+            <time dateTime="2025-11-08">November 8, 2025</time>
+            <span>•</span>
+            <span>10 min read</span>
+            <span>•</span>
+            <span>Best Practices</span>
+          </div>
+        </div>
+      </header>
+
+      {/* Article */}
+      <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <header className="mb-12">          
           <p className="text-xl text-gray-600">
             A comprehensive guide to planning yoga retreat schedules that balance practice, rest, and community time. Includes templates and best practices from successful retreat leaders.
           </p>

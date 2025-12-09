@@ -359,17 +359,21 @@ export default function SessionsManagement() {
 
   useEffect(() => {
     if (festivalId) {
-      fetchFestival()
-      fetchBookings() // Always fetch bookings for the count
-      fetchWaitlist() // Fetch waitlist entries
+      fetchFestival() // Now fetches everything in parallel
     }
   }, [festivalId])
 
   const fetchFestival = async () => {
     try {
-      // Fetch festival data
-      const festivalResponse = await fetch(`/api/admin/festivals/${festivalId}`)
+      // Fetch festival and sessions in parallel for faster loading
+      const [festivalResponse, sessionsResponse, bookingsResponse, waitlistResponse] = await Promise.all([
+        fetch(`/api/admin/festivals/${festivalId}`),
+        fetch(`/api/admin/festivals/${festivalId}/sessions`),
+        fetch(`/api/admin/festivals/${festivalId}/bookings`),
+        fetch(`/api/admin/festivals/${festivalId}/waitlist`)
+      ])
       
+      // Check festival response status first
       if (festivalResponse.status === 403) {
         setError({ 
           type: 'forbidden', 
@@ -397,15 +401,18 @@ export default function SessionsManagement() {
         return
       }
       
-      const festivalData = await festivalResponse.json()
+      // Parse all responses in parallel
+      const [festivalData, sessionsData, bookingsData, waitlistData] = await Promise.all([
+        festivalResponse.json(),
+        sessionsResponse.ok ? sessionsResponse.json() : { sessions: [] },
+        bookingsResponse.ok ? bookingsResponse.json() : { bookings: [] },
+        waitlistResponse.ok ? waitlistResponse.json() : { waitlist: [] }
+      ])
+      
       setFestival(festivalData.festival)
-
-      // Fetch sessions data
-      const sessionsResponse = await fetch(`/api/admin/festivals/${festivalId}/sessions`)
-      if (sessionsResponse.ok) {
-        const sessionsData = await sessionsResponse.json()
-        setSessions(sessionsData.sessions || [])
-      }
+      setSessions(sessionsData.sessions || [])
+      setBookings(bookingsData.bookings || [])
+      setWaitlist(waitlistData.waitlist || [])
     } catch (error) {
       console.error('Error fetching festival:', error)
       setError({ 
@@ -414,30 +421,6 @@ export default function SessionsManagement() {
       })
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  const fetchBookings = async () => {
-    try {
-      const response = await fetch(`/api/admin/festivals/${festivalId}/bookings`)
-      if (response.ok) {
-        const data = await response.json()
-        setBookings(data.bookings || [])
-      }
-    } catch (error) {
-      console.error('Error fetching bookings:', error)
-    }
-  }
-
-  const fetchWaitlist = async () => {
-    try {
-      const response = await fetch(`/api/admin/festivals/${festivalId}/waitlist`)
-      if (response.ok) {
-        const data = await response.json()
-        setWaitlist(data.waitlist || [])
-      }
-    } catch (error) {
-      console.error('Error fetching waitlist:', error)
     }
   }
 
@@ -1974,7 +1957,7 @@ export default function SessionsManagement() {
                                           if (!response.ok) throw new Error('Failed to notify');
                                           const data = await response.json();
                                           alert(data.message || 'Notification sent!');
-                                          fetchWaitlist();
+                                          fetchFestival(); // Refresh all data
                                         } catch (error) {
                                           console.error('Error notifying:', error);
                                           alert('Failed to send notification');
@@ -1994,7 +1977,7 @@ export default function SessionsManagement() {
                                           method: 'DELETE',
                                         });
                                         if (!response.ok) throw new Error('Failed to remove');
-                                        fetchWaitlist();
+                                        fetchFestival(); // Refresh all data
                                       } catch (error) {
                                         console.error('Error removing:', error);
                                         alert('Failed to remove from waitlist');

@@ -171,38 +171,46 @@ export default function BlogPost() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(getBreadcrumbSchema([
           { name: 'Blog', href: '/blog' },
+          { name: 'Features', href: '/blog?category=features' },
           { name: 'QR Code Event Schedules' }
         ])) }}
       />
 
-      {/* Article */}
-      <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Breadcrumbs items={[
-          { name: 'Blog', href: '/blog' },
-          { name: 'QR Code Event Schedules' }
-        ]} />
-
-        <header className="mb-12">
-          <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-            <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full font-medium">
-              Scheduling & Logistics
+      {/* Hero Header */}
+      <header className="bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 text-white py-20">
+        <div className="max-w-4xl mx-auto px-6">
+          <Breadcrumbs items={[
+            { name: 'Blog', href: '/blog' },
+            { name: 'Features', href: '/blog?category=features' },
+            { name: 'QR Code Event Schedules' }
+          ]} />
+          
+          <div className="mt-8 mb-6">
+            <span className="inline-block bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium">
+              Features
             </span>
-            <span className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" />
-              November 12, 2025
-            </span>
-            <span>• 11 min read</span>
           </div>
           
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6">
             QR Code Event Schedules: Complete 2025 Guide
           </h1>
           
-          <p className="text-xl text-gray-600">
+          <p className="text-xl text-white/90 leading-relaxed mb-8">
             Create interactive QR code schedules that attendees can scan instantly. Learn how to reduce printing costs, enable real-time updates, and deliver a seamless mobile-first experience.
           </p>
-        </header>
+          
+          <div className="flex items-center gap-6 text-sm text-white/80">
+            <time dateTime="2025-11-12">November 12, 2025</time>
+            <span>•</span>
+            <span>11 min read</span>
+            <span>•</span>
+            <span>Features</span>
+          </div>
+        </div>
+      </header>
 
+      {/* Article */}
+      <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <TableOfContents items={[
           { id: 'why-qr-code-schedules-are-taking-over-event-planning', title: 'Why QR Code Schedules Are Taking Over' },
           { id: 'how-to-create-a-qr-code-for-your-event-schedule', title: 'How to Create a QR Code Schedule' },

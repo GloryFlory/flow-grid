@@ -116,6 +116,24 @@ const jsonLd = {
   }
 };
 
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Flow Grid',
+  url: 'https://tryflowgrid.com',
+  logo: 'https://tryflowgrid.com/flow-grid-logo.png',
+  description: 'Event scheduling software for festivals, retreats, workshops, and conferences. Create beautiful schedules with team collaboration and booking management.',
+  foundingDate: '2024',
+  contactPoint: {
+    '@type': 'ContactPoint',
+    contactType: 'Customer Support',
+    url: 'https://tryflowgrid.com/contact',
+  },
+  sameAs: [
+    'https://www.instagram.com/tryflowgrid'
+  ]
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 
   return (
@@ -127,6 +145,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
       </head>
       <body>

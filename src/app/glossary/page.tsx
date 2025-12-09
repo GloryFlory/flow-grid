@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Footer from '@/components/Footer'
+import { Metadata } from 'next'
 import { 
   Search, 
   Tag, 
@@ -20,6 +21,11 @@ import {
   Shield,
   Database
 } from 'lucide-react'
+
+export const metadata: Metadata = {
+  title: 'Event Scheduling Glossary | Flow Grid Terms & Definitions',
+  description: 'Complete glossary of event scheduling terms. Learn about festivals, sessions, venues, waitlists, team roles, and Flow Grid features in plain language.',
+}
 
 export default function GlossaryPage() {
   const searchableTerms = [

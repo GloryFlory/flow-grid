@@ -159,38 +159,46 @@ export default function BlogPost() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(getBreadcrumbSchema([
           { name: 'Blog', href: '/blog' },
+          { name: 'Best Practices', href: '/blog?category=best-practices' },
           { name: 'Event Planning Checklist' }
         ])) }}
       />
 
-      {/* Article */}
-      <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Breadcrumbs items={[
-          { name: 'Blog', href: '/blog' },
-          { name: 'Event Planning Checklist' }
-        ]} />
-
-        <header className="mb-12">
-          <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-            <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full font-medium">
-              Event Planning
+      {/* Hero Header */}
+      <header className="bg-gradient-to-br from-green-600 via-green-700 to-teal-800 text-white py-20">
+        <div className="max-w-4xl mx-auto px-6">
+          <Breadcrumbs items={[
+            { name: 'Blog', href: '/blog' },
+            { name: 'Best Practices', href: '/blog?category=best-practices' },
+            { name: 'Event Planning Checklist' }
+          ]} />
+          
+          <div className="mt-8 mb-6">
+            <span className="inline-block bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium">
+              Best Practices
             </span>
-            <span className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" />
-              November 5, 2025
-            </span>
-            <span>• 6 min read</span>
           </div>
           
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6">
             The Complete Event Planning Checklist for 2025
           </h1>
           
-          <p className="text-xl text-gray-600">
+          <p className="text-xl text-white/90 leading-relaxed mb-8">
             Don't miss a detail! Our comprehensive event planning checklist covers everything from initial planning to post-event follow-up.
           </p>
-        </header>
+          
+          <div className="flex items-center gap-6 text-sm text-white/80">
+            <time dateTime="2025-11-05">November 5, 2025</time>
+            <span>•</span>
+            <span>6 min read</span>
+            <span>•</span>
+            <span>Best Practices</span>
+          </div>
+        </div>
+      </header>
 
+      {/* Article */}
+      <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <TableOfContents items={[
           { id: '6-months-before-your-event', title: '6 Months Before' },
           { id: '4-6-months-before', title: '4-6 Months Before' },

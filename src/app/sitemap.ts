@@ -2,6 +2,12 @@ import { MetadataRoute } from 'next'
 
 // Blog posts data - keep in sync with blog/page.tsx
 const blogPosts = [
+  { slug: 'event-planning-software-guide', date: '2025-12-08' },
+  { slug: 'event-scheduling-tool-features', date: '2025-12-08' },
+  { slug: 'interactive-schedule-builder', date: '2025-12-08' },
+  { slug: 'waitlist-automation-maximizes-attendance', date: '2024-12-04' },
+  { slug: 'export-master-event-analytics', date: '2024-12-04' },
+  { slug: 'many-ways-to-use-flow-grid', date: '2024-12-04' },
   { slug: 'event-app-community-building', date: '2025-11-29' },
   { slug: 'hidden-costs-manual-event-scheduling', date: '2025-11-29' },
   { slug: 'wellness-retreat-scheduling', date: '2025-11-29' },
