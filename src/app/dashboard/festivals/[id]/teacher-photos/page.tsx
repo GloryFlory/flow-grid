@@ -183,14 +183,11 @@ export default function FestivalTeacherPhotos() {
           fileInputRef.current.value = ''
         }
         
-        // Force refresh with no-cache
+        // Force refresh with cache-busting timestamp
+        const cacheBuster = `?t=${Date.now()}`
         await Promise.all([
-          fetch(`/api/admin/festivals/${festivalId}/teachers`, {
-            headers: { 'Cache-Control': 'no-cache' }
-          }).then(r => r.ok && r.json()).then(data => setTeachers(data.teachers || [])),
-          fetch(`/api/admin/festivals/${festivalId}/teacher-photos`, {
-            headers: { 'Cache-Control': 'no-cache' }
-          }).then(r => r.ok && r.json()).then(data => setPhotos(data.photos || []))
+          fetch(`/api/admin/festivals/${festivalId}/teachers${cacheBuster}`).then(r => r.ok && r.json()).then(data => setTeachers(data.teachers || [])),
+          fetch(`/api/admin/festivals/${festivalId}/teacher-photos${cacheBuster}`).then(r => r.ok && r.json()).then(data => setPhotos(data.photos || []))
         ])
       }
     } catch (error) {
@@ -212,14 +209,11 @@ export default function FestivalTeacherPhotos() {
       })
 
       if (response.ok) {
-        // Force refresh with no-cache
+        // Force refresh with cache-busting timestamp
+        const cacheBuster = `?t=${Date.now()}`
         await Promise.all([
-          fetch(`/api/admin/festivals/${festivalId}/teachers`, {
-            headers: { 'Cache-Control': 'no-cache' }
-          }).then(r => r.ok && r.json()).then(data => setTeachers(data.teachers || [])),
-          fetch(`/api/admin/festivals/${festivalId}/teacher-photos`, {
-            headers: { 'Cache-Control': 'no-cache' }
-          }).then(r => r.ok && r.json()).then(data => setPhotos(data.photos || []))
+          fetch(`/api/admin/festivals/${festivalId}/teachers${cacheBuster}`).then(r => r.ok && r.json()).then(data => setTeachers(data.teachers || [])),
+          fetch(`/api/admin/festivals/${festivalId}/teacher-photos${cacheBuster}`).then(r => r.ok && r.json()).then(data => setPhotos(data.photos || []))
         ])
       } else {
         console.error('Failed to delete photo:', await response.text())
