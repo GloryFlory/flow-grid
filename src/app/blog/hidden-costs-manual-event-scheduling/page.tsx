@@ -117,7 +117,7 @@ export default function BlogPost() {
   ]
 
   return (
-    <>
+    <div className="min-h-screen bg-white">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -131,6 +131,34 @@ export default function BlogPost() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       
+      {/* Navigation */}
+      <nav className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            <div className="flex items-center">
+              <Link href="/" className="flex items-center">
+                <img 
+                  src="/flow-grid-logo.png" 
+                  alt="Flow Grid Logo" 
+                  className="h-10 w-auto"
+                />
+                <span className="ml-3 text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
+                  Flow Grid
+                </span>
+              </Link>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Link href="/auth/signin">
+                <Button variant="outline">Sign In</Button>
+              </Link>
+              <Link href="/auth/signin">
+                <Button>Get Started</Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
       {/* Hero Header */}
       <header className="bg-gradient-to-br from-orange-600 via-orange-700 to-red-700 text-white py-20">
         <div className="max-w-4xl mx-auto px-6">
@@ -540,6 +568,6 @@ export default function BlogPost() {
 
         <Footer />
       </div>
-    </>
+    </div>
   )
 }
