@@ -171,7 +171,7 @@ export default async function TeamPage({
   }
 
   return (
-    <div className="container max-w-5xl mx-auto p-6 space-y-8">
+    <div className="container max-w-7xl mx-auto p-6 space-y-8">
       {/* Back Button */}
       <div>
         <Link href={`/dashboard/festivals/${festival.id}`}>
