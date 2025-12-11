@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Users, Mail, Trash2, Crown, Shield, Edit, Eye, Lock } from 'lucide-react'
+import { Users, Mail, Trash2, Crown, Shield, Edit, Eye, Lock, ArrowLeft } from 'lucide-react'
 import TeamInviteForm from '@/components/TeamInviteForm'
 import TeamMemberList from '@/components/TeamMemberList'
 import PendingInvitesList from '@/components/PendingInvitesList'
@@ -172,6 +172,16 @@ export default async function TeamPage({
 
   return (
     <div className="container max-w-5xl mx-auto p-6 space-y-8">
+      {/* Back Button */}
+      <div>
+        <Link href={`/dashboard/festivals/${festival.id}`}>
+          <Button variant="outline" size="sm">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Event
+          </Button>
+        </Link>
+      </div>
+
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Team Members</h1>

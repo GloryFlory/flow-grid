@@ -54,7 +54,7 @@ export default async function FestivalsPage() {
         },
       },
     },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { updatedAt: 'desc' }, // Show most recently edited first
   })
 
   // Add isShared and userRole to each festival
