@@ -36,8 +36,20 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Upstash Redis auto-parses JSON, so challengeDataRaw is already an object
-    const challengeData = challengeDataRaw as { challenge: string; email: string; userId: string };
+    // Parse the JSON string from Redis
+    let challengeData: { challenge: string; email: string; userId: string };
+    try {
+      challengeData = typeof challengeDataRaw === 'string' 
+        ? JSON.parse(challengeDataRaw)
+        : challengeDataRaw;
+    } catch (error) {
+      console.error('[Passkey Auth Verify] Failed to parse challenge data:', error);
+      return NextResponse.json(
+        { error: 'Invalid challenge data' },
+        { status: 400 }
+      );
+    }
+    
     const { challenge, email, userId } = challengeData;
 
     if (!userId) {

@@ -682,6 +682,7 @@ export default function SettingsPage() {
                         <input
                           type="password"
                           id="currentPassword"
+                          autoComplete="current-password"
                           value={passwordData.currentPassword}
                           onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -697,6 +698,7 @@ export default function SettingsPage() {
                       <input
                         type="password"
                         id="newPassword"
+                        autoComplete="new-password"
                         value={passwordData.newPassword}
                         onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -712,6 +714,7 @@ export default function SettingsPage() {
                       <input
                         type="password"
                         id="confirmPassword"
+                        autoComplete="new-password"
                         value={passwordData.confirmPassword}
                         onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"

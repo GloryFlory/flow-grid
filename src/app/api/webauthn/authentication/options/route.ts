@@ -96,16 +96,15 @@ export async function POST(req: NextRequest) {
     });
 
     // Store challenge in Redis with 5-minute TTL
-    // Upstash Redis auto-parses JSON, store as object directly (not stringified)
     const challengeKey = `passkey:auth:challenge:${crypto.randomUUID()}`;
-    await redis.set(
+    await redis.setex(
       challengeKey,
-      {
+      300, // 5 minutes
+      JSON.stringify({
         challenge: options.challenge,
         email: normalizedEmail,
         userId: user.id,
-      },
-      { ex: 300 } // 5 minutes TTL
+      })
     );
 
     return NextResponse.json(
