@@ -72,8 +72,23 @@ export async function POST(req: NextRequest) {
         }
       }
 
+      // Try to parse credential ID - it should be base64url encoded
+      let credentialIdBuffer: Buffer;
+      try {
+        credentialIdBuffer = Buffer.from(cred.credentialId, 'base64url');
+      } catch (error) {
+        console.error('[Passkey Auth] Invalid credentialId format:', cred.credentialId, error);
+        // Fallback: try regular base64
+        try {
+          credentialIdBuffer = Buffer.from(cred.credentialId, 'base64');
+        } catch {
+          // Last resort: treat as hex or raw string
+          credentialIdBuffer = Buffer.from(cred.credentialId);
+        }
+      }
+
       return {
-        id: Buffer.from(cred.credentialId, 'base64url'),
+        id: credentialIdBuffer,
         type: 'public-key' as const,
         transports,
       };
@@ -118,8 +133,16 @@ export async function POST(req: NextRequest) {
     );
   } catch (error) {
     console.error('[Passkey Authentication Options] Error:', error);
+    
+    // Return more detailed error in development
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const isDev = process.env.NODE_ENV === 'development';
+    
     return NextResponse.json(
-      { error: 'Failed to generate authentication options' },
+      { 
+        error: 'Failed to generate authentication options',
+        ...(isDev && { details: errorMessage, stack: error instanceof Error ? error.stack : undefined })
+      },
       { status: 500 }
     );
   }

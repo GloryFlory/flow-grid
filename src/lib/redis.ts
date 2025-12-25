@@ -22,8 +22,8 @@ function getRedisClient(): Redis {
   // FALLBACK for local development (remove these after env loading is fixed)
   if (!url || url === 'PASTE_YOUR_URL_HERE' || url.includes('PASTE')) {
     console.warn('[Redis] Using hardcoded fallback credentials (local dev only)');
-    url = "https://still-haddock-22951.upstash.io";
-    token = "AVmnAAIncDI0ZjVkNTYyYWUzZWU0NzkwYjc1MGIxMmY2YmJjN2E3OHAyMjI5NTE";
+    url = "https://rested-grouse-52904.upstash.io";
+    token = "Ac6oAAIncDFhMWY3YWU2YTA1NGU0OTAxOTAzOTg5NmI3Y2M1MTYwM3AxNTI5MDQ";
   }
 
   if (!url || !token) {
