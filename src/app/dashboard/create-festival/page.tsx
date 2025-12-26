@@ -1275,6 +1275,13 @@ export default function CreateFestivalPage() {
                     </p>
                   </div>
 
+                  {/* Excel Tip */}
+                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                    <p className="text-xs text-amber-800">
+                      <strong>💡 Excel users:</strong> If columns don't separate properly when you open the file, use <strong>File → Import → Text/CSV</strong> in Excel instead of double-clicking.
+                    </p>
+                  </div>
+
                   {/* CSV Drop Zone */}
                   <div 
                     className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 hover:bg-blue-50/50 transition-colors cursor-pointer"
