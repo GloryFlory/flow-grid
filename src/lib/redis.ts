@@ -15,20 +15,15 @@ function getRedisClient(): Redis {
     return globalThis.__flowgridRedis;
   }
 
-  // Try to get credentials from environment first
-  let url = process.env.UPSTASH_REDIS_REST_URL;
-  let token = process.env.UPSTASH_REDIS_REST_TOKEN;
-
-  // FALLBACK for local development (remove these after env loading is fixed)
-  if (!url || url === 'PASTE_YOUR_URL_HERE' || url.includes('PASTE')) {
-    console.warn('[Redis] Using hardcoded fallback credentials (local dev only)');
-    url = "https://rested-grouse-52904.upstash.io";
-    token = "Ac6oAAIncDFhMWY3YWU2YTA1NGU0OTAxOTAzOTg5NmI3Y2M1MTYwM3AxNTI5MDQ";
-  }
+  // Get credentials from environment variables
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
 
   if (!url || !token) {
     throw new Error(
-      'Upstash Redis environment variables are not configured. Please set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN.'
+      'Upstash Redis environment variables are not configured.\n' +
+      'Please set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in your .env.local file.\n' +
+      'See SUPABASE_SETUP.md for setup instructions.'
     );
   }
 
