@@ -1,4 +1,4 @@
-id,day,start,end,title,level,capacity,types,CardType,teachers,location,Description,Prerequisites
+﻿id,day,start,end,title,level,capacity,types,CardType,teachers,location,Description,Prerequisites
 1,2025-11-28,08:00,09:00,Registration & Check-in,,50,Admin,minimal,,Main Entrance,Welcome and registration desk,Event ticket required
 2,2025-11-28,09:00,10:30,Opening Keynote,,200,Presentation,photo,Dr. Sarah Chen,Main Auditorium,Welcome address and event overview,
 3,2025-11-28,11:00,12:30,Workshop: Creative Writing,Beginner,25,Workshop,detailed,Alex Rivera,Room 101,Hands-on writing workshop exploring narrative techniques,Notebook and pen recommended

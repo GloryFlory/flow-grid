@@ -407,20 +407,23 @@ export default function CreateFestivalPage() {
   }
 
   const downloadCsvTemplate = () => {
-    // Use semicolon delimiter for Windows Excel compatibility
-    // Note: Using semicolon (;) instead of comma (,) because Excel on Windows expects this format
+    // Detect user's OS to serve appropriate delimiter
+    // Windows Excel expects semicolon (;), Mac Excel expects comma (,)
+    const isMac = /Macintosh|Mac OS X/i.test(navigator.userAgent)
+    const delimiter = isMac ? ',' : ';'
+    
     // Column 'day' expects YYYY-MM-DD format (e.g., 2025-11-28) or DD/MM/YYYY
-    const csvContent = `id;day;start;end;title;level;capacity;types;CardType;teachers;location;Description;Prerequisites
-1;2025-11-28;08:00;09:00;Registration & Check-in;;50;Logistics;minimal;;Main Entrance;Welcome and registration desk;Event ticket required
-2;2025-11-28;09:00;10:30;Opening Keynote;;200;Presentation;photo;Dr. Sarah Chen;Main Auditorium;Welcome address and event overview;
-3;2025-11-28;11:00;12:30;Workshop: Creative Writing;Beginner;25;Workshop;detailed;Alex Rivera;Room 101;Hands-on writing workshop exploring narrative techniques;Notebook and pen recommended
-4;2025-11-28;13:00;14:00;Lunch Break;;80;Break;minimal;;Garden Terrace;Catered lunch and networking time;
-5;2025-11-28;14:30;16:00;Panel Discussion;Intermediate;40;Panel;photo;Maria Lopez, John Smith;Conference Room;Industry experts discuss current trends;Basic familiarity with topic helpful
-6;2025-11-28;16:30;17:30;Networking Session;;60;Social;minimal;;Lobby;Informal networking and refreshments;
-7;2025-11-29;08:30;09:30;Morning Meditation;;30;Wellness;photo;Emma Thompson;Quiet Room;Guided meditation to start the day;Comfortable clothing suggested
-8;2025-11-29;10:00;12:00;Advanced Masterclass;Advanced;15;Masterclass;detailed;Prof. David Kim;Studio;Deep dive into advanced techniques;Previous experience required
-9;2025-11-29;13:00;14:00;Lunch Break;;80;Break;minimal;;Dining Hall;Lunch and informal discussions;
-10;2025-11-29;15:00;16:00;Closing Ceremony;;100;Community;minimal;;Main Hall;Wrap-up and thank you remarks;`
+    const csvContent = `id${delimiter}day${delimiter}start${delimiter}end${delimiter}title${delimiter}level${delimiter}capacity${delimiter}types${delimiter}CardType${delimiter}teachers${delimiter}location${delimiter}Description${delimiter}Prerequisites
+1${delimiter}2025-11-28${delimiter}08:00${delimiter}09:00${delimiter}Registration & Check-in${delimiter}${delimiter}50${delimiter}Logistics${delimiter}minimal${delimiter}${delimiter}Main Entrance${delimiter}Welcome and registration desk${delimiter}Event ticket required
+2${delimiter}2025-11-28${delimiter}09:00${delimiter}10:30${delimiter}Opening Keynote${delimiter}${delimiter}200${delimiter}Presentation${delimiter}photo${delimiter}Dr. Sarah Chen${delimiter}Main Auditorium${delimiter}Welcome address and event overview${delimiter}
+3${delimiter}2025-11-28${delimiter}11:00${delimiter}12:30${delimiter}"Workshop: Creative Writing"${delimiter}Beginner${delimiter}25${delimiter}Workshop${delimiter}detailed${delimiter}Alex Rivera${delimiter}Room 101${delimiter}Hands-on writing workshop exploring narrative techniques${delimiter}Notebook and pen recommended
+4${delimiter}2025-11-28${delimiter}13:00${delimiter}14:00${delimiter}Lunch Break${delimiter}${delimiter}80${delimiter}Break${delimiter}minimal${delimiter}${delimiter}Garden Terrace${delimiter}Catered lunch and networking time${delimiter}
+5${delimiter}2025-11-28${delimiter}14:30${delimiter}16:00${delimiter}Panel Discussion${delimiter}Intermediate${delimiter}40${delimiter}Panel${delimiter}photo${delimiter}"Maria Lopez, John Smith"${delimiter}Conference Room${delimiter}Industry experts discuss current trends${delimiter}Basic familiarity with topic helpful
+6${delimiter}2025-11-28${delimiter}16:30${delimiter}17:30${delimiter}Networking Session${delimiter}${delimiter}60${delimiter}Social${delimiter}minimal${delimiter}${delimiter}Lobby${delimiter}Informal networking and refreshments${delimiter}
+7${delimiter}2025-11-29${delimiter}08:30${delimiter}09:30${delimiter}Morning Meditation${delimiter}${delimiter}30${delimiter}Wellness${delimiter}photo${delimiter}Emma Thompson${delimiter}Quiet Room${delimiter}Guided meditation to start the day${delimiter}Comfortable clothing suggested
+8${delimiter}2025-11-29${delimiter}10:00${delimiter}12:00${delimiter}Advanced Masterclass${delimiter}Advanced${delimiter}15${delimiter}Masterclass${delimiter}detailed${delimiter}Prof. David Kim${delimiter}Studio${delimiter}Deep dive into advanced techniques${delimiter}Previous experience required
+9${delimiter}2025-11-29${delimiter}13:00${delimiter}14:00${delimiter}Lunch Break${delimiter}${delimiter}80${delimiter}Break${delimiter}minimal${delimiter}${delimiter}Dining Hall${delimiter}Lunch and informal discussions${delimiter}
+10${delimiter}2025-11-29${delimiter}15:00${delimiter}16:00${delimiter}Closing Ceremony${delimiter}${delimiter}100${delimiter}Community${delimiter}minimal${delimiter}${delimiter}Main Hall${delimiter}Wrap-up and thank you remarks${delimiter}`
 
     // Add UTF-8 BOM for Excel compatibility (helps Excel recognize UTF-8 encoding)
     const BOM = '\uFEFF'

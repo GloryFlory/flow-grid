@@ -27,9 +27,14 @@ export async function GET(
       ]
     })
 
+    // Detect user's OS from User-Agent to serve appropriate delimiter
+    // Windows Excel expects semicolon (;), Mac Excel expects comma (,)
+    const userAgent = request.headers.get('user-agent') || ''
+    const isMac = /Macintosh|Mac OS X/i.test(userAgent)
+    const delimiter = isMac ? ',' : ';'
+    
     // Convert to CSV format matching import template order
-    // Using semicolon (;) delimiter for Windows Excel compatibility
-    const csvHeader = 'id;day;start;end;title;level;capacity;styles;CardType;teachers;location;Description;Prerequisites\n'
+    const csvHeader = `id${delimiter}day${delimiter}start${delimiter}end${delimiter}title${delimiter}level${delimiter}capacity${delimiter}styles${delimiter}CardType${delimiter}teachers${delimiter}location${delimiter}Description${delimiter}Prerequisites\n`
     
     const csvRows = sessions.map((session, index) => {
       const startOut = (() => {
@@ -60,15 +65,15 @@ export async function GET(
         session.prerequisites || '' // Prerequisites
       ]
       
-      // Escape fields that contain semicolons, quotes, or newlines
+      // Escape fields that contain the delimiter, quotes, or newlines
       return fields.map(field => {
         const fieldStr = String(field)
-        if (fieldStr.includes(';') || fieldStr.includes('"') || fieldStr.includes('\n') || fieldStr.includes('\r')) {
+        if (fieldStr.includes(delimiter) || fieldStr.includes('"') || fieldStr.includes('\n') || fieldStr.includes('\r')) {
           // Wrap in quotes and escape any existing quotes
           return `"${fieldStr.replace(/"/g, '""')}"`
         }
         return fieldStr
-      }).join(';') // Use semicolon as delimiter
+      }).join(delimiter)
     }).join('\n')
 
     // Add UTF-8 BOM for Excel compatibility (helps Excel recognize UTF-8 encoding)
