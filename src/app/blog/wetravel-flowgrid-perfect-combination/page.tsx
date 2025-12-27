@@ -96,10 +96,14 @@ export default function BlogPost() {
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
               <div className="flex items-center gap-3 mb-4">
                 <CreditCard className="w-8 h-8 text-blue-600" />
-                <h3 className="text-xl font-bold text-gray-900">WeTravel</h3>
+                <h3 className="text-xl font-bold text-gray-900">
+                  <a href="https://www.wetravel.com" target="_blank" rel="noopener noreferrer" className="text-gray-900 hover:text-blue-600">
+                    WeTravel
+                  </a>
+                </h3>
               </div>
               <p className="text-gray-700 mb-4">
-                <strong>What it does:</strong> Handles everything before and after your event—payments, registrations, booking management, participant details, and refunds.
+                <strong>What it does:</strong> Handles everything before and after your event—<a href="https://product.wetravel.com/payment-processing" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">payments</a>, registrations, booking management, participant details, and refunds.
               </p>
               <div className="space-y-2 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
@@ -164,7 +168,7 @@ export default function BlogPost() {
           <h2 className="text-3xl font-bold text-gray-900 mb-6">Why WeTravel Excels at Payments & Bookings</h2>
           
           <p className="text-gray-700 leading-relaxed mb-6">
-            Used by over 8,000 travel businesses worldwide, WeTravel solves the hardest part of multi-day events: getting paid efficiently and managing international participants.
+            Used by over 8,000 travel businesses worldwide, <a href="https://www.wetravel.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium">WeTravel</a> solves the hardest part of multi-day events: getting paid efficiently and managing international participants.
           </p>
 
           <div className="space-y-6">
@@ -175,7 +179,7 @@ export default function BlogPost() {
               <div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Global Payments, Local Fees</h3>
                 <p className="text-gray-700 mb-3">
-                  Price your retreat in USD, EUR, GBP, or any of 34 currencies while participants pay in <em>their</em> local currency. No foreign exchange headaches for you or them.
+                  Price your retreat in USD, EUR, GBP, or any of <a href="https://product.wetravel.com/pricing" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">34 currencies</a> while participants pay in <em>their</em> local currency. No foreign exchange headaches for you or them.
                 </p>
                 <ul className="space-y-2 text-gray-600 ml-6">
                   <li className="list-disc">Fee-free bank transfers (ACH, SEPA, BECS) in supported regions</li>
@@ -207,7 +211,7 @@ export default function BlogPost() {
               <div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Complete Booking Management</h3>
                 <p className="text-gray-700 mb-3">
-                  Collect custom information (dietary restrictions, room preferences, emergency contacts), manage room inventory, send automated emails, and track everything in one dashboard.
+                  Collect custom information (dietary restrictions, room preferences, emergency contacts), manage room inventory, send <a href="https://product.wetravel.com/bookings" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">automated emails</a>, and track everything in one dashboard.
                 </p>
                 <ul className="space-y-2 text-gray-600 ml-6">
                   <li className="list-disc">Customizable registration forms & questionnaires</li>
@@ -225,7 +229,7 @@ export default function BlogPost() {
               <div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Partner Network & Supplier Payments</h3>
                 <p className="text-gray-700">
-                  Pay retreat centers, yoga teachers, tour guides, and other partners directly through WeTravel with low-fee transfers. No more juggling Venmo, PayPal, and international wires.
+                  Pay retreat centers, yoga teachers, tour guides, and other partners directly through <a href="https://product.wetravel.com/travel-partner-network" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">WeTravel's Partner Network</a> with low-fee transfers. No more juggling Venmo, PayPal, and international wires.
                 </p>
               </div>
             </div>
@@ -618,12 +622,28 @@ export default function BlogPost() {
         <section className="mb-12">
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg p-8 text-center">
             <h2 className="text-3xl font-bold mb-4">Stop Juggling Tools. Start Creating Better Experiences.</h2>
-            <p className="text-xl text-blue-100 mb-6">
+            <p className="text-xl text-blue-100 mb-8">
               Join thousands of retreat organizers and festival creators who've simplified their operations with WeTravel + FlowGrid.
             </p>
+            
+            {/* Logos */}
+            <div className="flex items-center justify-center gap-8 mb-8">
+              <div className="bg-white rounded-lg px-6 py-4">
+                <svg className="h-8 w-auto" viewBox="0 0 120 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <text x="0" y="20" fontFamily="Arial, sans-serif" fontSize="18" fontWeight="bold" fill="#2563eb">WeTravel</text>
+                </svg>
+              </div>
+              <span className="text-2xl font-bold text-white">+</span>
+              <div className="bg-white rounded-lg px-6 py-4">
+                <svg className="h-8 w-auto" viewBox="0 0 120 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <text x="0" y="20" fontFamily="Arial, sans-serif" fontSize="18" fontWeight="bold" fill="#7c3aed">FlowGrid</text>
+                </svg>
+              </div>
+            </div>
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link href="/auth/signin">
-                <Button size="lg" className="bg-white text-purple-600 hover:bg-gray-100">
+                <Button size="lg" className="bg-white text-purple-600 hover:bg-gray-100 shadow-lg">
                   Try FlowGrid Free
                 </Button>
               </Link>
@@ -632,7 +652,7 @@ export default function BlogPost() {
                 target="_blank" 
                 rel="noopener noreferrer"
               >
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+                <Button size="lg" className="bg-blue-500 text-white hover:bg-blue-600 shadow-lg border-2 border-white">
                   Get WeTravel Demo
                 </Button>
               </a>
