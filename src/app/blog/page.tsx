@@ -16,6 +16,14 @@ export const metadata: Metadata = {
 
 const blogPosts = [
   {
+    slug: 'wetravel-flowgrid-perfect-combination',
+    title: 'WeTravel + FlowGrid: The Perfect End-to-End Solution for Retreat & Festival Organizers',
+    excerpt: 'Discover how WeTravel (for payments & bookings) and FlowGrid (for schedules) work together seamlessly to create a professional experience from registration to event day.',
+    date: '2025-12-27',
+    readTime: '9 min read',
+    category: 'Integrations & Partners',
+  },
+  {
     slug: 'many-ways-to-use-flow-grid',
     title: 'The Many Ways to Use Flow Grid: From Yoga Festivals to Corporate Retreats',
     excerpt: 'Flow Grid isn\'t just for yoga festivals. Discover how event organizers use this flexible platform for wellness festivals, dance conventions, workshops, corporate retreats, conferences, and more.',
