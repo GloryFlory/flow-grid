@@ -2,6 +2,7 @@ import { MetadataRoute } from 'next'
 
 // Blog posts data - keep in sync with blog/page.tsx
 const blogPosts = [
+  { slug: 'wetravel-flowgrid-perfect-combination', date: '2025-12-27' },
   { slug: 'event-planning-software-guide', date: '2025-12-08' },
   { slug: 'event-scheduling-tool-features', date: '2025-12-08' },
   { slug: 'interactive-schedule-builder', date: '2025-12-08' },
@@ -38,12 +39,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/auth/signin`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.8,
     },
     {
       url: `${baseUrl}/about`,

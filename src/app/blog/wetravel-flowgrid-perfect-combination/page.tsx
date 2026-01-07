@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { ArrowLeft, CheckCircle, Calendar, CreditCard, Users, Clock, Globe, Smartphone, Zap, TrendingUp } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CheckCircle, Calendar, CreditCard, Users, Clock, Globe, Smartphone, Zap, TrendingUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
 
@@ -453,14 +453,14 @@ export default function BlogPost() {
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">What It Costs (Transparent Pricing)</h2>
           
-          <div className="grid md:grid-cols-2 gap-6 mb-8">
+          <div className="grid md:grid-cols-2 gap-6 mb-6">
             {/* WeTravel Pricing */}
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <div className="bg-white border-2 border-blue-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
               <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                 <CreditCard className="w-6 h-6 text-blue-600" />
                 WeTravel Pricing
               </h3>
-              <ul className="space-y-3 text-gray-700">
+              <ul className="space-y-3 text-gray-700 mb-6">
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <span><strong>Platform fee:</strong> Varies by plan (contact for quote)</span>
@@ -482,21 +482,21 @@ export default function BlogPost() {
                 href="https://product.wetravel.com/request-a-demo" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="mt-4 inline-block"
+                className="block"
               >
-                <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                <Button className="w-full bg-blue-600 hover:bg-blue-700 shadow-md">
                   Get WeTravel Demo
                 </Button>
               </a>
             </div>
 
             {/* FlowGrid Pricing */}
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <div className="bg-white border-2 border-purple-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
               <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                 <Calendar className="w-6 h-6 text-purple-600" />
                 FlowGrid Pricing
               </h3>
-              <ul className="space-y-3 text-gray-700">
+              <ul className="space-y-3 text-gray-700 mb-6">
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
                   <span><strong>Free:</strong> First 5 events with all Pro features</span>
@@ -514,22 +514,37 @@ export default function BlogPost() {
                   <span><strong>No hidden fees:</strong> One flat monthly price, no per-attendee charges</span>
                 </li>
               </ul>
-              <Link href="/auth/signin">
-                <Button className="w-full mt-4 bg-purple-600 hover:bg-purple-700">
+              <Link href="/auth/signin" className="block">
+                <Button className="w-full bg-purple-600 hover:bg-purple-700 shadow-md">
                   Start Free with FlowGrid
                 </Button>
               </Link>
             </div>
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-            <p className="text-gray-900 font-semibold mb-2">💰 Total Cost Example (30-person retreat, $75,000 revenue):</p>
-            <ul className="space-y-2 text-gray-700">
-              <li>• <strong>WeTravel:</strong> ~$1,500-2,000 (payment processing + platform fee)</li>
-              <li>• <strong>FlowGrid:</strong> $29/month (one event) = <strong>Total: ~$1,530-2,030</strong></li>
-              <li>• <strong>Old way</strong> (Stripe + Google Forms + PDF): ~$2,500+ in fees + 20 hours of manual work</li>
-              <li className="text-green-700 font-semibold pt-2">💚 You save: $500+ and 15-20 hours of admin time</li>
-            </ul>
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-lg p-6">
+            <p className="text-gray-900 font-semibold mb-3 text-lg">💰 Total Cost Example (30-person retreat, $75,000 revenue):</p>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <p className="font-semibold text-gray-900 mb-2">With WeTravel + FlowGrid:</p>
+                <ul className="space-y-1 text-gray-700 text-sm">
+                  <li>• WeTravel: ~$1,500-2,000</li>
+                  <li>• FlowGrid: $29/month</li>
+                  <li className="font-semibold text-gray-900 pt-1">= Total: ~$1,530-2,030</li>
+                </ul>
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 mb-2">Old way (Stripe + Forms + PDFs):</p>
+                <ul className="space-y-1 text-gray-700 text-sm">
+                  <li>• Payment fees: ~$2,500</li>
+                  <li>• Manual work: 20+ hours</li>
+                  <li className="font-semibold text-red-700 pt-1">= Total: ~$2,500+ plus lost time</li>
+                </ul>
+              </div>
+            </div>
+            <p className="text-green-700 font-bold text-center mt-4 text-lg">
+              💚 You save: $500+ and 15-20 hours of admin time
+            </p>
           </div>
         </section>
 
@@ -661,17 +676,55 @@ export default function BlogPost() {
         </section>
 
         {/* Related Articles */}
-        <section className="border-t border-gray-200 pt-8">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">Related Articles</h3>
-          <div className="grid md:grid-cols-3 gap-4">
-            <Link href="/blog/get-festival-live-10-minutes" className="text-blue-600 hover:underline">
-              → Get Your Festival Live in 10 Minutes
+        <section className="border-t border-gray-200 pt-12">
+          <h3 className="text-2xl font-bold text-gray-900 mb-6">Related Articles</h3>
+          <div className="grid md:grid-cols-3 gap-6">
+            <Link href="/blog/get-festival-live-10-minutes" className="group">
+              <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-start gap-3">
+                  <ArrowRight className="w-5 h-5 text-blue-600 flex-shrink-0 mt-1 group-hover:translate-x-1 transition-transform" />
+                  <div>
+                    <h4 className="font-semibold text-gray-900 group-hover:text-blue-600 mb-2">
+                      Get Your Festival Live in 10 Minutes
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      Quick start guide to launching your event schedule
+                    </p>
+                  </div>
+                </div>
+              </div>
             </Link>
-            <Link href="/blog/festival-schedule-template-guide" className="text-blue-600 hover:underline">
-              → Festival Schedule Template Guide
+            
+            <Link href="/blog/festival-schedule-template-guide" className="group">
+              <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-start gap-3">
+                  <ArrowRight className="w-5 h-5 text-blue-600 flex-shrink-0 mt-1 group-hover:translate-x-1 transition-transform" />
+                  <div>
+                    <h4 className="font-semibold text-gray-900 group-hover:text-blue-600 mb-2">
+                      Festival Schedule Template Guide
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      Free templates and best practices for event scheduling
+                    </p>
+                  </div>
+                </div>
+              </div>
             </Link>
-            <Link href="/blog/spreadsheet-vs-scheduling-software" className="text-blue-600 hover:underline">
-              → Spreadsheets vs. Scheduling Software
+            
+            <Link href="/blog/spreadsheet-vs-scheduling-software" className="group">
+              <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-start gap-3">
+                  <ArrowRight className="w-5 h-5 text-blue-600 flex-shrink-0 mt-1 group-hover:translate-x-1 transition-transform" />
+                  <div>
+                    <h4 className="font-semibold text-gray-900 group-hover:text-blue-600 mb-2">
+                      Spreadsheets vs. Scheduling Software
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      Why modern tools beat spreadsheets for event planning
+                    </p>
+                  </div>
+                </div>
+              </div>
             </Link>
           </div>
         </section>
