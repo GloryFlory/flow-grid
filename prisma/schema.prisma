@@ -333,6 +333,35 @@ model TeamMember {
   @@map("team_members")
 }
 
+model PaymentRequest {
+  id                  String               @id @default(cuid())
+  userId              String
+  userEmail           String
+  userName            String?
+  plan                PlanType             // PRO only for now
+  billingCycle        BillingCycle         // MONTHLY or YEARLY
+  amount              Decimal
+  currency            String               @default("EUR")
+  paymentMethod       String               @default("REVOLUT") // For future: BANK_TRANSFER, etc.
+  paymentLink         String?              // Revolut payment link used
+  transactionRef      String?              // User-provided transaction reference
+  verificationStatus  PaymentVerificationStatus @default(PENDING)
+  userUpgradedAt      DateTime             @default(now()) // When user was upgraded (instant)
+  verifiedAt          DateTime?            // When admin verified payment
+  verifiedBy          String?              // Admin user ID who verified
+  flaggedAt           DateTime?            // If payment not found
+  flaggedBy           String?              // Admin user ID who flagged
+  flagReason          String?              // Why payment was flagged
+  adminNotes          String?              // Internal notes for admin
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  @@index([userId])
+  @@index([verificationStatus])
+  @@index([userUpgradedAt])
+  @@map("payment_requests")
+}
+
 enum TeamRole {
   OWNER   // Festival creator, full control
   ADMIN   // Can manage team and all content
@@ -365,4 +394,15 @@ enum SubscriptionStatus {
   CANCELED
   PAST_DUE
   UNPAID
+}
+
+enum PaymentVerificationStatus {
+  PENDING     // Awaiting admin verification (user already upgraded)
+  VERIFIED    // Admin confirmed payment received
+  FLAGGED     // Admin couldn't find payment (investigate/contact user)
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
 }

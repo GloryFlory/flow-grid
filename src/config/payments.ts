@@ -25,8 +25,17 @@ export const PRICING = {
   },
   PRO: {
     monthly: 29,
-    yearly: 23, // per month, billed annually
+    yearly: 23, // per month, billed annually (€276/year)
+    yearlyTotal: 276, // Total annual cost
   },
+};
+
+// Revolut Payment Links
+export const REVOLUT_LINKS = {
+  PRO_ANNUAL: process.env.NEXT_PUBLIC_REVOLUT_PRO_ANNUAL_LINK || '',
+  PRO_MONTHLY: process.env.NEXT_PUBLIC_REVOLUT_PRO_MONTHLY_LINK || '',
+  EVENT_PASS_REGULAR: process.env.NEXT_PUBLIC_REVOLUT_EVENT_PASS_LINK || '',
+  EVENT_PASS_PRO: process.env.NEXT_PUBLIC_REVOLUT_EVENT_PASS_PRO_LINK || '',
 };
 
 // Early access messaging
