@@ -820,9 +820,13 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
                         {/* Render sessions that start in this time slot */}
                         <div className="absolute left-0 right-0 top-0" style={{ padding: '2px' }}>
                           {(() => {
-                            // Get sessions that start in this time slot
+                            // Get sessions that start in this time slot (or within this 30-minute window)
                             const sessionsStartingHere = getSessionsAtTimeSlot(day, timeSlotMinutes)
-                              .filter(s => timeToMinutes(s.start) === timeSlotMinutes)
+                              .filter(s => {
+                                const sessionStartMinutes = timeToMinutes(s.start)
+                                // Include sessions that start within this 30-minute slot
+                                return sessionStartMinutes >= timeSlotMinutes && sessionStartMinutes < timeSlotMinutes + 30
+                              })
                             
                             if (sessionsStartingHere.length === 0) return null
                             
