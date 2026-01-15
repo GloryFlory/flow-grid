@@ -834,6 +834,10 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
                               const sessionStart = timeToMinutes(session.start)
                               const sessionEnd = timeToMinutes(session.end)
                               
+                              // Calculate offset within the 30-minute slot
+                              const minutesIntoSlot = sessionStart - timeSlotMinutes
+                              const topOffsetPx = (minutesIntoSlot / 30) * 40 // Each 30-min slot is 40px tall
+                              
                               const durationMinutes = sessionEnd - sessionStart
                               const calculatedHeight = (durationMinutes / 30) * 40 - 4
                               const heightInPixels = Math.max(28, calculatedHeight)
@@ -851,7 +855,7 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
                               // Calculate positioning
                               let width = '100%'
                               let leftOffset = '0'
-                              let topOffset = '1px'
+                              let topOffsetValue = `${topOffsetPx + 2}px` // Use calculated offset + padding
                               let zIndex = 10 + columnIndex
                               
                               if (totalColumns === 1) {
@@ -881,7 +885,7 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
                                     height: `${heightInPixels}px`,
                                     width: width,
                                     left: leftOffset,
-                                    top: topOffset,
+                                    top: topOffsetValue,
                                     zIndex: zIndex,
                                     boxShadow: `
                                       0 1px 3px rgba(0,0,0,0.08),
