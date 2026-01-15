@@ -7,14 +7,22 @@ import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
 import { Check, X, Zap, Building, Sparkles, ArrowRight, Mail, HelpCircle, Calendar, FileText, Layers, Users, Palette, Globe, Type, QrCode, Code, Copy, Smartphone, Eye, Download, Bookmark, BarChart3, Heart, Shield, Headphones, Ticket, MousePointerClick, Clock, Gift } from 'lucide-react'
-import { PAYMENTS_ENABLED, EARLY_ACCESS_CONFIG, PRICING } from '@/config/payments'
+import { PAYMENTS_ENABLED, EARLY_ACCESS_CONFIG, PRICING, REVOLUT_LINKS } from '@/config/payments'
+import { RevolutPaymentModal } from '@/components/RevolutPaymentModal'
 
 export default function PricingPage() {
   const { data: session } = useSession()
-  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly')
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('yearly') // Default to yearly
   const [showStickyHeader, setShowStickyHeader] = useState(false)
   const headerTriggerRef = useRef<HTMLDivElement>(null)
   const sectionEndRef = useRef<HTMLDivElement>(null)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [selectedPlan, setSelectedPlan] = useState<{
+    plan: string
+    amount: number
+    billingCycle: 'MONTHLY' | 'YEARLY'
+    paymentLink: string
+  } | null>(null)
 
   const prices = {
     pro: billingPeriod === 'monthly' ? 29 : 23,
@@ -49,29 +57,24 @@ export default function PricingPage() {
       return
     }
 
-    try {
-      const response = await fetch('/api/stripe/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          plan, 
-          billingPeriod: plan === 'EVENT_PASS' ? 'one-time' : billingPeriod 
-        }),
-      })
-
-      const { url, error } = await response.json()
+    // Use Revolut payment links
+    if (plan === 'PRO') {
+      const paymentLink = billingPeriod === 'yearly' 
+        ? REVOLUT_LINKS.PRO_ANNUAL 
+        : REVOLUT_LINKS.PRO_MONTHLY
       
-      if (error) {
-        alert(error)
-        return
-      }
+      const amount = billingPeriod === 'yearly' ? PRICING.PRO.yearlyTotal : PRICING.PRO.monthly
 
-      if (url) {
-        window.location.href = url
-      }
-    } catch (error) {
-      console.error('Checkout error:', error)
-      alert('Something went wrong. Please try again.')
+      setSelectedPlan({
+        plan: 'PRO',
+        amount,
+        billingCycle: billingPeriod === 'yearly' ? 'YEARLY' : 'MONTHLY',
+        paymentLink
+      })
+      setShowPaymentModal(true)
+    } else {
+      // EVENT_PASS - will implement later
+      alert('Event Pass purchase coming soon!')
     }
   }
 
@@ -581,6 +584,18 @@ export default function PricingPage() {
 
       {/* Footer */}
       <Footer />
+
+      {/* Revolut Payment Modal */}
+      {selectedPlan && (
+        <RevolutPaymentModal
+          isOpen={showPaymentModal}
+          onClose={() => setShowPaymentModal(false)}
+          paymentLink={selectedPlan.paymentLink}
+          plan={selectedPlan.plan}
+          amount={selectedPlan.amount}
+          billingCycle={selectedPlan.billingCycle}
+        />
+      )}
     </div>
   )
 }
