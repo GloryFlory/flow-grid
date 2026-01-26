@@ -27,6 +27,7 @@ export async function GET(
         secondaryColor: true,
         accentColor: true,
         headerFont: true,
+        customLevelColors: true,
         startDate: true,
         endDate: true,
         timezone: true,
@@ -292,6 +293,7 @@ export async function GET(
         secondaryColor: festival.secondaryColor,
         accentColor: festival.accentColor,
         headerFont: (festival as any).headerFont,
+        customLevelColors: festival.customLevelColors, // Add custom level colors
         startDate: festival.startDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
         endDate: festival.endDate.toISOString().split('T')[0],
         timezone: festival.timezone,

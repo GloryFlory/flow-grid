@@ -18,7 +18,7 @@ import {
 } from '@/lib/adminAnalytics'
 import { 
   TrendingUp, Users, Calendar, Eye, CheckCircle, ChevronDown, ChevronRight, 
-  X, ExternalLink, Crown, BarChart3, UserCheck, Mail, Search
+  X, ExternalLink, Crown, BarChart3, UserCheck, Mail, Search, CreditCard
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -164,8 +164,30 @@ export default function AdminPlatformDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Platform Dashboard</h1>
-          <p className="text-gray-600 mt-1">Admin overview and platform metrics</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Platform Dashboard</h1>
+              <p className="text-gray-600 mt-1">Admin overview and platform metrics</p>
+            </div>
+            
+            {/* Admin Quick Links */}
+            <div className="flex gap-3">
+              <a
+                href="/admin/payments"
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              >
+                <CreditCard className="w-4 h-4" />
+                Payments
+              </a>
+              <a
+                href="/admin/health-emails"
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-md hover:bg-purple-700 transition-colors"
+              >
+                <Mail className="w-4 h-4" />
+                Health Emails
+              </a>
+            </div>
+          </div>
         </div>
 
         {/* Tabs */}
@@ -210,12 +232,11 @@ export default function AdminPlatformDashboard() {
               className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 whitespace-nowrap ${
                 activeTab === 'events'
                   ? 'border-purple-500 text-purple-600'
-                  : 'border-transparent text-gray-400 hover:text-gray-500'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
               <Calendar className="w-4 h-4" />
               All Events
-              <span className="text-xs bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">Soon</span>
             </button>
             <button
               onClick={() => setActiveTab('inquiries')}
@@ -252,7 +273,13 @@ export default function AdminPlatformDashboard() {
           />
         )}
         {activeTab === 'users' && <ComingSoonTab title="User Management" description="Search users, view profiles, manage subscriptions" />}
-        {activeTab === 'events' && <ComingSoonTab title="All Events" description="Browse all events on the platform, view public schedules" />}
+        {activeTab === 'events' && (
+          <EventsTab 
+            festivals={festivalHealth} 
+            loading={analyticsLoading}
+            error={analyticsError}
+          />
+        )}
         {activeTab === 'inquiries' && <ComingSoonTab title="Sales Inquiries" description="View and respond to Enterprise and contact form submissions" />}
       </div>
     </div>
@@ -276,6 +303,219 @@ function ComingSoonTab({ title, description }: { title: string; description: str
           Coming Soon
         </span>
       </div>
+    </div>
+  )
+}
+
+// ============================================================================
+// Events Tab - All festivals on the platform
+// ============================================================================
+
+function EventsTab({ 
+  festivals, 
+  loading, 
+  error 
+}: { 
+  festivals: FestivalHealth[]
+  loading: boolean
+  error: string | null
+}) {
+  const [searchTerm, setSearchTerm] = React.useState('')
+  const [filterPlan, setFilterPlan] = React.useState<'all' | 'FREE' | 'PRO' | 'ENTERPRISE'>('all')
+  const [filterPublished, setFilterPublished] = React.useState<'all' | 'published' | 'draft'>('all')
+  const [sortBy, setSortBy] = React.useState<'name' | 'views' | 'sessions' | 'created'>('name')
+
+  if (loading) {
+    return <div className="text-gray-600">Loading events...</div>
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-red-600 mb-4">{error}</p>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="text-blue-600 hover:underline"
+        >
+          Retry
+        </button>
+      </div>
+    )
+  }
+
+  // Filter and sort festivals
+  const filteredFestivals = festivals
+    .filter(f => {
+      // Search filter
+      if (searchTerm && !f.name.toLowerCase().includes(searchTerm.toLowerCase()) && 
+          !(f.ownerEmail && f.ownerEmail.toLowerCase().includes(searchTerm.toLowerCase()))) {
+        return false
+      }
+      // Plan filter
+      if (filterPlan !== 'all' && f.plan !== filterPlan) {
+        return false
+      }
+      // Published filter
+      if (filterPublished === 'published' && !f.isPublished) {
+        return false
+      }
+      if (filterPublished === 'draft' && f.isPublished) {
+        return false
+      }
+      return true
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case 'name':
+          return a.name.localeCompare(b.name)
+        case 'views':
+          return (b.scheduleViews || 0) - (a.scheduleViews || 0)
+        case 'sessions':
+          return (b.sessionsCount || 0) - (a.sessionsCount || 0)
+        case 'created':
+          // Most recent first
+          return new Date(b.lastActivity || 0).getTime() - new Date(a.lastActivity || 0).getTime()
+        default:
+          return 0
+      }
+    })
+
+  return (
+    <div className="space-y-6">
+      {/* Filters */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {/* Search */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+            <input
+              type="text"
+              placeholder="Event name or email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+            />
+          </div>
+
+          {/* Plan Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Plan</label>
+            <select
+              value={filterPlan}
+              onChange={(e) => setFilterPlan(e.target.value as any)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              <option value="all">All Plans</option>
+              <option value="FREE">Free</option>
+              <option value="PRO">Pro</option>
+              <option value="ENTERPRISE">Enterprise</option>
+            </select>
+          </div>
+
+          {/* Status Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <select
+              value={filterPublished}
+              onChange={(e) => setFilterPublished(e.target.value as any)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              <option value="all">All Events</option>
+              <option value="published">Published</option>
+              <option value="draft">Drafts</option>
+            </select>
+          </div>
+
+          {/* Sort By */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              <option value="name">Name (A-Z)</option>
+              <option value="views">Most Views</option>
+              <option value="sessions">Most Sessions</option>
+              <option value="created">Recently Active</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Results Count */}
+      <div className="text-sm text-gray-600">
+        Showing {filteredFestivals.length} of {festivals.length} events
+      </div>
+
+      {/* Events Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredFestivals.map((festival) => (
+          <Link
+            key={festival.id}
+            href={`/dashboard/festivals/${festival.id}`}
+            className="block bg-white rounded-lg shadow-sm border border-gray-200 hover:border-purple-400 hover:shadow-md transition-all p-4 group"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex-1 min-w-0">
+                <h3 className="text-base font-semibold text-gray-900 group-hover:text-purple-600 transition-colors truncate">
+                  {festival.name}
+                </h3>
+                <p className="text-sm text-gray-500 truncate">{festival.ownerEmail}</p>
+              </div>
+              {festival.isPublished ? (
+                <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 ml-2" />
+              ) : (
+                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded flex-shrink-0 ml-2">Draft</span>
+              )}
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-2 mb-3">
+              <div className="text-center">
+                <div className="text-lg font-semibold text-gray-900">{festival.sessionsCount || 0}</div>
+                <div className="text-xs text-gray-500">Sessions</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-semibold text-gray-900">{festival.scheduleViews || 0}</div>
+                <div className="text-xs text-gray-500">Views</div>
+              </div>
+              <div className="text-center">
+                <div className={`text-lg font-semibold ${getHealthColor(festival.healthScore)}`}>
+                  {festival.healthScore}
+                </div>
+                <div className="text-xs text-gray-500">Health</div>
+              </div>
+            </div>
+
+            {/* Plan Badge */}
+            <div className="flex items-center justify-between">
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                festival.plan === 'PRO' 
+                  ? 'bg-purple-100 text-purple-800' 
+                  : festival.plan === 'ENTERPRISE'
+                  ? 'bg-blue-100 text-blue-800'
+                  : 'bg-gray-100 text-gray-800'
+              }`}>
+                {festival.plan}
+              </span>
+              
+              {festival.lastActivity && (
+                <span className="text-xs text-gray-400">
+                  {new Date(festival.lastActivity).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                </span>
+              )}
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      {filteredFestivals.length === 0 && (
+        <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+          <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+          <p className="text-gray-500">No events found matching your filters</p>
+        </div>
+      )}
     </div>
   )
 }
@@ -697,41 +937,46 @@ function AnalyticsTab({
                                 label="Sessions"
                                 achieved={festival.breakdown.sessions.achieved}
                                 points={festival.breakdown.sessions.points}
-                                maxPoints={20}
-                                description={`${festival.breakdown.sessions.value} sessions (needs >10)`}
+                                maxPoints={5}
+                                description={`${festival.breakdown.sessions.value} sessions (needs ≥10)`}
                               />
                               <BreakdownItem
                                 label="Schedule Views"
                                 achieved={festival.breakdown.views.achieved}
                                 points={festival.breakdown.views.points}
-                                maxPoints={20}
-                                description={`${festival.breakdown.views.value} views (needs >100)`}
+                                maxPoints={15}
+                                description={`${festival.breakdown.views.value} views (needs ≥100)`}
                               />
                               <BreakdownItem
                                 label="Branding"
                                 achieved={festival.breakdown.branding.achieved}
                                 points={festival.breakdown.branding.points}
-                                maxPoints={15}
+                                maxPoints={20}
                                 description={festival.breakdown.branding.achieved ? "Has custom logo/colors" : "No custom branding"}
                               />
                               <BreakdownItem
                                 label="Social Shares"
                                 achieved={festival.breakdown.shares.achieved}
                                 points={festival.breakdown.shares.points}
-                                maxPoints={10}
+                                maxPoints={5}
                                 description={festival.breakdown.shares.achieved ? "Has share activity" : "No shares yet"}
                               />
                               <BreakdownItem
-                                label="Recent Activity"
-                                achieved={festival.breakdown.recentActivity.achieved}
-                                points={festival.breakdown.recentActivity.points}
+                                label="Social Links"
+                                achieved={festival.breakdown.socialLinks.achieved}
+                                points={festival.breakdown.socialLinks.points}
                                 maxPoints={10}
+                                description={festival.breakdown.socialLinks.achieved ? "Has social media links" : "No social links added"}
+                              />
+                              <BreakdownItem
+                                label="Teacher Photos"
+                                achieved={festival.breakdown.teacherPhotos.achieved}
+                                points={festival.breakdown.teacherPhotos.points}
+                                maxPoints={20}
                                 description={
-                                  festival.breakdown.recentActivity.achieved 
-                                    ? `Active within 7 days` 
-                                    : festival.breakdown.recentActivity.lastActivity
-                                    ? `Last active ${new Date(festival.breakdown.recentActivity.lastActivity).toLocaleDateString()}`
-                                    : "No recent activity"
+                                  festival.breakdown.teacherPhotos.achieved 
+                                    ? `${festival.breakdown.teacherPhotos.value} photo(s) added` 
+                                    : "No teacher photos"
                                 }
                               />
                             </div>

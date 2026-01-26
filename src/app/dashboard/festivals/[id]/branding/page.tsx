@@ -28,6 +28,7 @@ interface Festival {
   secondaryColor: string
   accentColor: string
   headerFont?: string | null
+  customLevelColors?: Record<string, string> | null
 }
 
 export default function FestivalBranding() {
@@ -51,6 +52,14 @@ export default function FestivalBranding() {
     accent: '#ff6b6b'
   })
   const [headerFont, setHeaderFont] = useState<string | null>(null)
+  const [levelColors, setLevelColors] = useState<Record<string, string>>({
+    'Beginner': '#22C55E',
+    'Beginner+': '#84CC16',
+    'Intermediate': '#EAB308',
+    'Intermediate+': '#F97316',
+    'Advanced': '#8B5CF6',
+    'All Levels': '#3B82F6'
+  })
   const logoInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -67,6 +76,9 @@ export default function FestivalBranding() {
         accent: festival.accentColor
       })
       setHeaderFont(festival.headerFont || null)
+      if (festival.customLevelColors) {
+        setLevelColors(festival.customLevelColors as Record<string, string>)
+      }
     }
   }, [festival])
 
@@ -128,6 +140,7 @@ export default function FestivalBranding() {
           secondaryColor: previewColors.secondary,
           accentColor: previewColors.accent,
           headerFont: headerFont,
+          customLevelColors: levelColors,
         }),
       })
 
@@ -138,6 +151,7 @@ export default function FestivalBranding() {
           secondaryColor: previewColors.secondary,
           accentColor: previewColors.accent,
           headerFont: headerFont,
+          customLevelColors: levelColors,
         } : null)
       }
     } catch (error) {
@@ -155,6 +169,21 @@ export default function FestivalBranding() {
         accent: festival.accentColor
       })
     }
+  }
+
+  const resetLevelColors = () => {
+    setLevelColors({
+      'Beginner': '#22C55E',
+      'Beginner+': '#84CC16',
+      'Intermediate': '#EAB308',
+      'Intermediate+': '#F97316',
+      'Advanced': '#8B5CF6',
+      'All Levels': '#3B82F6'
+    })
+  }
+
+  const handleLevelColorChange = (level: string, color: string) => {
+    setLevelColors(prev => ({ ...prev, [level]: color }))
   }
 
   const presetColorSchemes = [
@@ -429,6 +458,60 @@ export default function FestivalBranding() {
                   >
                     <RefreshCw className="w-4 h-4 mr-2" />
                     Reset Colors
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Level Colors */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Palette className="w-5 h-5" />
+                  Level Colors
+                </CardTitle>
+                <p className="text-sm text-gray-600 mt-1">
+                  Customize the colors for session difficulty levels
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {Object.entries(levelColors).map(([level, color]) => (
+                  <div key={level}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {level}
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="color"
+                        value={color}
+                        onChange={(e) => handleLevelColorChange(level, e.target.value)}
+                        className="w-12 h-12 rounded-lg border border-gray-300 cursor-pointer"
+                      />
+                      <input
+                        type="text"
+                        value={color}
+                        onChange={(e) => handleLevelColorChange(level, e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm"
+                      />
+                      <div 
+                        className="w-12 h-12 rounded-lg border border-gray-200 flex items-center justify-center text-xs text-white font-medium"
+                        style={{ backgroundColor: color }}
+                      >
+                        {level.charAt(0)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Actions */}
+                <div className="flex gap-3 pt-4 border-t">
+                  <Button
+                    onClick={resetLevelColors}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Reset to Defaults
                   </Button>
                 </div>
               </CardContent>

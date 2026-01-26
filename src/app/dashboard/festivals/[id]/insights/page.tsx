@@ -24,6 +24,7 @@ interface Festival {
   name: string
   slug: string
   presenterLabel?: string
+  customLevelColors?: Record<string, string> | null
 }
 
 interface InsightsData {
@@ -46,11 +47,21 @@ interface InsightsData {
 }
 
 const LEVEL_COLORS: Record<string, { bg: string; fill: string }> = {
-  'Beginner': { bg: 'bg-green-500', fill: '#22c55e' },
-  'Intermediate': { bg: 'bg-yellow-500', fill: '#eab308' },
-  'Advanced': { bg: 'bg-red-500', fill: '#ef4444' },
-  'All Levels': { bg: 'bg-blue-500', fill: '#3b82f6' },
+  'Beginner': { bg: 'bg-green-500', fill: '#22C55E' },
+  'Beginner+': { bg: 'bg-lime-500', fill: '#84CC16' },
+  'Intermediate': { bg: 'bg-yellow-500', fill: '#EAB308' },
+  'Intermediate+': { bg: 'bg-orange-500', fill: '#F97316' },
+  'Advanced': { bg: 'bg-purple-500', fill: '#8B5CF6' },
+  'All Levels': { bg: 'bg-blue-500', fill: '#3B82F6' },
   'Not specified': { bg: 'bg-gray-400', fill: '#9ca3af' },
+}
+
+// Helper to get level color (custom or default)
+const getLevelColor = (level: string, customColors?: Record<string, string> | null): string => {
+  if (customColors && customColors[level]) {
+    return customColors[level]
+  }
+  return LEVEL_COLORS[level]?.fill || '#9ca3af'
 }
 
 const STYLE_COLORS = [
@@ -673,7 +684,7 @@ export default function InsightsPage() {
 
   // Prepare pie chart data
   const levelPieData = byLevel.map(l => ({ label: l.level, value: l.count }))
-  const levelColors = byLevel.map(l => LEVEL_COLORS[l.level]?.fill || '#9ca3af')
+  const levelColors = byLevel.map(l => getLevelColor(l.level, festival.customLevelColors as Record<string, string> | null))
   
   const stylePieData = byStyle.map(s => ({ label: s.style, value: s.count }))
 
@@ -812,16 +823,19 @@ export default function InsightsPage() {
                     />
                   </div>
                   <div className="flex-1 space-y-2">
-                    {byLevel.map((level) => (
-                      <div key={level.level} className="flex items-center gap-2 text-sm">
-                        <div className={`w-3 h-3 rounded-full ${LEVEL_COLORS[level.level]?.bg || 'bg-gray-400'}`} />
-                        <span className="flex-1">{level.level}</span>
-                        <span className="font-medium">{level.count}</span>
-                        <span className="text-muted-foreground text-xs w-12 text-right">
-                          {Math.round((level.count / totalLevelCount) * 100)}%
-                        </span>
-                      </div>
-                    ))}
+                    {byLevel.map((level) => {
+                      const color = getLevelColor(level.level, festival.customLevelColors as Record<string, string> | null)
+                      return (
+                        <div key={level.level} className="flex items-center gap-2 text-sm">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }} />
+                          <span className="flex-1">{level.level}</span>
+                          <span className="font-medium">{level.count}</span>
+                          <span className="text-muted-foreground text-xs w-12 text-right">
+                            {Math.round((level.count / totalLevelCount) * 100)}%
+                          </span>
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               )}

@@ -33,6 +33,7 @@ interface SessionCardProps {
   onTeacherClick: (teacher: string) => void
   isFavourite?: boolean
   onFavouriteToggle?: (sessionId: string) => void
+  customLevelColors?: Record<string, string> | null
 }
 
 // Helper functions
@@ -55,7 +56,13 @@ const getSessionSize = (session: Session) => {
   return 'large'
 }
 
-const getLevelColor = (level: string) => {
+const getLevelColor = (level: string, customColors?: Record<string, string> | null) => {
+  // Use custom color if available
+  if (customColors && customColors[level]) {
+    return customColors[level]
+  }
+  
+  // Fallback to defaults
   switch (level) {
     case 'Beginner':
       return '#22C55E' // green
@@ -81,8 +88,8 @@ const getTeacherImageSrc = (session: any) => {
     return session.teacherPhoto
   }
   
-  // Fallback to placeholder if no photo is available
-  return '/teachers/placeholder.jpg'
+  // Return null if no photo - component should handle hiding the image
+  return null
 }
 
 // Enhanced teacher link function (could link to teacher profiles in the future)
@@ -129,7 +136,7 @@ const FavouriteButton = ({
   )
 }
 
-export function SessionCard({ session, onClick, onStyleClick, onLevelClick, onTeacherClick, isFavourite = false, onFavouriteToggle }: SessionCardProps) {
+export function SessionCard({ session, onClick, onStyleClick, onLevelClick, onTeacherClick, isFavourite = false, onFavouriteToggle, customLevelColors }: SessionCardProps) {
   const size = getSessionSize(session)
   
   // Normalize and default safely - handle both cardType and CardType
@@ -235,18 +242,20 @@ export function SessionCard({ session, onClick, onStyleClick, onLevelClick, onTe
                 {session.teachers.length === 1 ? (
                   /* Single teacher - show one large photo */
                   <div className="teacher-photo-single">
-                    <img 
-                      src={session.teacherPhotos?.[0] || '/teachers/placeholder.jpg'}
-                      alt={session.teachers[0]}
-                      className="teacher-photo-large"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement
-                        target.style.display = 'none'
-                        const nextElement = target.nextElementSibling as HTMLElement
-                        if (nextElement) nextElement.style.display = 'flex'
-                      }}
-                    />
-                    <div className="teacher-placeholder-large" style={{ display: 'none' }}>
+                    {session.teacherPhotos?.[0] ? (
+                      <img 
+                        src={session.teacherPhotos[0]}
+                        alt={session.teachers[0]}
+                        className="teacher-photo-large"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement
+                          target.style.display = 'none'
+                          const nextElement = target.nextElementSibling as HTMLElement
+                          if (nextElement) nextElement.style.display = 'flex'
+                        }}
+                      />
+                    ) : null}
+                    <div className="teacher-placeholder-large" style={{ display: session.teacherPhotos?.[0] ? 'none' : 'flex' }}>
                       {session.teachers[0].split(' ').map(n => n[0]).join('').toUpperCase()}
                     </div>
                   </div>
@@ -255,18 +264,20 @@ export function SessionCard({ session, onClick, onStyleClick, onLevelClick, onTe
                   <div className="teacher-photos-multiple">
                     {session.teachers.slice(0, 3).map((teacher, index) => (
                       <div key={index} className="teacher-avatar-small" style={{ zIndex: 10 - index }}>
-                        <img 
-                          src={session.teacherPhotos?.[index] || '/teachers/placeholder.jpg'}
-                          alt={teacher}
-                          className="teacher-photo-small"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement
-                            target.style.display = 'none'
-                            const nextElement = target.nextElementSibling as HTMLElement
-                            if (nextElement) nextElement.style.display = 'flex'
-                          }}
-                        />
-                        <div className="teacher-placeholder-small" style={{ display: 'none' }}>
+                        {session.teacherPhotos?.[index] ? (
+                          <img 
+                            src={session.teacherPhotos[index]!}
+                            alt={teacher}
+                            className="teacher-photo-small"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement
+                              target.style.display = 'none'
+                              const nextElement = target.nextElementSibling as HTMLElement
+                              if (nextElement) nextElement.style.display = 'flex'
+                            }}
+                          />
+                        ) : null}
+                        <div className="teacher-placeholder-small" style={{ display: session.teacherPhotos?.[index] ? 'none' : 'flex' }}>
                           {teacher.split(' ').map(n => n[0]).join('').toUpperCase()}
                         </div>
                       </div>
@@ -346,7 +357,7 @@ export function SessionCard({ session, onClick, onStyleClick, onLevelClick, onTe
             {session.level && (
               <button
                 className="style-tag clickable level-colored"
-                style={{ backgroundColor: getLevelColor(session.level), color: 'white' }}
+                style={{ backgroundColor: getLevelColor(session.level, customLevelColors), color: 'white' }}
                 onClick={(e) => {
                   e.stopPropagation()
                   onLevelClick(session.level)

@@ -74,9 +74,15 @@ const formatDayHeader = (dateStr: string): string => {
 }
 
 // Get level-based color - match SessionCard colors exactly
-const getSessionColor = (session: Session, festival?: { primaryColor?: string }): string => {
+const getSessionColor = (session: Session, festival?: { primaryColor?: string; customLevelColors?: Record<string, string> | null }): string => {
   // If level is set, use level-based colors
   if (session.level) {
+    // Use custom color if available
+    if (festival?.customLevelColors && festival.customLevelColors[session.level]) {
+      return festival.customLevelColors[session.level]
+    }
+    
+    // Fallback to defaults
     switch (session.level) {
       case 'Beginner':
         return '#22C55E' // green
@@ -1009,30 +1015,15 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
         <div className="bg-white rounded-lg shadow p-4">
           <h3 className="text-sm font-semibold text-gray-900 mb-3">Level Colors:</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 text-xs">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded border-l-4" style={{ borderColor: '#22C55E', backgroundColor: '#f0fdf4' }}></div>
-              <span>Beginner</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded border-l-4" style={{ borderColor: '#84CC16', backgroundColor: '#f7fee7' }}></div>
-              <span>Beginner+</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded border-l-4" style={{ borderColor: '#EAB308', backgroundColor: '#fefce8' }}></div>
-              <span>Intermediate</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded border-l-4" style={{ borderColor: '#F97316', backgroundColor: '#fff7ed' }}></div>
-              <span>Intermediate+</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded border-l-4" style={{ borderColor: '#8B5CF6', backgroundColor: '#faf5ff' }}></div>
-              <span>Advanced</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded border-l-4" style={{ borderColor: '#3B82F6', backgroundColor: '#eff6ff' }}></div>
-              <span>All Levels</span>
-            </div>
+            {(['Beginner', 'Beginner+', 'Intermediate', 'Intermediate+', 'Advanced', 'All Levels'] as const).map((level) => {
+              const color = getSessionColor({ level } as Session, festival)
+              return (
+                <div key={level} className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded border-l-4" style={{ borderColor: color, backgroundColor: `${color}15` }}></div>
+                  <span>{level}</span>
+                </div>
+              )
+            })}
           </div>
         </div>
       </div>

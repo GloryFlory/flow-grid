@@ -292,6 +292,7 @@ export default function SessionsManagement() {
   const [waitlist, setWaitlist] = useState<any[]>([])
   const [activeTab, setActiveTab] = useState<'sessions' | 'bookings' | 'waitlist'>('sessions')
   const [isLoading, setIsLoading] = useState(true)
+  const [hasFetchedData, setHasFetchedData] = useState(false)
   const [error, setError] = useState<{ type: 'not-found' | 'forbidden' | 'error'; message: string } | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -358,10 +359,10 @@ export default function SessionsManagement() {
   const outOfRangeSessions = getOutOfRangeSessions()
 
   useEffect(() => {
-    if (festivalId) {
+    if (festivalId && !hasFetchedData) {
       fetchFestival() // Now fetches everything in parallel
     }
-  }, [festivalId])
+  }, [festivalId, hasFetchedData])
 
   const fetchFestival = async () => {
     try {
@@ -413,6 +414,7 @@ export default function SessionsManagement() {
       setSessions(sessionsData.sessions || [])
       setBookings(bookingsData.bookings || [])
       setWaitlist(waitlistData.waitlist || [])
+      setHasFetchedData(true)
     } catch (error) {
       console.error('Error fetching festival:', error)
       setError({ 
@@ -524,6 +526,7 @@ export default function SessionsManagement() {
 
       if (response.ok) {
         // Refresh the festival data to show updated sessions
+        setHasFetchedData(false) // Reset flag to allow refetch
         await fetchFestival()
         setSelectedFile(null)
         setShowCSVPreview(false)
@@ -676,6 +679,7 @@ export default function SessionsManagement() {
 
       if (data.success) {
         // Refresh festival data
+        setHasFetchedData(false) // Reset flag to allow refetch
         await fetchFestival()
         setGoogleSheetUrl('')
         setSheetValidation(null)
@@ -833,6 +837,7 @@ export default function SessionsManagement() {
         setEditingSession(null)
         
         // Force refresh both festival AND sessions data
+        setHasFetchedData(false) // Reset flag to allow refetch
         await fetchFestival()
       } else {
         // Better error handling

@@ -4,7 +4,7 @@
   "description": "Flow Grid - Multi-tenant SaaS platform for creating beautiful, interactive schedules for festivals, workshops, and events.",
   "main": "index.js",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3000",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",

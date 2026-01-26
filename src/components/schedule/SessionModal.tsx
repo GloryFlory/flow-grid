@@ -35,6 +35,7 @@ interface SessionModalProps {
   onFavouriteToggle?: (sessionId: string) => void
   primaryColor?: string
   accentColor?: string
+  customLevelColors?: Record<string, string> | null
 }
 
 // Helper functions
@@ -50,16 +51,29 @@ const getDuration = (start: string, end: string) => {
   return (endTime.getTime() - startTime.getTime()) / (1000 * 60) // minutes
 }
 
-const getLevelColor = (level: string) => {
+const getLevelColor = (level: string, customColors?: Record<string, string> | null) => {
+  // Use custom color if available
+  if (customColors && customColors[level]) {
+    return customColors[level]
+  }
+  
+  // Fallback to defaults
   switch (level) {
     case 'Beginner':
-      return '#10b981' // green
+      return '#22C55E' // green
+    case 'Beginner+':
+      return '#84CC16' // lime
     case 'Intermediate':
-      return '#f59e0b' // amber
+      return '#EAB308' // yellow
+    case 'Intermediate+':
+      return '#F97316' // orange
     case 'Advanced':
-      return '#ef4444' // red
+      return '#8B5CF6' // purple
+    case 'All Levels':
+    case 'Open Level':
+      return '#3B82F6' // blue
     default:
-      return '#3b82f6' // blue
+      return '#3B82F6' // blue
   }
 }
 
@@ -89,7 +103,7 @@ const getTeacherLink = (teachers: string[], index: number, session: Session) => 
   return session.teacherUrls[index]
 }
 
-export function SessionModal({ session, onClose, festivalSlug, isFavourite = false, onFavouriteToggle, primaryColor = '#4a90e2', accentColor = '#ff6b6b' }: SessionModalProps) {
+export function SessionModal({ session, onClose, festivalSlug, isFavourite = false, onFavouriteToggle, primaryColor = '#4a90e2', accentColor = '#ff6b6b', customLevelColors }: SessionModalProps) {
   const [showBookingForm, setShowBookingForm] = useState(false)
   const [bookingNames, setBookingNames] = useState('')
   const [bookingEmail, setBookingEmail] = useState('')
@@ -423,7 +437,7 @@ export function SessionModal({ session, onClose, festivalSlug, isFavourite = fal
                 <h5>LEVEL</h5>
                 <span 
                   className="modal-level-badge" 
-                  style={{ backgroundColor: getLevelColor(session.level) }}
+                  style={{ backgroundColor: getLevelColor(session.level, customLevelColors) }}
                 >
                   {session.level}
                 </span>

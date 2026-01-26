@@ -16,7 +16,7 @@ export async function PATCH(
     if (error) return error
 
     const body = await request.json()
-    const { primaryColor, secondaryColor, accentColor, headerFont } = body
+    const { primaryColor, secondaryColor, accentColor, headerFont, customLevelColors } = body
 
     // Update branding colors and font
     const updatedFestival = await prisma.festival.update({
@@ -26,6 +26,7 @@ export async function PATCH(
         secondaryColor,
         accentColor,
         headerFont: headerFont || null,
+        customLevelColors: customLevelColors || null,
       },
     })
 

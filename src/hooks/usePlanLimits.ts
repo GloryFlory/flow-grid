@@ -14,10 +14,14 @@ interface PlanLimits {
 export function usePlanLimits() {
   const [limits, setLimits] = useState<PlanLimits | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [hasFetched, setHasFetched] = useState(false)
 
   useEffect(() => {
-    fetchLimits()
-  }, [])
+    // Only fetch if we haven't already fetched data
+    if (!hasFetched) {
+      fetchLimits()
+    }
+  }, [hasFetched])
 
   const fetchLimits = async () => {
     try {
@@ -25,6 +29,7 @@ export function usePlanLimits() {
       if (response.ok) {
         const data = await response.json()
         setLimits(data)
+        setHasFetched(true)
       }
     } catch (error) {
       console.error('Failed to fetch plan limits:', error)
@@ -35,6 +40,7 @@ export function usePlanLimits() {
 
   const refresh = () => {
     setIsLoading(true)
+    setHasFetched(false) // Reset hasFetched to allow refetch
     fetchLimits()
   }
 

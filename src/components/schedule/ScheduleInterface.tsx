@@ -42,6 +42,7 @@ interface Festival {
   secondaryColor?: string
   accentColor?: string
   headerFont?: string | null
+  customLevelColors?: Record<string, string> | null
   whatsappLink?: string
   telegramLink?: string
   facebookLink?: string
@@ -742,6 +743,7 @@ export default function ScheduleInterface({ festival, sessions, showPoweredBy = 
                         onTeacherClick={setTeacherFilter}
                         isFavourite={isFavourite(session.id)}
                         onFavouriteToggle={handleFavouriteToggle}
+                        customLevelColors={festival.customLevelColors}
                       />
                     ))}
                   </div>
@@ -775,6 +777,7 @@ export default function ScheduleInterface({ festival, sessions, showPoweredBy = 
                     onTeacherClick={setTeacherFilter}
                     isFavourite={isFavourite(session.id)}
                     onFavouriteToggle={handleFavouriteToggle}
+                    customLevelColors={festival.customLevelColors}
                   />
                 ))}
             </div>
@@ -797,6 +800,7 @@ export default function ScheduleInterface({ festival, sessions, showPoweredBy = 
         onFavouriteToggle={handleFavouriteToggle}
         primaryColor={festival.primaryColor}
         accentColor={festival.accentColor}
+        customLevelColors={festival.customLevelColors}
       />
     </div>
   )

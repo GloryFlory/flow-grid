@@ -61,11 +61,15 @@ export function DashboardClient({
 }) {
   const [festivals, setFestivals] = useState<Festival[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [hasFetched, setHasFetched] = useState(false)
   const { limits, isLoading: limitsLoading } = usePlanLimits()
 
   useEffect(() => {
-    fetchFestivals()
-  }, [])
+    // Only fetch if we haven't already fetched data
+    if (!hasFetched) {
+      fetchFestivals()
+    }
+  }, [hasFetched])
 
   const fetchFestivals = async () => {
     try {
@@ -73,6 +77,7 @@ export function DashboardClient({
       if (response.ok) {
         const data = await response.json()
         setFestivals(data)
+        setHasFetched(true)
       }
     } catch (error) {
       console.error('Failed to fetch festivals:', error)

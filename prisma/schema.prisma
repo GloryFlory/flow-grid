@@ -75,6 +75,7 @@ model Festival {
   secondaryColor String             @default("#7b68ee")
   accentColor    String             @default("#ff6b6b")
   headerFont     String?            // Google Font name for headers (e.g., "Playfair Display", "Oswald")
+  customLevelColors Json?           // Custom colors for session levels: { "Beginner": "#22C55E", "Beginner+": "#84CC16", ... }
   hideWatermark  Boolean            @default(false) // Hide "Powered by Flow Grid" (Pro feature)
   isPublished    Boolean            @default(false)
   customDomain   String?            @unique

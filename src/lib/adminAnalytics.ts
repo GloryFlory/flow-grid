@@ -26,13 +26,15 @@ export type HealthBreakdown = {
   sessions: { achieved: boolean; points: number; value: number }
   views: { achieved: boolean; points: number; value: number }
   branding: { achieved: boolean; points: number }
+  socialLinks: { achieved: boolean; points: number }
+  teacherPhotos: { achieved: boolean; points: number; value: number }
   shares: { achieved: boolean; points: number }
-  recentActivity: { achieved: boolean; points: number; lastActivity: Date | null }
 }
 
 export type FestivalHealth = {
   id: string
   name: string
+  ownerId: string
   ownerEmail: string | null
   plan: string
   sessionsCount: number
@@ -168,8 +170,9 @@ function calculateHealthScore(data: {
   sessionsCount: number
   scheduleViews: number
   hasBranding: boolean
+  hasSocialLinks: boolean
+  teacherPhotosCount: number
   hasShares: boolean
-  lastActivity: Date | null
 }): { score: number; breakdown: HealthBreakdown } {
   let score = 0
   const breakdown: HealthBreakdown = {
@@ -177,48 +180,51 @@ function calculateHealthScore(data: {
     sessions: { achieved: false, points: 0, value: data.sessionsCount },
     views: { achieved: false, points: 0, value: data.scheduleViews },
     branding: { achieved: false, points: 0 },
-    shares: { achieved: false, points: 0 },
-    recentActivity: { achieved: false, points: 0, lastActivity: data.lastActivity }
+    socialLinks: { achieved: false, points: 0 },
+    teacherPhotos: { achieved: false, points: 0, value: data.teacherPhotosCount },
+    shares: { achieved: false, points: 0 }
   }
 
-  // Published
+  // Published (25 points) - MOST IMPORTANT
   if (data.isPublished) {
     score += 25
     breakdown.published = { achieved: true, points: 25 }
   }
 
-  // Has content
-  if (data.sessionsCount > 10) {
-    score += 20
-    breakdown.sessions = { achieved: true, points: 20, value: data.sessionsCount }
-  }
-
-  // Getting traffic
-  if (data.scheduleViews > 100) {
-    score += 20
-    breakdown.views = { achieved: true, points: 20, value: data.scheduleViews }
-  }
-
-  // Has branding
+  // Has branding - logo and colors (20 points)
   if (data.hasBranding) {
+    score += 20
+    breakdown.branding = { achieved: true, points: 20 }
+  }
+
+  // Has teacher photos (20 points)
+  if (data.teacherPhotosCount > 0) {
+    score += 20
+    breakdown.teacherPhotos = { achieved: true, points: 20, value: data.teacherPhotosCount }
+  }
+
+  // Getting traffic - 100+ views (15 points)
+  if (data.scheduleViews >= 100) {
     score += 15
-    breakdown.branding = { achieved: true, points: 15 }
+    breakdown.views = { achieved: true, points: 15, value: data.scheduleViews }
   }
 
-  // Being shared
-  if (data.hasShares) {
+  // Has social links - at least one platform (10 points)
+  if (data.hasSocialLinks) {
     score += 10
-    breakdown.shares = { achieved: true, points: 10 }
+    breakdown.socialLinks = { achieved: true, points: 10 }
   }
 
-  // Recent activity (last 7 days)
-  if (data.lastActivity) {
-    const sevenDaysAgo = new Date()
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
-    if (data.lastActivity >= sevenDaysAgo) {
-      score += 10
-      breakdown.recentActivity = { achieved: true, points: 10, lastActivity: data.lastActivity }
-    }
+  // Has sessions - at least 10 (5 points)
+  if (data.sessionsCount >= 10) {
+    score += 5
+    breakdown.sessions = { achieved: true, points: 5, value: data.sessionsCount }
+  }
+
+  // Being shared - at least 1 share (5 points)
+  if (data.hasShares) {
+    score += 5
+    breakdown.shares = { achieved: true, points: 5 }
   }
 
   return { score, breakdown }
@@ -237,6 +243,11 @@ export async function getFestivalHealthList(): Promise<FestivalHealth[]> {
         }
       },
       sessions: true,
+      teachers: {
+        include: {
+          photos: true // Include photos to count them
+        }
+      },
       _count: {
         select: {
           sessions: true
@@ -245,74 +256,103 @@ export async function getFestivalHealthList(): Promise<FestivalHealth[]> {
     }
   })
 
-  // Process each festival
-  const healthList = await Promise.all(
-    festivals.map(async (festival) => {
-      // Count schedule views for this festival
-      const scheduleViews = await prisma.analytics.count({
-        where: {
-          festivalId: festival.id,
-          event: 'schedule_viewed'
-        }
-      })
+  // Batch fetch all analytics data at once instead of per-festival queries
+  const festivalIds = festivals.map(f => f.id)
+  
+  // Get all analytics events for these festivals in one query
+  const allAnalytics = await prisma.analytics.findMany({
+    where: {
+      festivalId: { in: festivalIds }
+    },
+    select: {
+      festivalId: true,
+      event: true,
+      timestamp: true
+    }
+  })
 
-      // Check if has share events
-      const shareCount = await prisma.analytics.count({
-        where: {
-          festivalId: festival.id,
-          event: 'schedule_shared'
-        }
-      })
+  // Build lookup maps for fast access
+  const analyticsMap = new Map<string, { views: number; shares: number; lastActivity: Date | null }>()
+  
+  festivalIds.forEach(id => {
+    analyticsMap.set(id, { views: 0, shares: 0, lastActivity: null })
+  })
 
-      // Get last activity (most recent analytics event or festival update)
-      const lastAnalyticsEvent = await prisma.analytics.findFirst({
-        where: {
-          festivalId: festival.id
-        },
-        orderBy: {
-          timestamp: 'desc'
-        },
-        select: {
-          timestamp: true
-        }
-      })
+  // Process all analytics in one pass
+  allAnalytics.forEach(record => {
+    if (!record.festivalId) return // Skip null festivalIds
+    
+    const data = analyticsMap.get(record.festivalId)!
+    
+    if (record.event === 'schedule_viewed') {
+      data.views++
+    } else if (record.event === 'schedule_shared') {
+      data.shares++
+    }
+    
+    // Track most recent activity
+    if (!data.lastActivity || record.timestamp > data.lastActivity) {
+      data.lastActivity = record.timestamp
+    }
+  })
 
-      const lastActivity = lastAnalyticsEvent?.timestamp || festival.updatedAt
+  // Process each festival with pre-fetched data
+  const healthList: FestivalHealth[] = festivals.map((festival) => {
+    const analytics = analyticsMap.get(festival.id)!
+    const scheduleViews = analytics.views
+    const shareCount = analytics.shares
+    const lastAnalyticsEvent = analytics.lastActivity
 
-      // Check if has branding (logo or custom colors)
-      const hasBranding = !!(
-        festival.logo || 
-        (festival.primaryColor && festival.primaryColor !== '#4a90e2') ||
-        (festival.secondaryColor && festival.secondaryColor !== '#7b68ee')
-      )
+    const lastActivity = lastAnalyticsEvent || festival.updatedAt
 
-      const healthData = {
-        isPublished: festival.isPublished,
-        sessionsCount: festival._count.sessions,
-        scheduleViews,
-        hasBranding,
-        hasShares: shareCount > 0,
-        lastActivity
-      }
+    // Check if has branding (logo or custom colors)
+    const hasBranding = !!(
+      festival.logo || 
+      (festival.primaryColor && festival.primaryColor !== '#4a90e2') ||
+      (festival.secondaryColor && festival.secondaryColor !== '#7b68ee')
+    )
 
-      const { score: healthScore, breakdown } = calculateHealthScore(healthData)
+    // Check if has social links
+    const hasSocialLinks = !!(
+      festival.whatsappLink ||
+      festival.telegramLink ||
+      festival.facebookLink ||
+      festival.instagramLink
+    )
 
-      return {
-        id: festival.id,
-        name: festival.name,
-        ownerEmail: festival.user.email,
-        plan: festival.user.subscription?.plan || 'FREE',
-        sessionsCount: festival._count.sessions,
-        scheduleViews,
-        lastActivity,
-        isPublished: festival.isPublished,
-        hasBranding,
-        hasShares: shareCount > 0,
-        healthScore,
-        breakdown
-      }
-    })
-  )
+    // Count teacher photos (sum all photos from all teachers)
+    const teacherPhotosCount = festival.teachers?.reduce((sum, teacher) => {
+      return sum + (teacher.photos?.length || 0)
+    }, 0) || 0
+
+    const healthData = {
+      isPublished: festival.isPublished,
+      sessionsCount: festival._count.sessions,
+      scheduleViews,
+      hasBranding,
+      hasSocialLinks,
+      teacherPhotosCount,
+      hasShares: shareCount > 0
+    }
+
+    const { score: healthScore, breakdown } = calculateHealthScore(healthData)
+
+    return {
+      id: festival.id,
+      name: festival.name,
+      ownerId: festival.userId,
+      ownerEmail: festival.user.email,
+      plan: festival.user.subscription?.plan || 'FREE',
+      sessionsCount: festival._count.sessions,
+      scheduleViews,
+      lastActivity,
+      isPublished: festival.isPublished,
+      hasBranding,
+      hasShares: shareCount > 0,
+      healthScore,
+      breakdown
+    }
+  })
 
   // Sort by health score descending
   return healthList.sort((a, b) => b.healthScore - a.healthScore)
