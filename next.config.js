@@ -59,10 +59,7 @@ const nextConfig = {
         // Allow public schedules to be embedded in iframes
         source: '/:slug/schedule',
         headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'ALLOWALL', // Allow embedding on any site
-          },
+          // Don't set X-Frame-Options for schedule pages (allows all embedding)
           {
             key: 'X-Content-Type-Options',
             value: 'nosniff',
