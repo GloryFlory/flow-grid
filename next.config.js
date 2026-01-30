@@ -56,6 +56,25 @@ const nextConfig = {
   async headers() {
     return [
       {
+        // Allow public schedules to be embedded in iframes
+        source: '/:slug/schedule',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'ALLOWALL', // Allow embedding on any site
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin',
+          },
+        ],
+      },
+      {
+        // Block iframes for all other pages (admin, dashboard, auth)
         source: '/(.*)',
         headers: [
           {
