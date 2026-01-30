@@ -56,10 +56,9 @@ const nextConfig = {
   async headers() {
     return [
       {
-        // Allow public schedules to be embedded in iframes
+        // Allow public schedules to be embedded in iframes (no X-Frame-Options)
         source: '/:slug/schedule',
         headers: [
-          // Don't set X-Frame-Options for schedule pages (allows all embedding)
           {
             key: 'X-Content-Type-Options',
             value: 'nosniff',
@@ -71,8 +70,8 @@ const nextConfig = {
         ],
       },
       {
-        // Block iframes for all other pages (admin, dashboard, auth)
-        source: '/(.*)',
+        // Block iframes for all other pages EXCEPT schedule pages
+        source: '/:path((?!.*/schedule$).*)*',
         headers: [
           {
             key: 'X-Frame-Options',
