@@ -1601,7 +1601,7 @@ export default function CreateFestivalPage() {
                   </div>
 
                   <div className="space-y-3 max-h-60 overflow-y-auto border rounded-lg p-4 bg-gray-50">
-                    {sessions.slice(0, 5).map((session) => (
+                    {sessions.filter(s => s && s.title).slice(0, 5).map((session) => (
                       <div key={session.id} className="flex items-start justify-between p-3 bg-white rounded-lg border">
                         <div className="flex-1">
                           <div className="flex items-start gap-3">

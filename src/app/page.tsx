@@ -50,8 +50,32 @@ export default function HomePage() {
 
     return () => clearInterval(interval)
   }, [])
+  
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Flow Grid",
+    "applicationCategory": "BusinessApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Professional event scheduling software for yoga retreats, music festivals, workshops and conferences. Create beautiful schedules in minutes.",
+    "url": "https://tryflowgrid.com",
+    "screenshot": "https://tryflowgrid.com/og-image.png",
+    "operatingSystem": "Web",
+    "browserRequirements": "Requires JavaScript. Requires HTML5."
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* SEO Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+      
       {/* Navigation */}
       <nav className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
