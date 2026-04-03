@@ -229,6 +229,32 @@ export default function BlogPost() {
             This article will help you decide whether to stick with spreadsheets or make the switch to dedicated scheduling software. We'll look at real scenarios, costs, and the exact breaking points where most organizers make the change.
           </p>
 
+          {/* Download CTA */}
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-8 my-8 not-prose">
+            <div className="flex items-start gap-4">
+              <div className="text-4xl">📊</div>
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Free Event Schedule Template</h3>
+                <p className="text-gray-700 mb-4">
+                  Download our ready-to-use 2-day conference schedule template with 20 sessions including keynotes, workshops, panels, networking breaks, and meals. Perfect for comparing how spreadsheets vs scheduling software handle the same event.
+                </p>
+                <a 
+                  href="/templates/event-schedule-template.csv"
+                  download
+                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Download Free Template (CSV)
+                </a>
+                <p className="text-sm text-gray-600 mt-3">
+                  Open in Excel, Google Sheets, or import into FlowGrid to see the difference
+                </p>
+              </div>
+            </div>
+          </div>
+
           <h2 id="the-spreadsheet-reality-check">The Spreadsheet Reality Check</h2>
           
           <p>

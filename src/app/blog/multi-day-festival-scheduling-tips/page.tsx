@@ -231,6 +231,32 @@ export default function BlogPost() {
             After helping hundreds of festival organizers create multi-day schedules, we've identified seven essential strategies that separate great festivals from chaotic ones.
           </p>
 
+          {/* Download CTA */}
+          <div className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-xl p-8 my-8 not-prose">
+            <div className="flex items-start gap-4">
+              <div className="text-4xl">🎵</div>
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Free Music Festival Planning Template</h3>
+                <p className="text-gray-700 mb-4">
+                  Download our complete 3-day music festival schedule template with 23 sessions across multiple stages (Main Stage, Electronic Tent, Acoustic Stage, Jazz Lounge). Includes headliners, workshops, wellness activities, and late-night sets. Ready to customize for your event.
+                </p>
+                <a 
+                  href="/templates/music-festival-schedule-template.csv"
+                  download
+                  className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Download Free Template (CSV)
+                </a>
+                <p className="text-sm text-gray-600 mt-3">
+                  Compatible with FlowGrid — import and customize in seconds
+                </p>
+              </div>
+            </div>
+          </div>
+
           <h2 id="1-design-your-festival-arc">1. Design Your Festival Arc</h2>
           
           <p>

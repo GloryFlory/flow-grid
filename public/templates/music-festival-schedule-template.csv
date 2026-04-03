@@ -1,0 +1,24 @@
+day,start,end,title,teachers,location,level,capacity,types,cardType
+Friday,18:00,19:00,Festival Opening Ceremony,DJ Sunset,Main Stage,All Levels,5000,Performance,minimal
+Friday,19:00,20:30,The Midnight Riders,The Midnight Riders,Main Stage,All Levels,5000,Indie Rock,photo
+Friday,20:00,21:00,Electronic Dreams,DJ Nova,Electronic Tent,All Levels,2000,Electronic,photo
+Friday,21:00,22:30,Acoustic Sessions: Local Voices,Various Artists,Acoustic Stage,All Levels,500,Acoustic,detailed
+Friday,22:30,00:00,Headliner: Electric Pulse,Electric Pulse,Main Stage,All Levels,5000,EDM,photo
+Friday,23:00,01:00,Late Night Jazz,The Blue Notes Quartet,Jazz Lounge,All Levels,300,Jazz,detailed
+Saturday,11:00,12:00,Yoga & Movement,Sarah Flow,Wellness Area,All Levels,100,Wellness,minimal
+Saturday,12:00,13:00,Food & Craft Market Opens,Various Vendors,Market Square,All Levels,3000,Market,minimal
+Saturday,13:00,14:00,Emerging Artists Showcase,Various,Discovery Stage,All Levels,800,Showcase,photo
+Saturday,14:00,15:30,The Wanderers,The Wanderers,Main Stage,All Levels,5000,Folk Rock,photo
+Saturday,14:30,15:30,Hip Hop Workshop,MC Flow,Workshop Tent,Intermediate,50,Workshop,detailed
+Saturday,16:00,17:30,Sunset Sounds: Tropical Vibes,Island Groove Collective,Main Stage,All Levels,5000,Reggae,photo
+Saturday,17:00,18:00,Kids Zone: Interactive Music,Music Together Team,Family Area,All Levels,200,Family,minimal
+Saturday,18:30,20:00,The Phoenix Rising,The Phoenix Rising,Main Stage,All Levels,5000,Alternative Rock,photo
+Saturday,19:00,20:30,Deep House Sessions,DJ Horizon,Electronic Tent,All Levels,2000,House,photo
+Saturday,20:30,22:00,Headliner: Neon Nights,Neon Nights,Main Stage,All Levels,5000,Pop,photo
+Saturday,21:00,22:30,Techno Underground,Techno Collective,Underground Stage,All Levels,1500,Techno,detailed
+Saturday,22:30,00:30,Silent Disco,3 DJs Rotating,Silent Disco Area,All Levels,1000,Silent Disco,photo
+Sunday,11:00,12:00,Morning Meditation & Sound Bath,Sound Healing Collective,Wellness Area,All Levels,150,Wellness,minimal
+Sunday,12:00,13:00,Brunch Beats,DJ Mimosa,Chill Zone,All Levels,500,Chill,minimal
+Sunday,13:00,14:30,Sunday Sessions: Soulful Sounds,The Soul Collective,Main Stage,All Levels,5000,Soul,photo
+Sunday,15:00,16:30,Closing Headliner: Journey's End,Journey's End,Main Stage,All Levels,5000,Indie Pop,photo
+Sunday,16:30,17:00,Festival Closing Ceremony,Festival Crew,Main Stage,All Levels,5000,Ceremony,minimal

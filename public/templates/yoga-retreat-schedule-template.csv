@@ -1,0 +1,18 @@
+day,start,end,title,teachers,location,level,capacity,description,prerequisites,types,cardType
+Saturday,07:00,08:30,Morning Meditation & Breathwork,Sarah Chen,Meditation Hall,Beginner,30,Start your day with guided meditation and pranayama breathing techniques,,Meditation,detailed
+Saturday,08:30,09:30,Nourishing Breakfast,Kitchen Team,Dining Hall,All Levels,50,Healthy vegetarian breakfast with fresh local ingredients,,Meal,minimal
+Saturday,09:30,11:00,Vinyasa Flow - Energizing Practice,Maya Rodriguez,Yoga Studio,Intermediate,25,Dynamic flowing sequence to build heat and energy,Basic yoga experience,Vinyasa,photo
+Saturday,11:00,12:00,Free Time / Beach Walk,Self-guided,Beach,All Levels,50,Optional nature walk or personal relaxation time,,Free Time,minimal
+Saturday,12:30,13:30,Wholesome Lunch,Kitchen Team,Dining Hall,All Levels,50,Fresh organic lunch with meditation garden herbs,,Meal,minimal
+Saturday,14:00,15:00,Rest & Integration,Self-guided,Rooms,All Levels,50,Afternoon siesta and personal reflection time,,Free Time,minimal
+Saturday,15:00,16:30,Yin Yoga & Sound Healing,Tom Anderson,Yoga Studio,All Levels,30,Deep passive stretching with crystal singing bowls,,Yin Yoga,detailed
+Saturday,16:30,17:30,Free Time / Pool,Self-guided,Pool Area,All Levels,50,Swim or relax by the infinity pool,,Free Time,minimal
+Saturday,18:00,19:00,Light Dinner,Kitchen Team,Dining Hall,All Levels,50,Light evening meal to prepare for evening practice,,Meal,minimal
+Saturday,19:30,20:30,Evening Restorative Yoga,Sarah Chen,Yoga Studio,All Levels,35,Gentle restorative practice with props and blankets,,Restorative,photo
+Saturday,21:00,22:00,Stargazing & Tea Circle,Group Activity,Terrace,All Levels,30,Herbal tea and connection under the stars,,Social,minimal
+Sunday,07:00,08:30,Sunrise Yoga on the Beach,Maya Rodriguez,Beach,All Levels,40,Gentle flow practice as the sun rises over the ocean,,Vinyasa,photo
+Sunday,08:30,09:30,Breakfast,Kitchen Team,Dining Hall,All Levels,50,Energizing breakfast buffet,,Meal,minimal
+Sunday,09:30,11:00,Workshop: Yoga Philosophy,Tom Anderson,Library,All Levels,20,Exploring the eight limbs of yoga and their modern application,,Workshop,detailed
+Sunday,11:00,12:30,Free Time,Self-guided,Various,All Levels,50,Personal practice or explore the local village,,Free Time,minimal
+Sunday,12:30,13:30,Lunch,Kitchen Team,Dining Hall,All Levels,50,Farm-to-table lunch celebration,,Meal,minimal
+Sunday,14:00,15:30,Closing Circle & Integration,All Teachers,Yoga Studio,All Levels,50,Group sharing and closing ceremony to honor our journey together,,Ceremony,detailed

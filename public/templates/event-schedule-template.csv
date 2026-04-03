@@ -1,0 +1,20 @@
+day,start,end,title,teachers,location,level,capacity,description,types,cardType
+Day 1,09:00,09:30,Registration & Welcome Coffee,Event Team,Main Lobby,All Levels,200,Check-in and networking with morning refreshments,Registration,minimal
+Day 1,09:30,10:00,Opening Keynote,Sarah Johnson,Main Hall,All Levels,200,Welcome address and event overview,Keynote,photo
+Day 1,10:00,11:30,Workshop A: Getting Started,John Smith,Room A,Beginner,50,Introduction to the fundamentals with hands-on practice,Workshop,detailed
+Day 1,10:00,11:30,Workshop B: Advanced Techniques,Maria Garcia,Room B,Advanced,40,Deep dive for experienced participants,Workshop,detailed
+Day 1,11:30,12:00,Coffee Break & Networking,Self-guided,Lounge Area,All Levels,200,Refreshments and informal networking,Break,minimal
+Day 1,12:00,13:00,Panel Discussion: Industry Trends,Multiple Speakers,Main Hall,All Levels,200,Expert panel on current developments,Panel,photo
+Day 1,13:00,14:00,Lunch Break,Catering,Dining Area,All Levels,200,Buffet lunch with vegetarian and vegan options,Meal,minimal
+Day 1,14:00,15:30,Hands-on Session: Project Work,Various Mentors,Workshop Space,Intermediate,80,Practical application in small groups,Hands-on,detailed
+Day 1,15:30,16:00,Afternoon Break,Self-guided,Lounge Area,All Levels,200,Tea and snacks,Break,minimal
+Day 1,16:00,17:00,Lightning Talks,Various Speakers,Main Hall,All Levels,200,Quick 10-minute presentations from community members,Talks,photo
+Day 1,17:00,18:00,Networking Reception,Event Team,Terrace,All Levels,200,Wine and cheese reception with live music,Social,minimal
+Day 2,09:00,09:30,Morning Energizer,Wellness Coach,Main Hall,All Levels,200,Quick movement session to start the day,Wellness,minimal
+Day 2,09:30,11:00,Workshop C: Best Practices,Lisa Chen,Room A,Intermediate,50,Learn proven strategies and techniques,Workshop,detailed
+Day 2,09:30,11:00,Workshop D: Case Studies,David Park,Room B,All Levels,50,Real-world examples and lessons learned,Workshop,detailed
+Day 2,11:00,11:30,Coffee Break,Self-guided,Lounge Area,All Levels,200,Morning refreshments,Break,minimal
+Day 2,11:30,12:30,Interactive Q&A Session,Expert Panel,Main Hall,All Levels,200,Ask anything - no question too big or small,Q&A,photo
+Day 2,12:30,13:30,Lunch,Catering,Dining Area,All Levels,200,Final networking lunch,Meal,minimal
+Day 2,13:30,14:30,Closing Keynote: Future Vision,Dr. Alex Thompson,Main Hall,All Levels,200,Looking ahead at what's next,Keynote,photo
+Day 2,14:30,15:00,Closing Remarks & Prize Draw,Event Team,Main Hall,All Levels,200,Thank you and final announcements,Closing,minimal

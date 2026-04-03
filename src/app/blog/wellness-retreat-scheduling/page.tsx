@@ -186,6 +186,32 @@ export default function BlogPost() {
               After organizing dozens of retreats—and attending many more—I've learned that the schedule itself can be either a source of healing or another form of hustle culture in disguise. The difference lies in understanding energy, rhythm, and the courage to leave empty space.
             </p>
 
+            {/* Download CTA */}
+            <div className="bg-gradient-to-br from-green-50 to-teal-50 border-2 border-green-200 rounded-xl p-8 my-8 not-prose">
+              <div className="flex items-start gap-4">
+                <div className="text-4xl">📥</div>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Free Yoga Retreat Schedule Template</h3>
+                  <p className="text-gray-700 mb-4">
+                    Get our complete 2-day yoga retreat schedule template with 17 sessions including meditation, vinyasa, yin yoga, sound healing, meals, and free time blocks. Ready to import directly into FlowGrid or use as a planning guide.
+                  </p>
+                  <a 
+                    href="/templates/yoga-retreat-schedule-template.csv"
+                    download
+                    className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Download Free Template (CSV)
+                  </a>
+                  <p className="text-sm text-gray-600 mt-3">
+                    Compatible with FlowGrid, Excel, Google Sheets, and other scheduling tools
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* Section 1 */}
             <h2 className="flex items-center gap-3">
               <Sun className="w-8 h-8 text-yellow-500" />
