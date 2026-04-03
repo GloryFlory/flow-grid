@@ -9,18 +9,19 @@ import type { Metadata } from 'next'
 import { ArrowLeft, Calendar, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Spreadsheets vs Scheduling Software for Events - 2025',
-  description: 'Compare Excel/Google Sheets vs scheduling software for events. Real examples, honest pros & cons, and when to make the switch.',
+  title: 'Spreadsheets vs Event Scheduling Software: Pros, Cons & When to Switch',
+  description: 'Excel/Google Sheets vs dedicated event software - honest comparison with real examples. See exactly when spreadsheets become too limiting for your events.',
   keywords: [
     'event scheduling software',
     'spreadsheet vs software',
     'festival planning tools',
     'event management software',
-    'Google Sheets event schedule'
+    'Google Sheets event schedule',
+    'venue management software'
   ],
   openGraph: {
-    title: 'Spreadsheets vs Scheduling Software for Events',
-    description: 'Should you use Excel or dedicated software for your event schedule? Compare the pros and cons.',
+    title: 'Spreadsheets vs Event Scheduling Software: Pros, Cons & When to Switch',
+    description: 'Excel/Google Sheets vs dedicated event software - honest comparison with real examples. See exactly when spreadsheets become too limiting for your events.',
     images: ['/og-image.png'],
   },
 }

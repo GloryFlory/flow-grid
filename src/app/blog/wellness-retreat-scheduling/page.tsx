@@ -9,8 +9,8 @@ import type { Metadata } from 'next'
 import { ArrowLeft, Heart, Sun, Moon, Leaf, Clock, Users } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Wellness Retreat Scheduling: Creating Flows That Actually Feel Relaxing',
-  description: 'Design wellness retreat schedules that balance practice, rest, and community. Create flows that feel natural and rejuvenating.',
+  title: 'Yoga Retreat Planning: Complete Guide + Free Schedule Template (2026)',
+  description: 'Step-by-step yoga retreat planning guide with free schedule template. Learn how to balance practice, rest & community for a transformative retreat experience.',
   keywords: [
     'wellness retreat scheduling',
     'yoga retreat planning',
@@ -21,8 +21,8 @@ export const metadata: Metadata = {
     'spa retreat planning'
   ],
   openGraph: {
-    title: 'Wellness Retreat Scheduling: Creating Flows That Actually Feel Relaxing',
-    description: 'Design wellness retreat schedules that balance practice, rest, and community. Create flows that feel natural and rejuvenating.',
+    title: 'Yoga Retreat Planning: Complete Guide + Free Schedule Template (2026)',
+    description: 'Step-by-step yoga retreat planning guide with free schedule template. Learn how to balance practice, rest & community for a transformative retreat experience.',
     images: ['/og-image.png'],
   },
 }

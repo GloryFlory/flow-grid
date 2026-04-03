@@ -9,18 +9,19 @@ import type { Metadata } from 'next'
 import { ArrowLeft, Calendar, TrendingUp } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: '7 Multi-Day Festival Scheduling Tips - Expert Guide 2025',
-  description: 'Master complex multi-day festival scheduling. Manage overlapping sessions, multiple venues & hundreds of attendees with proven strategies.',
+  title: 'Music Festival Planning Template + 7 Scheduling Tips (Free Download)',
+  description: 'Free music festival planning template + expert scheduling tips. Learn how to manage overlapping sessions, multiple stages & avoid attendee conflicts.',
   keywords: [
     'multi-day festival',
     'festival scheduling',
     'multi-venue event',
     'complex event scheduling',
-    'festival planning tips'
+    'festival planning tips',
+    'music festival planning template'
   ],
   openGraph: {
-    title: '7 Essential Tips for Multi-Day Festival Scheduling',
-    description: 'Learn how to manage complex multi-day festivals with ease. Expert tips from professional organizers.',
+    title: 'Music Festival Planning Template + 7 Scheduling Tips (Free Download)',
+    description: 'Free music festival planning template + expert scheduling tips. Learn how to manage overlapping sessions, multiple stages & avoid attendee conflicts.',
     images: ['/og-image.png'],
   },
 }
