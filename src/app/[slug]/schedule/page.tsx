@@ -51,6 +51,7 @@ export default function FestivalSchedule() {
   const [festival, setFestival] = useState<Festival | null>(null)
   const [sessions, setSessions] = useState<Session[]>([])
   const [showPoweredBy, setShowPoweredBy] = useState(true)
+  const [isFoundingMember, setIsFoundingMember] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -72,6 +73,7 @@ export default function FestivalSchedule() {
         setFestival(data.festival)
         setSessions(data.sessions)
         setShowPoweredBy(data.showPoweredBy ?? true)
+        setIsFoundingMember(data.isFoundingMember ?? false)
       } catch (err) {
         console.error('Error fetching festival:', err)
         setError('Failed to load festival data')
@@ -120,6 +122,7 @@ export default function FestivalSchedule() {
         festival={festival}
         sessions={sessions}
         showPoweredBy={showPoweredBy}
+        isFoundingMember={isFoundingMember}
       />
     </div>
   )

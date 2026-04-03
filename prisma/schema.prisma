@@ -339,8 +339,8 @@ model PaymentRequest {
   userId              String
   userEmail           String
   userName            String?
-  plan                PlanType             // PRO only for now
-  billingCycle        BillingCycle         // MONTHLY or YEARLY
+  plan                PlanType             // PRO or EVENT_PASS
+  billingCycle        BillingCycle?        // MONTHLY, YEARLY, or null for EVENT_PASS
   amount              Decimal
   currency            String               @default("EUR")
   paymentMethod       String               @default("REVOLUT") // For future: BANK_TRANSFER, etc.
@@ -388,6 +388,7 @@ enum PlanType {
   FREE
   PRO
   ENTERPRISE
+  EVENT_PASS
 }
 
 enum SubscriptionStatus {

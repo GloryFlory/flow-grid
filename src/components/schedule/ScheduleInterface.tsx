@@ -53,6 +53,7 @@ interface ScheduleInterfaceProps {
   festival: Festival
   sessions: Session[]
   showPoweredBy?: boolean // Show "Powered by Flow Grid" footer (default: true, hidden for Pro+)
+  isFoundingMember?: boolean // Show founding member badge variant
 }
 
 // Helper function to group sessions by day
@@ -106,7 +107,7 @@ const formatDayHeader = (dateStr: string, showDates: boolean): string => {
   }
 }
 
-export default function ScheduleInterface({ festival, sessions, showPoweredBy = true }: ScheduleInterfaceProps) {
+export default function ScheduleInterface({ festival, sessions, showPoweredBy = true, isFoundingMember = false }: ScheduleInterfaceProps) {
   // State for filters and UI
   const [levelFilter, setLevelFilter] = useState('')
   const [styleFilter, setStyleFilter] = useState('')
@@ -643,17 +644,28 @@ export default function ScheduleInterface({ festival, sessions, showPoweredBy = 
             {showPoweredBy && (
               <div className="flex items-center justify-center gap-1.5 py-2 mt-1">
                 <a 
-                  href="https://tryflowgrid.com?ref=powered-by"
+                  href={`https://tryflowgrid.com?ref=${isFoundingMember ? 'founding-member' : 'powered-by'}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors"
                 >
-                  <img 
-                    src="/flow-grid-logo.png" 
-                    alt="Flow Grid" 
-                    className="h-3.5 opacity-70"
-                  />
-                  <span>Powered by <span className="font-medium">Flow Grid</span></span>
+                  {isFoundingMember ? (
+                    <>
+                      <span>⭐</span>
+                      <span className="font-medium text-amber-500">Founding Member</span>
+                      <span className="text-gray-300">·</span>
+                      <span>Powered by <span className="font-medium">Flow Grid</span></span>
+                    </>
+                  ) : (
+                    <>
+                      <img 
+                        src="/flow-grid-logo.png" 
+                        alt="Flow Grid" 
+                        className="h-3.5 opacity-70"
+                      />
+                      <span>Powered by <span className="font-medium">Flow Grid</span></span>
+                    </>
+                  )}
                 </a>
               </div>
             )}

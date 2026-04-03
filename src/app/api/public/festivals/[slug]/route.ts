@@ -280,6 +280,7 @@ export async function GET(
     const subscription = (festival as any).user?.subscription
     const hasWhiteLabel = subscription?.plan && ['PRO', 'ENTERPRISE'].includes(subscription.plan)
     const showPoweredBy = !hasWhiteLabel
+    const isFoundingMember = subscription?.isFoundingMember === true
 
     const response = {
       festival: {
@@ -303,7 +304,8 @@ export async function GET(
         instagramLink: (festival as any).instagramLink
       },
       sessions: transformedSessions,
-      showPoweredBy
+      showPoweredBy,
+      isFoundingMember,
     }
 
     // Add cache headers for better performance

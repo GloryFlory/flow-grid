@@ -231,7 +231,8 @@ export const authOptions: NextAuthOptions = {
   events: {
     async createUser({ user }) {
       // Auto-create PRO subscription for new users (Early Access / Founding Member)
-      // This gives everyone PRO for 1 year during the pre-launch phase
+      // Everyone who signs up while PAYMENTS_ENABLED=false is a Founding Member
+      // Founding Member perks: PRO plan, 10 free events, permanent €39 Event Pass discount
       if (user.id) {
         const oneYearFromNow = new Date();
         oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
@@ -241,7 +242,7 @@ export const authOptions: NextAuthOptions = {
             userId: user.id,
             plan: 'PRO',
             status: 'ACTIVE',
-            festivalsLimit: 5,
+            festivalsLimit: 10,
             stripeCurrentPeriodEnd: oneYearFromNow,
             isFoundingMember: true,
           },

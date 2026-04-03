@@ -49,7 +49,8 @@ export async function GET() {
       subscription: {
         plan: subscription.plan,
         festivalsLimit,
-        status: subscription.status
+        status: subscription.status,
+        isFoundingMember: user.subscription?.isFoundingMember ?? false,
       },
       totalFestivals,
       publishedFestivals,

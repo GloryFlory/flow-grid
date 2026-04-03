@@ -23,6 +23,21 @@ export default function PricingPage() {
     billingCycle: 'MONTHLY' | 'YEARLY'
     paymentLink: string
   } | null>(null)
+  const [userSubscription, setUserSubscription] = useState<{
+    plan: string
+    isFoundingMember: boolean
+    festivalsLimit: number
+  } | null>(null)
+
+  // Fetch user subscription to show founding member status
+  useEffect(() => {
+    if (session) {
+      fetch('/api/user/subscription')
+        .then(r => r.json())
+        .then(data => setUserSubscription(data.subscription))
+        .catch(() => null)
+    }
+  }, [session])
 
   const prices = {
     pro: billingPeriod === 'monthly' ? 29 : 23,
@@ -57,8 +72,8 @@ export default function PricingPage() {
       return
     }
 
-    // Use Revolut payment links
     if (plan === 'PRO') {
+      // Use Revolut payment links for Pro subscription
       const paymentLink = billingPeriod === 'yearly' 
         ? REVOLUT_LINKS.PRO_ANNUAL 
         : REVOLUT_LINKS.PRO_MONTHLY
@@ -72,9 +87,27 @@ export default function PricingPage() {
         paymentLink
       })
       setShowPaymentModal(true)
-    } else {
-      // EVENT_PASS - will implement later
-      alert('Event Pass purchase coming soon!')
+    } else if (plan === 'EVENT_PASS') {
+      // Fetch user's current subscription to determine pricing
+      try {
+        const response = await fetch('/api/user/subscription')
+        const data = await response.json()
+        
+        const isPro = data.subscription?.plan === 'PRO'
+        const amount = isPro ? PRICING.EVENT_PASS.proDiscount : PRICING.EVENT_PASS.regular
+        const paymentLink = isPro ? REVOLUT_LINKS.EVENT_PASS_PRO : REVOLUT_LINKS.EVENT_PASS_REGULAR
+
+        setSelectedPlan({
+          plan: 'EVENT_PASS',
+          amount,
+          billingCycle: 'YEARLY', // Dummy value, not used for one-time
+          paymentLink
+        })
+        setShowPaymentModal(true)
+      } catch (error) {
+        console.error('Error fetching subscription:', error)
+        alert('Failed to load pricing. Please try again.')
+      }
     }
   }
 
@@ -154,7 +187,28 @@ export default function PricingPage() {
           {!PAYMENTS_ENABLED && (
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-100 to-orange-100 border border-amber-200 text-amber-800 px-4 py-2 rounded-full text-sm font-medium mb-8">
               <Gift className="w-4 h-4" />
-              Early Access: 5 free events for founding members
+              Early Access: 10 free events for founding members
+            </div>
+          )}
+
+          {/* Founding Member Banner - shown when signed in user is a founding member */}
+          {PAYMENTS_ENABLED && session && userSubscription?.isFoundingMember && (
+            <div className="max-w-2xl mx-auto mb-8 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-5 text-left">
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">⭐</span>
+                <div>
+                  <p className="font-bold text-amber-900 mb-1">You're a Founding Member</p>
+                  <p className="text-sm text-amber-800">
+                    Thank you for being an early supporter of Flow Grid. As a founding member you receive:
+                  </p>
+                  <ul className="mt-2 space-y-1 text-sm text-amber-800">
+                    <li>✓ <strong>10 free events</strong> included with your Pro plan</li>
+                    <li>✓ <strong>Permanent discount</strong> on Event Passes — €39 instead of €69</li>
+                    <li>✓ <strong>Founding Member badge</strong> on your public schedules</li>
+                    <li>✓ <strong>Price lock</strong> — your Pro rate is guaranteed if you stay subscribed</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           )}
 
@@ -241,10 +295,18 @@ export default function PricingPage() {
 
             <div className="mb-5">
               {PAYMENTS_ENABLED ? (
-                <>
-                  <span className="text-3xl font-bold text-slate-900">€{PRICING.EVENT_PASS.regular}</span>
-                  <p className="text-sm text-slate-500 mt-1">One-time purchase</p>
-                </>
+                userSubscription?.isFoundingMember ? (
+                  <>
+                    <span className="text-3xl font-bold text-slate-400 line-through">€{PRICING.EVENT_PASS.regular}</span>
+                    <span className="text-3xl font-bold text-amber-600 ml-2">€{PRICING.EVENT_PASS.proDiscount}</span>
+                    <p className="text-sm text-amber-600 mt-1">⭐ Founding Member discount</p>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-3xl font-bold text-slate-900">€{PRICING.EVENT_PASS.regular}</span>
+                    <p className="text-sm text-slate-500 mt-1">One-time purchase</p>
+                  </>
+                )
               ) : (
                 <>
                   <span className="text-3xl font-bold text-slate-900 line-through text-slate-400">€{PRICING.EVENT_PASS.regular}</span>

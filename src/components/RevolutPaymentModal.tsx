@@ -32,14 +32,19 @@ export function RevolutPaymentModal({
     setError(null)
 
     try {
-      const response = await fetch('/api/payments/revolut/confirm', {
+      // Different endpoints for PRO vs EVENT_PASS
+      const endpoint = plan === 'EVENT_PASS' 
+        ? '/api/payments/revolut/event-pass'
+        : '/api/payments/revolut/confirm'
+
+      const body = plan === 'EVENT_PASS'
+        ? { transactionRef: null } // EVENT_PASS doesn't need billingCycle
+        : { plan, billingCycle, transactionRef: null }
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          plan,
-          billingCycle,
-          transactionRef: null, // Optional: user could provide this
-        })
+        body: JSON.stringify(body)
       })
 
       const data = await response.json()
@@ -70,10 +75,16 @@ export function RevolutPaymentModal({
             </h2>
             <div className="mb-6">
               <p className="text-slate-600 mb-4">
-                You're upgrading to <strong>{plan}</strong> ({billingCycle.toLowerCase()})
+                {plan === 'EVENT_PASS' 
+                  ? `You're purchasing an Event Pass (one-time)` 
+                  : `You're upgrading to ${plan} (${billingCycle.toLowerCase()})`
+                }
               </p>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                 <p className="text-sm text-blue-900 font-medium">Amount: €{amount}</p>
+                {plan === 'EVENT_PASS' && (
+                  <p className="text-xs text-blue-700 mt-1">This adds 1 event slot to your account</p>
+                )}
               </div>
               <ol className="space-y-3 text-sm text-slate-600">
                 <li className="flex items-start gap-2">
@@ -125,7 +136,10 @@ export function RevolutPaymentModal({
               Confirm Payment
             </h2>
             <p className="text-slate-600 mb-6">
-              Have you completed the payment on Revolut? Once confirmed, you'll be instantly upgraded to Pro!
+              {plan === 'EVENT_PASS'
+                ? "Have you completed the payment on Revolut? Once confirmed, your event limit will be instantly increased by 1!"
+                : "Have you completed the payment on Revolut? Once confirmed, you'll be instantly upgraded to Pro!"
+              }
             </p>
             
             {error && (

@@ -45,6 +45,7 @@ export default function PublicFestivalPage() {
   const params = useParams()
   const [festival, setFestival] = useState<Festival | null>(null)
   const [showPoweredBy, setShowPoweredBy] = useState(true)
+  const [isFoundingMember, setIsFoundingMember] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -59,6 +60,7 @@ export default function PublicFestivalPage() {
         const data = await response.json()
         setFestival(data)
         setShowPoweredBy(data.showPoweredBy ?? true)
+        setIsFoundingMember(data.isFoundingMember ?? false)
       } else {
         setError('Festival not found')
       }
@@ -307,7 +309,11 @@ export default function PublicFestivalPage() {
         {showPoweredBy && (
           <div className="text-center mt-16 pt-8 border-t border-gray-200">
             <p className="text-gray-500 text-sm">
-              Powered by <span className="font-semibold">Flow Grid</span>
+              {isFoundingMember ? (
+                <>⭐ <span className="font-semibold text-amber-500">Founding Member</span> · Powered by <span className="font-semibold">Flow Grid</span></>
+              ) : (
+                <>Powered by <span className="font-semibold">Flow Grid</span></>
+              )}
             </p>
           </div>
         )}
