@@ -554,14 +554,6 @@ export default function PricingPage() {
               answer="No! The Free plan is completely free forever with no credit card required. You only need to enter payment details when upgrading to Pro or purchasing an Event Pass."
             />
             <FAQItem 
-              question="What are Founding Member perks?"
-              answer="All users who joined during Early Access are Founding Members. You get 10 free event slots (instead of 1), a permanent €39 discount on all Event Passes (instead of €69), and a ⭐ Founding Member badge on your dashboard and public schedules — forever."
-            />
-            <FAQItem 
-              question="What happens after my 10 free events?"
-              answer="Founding Members get 10 free event slots as a thank-you perk (the standard Pro plan includes 5). When you need more slots, purchase additional Event Passes — €39 for Founding Members, €69 regular price. Your existing events and data always stay yours."
-            />
-            <FAQItem 
               question="What payment methods do you accept?"
               answer="We currently accept payments via Revolut. After completing your payment, your account is upgraded instantly. Contact us if you need an invoice or alternative payment method."
             />
