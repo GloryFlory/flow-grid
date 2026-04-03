@@ -69,6 +69,24 @@ export default function AdminPlatformDashboard() {
   const [analyticsLoading, setAnalyticsLoading] = useState(true)
   const [analyticsError, setAnalyticsError] = useState<string | null>(null)
 
+  // Users tab state
+  const [allUsers, setAllUsers] = useState<Array<{
+    id: string
+    email: string
+    name: string | null
+    createdAt: string
+    plan: string
+    status: string
+    isFoundingMember: boolean
+    festivalsLimit: number
+    festivalsUsed: number
+    expiresAt: string | null
+    festivalCount: number
+  }>>([])
+  const [usersLoading, setUsersLoading] = useState(false)
+  const [usersCopied, setUsersCopied] = useState(false)
+  const [usersSearch, setUsersSearch] = useState('')
+
   // Auth check
   useEffect(() => {
     if (status === 'loading') return
@@ -124,6 +142,16 @@ export default function AdminPlatformDashboard() {
         setAnalyticsLoading(false)
       })
   }, [session])
+
+  // Fetch users data when users tab is active
+  useEffect(() => {
+    if (activeTab !== 'users' || session?.user?.role !== 'ADMIN' || allUsers.length > 0) return
+    setUsersLoading(true)
+    fetch('/api/admin/users')
+      .then(res => res.json())
+      .then(data => { setAllUsers(data.users ?? []); setUsersLoading(false) })
+      .catch(() => setUsersLoading(false))
+  }, [activeTab, session, allUsers.length])
 
   const toggleRow = (festivalId: string) => {
     setExpandedRows(prev => {
@@ -225,7 +253,6 @@ export default function AdminPlatformDashboard() {
             >
               <Search className="w-4 h-4" />
               Users
-              <span className="text-xs bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">Soon</span>
             </button>
             <button
               onClick={() => setActiveTab('events')}
@@ -272,7 +299,7 @@ export default function AdminPlatformDashboard() {
             error={analyticsError}
           />
         )}
-        {activeTab === 'users' && <ComingSoonTab title="User Management" description="Search users, view profiles, manage subscriptions" />}
+        {activeTab === 'users' && <UsersTab users={allUsers} loading={usersLoading} search={usersSearch} onSearchChange={setUsersSearch} copied={usersCopied} onCopy={(emails) => { navigator.clipboard.writeText(emails); setUsersCopied(true); setTimeout(() => setUsersCopied(false), 2000) }} />}
         {activeTab === 'events' && (
           <EventsTab 
             festivals={festivalHealth} 
@@ -281,6 +308,139 @@ export default function AdminPlatformDashboard() {
           />
         )}
         {activeTab === 'inquiries' && <ComingSoonTab title="Sales Inquiries" description="View and respond to Enterprise and contact form submissions" />}
+      </div>
+    </div>
+  )
+}
+
+// ============================================================================
+// ============================================================================
+// Users Tab - All registered users
+// ============================================================================
+
+type UserRecord = {
+  id: string
+  email: string
+  name: string | null
+  createdAt: string
+  plan: string
+  status: string
+  isFoundingMember: boolean
+  festivalsLimit: number
+  festivalsUsed: number
+  expiresAt: string | null
+  festivalCount: number
+}
+
+function UsersTab({
+  users,
+  loading,
+  search,
+  onSearchChange,
+  copied,
+  onCopy,
+}: {
+  users: UserRecord[]
+  loading: boolean
+  search: string
+  onSearchChange: (v: string) => void
+  copied: boolean
+  onCopy: (emails: string) => void
+}) {
+  const filtered = users.filter(u =>
+    u.email.toLowerCase().includes(search.toLowerCase()) ||
+    (u.name ?? '').toLowerCase().includes(search.toLowerCase())
+  )
+  const allEmails = users.map(u => u.email).join(', ')
+  const foundingEmails = users.filter(u => u.isFoundingMember).map(u => u.email).join(', ')
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+        <div className="text-gray-500">Loading users…</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+          <div className="flex-1">
+            <h2 className="text-lg font-semibold text-gray-900">
+              Users <span className="text-gray-400 font-normal text-sm">({users.length} total · {users.filter(u => u.isFoundingMember).length} founding members)</span>
+            </h2>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            <button
+              onClick={() => onCopy(allEmails)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+            >
+              {copied ? '✓ Copied!' : `Copy all emails (${users.length})`}
+            </button>
+            <button
+              onClick={() => onCopy(foundingEmails)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm bg-amber-500 text-white rounded-md hover:bg-amber-600 transition-colors"
+            >
+              ⭐ Copy founding member emails ({users.filter(u => u.isFoundingMember).length})
+            </button>
+          </div>
+        </div>
+        <div className="mt-3">
+          <input
+            type="text"
+            placeholder="Search by email or name…"
+            value={search}
+            onChange={e => onSearchChange(e.target.value)}
+            className="w-full sm:w-72 px-3 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          />
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-gray-50 border-b border-gray-200 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3">Email</th>
+              <th className="px-4 py-3">Name</th>
+              <th className="px-4 py-3">Plan</th>
+              <th className="px-4 py-3">Founding</th>
+              <th className="px-4 py-3">Events</th>
+              <th className="px-4 py-3">Joined</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {filtered.length === 0 && (
+              <tr>
+                <td colSpan={6} className="px-4 py-8 text-center text-gray-400">No users found</td>
+              </tr>
+            )}
+            {filtered.map(user => (
+              <tr key={user.id} className={user.isFoundingMember ? 'bg-amber-50/40' : ''}>
+                <td className="px-4 py-3 font-medium text-gray-900 max-w-[220px] truncate">{user.email}</td>
+                <td className="px-4 py-3 text-gray-600">{user.name ?? <span className="text-gray-300">—</span>}</td>
+                <td className="px-4 py-3">
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                    user.plan === 'PRO' ? 'bg-indigo-100 text-indigo-700' :
+                    user.plan === 'ENTERPRISE' ? 'bg-purple-100 text-purple-700' :
+                    'bg-gray-100 text-gray-600'
+                  }`}>
+                    {user.plan}
+                  </span>
+                </td>
+                <td className="px-4 py-3">
+                  {user.isFoundingMember ? <span className="text-amber-500 font-medium">⭐ Yes</span> : <span className="text-gray-300">—</span>}
+                </td>
+                <td className="px-4 py-3 text-gray-600">{user.festivalCount} / {user.festivalsLimit}</td>
+                <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
+                  {new Date(user.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   )

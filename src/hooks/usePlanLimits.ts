@@ -7,6 +7,7 @@ interface PlanLimits {
   festivalsLimit: number
   sessionsLimit: number
   isAdmin: boolean
+  isFoundingMember: boolean
   canCreateMore: boolean
   features: PlanFeatures
 }

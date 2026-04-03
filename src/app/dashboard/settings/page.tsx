@@ -9,6 +9,8 @@ import { passkeysSupported, getAuthenticatorName, analytics } from '@/lib/passke
 import { track } from '@/lib/consent'
 import { startRegistration } from '@simplewebauthn/browser'
 import { usePlanLimits } from '@/hooks/usePlanLimits'
+import { RevolutPaymentModal } from '@/components/RevolutPaymentModal'
+import { PRICING, REVOLUT_LINKS } from '@/config/payments'
 import type { PublicKeyCredentialCreationOptionsJSON } from '@simplewebauthn/types'
 
 interface Passkey {
@@ -36,6 +38,13 @@ export default function SettingsPage() {
   const [isRegistering, setIsRegistering] = useState(false)
   const [hasPassword, setHasPassword] = useState<boolean | null>(null) // null = loading
   const [isPurchasingEventPass, setIsPurchasingEventPass] = useState(false)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [selectedPlan, setSelectedPlan] = useState<{
+    plan: string
+    amount: number
+    billingCycle: 'MONTHLY' | 'YEARLY'
+    paymentLink: string
+  } | null>(null)
 
   const [profileData, setProfileData] = useState({
     name: '',
@@ -249,31 +258,19 @@ export default function SettingsPage() {
   const handleBuyEventPass = async () => {
     setIsPurchasingEventPass(true)
     try {
-      // Use discounted price for Pro users
-      const billingPeriod = limits?.currentPlan === 'PRO' ? 'one-time-pro-discount' : 'one-time'
-      
-      const response = await fetch('/api/stripe/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          plan: 'EVENT_PASS', 
-          billingPeriod
-        }),
+      const isFoundingMemberOrPro = limits?.isFoundingMember || limits?.currentPlan === 'PRO'
+      const amount = isFoundingMemberOrPro ? PRICING.EVENT_PASS.proDiscount : PRICING.EVENT_PASS.regular
+      const paymentLink = isFoundingMemberOrPro ? REVOLUT_LINKS.EVENT_PASS_PRO : REVOLUT_LINKS.EVENT_PASS_REGULAR
+      setSelectedPlan({
+        plan: 'EVENT_PASS',
+        amount,
+        billingCycle: 'YEARLY', // unused for one-time
+        paymentLink,
       })
-
-      const { url, error } = await response.json()
-      
-      if (error) {
-        setMessage({ type: 'error', text: error })
-        return
-      }
-
-      if (url) {
-        window.location.href = url
-      }
+      setShowPaymentModal(true)
     } catch (error) {
-      console.error('Checkout error:', error)
-      setMessage({ type: 'error', text: 'Failed to start checkout. Please try again.' })
+      console.error('Event pass error:', error)
+      setMessage({ type: 'error', text: 'Failed to open checkout. Please try again.' })
     } finally {
       setIsPurchasingEventPass(false)
     }
@@ -456,6 +453,11 @@ export default function SettingsPage() {
                           </div>
                           <div>
                             <h4 className="text-xl font-bold text-gray-900">{limits.currentPlan} Plan</h4>
+                            {limits.isFoundingMember && (
+                              <span className="inline-flex items-center gap-1 text-xs text-amber-600 font-medium">
+                                ⭐ Founding Member
+                              </span>
+                            )}
                             {limits.isAdmin && (
                               <span className="text-xs text-purple-600 font-medium">Admin Override</span>
                             )}
@@ -537,14 +539,20 @@ export default function SettingsPage() {
                         {isPurchasingEventPass ? 'Starting checkout...' : 'Buy Event Pass'}
                       </h4>
                       <p className="text-sm text-gray-500">
-                        {limits?.currentPlan === 'PRO' ? (
+                        {limits?.isFoundingMember ? (
                           <>
-                            <span className="line-through text-gray-400">€69</span>
-                            <span className="text-green-600 font-medium ml-1">€39</span>
+                            <span className="line-through text-gray-400">€{PRICING.EVENT_PASS.regular}</span>
+                            <span className="text-green-600 font-medium ml-1">€{PRICING.EVENT_PASS.proDiscount}</span>
+                            <span className="text-amber-600 ml-1">⭐ Founding Member discount</span>
+                          </>
+                        ) : limits?.currentPlan === 'PRO' ? (
+                          <>
+                            <span className="line-through text-gray-400">€{PRICING.EVENT_PASS.regular}</span>
+                            <span className="text-green-600 font-medium ml-1">€{PRICING.EVENT_PASS.proDiscount}</span>
                             <span className="text-gray-400 ml-1">Pro discount</span>
                           </>
                         ) : (
-                          '€69 one-time for 1 extra event'
+                          `€${PRICING.EVENT_PASS.regular} one-time for 1 extra event`
                         )}
                       </p>
                     </div>
@@ -833,6 +841,18 @@ export default function SettingsPage() {
           )}
         </div>
       </div>
+
+      {/* Revolut Payment Modal */}
+      {showPaymentModal && selectedPlan && (
+        <RevolutPaymentModal
+          isOpen={showPaymentModal}
+          onClose={() => { setShowPaymentModal(false); setSelectedPlan(null) }}
+          plan={selectedPlan.plan}
+          amount={selectedPlan.amount}
+          billingCycle={selectedPlan.billingCycle}
+          paymentLink={selectedPlan.paymentLink}
+        />
+      )}
     </div>
   )
 }

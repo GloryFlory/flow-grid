@@ -56,6 +56,7 @@ export async function GET(request: NextRequest) {
       isAdmin,
       canCreateMore,
       features: planFeatures,
+      isFoundingMember: user.subscription?.isFoundingMember ?? false,
       subscription: user.subscription ? {
         status: user.subscription.status,
         currentPeriodEnd: user.subscription.stripeCurrentPeriodEnd,
