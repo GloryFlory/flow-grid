@@ -540,92 +540,44 @@ export default function PricingPage() {
             Frequently asked questions
           </h2>
 
-          {/* Early Access FAQs - shown when payments are disabled */}
-          <div className="space-y-6">
-            <FAQItem 
-              question="What does Early Access include?"
-              answer="During Early Access, you get Pro features for up to 5 events completely free. This includes team collaboration, watermark removal, embed widgets, detailed analytics, and everything else Pro offers. No credit card required."
-            />
-            <FAQItem 
-              question="Why is it free?"
-              answer="We're building Flow Grid with the community. Early Access users help shape the product with their feedback. In return, your first 5 events are on us — and you get Founding Member status."
-            />
-            <FAQItem 
-              question="What happens after my 5 free events?"
-              answer="When you need more events, you can purchase additional Event Passes (€69 each, or €39 with a Pro subscription). Your existing events and data stay yours regardless of what you decide."
-            />
-            <FAQItem 
-              question="Do I need a credit card to sign up?"
-              answer="No! Early Access is completely free with no credit card required. Just sign up and start creating your event schedules immediately."
-            />
-            <FAQItem 
-              question="What's the difference between Event Pass and Pro?"
-              answer="Event Pass is a one-time purchase for a single event with basic features including 1 team member. Pro includes premium features like watermark removal, embed widgets, detailed analytics with export, up to 3 team members, and discounted Event Passes (€39 instead of €69)."
-            />
-            <FAQItem 
-              question="What happens to my data if I don't continue?"
-              answer="Your data is yours. All your events remain accessible and you can export everything anytime. We'll never hold your data hostage."
-            />
-            <FAQItem 
-              question="How many events can I create?"
-              answer="During Early Access, you can have up to 5 published events with full Pro features. Need more? Purchase additional Event Passes or contact us about Enterprise options."
-            />
-            <FAQItem 
-              question="Can my team use Flow Grid too?"
-              answer="Yes! Event Pass includes 1 team member, Pro includes team collaboration for up to 3 members, and Enterprise plans offer unlimited team members with advanced role-based permissions."
-            />
-            <FAQItem 
-              question="What's included in Enterprise?"
-              answer="Enterprise is fully customizable based on your needs. Common features include unlimited events, white-label branding, custom domains, advanced team permissions, and dedicated support. Contact us to discuss your requirements."
-            />
-          </div>
-
-          {/* 
-          =======================================================================
-          PAID FAQs - Uncomment these when PAYMENTS_ENABLED=true
-          =======================================================================
-          
           <div className="space-y-6">
             <FAQItem 
               question="What's the difference between Event Pass and Pro?"
-              answer="Event Pass is a one-time purchase that unlocks Pro features for a single event - it's yours forever, no subscription needed. Pro is a monthly subscription that gives you 5 event slots you can swap anytime, plus the ability to duplicate events. Choose Event Pass if you have 1-2 events per year, or Pro if you manage multiple events regularly."
+              answer="Event Pass is a one-time purchase that adds 1 extra event slot — yours forever, no subscription needed. Pro is a subscription that gives you 5 event slots plus premium features like watermark removal, embed widgets, and detailed analytics. Choose Event Pass for occasional use, or Pro if you run multiple events regularly."
             />
             <FAQItem 
               question="Can I buy multiple Event Passes?"
-              answer="Yes! Each Event Pass unlocks Pro features for one additional event. If you have 3 events, buy 3 Event Passes - each event keeps its Pro features permanently."
+              answer="Yes! Each Event Pass adds one extra event slot to your account. Buy as many as you need — each slot is permanent and never expires."
             />
             <FAQItem 
               question="Do I need a credit card to sign up?"
-              answer="No! The Free plan is completely free forever with no credit card required. You only need to enter payment details when upgrading."
+              answer="No! The Free plan is completely free forever with no credit card required. You only need to enter payment details when upgrading to Pro or purchasing an Event Pass."
             />
             <FAQItem 
-              question="Can I upgrade or downgrade at any time?"
-              answer="Yes! You can upgrade your plan instantly. When downgrading from Pro, you'll keep your current plan features until the end of your billing period. Event Passes never expire - once purchased, that event has Pro features forever."
+              question="What are Founding Member perks?"
+              answer="All users who joined during Early Access are Founding Members. You get 10 free event slots (instead of 1), a permanent €39 discount on all Event Passes (instead of €69), and a ⭐ Founding Member badge on your dashboard and public schedules — forever."
+            />
+            <FAQItem 
+              question="What happens after my 10 free events?"
+              answer="Founding Members get 10 free event slots as a thank-you perk (the standard Pro plan includes 5). When you need more slots, purchase additional Event Passes — €39 for Founding Members, €69 regular price. Your existing events and data always stay yours."
             />
             <FAQItem 
               question="What payment methods do you accept?"
-              answer="We accept all major credit cards (Visa, Mastercard, American Express) through Stripe. For Enterprise annual plans, we also offer invoicing."
+              answer="We currently accept payments via Revolut. After completing your payment, your account is upgraded instantly. Contact us if you need an invoice or alternative payment method."
             />
             <FAQItem 
               question="What happens to my data if I cancel?"
-              answer="Your data is yours. If you cancel Pro, your festivals remain accessible as drafts. Festivals with Event Passes keep their Pro features. You can export your data anytime."
+              answer="Your data is yours. All your events remain accessible and you can export everything at any time. We'll never hold your data hostage."
             />
             <FAQItem 
-              question="Can I get a refund?"
-              answer="We offer a 30-day money-back guarantee. If you're not satisfied, contact us within 30 days of your purchase for a full refund."
-            />
-            <FAQItem 
-              question="Do you offer discounts for non-profits?"
-              answer="Yes! We offer 50% off for registered non-profit organizations. Contact us with your organization details to apply."
+              question="Can my team use Flow Grid too?"
+              answer="Yes! Event Pass includes 1 team member, Pro includes collaboration for up to 3 members, and Enterprise offers unlimited team members with advanced role-based permissions."
             />
             <FAQItem 
               question="What's included in Enterprise?"
-              answer="Enterprise is fully customizable based on your needs. Common features include unlimited festivals, white-label branding, custom domains, team collaboration, payment processing, and dedicated support. Contact us to discuss your requirements."
+              answer="Enterprise is fully customizable. Common features include unlimited events, white-label branding, custom domains, advanced team permissions, and dedicated support. Contact us to discuss your requirements."
             />
           </div>
-          
-          =======================================================================
-          */}
         </div>
 
         {/* CTA */}
