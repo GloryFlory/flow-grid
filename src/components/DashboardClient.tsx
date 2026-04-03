@@ -125,15 +125,17 @@ export function DashboardClient({
           {limits && (
             <div className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium flex items-center gap-2 self-start sm:self-auto ${
               limits.isAdmin ? 'bg-purple-100 text-purple-700' :
+              limits.isFoundingMember ? 'bg-amber-100 text-amber-700' :
               limits.currentPlan === 'FREE' ? 'bg-gray-100 text-gray-700' :
               limits.currentPlan === 'PRO' ? 'bg-blue-100 text-blue-700' :
               'bg-purple-100 text-purple-700'
             }`}>
               {limits.isAdmin && <Crown className="w-3 h-3 sm:w-4 sm:h-4" />}
-              {!limits.isAdmin && limits.currentPlan === 'FREE' && <Zap className="w-3 h-3 sm:w-4 sm:h-4" />}
-              {!limits.isAdmin && limits.currentPlan === 'PRO' && <Crown className="w-3 h-3 sm:w-4 sm:h-4" />}
-              {!limits.isAdmin && limits.currentPlan === 'ENTERPRISE' && <Crown className="w-3 h-3 sm:w-4 sm:h-4" />}
-              {limits.isAdmin ? 'Admin' : limits.currentPlan} Plan
+              {!limits.isAdmin && limits.isFoundingMember && <span className="text-sm leading-none">⭐</span>}
+              {!limits.isAdmin && !limits.isFoundingMember && limits.currentPlan === 'FREE' && <Zap className="w-3 h-3 sm:w-4 sm:h-4" />}
+              {!limits.isAdmin && !limits.isFoundingMember && limits.currentPlan === 'PRO' && <Crown className="w-3 h-3 sm:w-4 sm:h-4" />}
+              {!limits.isAdmin && !limits.isFoundingMember && limits.currentPlan === 'ENTERPRISE' && <Crown className="w-3 h-3 sm:w-4 sm:h-4" />}
+              {limits.isAdmin ? 'Admin' : limits.isFoundingMember ? 'Founding Member' : `${limits.currentPlan} Plan`}
             </div>
           )}
         </div>
