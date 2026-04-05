@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import ScheduleInterface from '@/components/schedule/ScheduleInterface'
 
 interface Session {
@@ -46,7 +46,9 @@ interface Festival {
 // This page will render the public schedule for any festival
 export default function FestivalSchedule() {
   const params = useParams()
+  const searchParams = useSearchParams()
   const slug = params.slug as string
+  const previewWatermark = searchParams.get('preview') === 'watermark'
   
   const [festival, setFestival] = useState<Festival | null>(null)
   const [sessions, setSessions] = useState<Session[]>([])
@@ -121,7 +123,7 @@ export default function FestivalSchedule() {
       <ScheduleInterface 
         festival={festival}
         sessions={sessions}
-        showPoweredBy={showPoweredBy}
+        showPoweredBy={previewWatermark ? true : showPoweredBy}
         isFoundingMember={isFoundingMember}
       />
     </div>

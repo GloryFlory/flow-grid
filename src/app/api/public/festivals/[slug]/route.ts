@@ -66,6 +66,7 @@ export async function GET(
             subscription: {
               select: {
                 plan: true,
+                isFoundingMember: true,
               }
             }
           }

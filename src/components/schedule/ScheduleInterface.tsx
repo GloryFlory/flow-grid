@@ -644,7 +644,7 @@ export default function ScheduleInterface({ festival, sessions, showPoweredBy = 
             {showPoweredBy && (
               <div className="flex items-center justify-center gap-1.5 py-2 mt-1">
                 <a 
-                  href={`https://tryflowgrid.com?ref=${isFoundingMember ? 'founding-member' : 'powered-by'}`}
+                  href="https://tryflowgrid.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors"
