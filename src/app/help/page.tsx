@@ -349,7 +349,7 @@ export default function HelpCenterPage() {
             <div className="border-l-4 border-indigo-200 pl-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">How many events can I create?</h3>
               <p className="text-gray-700">
-                The Free plan includes 1 event. Pro users can create up to 10 events, and Enterprise users have unlimited events. Visit our <a href="/pricing" className="text-indigo-600 hover:underline">pricing page</a> for details.
+                The Free plan includes 1 event. Pro users can create up to 5 events, and Enterprise users have unlimited events. Visit our <a href="/pricing" className="text-indigo-600 hover:underline">pricing page</a> for details.
               </p>
             </div>
 
