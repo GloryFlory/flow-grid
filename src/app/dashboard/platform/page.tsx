@@ -317,7 +317,8 @@ export default function AdminPlatformDashboard() {
           <OverviewTab 
             stats={platformStats} 
             loading={overviewLoading} 
-            error={overviewError} 
+            error={overviewError}
+            onNavigate={setActiveTab}
           />
         )}
         {activeTab === 'analytics' && (
@@ -736,11 +737,13 @@ function MiniSparkline({ values, color = '#8b5cf6' }: { values: number[], color?
 function OverviewTab({ 
   stats, 
   loading, 
-  error 
+  error,
+  onNavigate,
 }: { 
   stats: PlatformStats | null
   loading: boolean
   error: string | null
+  onNavigate: (tab: TabType) => void
 }) {
   if (loading) {
     return (
@@ -818,16 +821,28 @@ function OverviewTab({
               <h3 className="text-sm font-semibold text-gray-700">Schedule Views</h3>
               <p className="text-xs text-gray-400">Last 8 weeks · {stats.views.total.toLocaleString()} total</p>
             </div>
-            <Eye className="w-4 h-4 text-purple-400" />
+            <div className="flex items-center gap-3">
+              <Eye className="w-4 h-4 text-purple-400" />
+              <button
+                onClick={() => onNavigate('analytics')}
+                className="text-xs text-purple-600 hover:text-purple-800 hover:underline font-medium"
+              >
+                View details →
+              </button>
+            </div>
           </div>
-          <div className="flex items-end gap-1 h-16">
+          <div className="flex items-end gap-1 h-16 group/chart">
             {(stats.views?.weekly || []).map((v, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-1">
+              <div key={i} className="flex-1 flex flex-col items-center gap-1 relative">
                 <div
-                  className="w-full bg-purple-200 rounded-sm hover:bg-purple-400 transition-colors cursor-default"
+                  className="w-full bg-purple-200 hover:bg-purple-500 rounded-sm transition-colors cursor-default peer"
                   style={{ height: `${maxWeekViews > 0 ? Math.max((v / maxWeekViews) * 52, v > 0 ? 4 : 0) : 0}px` }}
-                  title={`${stats.views.labels?.[i] || ''}: ${v} views`}
                 />
+                {/* Tooltip */}
+                <div className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap opacity-0 peer-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                  <div className="font-semibold">{v} views</div>
+                  <div className="text-gray-400">{stats.views.labels?.[i]}</div>
+                </div>
               </div>
             ))}
           </div>
@@ -901,7 +916,10 @@ function OverviewTab({
         <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-gray-700">Expiring Soon</h3>
-            <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">{stats.expiringSubs.length} in 90 days</span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">{stats.expiringSubs.length} in 90 days</span>
+              <button onClick={() => onNavigate('users')} className="text-xs text-purple-600 hover:underline font-medium">All users →</button>
+            </div>
           </div>
           {stats.expiringSubs.length === 0 ? (
             <p className="text-sm text-gray-400 text-center py-4">No subscriptions expiring soon</p>
