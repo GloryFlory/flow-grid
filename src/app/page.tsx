@@ -97,12 +97,16 @@ export default function HomePage() {
                 </Link>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/auth/signin">
-                <Button variant="outline">Sign In</Button>
+            <div className="flex items-center gap-3">
+              <Link href="/showcase">
+                <Button variant="outline" className="border-gray-300 text-gray-700 hover:border-[#2a468b] hover:text-[#2a468b] transition-colors">
+                  Take a Tour
+                </Button>
               </Link>
               <Link href="/auth/signin">
-                <Button>Get Started</Button>
+                <Button className="bg-[#ff7119] hover:bg-[#b40225] text-white transition-colors">
+                  Get Started
+                </Button>
               </Link>
             </div>
           </div>
@@ -150,6 +154,11 @@ export default function HomePage() {
               <Link href="/auth/signin">
                 <Button size="lg" className="text-lg px-8 py-3 bg-[#ff7119] hover:bg-[#b40225] text-white shadow-lg">
                   Start Free Today <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+              </Link>
+              <Link href="/showcase">
+                <Button size="lg" className="text-lg px-8 py-3 bg-white text-[#2a468b] hover:bg-[#2a468b] hover:text-white transition-colors shadow-lg font-semibold">
+                  See How It Works →
                 </Button>
               </Link>
               <Link href="/flow-grid-demo/schedule" target="_blank">
