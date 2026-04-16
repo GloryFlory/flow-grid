@@ -230,23 +230,36 @@ export const authOptions: NextAuthOptions = {
   },
   events: {
     async createUser({ user }) {
-      // Auto-create PRO subscription for new users (Early Access / Founding Member)
-      // Everyone who signs up while PAYMENTS_ENABLED=false is a Founding Member
-      // Founding Member perks: PRO plan, 10 free events, permanent €39 Event Pass discount
+      // Ensure all new users start with FREE plan (never PRO on signup)
+      // Override any adapter defaults or previous state
       if (user.id) {
-        const oneYearFromNow = new Date();
-        oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
-        
-        await prisma.subscription.create({
-          data: {
-            userId: user.id,
-            plan: 'PRO',
-            status: 'ACTIVE',
-            festivalsLimit: 10,
-            stripeCurrentPeriodEnd: oneYearFromNow,
-            isFoundingMember: true,
-          },
+        const existingSub = await prisma.subscription.findUnique({
+          where: { userId: user.id }
         });
+        
+        if (existingSub) {
+          // If subscription already exists (shouldn't), enforce FREE
+          await prisma.subscription.update({
+            where: { userId: user.id },
+            data: {
+              plan: 'FREE',
+              status: 'ACTIVE',
+              festivalsLimit: 1,
+              isFoundingMember: false,
+            },
+          });
+        } else {
+          // Create new FREE subscription
+          await prisma.subscription.create({
+            data: {
+              userId: user.id,
+              plan: 'FREE',
+              status: 'ACTIVE',
+              festivalsLimit: 1,
+              isFoundingMember: false,
+            },
+          });
+        }
       }
     },
   },
