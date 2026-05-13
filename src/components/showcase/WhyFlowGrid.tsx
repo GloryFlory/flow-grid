@@ -118,6 +118,28 @@ const FEATURES = [
     color: '#466D60',
     gradient: 'from-emerald-700/20 to-transparent',
   },
+  {
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+        <path d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm0 8a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zm12 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+    headline: 'Landing pages — built in',
+    body: 'Create dedicated sign-up pages for early bird interest, waitlists, webinars, retreats, volunteer applications and more. All linked to your event, with email notifications the moment someone signs up.',
+    color: '#B40225',
+    gradient: 'from-rose-600/20 to-transparent',
+  },
+  {
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+        <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+    headline: 'Organiser dashboard',
+    body: "See everything at once: recent signups, bookings, saved sessions, waitlists, upcoming events, and sessions nearing capacity. Customise the widgets to show only what matters to you.",
+    color: '#2A468B',
+    gradient: 'from-blue-700/20 to-transparent',
+  },
 ]
 
 // ── Stagger variants ──────────────────────────────────────────────────────────
