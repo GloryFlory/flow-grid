@@ -78,7 +78,6 @@ export async function POST(
         data: { festivalId, pageType: 'WEBINAR', pageSlug: 'webinar', title: 'Webinar Signup', headline: 'My Webinar', speakerPhoto: publicUrl },
       })
     }
-    })
 
     return NextResponse.json({ url: publicUrl })
   } catch (error) {
