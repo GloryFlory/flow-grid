@@ -18,7 +18,8 @@ import {
   Heart,
   Music,
   Briefcase,
-  Ticket
+  Ticket,
+  Globe,
 } from 'lucide-react'
 
 const heroMessages = [
@@ -267,6 +268,18 @@ export default function HomePage() {
               <CardContent>
                 <p className="text-gray-600">
                   Upload your logo, pick your colors, and ship. Takes 2 minutes. Looks like you spent $5k on a custom website. (You didn't.)
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <Globe className="w-12 h-12 mb-4" style={{ color: '#b40225' }} />
+                <CardTitle>Grow Your Audience Before Your Event</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Create landing pages for early bird sign-ups, waitlists, webinars, and retreat interest — all linked to your event. Collect subscribers and get notified by email the moment someone signs up.
                 </p>
               </CardContent>
             </Card>

@@ -227,7 +227,7 @@ export async function GET(request: NextRequest) {
           }
         }
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { updatedAt: 'desc' }
     })
 
     // Add isShared flag and user's role to each festival

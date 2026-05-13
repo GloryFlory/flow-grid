@@ -19,7 +19,8 @@ import {
   ArrowLeft,
   FileText,
   Share2,
-  PieChart
+  BedDouble,
+  Megaphone
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -405,11 +406,72 @@ export default function FestivalManagement() {
                     </div>
                   </div>
                 </Link>
+
+                <div className="p-3 sm:p-4 border border-gray-200 rounded-lg bg-white">
+                  <div className="flex items-start sm:items-center justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm sm:text-base font-semibold text-gray-900 break-words">Marketing & Sponsors</h3>
+                      <p className="text-xs sm:text-sm text-gray-600 mt-0.5">Campaign attribution, sponsor tracking, and promotion overview</p>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <Megaphone className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                        Planned
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-3 sm:p-4 border border-gray-200 rounded-lg bg-white">
+                  <div className="flex items-start sm:items-center justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm sm:text-base font-semibold text-gray-900 break-words">Financials</h3>
+                      <p className="text-xs sm:text-sm text-gray-600 mt-0.5">Track event expenses and facilitator payouts in one finance space</p>
+                    </div>
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 flex-shrink-0">
+                      Planned
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                  <Users className="w-4 h-4 sm:w-5 sm:h-5" />
+                  Guests
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 sm:space-y-4">
+                <Link href={`/dashboard/festivals/${festival.id}/guests`}>
+                  <div className="p-3 sm:p-4 border border-gray-200 rounded-lg hover:border-indigo-300 hover:bg-indigo-50 transition-all cursor-pointer">
+                    <div className="flex items-start sm:items-center justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 break-words">Guest Lifecycle & Check-in</h3>
+                        <p className="text-xs sm:text-sm text-gray-600 mt-0.5">Upload workbook data, manage payment status, waivers, shirts, and check-in</p>
+                      </div>
+                      <Users className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0" />
+                    </div>
+                  </div>
+                </Link>
+
+                <Link href={`/dashboard/festivals/${festival.id}/rooms`}>
+                  <div className="p-3 sm:p-4 border border-gray-200 rounded-lg hover:border-indigo-300 hover:bg-indigo-50 transition-all cursor-pointer">
+                    <div className="flex items-start sm:items-center justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 break-words">Rooms</h3>
+                        <p className="text-xs sm:text-sm text-gray-600 mt-0.5">Build room lists from guest preferences and allocation notes</p>
+                      </div>
+                      <BedDouble className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0" />
+                    </div>
+                  </div>
+                </Link>
               </CardContent>
             </Card>
           </div>
 
-          {/* Branding & Assets */}
+          {/* Branding & Settings */}
           <div className="space-y-4 sm:space-y-6">
             <Card data-tour="branding-design">
               <CardHeader className="pb-3 sm:pb-6">
@@ -449,7 +511,7 @@ export default function FestivalManagement() {
                     <div className="flex items-start sm:items-center justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <h3 className="text-sm sm:text-base font-semibold text-gray-900 break-words">Facilitator Info & Photos</h3>
-                        <p className="text-xs sm:text-sm text-gray-600 mt-0.5">Manage profiles and photos</p>
+                        <p className="text-xs sm:text-sm text-gray-600 mt-0.5">Manage profiles, bios, and photo assets</p>
                       </div>
                       <ImageIcon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0" />
                     </div>
@@ -506,6 +568,29 @@ export default function FestivalManagement() {
                         <p className="text-xs sm:text-sm text-gray-600 mt-0.5">QR codes, social sharing, marketing tools</p>
                       </div>
                       <Share2 className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0" />
+                    </div>
+                  </div>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                  <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
+                  Landing Page & Signups
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700 ml-1">Pro</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 sm:space-y-4">
+                <Link href={`/dashboard/festivals/${festival.id}/landing-pages`}>
+                  <div className="p-3 sm:p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-all cursor-pointer">
+                    <div className="flex items-start sm:items-center justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 break-words">Signup Pages</h3>
+                        <p className="text-xs sm:text-sm text-gray-600 mt-0.5">Webinar, early bird, waitlist — collect emails from any campaign</p>
+                      </div>
+                      <Globe className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0" />
                     </div>
                   </div>
                 </Link>

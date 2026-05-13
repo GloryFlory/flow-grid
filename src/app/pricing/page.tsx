@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
-import { Check, X, Zap, Building, Sparkles, ArrowRight, Mail, HelpCircle, Calendar, FileText, Layers, Users, Palette, Globe, Type, QrCode, Code, Copy, Smartphone, Eye, Download, Bookmark, BarChart3, Heart, Shield, Headphones, Ticket, MousePointerClick, Clock, Gift } from 'lucide-react'
+import { Check, X, Zap, Building, Sparkles, ArrowRight, Mail, HelpCircle, Calendar, FileText, Layers, Users, Palette, Globe, Type, QrCode, Code, Copy, Smartphone, Eye, Download, Bookmark, BarChart3, Heart, Shield, Headphones, Ticket, MousePointerClick, Clock, Gift, LayoutTemplate, Bell, BookOpen } from 'lucide-react'
 import { PAYMENTS_ENABLED, EARLY_ACCESS_CONFIG, PRICING, REVOLUT_LINKS } from '@/config/payments'
 import { RevolutPaymentModal } from '@/components/RevolutPaymentModal'
 
@@ -488,6 +488,16 @@ export default function PricingPage() {
               <ComparisonRow icon={<Code className="w-4 h-4" />} feature="Embeddable widget" tooltip="Add your schedule directly to your website with an embed code" free={false} eventPass={false} pro={true} enterprise={true} />
               <ComparisonRow icon={<Copy className="w-4 h-4" />} feature="Duplicate events" tooltip="Clone an entire event to quickly set up recurring events" free={false} eventPass={false} pro={true} enterprise={true} />
               <ComparisonRow icon={<Layers className="w-4 h-4" />} feature="Multiple published events" tooltip="Have more than one event live at the same time" free={false} eventPass={false} pro={true} enterprise={true} />
+            </FeatureSection>
+
+            {/* Landing Pages & Signups */}
+            <FeatureSection title="Landing Pages & Signups">
+              <ComparisonRow icon={<LayoutTemplate className="w-4 h-4" />} feature="Landing page builder" tooltip="Create dedicated sign-up pages for your event: early bird, waitlist, webinar, retreat interest, and more" free={true} eventPass={true} pro={true} enterprise={true} />
+              <ComparisonRow icon={<Globe className="w-4 h-4" />} feature="Page types" tooltip="Webinar, Early Bird, Waitlist, Retreat Interest, Volunteer, Scholarship, Discovery Call" free="7 types" eventPass="7 types" pro="7 types" enterprise="7 types" />
+              <ComparisonRow icon={<LayoutTemplate className="w-4 h-4" />} feature="Page templates" tooltip="Choose from Minimal, Hero, Speaker, and Countdown templates for each page" free="4 templates" eventPass="4 templates" pro="4 templates" enterprise="4 templates" />
+              <ComparisonRow icon={<Users className="w-4 h-4" />} feature="Subscriber list & export" tooltip="View and export your sign-up lists per page" free={true} eventPass={true} pro={true} enterprise={true} />
+              <ComparisonRow icon={<Bell className="w-4 h-4" />} feature="Email notification on signup" tooltip="Get an email whenever someone signs up to one of your landing pages" free={true} eventPass={true} pro={true} enterprise={true} />
+              <ComparisonRow icon={<BookOpen className="w-4 h-4" />} feature="GDPR-compliant consent capture" tooltip="Consent timestamp, version, and exact wording stored with every signup" free={true} eventPass={true} pro={true} enterprise={true} />
             </FeatureSection>
 
             {/* Attendee Experience */}

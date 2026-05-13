@@ -125,8 +125,8 @@ export function DashboardNavigation() {
           </nav>
 
           {/* Desktop User Menu */}
-          <div className="hidden md:flex items-center space-x-4">
-            <div className="flex items-center text-sm text-gray-600">
+          <div className="hidden md:flex items-center space-x-2">
+            <div className="flex items-center text-sm text-gray-600 px-2">
               <User className="w-4 h-4 mr-2" />
               <span className="max-w-[150px] truncate">{session?.user?.name || session?.user?.email}</span>
             </div>
@@ -141,8 +141,8 @@ export function DashboardNavigation() {
             </Button>
           </div>
 
-          {/* Mobile Sign Out Button */}
-          <div className="md:hidden">
+          {/* Mobile Sign Out */}
+          <div className="md:hidden flex items-center gap-1">
             <Button
               variant="outline"
               size="sm"

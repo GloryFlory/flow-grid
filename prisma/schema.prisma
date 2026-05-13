@@ -96,6 +96,8 @@ model Festival {
   teachers       Teacher[]
   waitlist       SessionWaitlist[]
   teamMembers    TeamMember[]
+  landingPages   LandingPage[]
+  subscribers    WebinarSubscriber[]
 
   @@index([slug, isPublished])
   @@index([userId])
@@ -407,4 +409,60 @@ enum PaymentVerificationStatus {
 enum BillingCycle {
   MONTHLY
   YEARLY
+}
+
+model LandingPage {
+  id               String              @id @default(cuid())
+  festivalId       String
+  pageType         String              @default("WEBINAR") // WEBINAR | EARLY_BIRD | WAITLIST
+  pageSlug         String              @default("webinar") // URL-safe identifier
+  title            String              @default("")        // internal name shown in list
+  template         String              @default("minimal") // minimal | hero | speaker | countdown
+  headline         String
+  subheadline      String?
+  description      String?
+  ctaText          String              @default("Sign me up")
+  webinarDate      DateTime?
+  webinarEndDate   DateTime?   // optional end of event/early-bird window
+  webinarDuration  Int?        // minutes
+  speakerName      String?
+  speakerTitle     String?
+  speakerBio       String?
+  speakerPhoto     String?     // URL
+  privacyPolicyUrl String?
+  webinarLink      String?     // Zoom/Teams/Meet join URL
+  isPublished      Boolean             @default(false)
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  festival         Festival            @relation(fields: [festivalId], references: [id], onDelete: Cascade)
+  subscribers      WebinarSubscriber[]
+
+  @@unique([festivalId, pageSlug])
+  @@map("landing_pages")
+}
+
+model WebinarSubscriber {
+  id              String      @id @default(cuid())
+  landingPageId   String
+  festivalId      String      // kept for easy cross-page querying
+  email           String
+  firstName       String?
+  lastName        String?
+  consentAt       DateTime    // GDPR: when consent was given
+  consentVersion  String      @default("1.0") // Which T&C version was shown
+  consentText     String      // Exact wording shown at signup
+  unsubscribeToken String     @unique @default(cuid())
+  unsubscribedAt  DateTime?   // Set when they unsubscribe
+  ipAddress       String?     // For compliance audit trail (hashed)
+  confirmedAt     DateTime?   // Double opt-in confirmation timestamp
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  landingPage     LandingPage @relation(fields: [landingPageId], references: [id], onDelete: Cascade)
+  festival        Festival    @relation(fields: [festivalId], references: [id], onDelete: Cascade)
+
+  @@unique([landingPageId, email])
+  @@index([landingPageId])
+  @@index([festivalId])
+  @@index([unsubscribeToken])
+  @@map("webinar_subscribers")
 }
