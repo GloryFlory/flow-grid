@@ -51,9 +51,8 @@ export default function LandingPagesListPage() {
   const router = useRouter()
   const festivalId = params.id as string
   const { limits } = usePlanLimits()
-  const isPro = limits === null
-    ? null // still loading
-    : limits?.currentPlan === 'PRO' || limits?.currentPlan === 'ENTERPRISE'
+  // TODO: restrict to Pro+ when ready
+  const isPro = limits === null ? null : true
 
   const [festivalSlug, setFestivalSlug] = useState('')
   const [festivalName, setFestivalName] = useState('')
