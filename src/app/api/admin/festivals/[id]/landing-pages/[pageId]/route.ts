@@ -46,19 +46,6 @@ export async function PUT(
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
     }
 
-    // Pro gate
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { subscription: { select: { plan: true } }, role: true },
-    })
-    const isPro = user?.subscription?.plan === 'PRO' || user?.role === 'ADMIN'
-    if (!isPro) {
-      return NextResponse.json(
-        { error: 'Landing pages are a Pro feature. Please upgrade to access this.' },
-        { status: 403 }
-      )
-    }
-
     // Verify page belongs to this festival
     const existing = await prisma.landingPage.findFirst({
       where: { id: pageId, festivalId },
