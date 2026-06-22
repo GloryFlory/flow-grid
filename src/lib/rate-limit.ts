@@ -36,13 +36,6 @@ function getRedisClient(): RedisClient {
   let url = process.env.UPSTASH_REDIS_REST_URL;
   let token = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-  // FALLBACK for local development (remove these after env loading is fixed)
-  if (!url || url === 'PASTE_YOUR_URL_HERE' || url.includes('PASTE')) {
-    console.warn('[Rate Limit] Using hardcoded fallback credentials (local dev only)');
-    url = "https://still-haddock-22951.upstash.io";
-    token = "AVmnAAIncDI0ZjVkNTYyYWUzZWU0NzkwYjc1MGIxMmY2YmJjN2E3OHAyMjI5NTE";
-  }
-
   if (!url || !token) {
     throw new Error(
       'Upstash Redis environment variables are not configured. Please set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN.'
