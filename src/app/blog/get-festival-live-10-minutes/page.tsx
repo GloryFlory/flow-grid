@@ -122,10 +122,10 @@ export default function BlogPost() {
       category: 'Festival Planning'
     },
     {
-      slug: 'multi-day-festival-scheduling-tips',
-      title: '7 Multi-Day Festival Scheduling Tips',
-      excerpt: 'Manage complex events with overlapping sessions and multiple venues.',
-      category: 'Festival Planning'
+      slug: 'earn-money-referring-event-organisers-flow-grid',
+      title: 'Earn Money Referring Event Organisers to Flow Grid',
+      excerpt: 'Know other event organisers? Flow Grid\'s affiliate programme pays €25–€50 per referral.',
+      category: 'Earn Money'
     }
   ]
 

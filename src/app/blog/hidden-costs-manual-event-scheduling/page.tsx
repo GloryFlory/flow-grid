@@ -557,10 +557,10 @@ export default function BlogPost() {
                 category: 'Planning'
               },
               {
-                slug: 'real-time-schedule-updates',
-                title: 'Real-Time Schedule Updates: Keeping Attendees Informed',
-                excerpt: 'How to communicate schedule changes effectively without chaos.',
-                category: 'Operations'
+                slug: 'earn-money-referring-event-organisers-flow-grid',
+                title: 'Earn Money Referring Event Organisers to Flow Grid',
+                excerpt: 'Know other event organisers still on spreadsheets? Flow Grid\'s affiliate programme pays €25–€50 per referral.',
+                category: 'Earn Money'
               }
             ]}
           />

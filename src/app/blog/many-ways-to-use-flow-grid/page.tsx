@@ -70,10 +70,10 @@ const relatedPosts = [
     category: 'Event Management'
   },
   {
-    slug: 'volunteer-scheduling-best-practices',
-    title: 'Festival Volunteer Scheduling: Best Practices for Success',
-    excerpt: 'Master volunteer coordination with proven scheduling strategies.',
-    category: 'Best Practices'
+    slug: 'earn-money-referring-event-organisers-flow-grid',
+    title: 'Earn Money Referring Event Organisers to Flow Grid',
+    excerpt: 'Know other event organisers? Flow Grid\'s affiliate programme pays €25–€50 per referral.',
+    category: 'Earn Money'
   },
   {
     slug: 'get-festival-live-10-minutes',
