@@ -445,6 +445,46 @@ If booking is enabled:
 
 ---
 
+## Affiliate Programme
+
+Earn money by referring new users to Flow Grid.
+
+### How It Works
+
+1. Go to **Settings → Affiliate** in your dashboard
+2. Copy your unique referral link (e.g. `tryflowgrid.com/?ref=YOURCODE`)
+3. Share it with event organisers, communities, or on social media
+4. When someone signs up via your link and upgrades, you earn a payout
+
+### Payouts
+
+| Conversion | Payout |
+|---|---|
+| Pro subscription (monthly or annual) | €25 flat |
+| Event Pass | €50 flat |
+
+Payouts are processed manually — you'll receive an email from the Flow Grid team once confirmed. There is no minimum threshold.
+
+### Tracking Your Referrals
+
+Your **Settings → Affiliate** tab shows:
+- Your referral link and code
+- Total referrals and conversions
+- Pending payout amount
+- Total earned (paid out)
+
+Each referral has one of three statuses:
+- **Signed up** — the person created an account via your link
+- **Payout pending** — they converted to a paid plan; payout owed to you
+- **Paid out** — Flow Grid has transferred the payout
+
+### Tips
+
+- Share your link in event organiser communities, Facebook groups, or with colleagues who run events
+- The link works for 30 days after someone first clicks it — so they don't have to sign up immediately
+
+---
+
 ## Tips & Best Practices
 
 ### Organizing Your Schedule
@@ -511,6 +551,6 @@ A: No! Designed for non-technical festival organizers.
 
 ---
 
-**Last Updated**: November 2025  
-**Version**: 2.0  
+**Last Updated**: June 2026  
+**Version**: 2.1  
 **Platform**: Flow Grid Festival Scheduler

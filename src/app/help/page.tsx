@@ -274,7 +274,14 @@ export default function HelpCenterPage() {
             <div className="border-l-4 border-red-200 pl-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Can I embed my schedule on another website?</h3>
               <p className="text-gray-700">
-                Currently, we don't offer embed codes, but you can always link to your Flow Grid event page from your main website or social media.
+                Yes! Pro users can embed their live schedule directly on any website using an iframe snippet. Find the embed code under your event's <strong>Share &amp; Promote</strong> tab in the dashboard.
+              </p>
+            </div>
+
+            <div className="border-l-4 border-red-200 pl-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Can I earn money by referring others to Flow Grid?</h3>
+              <p className="text-gray-700">
+                Yes — every account has a unique referral link under <strong>Settings → Affiliate</strong>. You earn €25 when someone you refer upgrades to Pro, or €50 if they buy an Event Pass. Payouts are processed manually and you'll be contacted by email.
               </p>
             </div>
 

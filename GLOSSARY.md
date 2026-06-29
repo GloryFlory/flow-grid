@@ -416,6 +416,28 @@ Trying to create festival with slug that already exists. Must use unique slug.
 
 ---
 
+## Affiliate Programme
+
+### Affiliate Programme
+A referral scheme where Flow Grid users earn a cash payout for referring new paying customers. Each user gets a unique referral link available under Settings → Affiliate.
+
+### Referral Link
+A unique URL containing your affiliate code (e.g. `tryflowgrid.com/?ref=YOURCODE`). When someone signs up via this link, the referral is tracked for 30 days.
+
+### Affiliate Code
+The short unique identifier appended to your referral link (e.g. `YOURCODE`). Automatically assigned to every account.
+
+### Referral Status
+The current state of a referral:
+- **Signed up** — referred user created an account
+- **Payout pending** (CONVERTED) — referred user purchased a paid plan; payout is owed
+- **Paid out** (PAID) — Flow Grid has paid the affiliate
+
+### Payout
+The cash amount earned per successful referral: €25 for a Pro subscription, €50 for an Event Pass. Paid manually by the Flow Grid team.
+
+---
+
 ## Feature Flags
 
 ### Booking Enabled
@@ -477,8 +499,8 @@ Download session data as CSV (planned).
 
 ---
 
-**Last Updated**: November 2025  
-**Version**: 2.0  
+**Last Updated**: June 2026  
+**Version**: 2.1  
 **Platform**: Flow Grid Festival Scheduler
 
 ---
