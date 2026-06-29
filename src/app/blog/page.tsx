@@ -16,6 +16,14 @@ export const metadata: Metadata = {
 
 const blogPosts = [
   {
+    slug: 'earn-money-referring-event-organisers-flow-grid',
+    title: 'Earn Money Referring Event Organisers to Flow Grid',
+    excerpt: 'Flow Grid\'s affiliate programme pays €25 per Pro referral and €50 per Event Pass. If you know event organisers still using PDFs and spreadsheets, your link is worth real money.',
+    date: '2026-06-29',
+    readTime: '6 min read',
+    category: 'Earn Money',
+  },
+  {
     slug: 'wetravel-flowgrid-perfect-combination',
     title: 'WeTravel + FlowGrid: The Perfect End-to-End Solution for Retreat & Festival Organizers',
     excerpt: 'Discover how WeTravel (for payments & bookings) and FlowGrid (for schedules) work together seamlessly to create a professional experience from registration to event day.',
