@@ -21,25 +21,27 @@ export async function GET(req: NextRequest) {
   }
 
   const statusParam = req.nextUrl.searchParams.get('status') ?? 'CONVERTED'
-  const where =
-    statusParam === 'ALL'
-      ? { status: { in: ['CONVERTED', 'PAID'] as const } }
-      : { status: statusParam as 'CONVERTED' | 'PAID' }
+  const statuses: ('CONVERTED' | 'PAID')[] = statusParam === 'ALL' ? ['CONVERTED', 'PAID'] : [statusParam as 'CONVERTED' | 'PAID']
 
   const referrals = await prisma.affiliateReferral.findMany({
-    where,
+    where: { status: { in: statuses } },
     orderBy: { convertedAt: 'desc' },
-    include: {
-      affiliateUser: { select: { id: true, email: true, name: true } },
-    },
   })
+
+  // Fetch affiliate user details separately
+  const userIds = [...new Set(referrals.map((r) => r.affiliateUserId))]
+  const users = await prisma.user.findMany({
+    where: { id: { in: userIds } },
+    select: { id: true, email: true, name: true },
+  })
+  const userMap = Object.fromEntries(users.map((u) => [u.id, u]))
 
   return NextResponse.json({
     referrals: referrals.map((r) => ({
       id: r.id,
       affiliateUserId: r.affiliateUserId,
-      affiliateEmail: r.affiliateUser.email,
-      affiliateName: r.affiliateUser.name,
+      affiliateEmail: userMap[r.affiliateUserId]?.email ?? null,
+      affiliateName: userMap[r.affiliateUserId]?.name ?? null,
       referredEmail: r.referredEmail,
       conversionType: r.conversionType,
       payoutAmount: r.payoutAmount?.toString() ?? null,

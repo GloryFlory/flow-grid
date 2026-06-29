@@ -29,7 +29,6 @@ export function DashboardNavigation() {
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Events', href: '/dashboard/festivals', icon: Calendar },
     { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
-    { name: 'Affiliate', href: '/dashboard/affiliate', icon: BadgeEuro },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
   ]
 

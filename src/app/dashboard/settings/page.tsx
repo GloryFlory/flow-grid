@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { User, Mail, Lock, Bell, Shield, AlertCircle, Key, Smartphone, CheckCircle2, LogOut, Globe, CreditCard, Crown, Zap, ArrowRight, Ticket } from 'lucide-react'
+import { User, Mail, Lock, Bell, Shield, AlertCircle, Key, Smartphone, CheckCircle2, LogOut, Globe, CreditCard, Crown, Zap, ArrowRight, Ticket, BadgeEuro, Copy, Check, Users, TrendingUp, Clock } from 'lucide-react'
 import { passkeysSupported, getAuthenticatorName, analytics } from '@/lib/passkeys'
 import { track } from '@/lib/consent'
 import { startRegistration } from '@simplewebauthn/browser'
@@ -21,7 +21,7 @@ interface Passkey {
   transports: string | null
 }
 
-type SettingsTab = 'account' | 'billing' | 'security' | 'notifications' | 'danger-zone'
+type SettingsTab = 'account' | 'billing' | 'security' | 'notifications' | 'affiliate' | 'danger-zone'
 
 export default function SettingsPage() {
   const { data: session, update } = useSession()
@@ -50,6 +50,37 @@ export default function SettingsPage() {
     name: '',
   })
 
+  // Affiliate state
+  type ReferralStatus = 'SIGNED_UP' | 'CONVERTED' | 'PAID'
+  interface AffiliateReferral {
+    id: string
+    referredEmail: string | null
+    conversionType: string | null
+    payoutAmount: string | null
+    status: ReferralStatus
+    signedUpAt: string | null
+    convertedAt: string | null
+    paidAt: string | null
+  }
+  interface AffiliateData {
+    affiliateCode: string | null
+    referrals: AffiliateReferral[]
+    stats: { totalReferrals: number; conversions: number; pendingPayout: number; totalEarned: number }
+  }
+  const [affiliateData, setAffiliateData] = useState<AffiliateData | null>(null)
+  const [affiliateLoading, setAffiliateLoading] = useState(false)
+  const [linkCopied, setLinkCopied] = useState(false)
+
+  useEffect(() => {
+    if (activeTab === 'affiliate' && !affiliateData) {
+      setAffiliateLoading(true)
+      fetch('/api/affiliate/stats')
+        .then((r) => r.json())
+        .then(setAffiliateData)
+        .finally(() => setAffiliateLoading(false))
+    }
+  }, [activeTab])
+
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -61,7 +92,7 @@ export default function SettingsPage() {
 
   // Update tab from URL parameter
   useEffect(() => {
-    if (tabParam && ['account', 'billing', 'security', 'notifications', 'danger-zone'].includes(tabParam)) {
+    if (tabParam && ['account', 'billing', 'security', 'notifications', 'affiliate', 'danger-zone'].includes(tabParam)) {
       setActiveTab(tabParam)
     }
   }, [tabParam])
@@ -337,6 +368,17 @@ export default function SettingsPage() {
               <Bell className="w-4 h-4" />
               Notifications
               <span className="text-xs text-gray-400">(Coming Soon)</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('affiliate')}
+              className={`flex items-center gap-2 px-6 py-4 font-medium text-sm border-b-2 transition-colors whitespace-nowrap ${
+                activeTab === 'affiliate'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
+              }`}
+            >
+              <BadgeEuro className="w-4 h-4" />
+              Affiliate
             </button>
             <button
               onClick={() => setActiveTab('danger-zone')}
@@ -789,6 +831,111 @@ export default function SettingsPage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Notifications Coming Soon</h3>
               <p className="text-gray-600 text-sm max-w-md mx-auto">
                 We're working on email notification preferences. You'll be able to control what emails you receive and how often.
+              </p>
+            </div>
+          )}
+
+          {/* Affiliate Tab */}
+          {activeTab === 'affiliate' && (
+            <div className="space-y-6">
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-1">Affiliate Programme</h3>
+                <p className="text-sm text-gray-500">
+                  Earn <span className="font-medium text-gray-700">€25</span> per Pro signup or{' '}
+                  <span className="font-medium text-gray-700">€50</span> per Event Pass via your referral link. Payouts are processed manually.
+                </p>
+              </div>
+
+              {/* Referral link */}
+              {affiliateLoading ? (
+                <div className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+              ) : affiliateData?.affiliateCode ? (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Your referral link</label>
+                  <div className="flex items-center gap-3">
+                    <code className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-800 truncate">
+                      {`${process.env.NEXT_PUBLIC_APP_URL ?? 'https://tryflowgrid.com'}/?ref=${affiliateData.affiliateCode}`}
+                    </code>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(`${process.env.NEXT_PUBLIC_APP_URL ?? 'https://tryflowgrid.com'}/?ref=${affiliateData.affiliateCode}`)
+                        setLinkCopied(true)
+                        setTimeout(() => setLinkCopied(false), 2000)
+                      }}
+                      className="flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors shrink-0"
+                    >
+                      {linkCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                      {linkCopied ? 'Copied!' : 'Copy'}
+                    </button>
+                  </div>
+                  <p className="mt-2 text-xs text-gray-400">Code: <span className="font-mono font-semibold">{affiliateData.affiliateCode}</span></p>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-400">Your affiliate code is being generated — try refreshing.</p>
+              )}
+
+              {/* Stats */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {[
+                  { icon: <Users className="w-4 h-4 text-blue-500" />, label: 'Referrals', value: affiliateData?.stats.totalReferrals ?? 0 },
+                  { icon: <TrendingUp className="w-4 h-4 text-green-500" />, label: 'Conversions', value: affiliateData?.stats.conversions ?? 0 },
+                  { icon: <Clock className="w-4 h-4 text-amber-500" />, label: 'Pending payout', value: `€${affiliateData?.stats.pendingPayout ?? 0}` },
+                  { icon: <BadgeEuro className="w-4 h-4 text-emerald-500" />, label: 'Total earned', value: `€${affiliateData?.stats.totalEarned ?? 0}` },
+                ].map(({ icon, label, value }) => (
+                  <div key={label} className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                    {icon}
+                    <div className="text-xl font-bold text-gray-900 mt-2">{value}</div>
+                    <div className="text-xs text-gray-500 mt-0.5">{label}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Referral history */}
+              <div>
+                <h4 className="font-medium text-gray-900 mb-3">Referral history</h4>
+                {!affiliateData?.referrals.length ? (
+                  <p className="text-sm text-gray-400 py-6 text-center border border-dashed border-gray-200 rounded-lg">
+                    No referrals yet — share your link to get started!
+                  </p>
+                ) : (
+                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                          <th className="px-4 py-3">Email</th>
+                          <th className="px-4 py-3">Plan</th>
+                          <th className="px-4 py-3">Payout</th>
+                          <th className="px-4 py-3">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {affiliateData.referrals.map((r) => {
+                          const badge = {
+                            SIGNED_UP: { label: 'Signed up', className: 'bg-blue-100 text-blue-700' },
+                            CONVERTED: { label: 'Payout pending', className: 'bg-amber-100 text-amber-700' },
+                            PAID: { label: 'Paid out', className: 'bg-green-100 text-green-700' },
+                          }[r.status]
+                          return (
+                            <tr key={r.id} className="hover:bg-gray-50">
+                              <td className="px-4 py-3 text-gray-700">{r.referredEmail ?? '—'}</td>
+                              <td className="px-4 py-3 text-gray-500">{r.conversionType ?? '—'}</td>
+                              <td className="px-4 py-3 font-medium">{r.payoutAmount ? `€${Number(r.payoutAmount).toFixed(0)}` : '—'}</td>
+                              <td className="px-4 py-3">
+                                <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${badge.className}`}>
+                                  {badge.label}
+                                </span>
+                              </td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
+              <p className="text-xs text-gray-400">
+                Questions about payouts? <a href="mailto:hello@tryflowgrid.com" className="underline">hello@tryflowgrid.com</a>
               </p>
             </div>
           )}
