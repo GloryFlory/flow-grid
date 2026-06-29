@@ -51,11 +51,31 @@ export async function POST(
         flagReason: action === 'FLAG' ? notes : null,
         adminNotes: notes || null,
       },
-      include: {
-        // Note: We don't have a relation to User in PaymentRequest
-        // We'll fetch user separately if needed
-      }
     })
+
+    // On verification, check if the paying user was referred by an affiliate
+    if (action === 'VERIFY') {
+      const payoutAmount = paymentRequest.plan === 'EVENT_PASS' ? 50 : 25
+
+      const referral = await prisma.affiliateReferral.findFirst({
+        where: {
+          referredUserId: paymentRequest.userId,
+          status: 'SIGNED_UP',
+        },
+      })
+
+      if (referral) {
+        await prisma.affiliateReferral.update({
+          where: { id: referral.id },
+          data: {
+            status: 'CONVERTED',
+            conversionType: paymentRequest.plan,
+            payoutAmount,
+            convertedAt: new Date(),
+          },
+        })
+      }
+    }
 
     return NextResponse.json({
       success: true,

@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { DashboardNavigation } from '@/components/dashboard/navigation'
+import { AffiliateClaimer } from '@/components/dashboard/AffiliateClaimer'
 
 export default async function DashboardLayout({
   children,
@@ -25,6 +26,7 @@ export default async function DashboardLayout({
   return (
     <div className="min-h-screen bg-gray-50">
       <DashboardNavigation />
+      <AffiliateClaimer />
       {children}
     </div>
   )

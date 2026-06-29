@@ -16,6 +16,20 @@ interface Update {
 }
 
 const updates: Update[] = [
+  // June 2026
+  {
+    date: '2026-06-29',
+    type: 'feature',
+    title: 'Affiliate Programme',
+    description: 'Earn money by referring new users to Flow Grid — €25 per Pro signup, €50 per Event Pass.',
+    details: [
+      'Every account gets a unique referral link automatically',
+      'Share your link — anyone who signs up and converts earns you a payout',
+      'Track referrals, conversions, and payout status from your dashboard under "Affiliate"',
+      'Payouts are processed manually — you\'ll hear from us via email once confirmed',
+      '€25 flat for a Pro subscription, €50 flat for an Event Pass',
+    ]
+  },
   // December 2025
   {
     date: '2025-12-07',

@@ -21,6 +21,7 @@ model User {
   updatedAt              DateTime             @updatedAt
   role                   UserRole             @default(USER)
   hasCompletedOnboarding Boolean              @default(false)
+  affiliateCode          String?              @unique
   accounts               Account[]
   analytics              Analytics[]
   festivals              Festival[]
@@ -28,6 +29,8 @@ model User {
   subscription           Subscription?
   webAuthnCredentials    WebAuthnCredential[]
   teamMemberships        TeamMember[]
+  affiliateReferrals     AffiliateReferral[]  @relation("AffiliateUser")
+  referredBy             AffiliateReferral[]  @relation("ReferredUser")
 
   @@map("users")
 }
@@ -465,4 +468,35 @@ model WebinarSubscriber {
   @@index([festivalId])
   @@index([unsubscribeToken])
   @@map("webinar_subscribers")
+}
+
+model AffiliateReferral {
+  id              String          @id @default(cuid())
+  affiliateUserId String
+  referredUserId  String?
+  referredEmail   String?
+  conversionType  String?         // PRO | EVENT_PASS
+  payoutAmount    Decimal?        // 25.00 or 50.00 EUR
+  status          AffiliateStatus @default(SIGNED_UP)
+  signedUpAt      DateTime?
+  convertedAt     DateTime?
+  paidAt          DateTime?
+  paidBy          String?
+  notes           String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  affiliateUser   User            @relation("AffiliateUser", fields: [affiliateUserId], references: [id], onDelete: Cascade)
+  referredUser    User?           @relation("ReferredUser", fields: [referredUserId], references: [id], onDelete: SetNull)
+
+  @@unique([affiliateUserId, referredUserId])
+  @@index([affiliateUserId])
+  @@index([referredUserId])
+  @@index([status])
+  @@map("affiliate_referrals")
+}
+
+enum AffiliateStatus {
+  SIGNED_UP   // Referred user created an account
+  CONVERTED   // Referred user bought Pro or Event Pass — payout owed
+  PAID        // You've paid the affiliate
 }

@@ -230,37 +230,39 @@ export const authOptions: NextAuthOptions = {
   },
   events: {
     async createUser({ user }) {
-      // Ensure all new users start with FREE plan (never PRO on signup)
-      // Override any adapter defaults or previous state
-      if (user.id) {
-        const existingSub = await prisma.subscription.findUnique({
-          where: { userId: user.id }
-        });
-        
-        if (existingSub) {
-          // If subscription already exists (shouldn't), enforce FREE
-          await prisma.subscription.update({
-            where: { userId: user.id },
-            data: {
-              plan: 'FREE',
-              status: 'ACTIVE',
-              festivalsLimit: 1,
-              isFoundingMember: false,
-            },
-          });
-        } else {
-          // Create new FREE subscription
-          await prisma.subscription.create({
-            data: {
-              userId: user.id,
-              plan: 'FREE',
-              status: 'ACTIVE',
-              festivalsLimit: 1,
-              isFoundingMember: false,
-            },
-          });
-        }
+      if (!user.id) return
+
+      // Generate a unique 8-char affiliate code
+      const generateCode = () => Math.random().toString(36).substring(2, 10).toUpperCase()
+      let affiliateCode = generateCode()
+      let attempts = 0
+      while (attempts < 5) {
+        const existing = await prisma.user.findUnique({ where: { affiliateCode } })
+        if (!existing) break
+        affiliateCode = generateCode()
+        attempts++
       }
+
+      const existingSub = await prisma.subscription.findUnique({
+        where: { userId: user.id }
+      });
+
+      await Promise.all([
+        // Ensure FREE plan on signup
+        existingSub
+          ? prisma.subscription.update({
+              where: { userId: user.id },
+              data: { plan: 'FREE', status: 'ACTIVE', festivalsLimit: 1, isFoundingMember: false },
+            })
+          : prisma.subscription.create({
+              data: { userId: user.id, plan: 'FREE', status: 'ACTIVE', festivalsLimit: 1, isFoundingMember: false },
+            }),
+        // Assign affiliate code
+        prisma.user.update({
+          where: { id: user.id },
+          data: { affiliateCode },
+        }),
+      ])
     },
   },
   pages: {

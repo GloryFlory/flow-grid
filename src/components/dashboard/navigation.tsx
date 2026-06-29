@@ -4,17 +4,18 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
-import { 
-  Calendar, 
-  Home, 
-  Settings, 
+import {
+  Calendar,
+  Home,
+  Settings,
   LogOut,
   User,
   BarChart3,
   Shield,
   HelpCircle,
   ExternalLink,
-  Mail
+  Mail,
+  BadgeEuro
 } from 'lucide-react'
 import Image from 'next/image'
 import { useState } from 'react'
@@ -28,6 +29,7 @@ export function DashboardNavigation() {
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Events', href: '/dashboard/festivals', icon: Calendar },
     { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
+    { name: 'Affiliate', href: '/dashboard/affiliate', icon: BadgeEuro },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
   ]
 
@@ -49,9 +51,12 @@ export function DashboardNavigation() {
     },
   ]
 
-  // Add Platform link for admins
-  const adminNavigation = session?.user?.role === 'ADMIN' 
-    ? [{ name: 'Platform', href: '/dashboard/platform', icon: Shield }]
+  // Add Platform + admin affiliate links for admins
+  const adminNavigation = session?.user?.role === 'ADMIN'
+    ? [
+        { name: 'Platform', href: '/dashboard/platform', icon: Shield },
+        { name: 'Payouts', href: '/admin/affiliates', icon: BadgeEuro },
+      ]
     : []
 
   const allNavigation = [...navigation, ...adminNavigation]
