@@ -17,7 +17,7 @@ import {
 
 interface UseConditionalPasskeyOptions {
   emailRef: React.RefObject<HTMLInputElement>;
-  onSuccess: () => void;
+  onSuccess: (passkeyToken: string) => void;
   onUnsupported?: () => void;
 }
 
@@ -143,9 +143,9 @@ export function useConditionalPasskey({
 
       const result = await verifyAuthentication(email, credential, challengeKey);
 
-      if (result.success) {
+      if (result.success && result.passkeyToken) {
         analytics.passkeys.auth.success();
-        onSuccess();
+        onSuccess(result.passkeyToken);
       } else {
         throw new Error(result.error || 'Authentication failed');
       }
@@ -218,9 +218,9 @@ export function useConditionalPasskey({
 
       const result = await verifyAuthentication(email, credential, challengeKey);
 
-      if (result.success) {
+      if (result.success && result.passkeyToken) {
         analytics.passkeys.auth.success();
-        onSuccess();
+        onSuccess(result.passkeyToken);
       } else {
         throw new Error(result.error || 'Authentication failed');
       }

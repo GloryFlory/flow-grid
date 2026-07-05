@@ -70,7 +70,7 @@ export default function HelpCenterPage() {
               <ol className="list-decimal list-inside mt-3 text-sm text-gray-700">
                 <li><strong>Event Details</strong> — Name, description, dates, and a unique slug. Keep the slug short and url-friendly.</li>
                 <li><strong>Schedule Setup</strong> — Upload a CSV (we provide a template) or add sessions manually. Choose card types (minimal, photo, detailed).</li>
-                <li><strong>Preview & Publish</strong> — Review imported sessions, set visibility, and publish your event. Your event will appear at <code>https://yourslug.tryflowgrid.com</code>.</li>
+                <li><strong>Preview & Publish</strong> — Review imported sessions, set visibility, and publish your event. Your event will appear at <code>https://tryflowgrid.com/yourslug</code>.</li>
               </ol>
               <div className="mt-4 flex gap-3">
                 <Link href="/dashboard/create-festival"><Button>Start Creating</Button></Link>
@@ -101,7 +101,7 @@ export default function HelpCenterPage() {
             <div className="border-l-4 border-blue-200 pl-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">What makes a good event slug?</h3>
               <p className="text-gray-700">
-                Your slug becomes part of your public URL (e.g., yourevent.tryflowgrid.com). Use lowercase letters, numbers, and hyphens only. Examples: "summer-dance-fest", "2025-tango-weekend", "montreal-swing-event".
+                Your slug becomes part of your public URL (e.g., tryflowgrid.com/yourevent). Use lowercase letters, numbers, and hyphens only. Examples: "summer-dance-fest", "2025-tango-weekend", "montreal-swing-event".
               </p>
             </div>
 
@@ -260,7 +260,7 @@ export default function HelpCenterPage() {
             <div className="border-l-4 border-red-200 pl-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">What's my event's public URL?</h3>
               <p className="text-gray-700">
-                Your event is available at yourslug.tryflowgrid.com (where "yourslug" is the slug you chose when creating the event).
+                Your event is available at tryflowgrid.com/yourslug (where "yourslug" is the slug you chose when creating the event).
               </p>
             </div>
 

@@ -1174,7 +1174,7 @@ export default function CreateFestivalPage() {
                 </label>
                 <div className="flex">
                   <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-                    https://
+                    https://tryflowgrid.com/
                   </span>
                   <input
                     id="slug"
@@ -1193,7 +1193,7 @@ export default function CreateFestivalPage() {
                         setTimeout(() => setSlugHint(null), 3000)
                       }
                     }}
-                    className={`flex-1 px-3 py-2 border focus:outline-none focus:ring-2 focus:border-transparent ${
+                    className={`flex-1 px-3 py-2 border rounded-r-md focus:outline-none focus:ring-2 focus:border-transparent ${
                       slugHint ? 'border-orange-300 focus:ring-orange-500' :
                       slugValidation.isChecking ? 'border-yellow-300 focus:ring-yellow-500' :
                       !slugValidation.isAvailable ? 'border-red-300 focus:ring-red-500' :
@@ -1203,9 +1203,6 @@ export default function CreateFestivalPage() {
                     placeholder="mac-2025"
                     required
                   />
-                  <span className="inline-flex items-center px-3 rounded-r-md border border-l-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-                    .tryflowgrid.com
-                  </span>
                 </div>
                 <div className="flex items-center justify-between mt-1">
                   <p className="text-xs text-gray-500">
@@ -1689,7 +1686,7 @@ export default function CreateFestivalPage() {
                   </div>
                   <div>
                     <span className="font-medium text-gray-700">URL:</span>
-                    <span className="ml-2 text-gray-900">https://{festivalData.slug}.tryflowgrid.com</span>
+                    <span className="ml-2 text-gray-900">https://tryflowgrid.com/{festivalData.slug}</span>
                   </div>
                   <div>
                     <span className="font-medium text-gray-700">Dates:</span>

@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-// Temporary debug endpoint to check what's in the database
+// Temporary debug endpoint to check what's in the database.
+// Dev-only: never exposes data in production.
 export async function GET() {
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
   try {
     const festivals = await prisma.festival.findMany({
       include: {

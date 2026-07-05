@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+// Dev-only seeding endpoint. Disabled in production so it can't be used to
+// create an admin account or write data on the live site.
 export async function POST() {
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
   try {
     // First, let's create a test user if one doesn't exist
     let testUser = await prisma.user.findFirst({

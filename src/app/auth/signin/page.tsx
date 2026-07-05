@@ -34,11 +34,11 @@ function SignInContent() {
     error: passkeyError,
   } = useConditionalPasskey({
     emailRef,
-    onSuccess: async () => {
+    onSuccess: async (passkeyToken: string) => {
       try {
         const result = await signIn('credentials', {
           email,
-          passkeyVerified: 'true',
+          passkeyToken,
           redirect: false,
         })
         

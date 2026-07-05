@@ -38,3 +38,8 @@ logs
 *.log
 .vercel
 .env*.local
+flowgrid-backup.sql
+
+# Installer packages (accidentally committed before)
+*.pkg
+.claude/

@@ -47,11 +47,13 @@ export async function POST(
       )
     }
 
-    // Update display order for each session
+    // Update display order for each session.
+    // Scope the update to THIS festival's sessions so a caller can't reorder
+    // sessions belonging to another festival by passing foreign IDs (IDOR).
     await Promise.all(
       sessions.map((s: { id: string; displayOrder: number }) =>
-        prisma.festivalSession.update({
-          where: { id: s.id },
+        prisma.festivalSession.updateMany({
+          where: { id: s.id, festivalId },
           data: { displayOrder: new Decimal(s.displayOrder) } as any
         })
       )

@@ -10,7 +10,7 @@ import { verifyAuthenticationResponse } from '@simplewebauthn/server';
 import type { AuthenticationResponseJSON } from '@simplewebauthn/types';
 import { redis } from '@/lib/redis';
 import { prisma } from '@/lib/prisma';
-import { signIn } from 'next-auth/react';
+import { issuePasskeyProof } from '@/lib/passkey-proof';
 
 const RP_ID = process.env.WEBAUTHN_RP_ID || 'localhost';
 const ORIGIN = process.env.NEXTAUTH_URL || 'http://localhost:3000';
@@ -122,6 +122,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Mint a single-use, server-issued proof bound to this user. The client
+    // passes it to signIn('credentials'); the provider verifies it server-side.
+    const passkeyToken = await issuePasskeyProof(user.email);
+
     console.log('[Passkey Authentication] Success:', {
       userId,
       credentialId: storedCredential.credentialId,
@@ -130,6 +134,7 @@ export async function POST(req: NextRequest) {
     // Return success - client will handle session creation via NextAuth
     return NextResponse.json({
       success: true,
+      passkeyToken,
       user: {
         id: user.id,
         email: user.email,

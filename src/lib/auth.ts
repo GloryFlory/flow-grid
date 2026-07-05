@@ -8,6 +8,7 @@ import { normalizeEmail } from './email'
 import bcrypt from 'bcryptjs'
 import { Resend } from 'resend'
 import { logError } from './log'
+import { consumePasskeyProof } from './passkey-proof'
 
 const resend = new Resend(process.env.RESEND_API_KEY!)
 
@@ -125,7 +126,7 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
-        passkeyVerified: { label: 'Passkey Verified', type: 'text' }
+        passkeyToken: { label: 'Passkey Token', type: 'text' }
       },
       async authorize(credentials) {
         if (!credentials?.email) {
@@ -134,8 +135,18 @@ export const authOptions: NextAuthOptions = {
 
         const normalizedEmail = normalizeEmail(credentials.email);
 
-        // If passkey is already verified, just find and return the user
-        if (credentials.passkeyVerified === 'true') {
+        // Passkey sign-in: require a single-use, server-issued proof token that
+        // can only have been minted after a real assertion was verified
+        // server-side (see /api/webauthn/authentication/verify). We never trust
+        // a client-supplied "verified" flag.
+        if (credentials.passkeyToken) {
+          const proofEmail = await consumePasskeyProof(credentials.passkeyToken)
+
+          // Token must exist, be unexpired, and be bound to this same email
+          if (!proofEmail || normalizeEmail(proofEmail) !== normalizedEmail) {
+            return null
+          }
+
           const user = await prisma.user.findUnique({
             where: { email: normalizedEmail }
           })

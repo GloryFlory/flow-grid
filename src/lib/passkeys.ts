@@ -105,6 +105,8 @@ export interface AuthenticationVerifyRequest {
 export interface AuthenticationVerifyResponse {
   success: boolean;
   userId?: string;
+  /** Single-use proof token required by the credentials provider to sign in */
+  passkeyToken?: string;
   error?: string;
 }
 

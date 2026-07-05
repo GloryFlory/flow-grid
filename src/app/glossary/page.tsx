@@ -36,7 +36,7 @@ export default function GlossaryPage() {
       terms: [
         {
           term: "Event",
-          definition: "A complete event with multiple sessions, teachers, and a schedule. Each event gets its own subdomain (e.g., yourevent.tryflowgrid.com)."
+          definition: "A complete event with multiple sessions, teachers, and a schedule. Each event gets its own public URL (e.g., tryflowgrid.com/yourevent)."
         },
         {
           term: "Slug",
@@ -140,7 +140,7 @@ export default function GlossaryPage() {
       terms: [
         {
           term: "Public Schedule",
-          definition: "The main page visitors see at yourevent.tryflowgrid.com, displaying all published sessions in an organized, filterable format."
+          definition: "The main page visitors see at tryflowgrid.com/yourevent, displaying all published sessions in an organized, filterable format."
         },
         {
           term: "Filtering",
