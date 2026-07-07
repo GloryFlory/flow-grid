@@ -5,7 +5,7 @@ import Footer from '@/components/Footer'
 import { PAYMENTS_ENABLED } from '@/config/payments'
 import {
   ArrowRight, BarChart3, Globe, Smartphone, Zap, Ticket, Briefcase,
-  Star, CalendarPlus, Share2, SlidersHorizontal, Layout, Users, Building2, Code2, Layers,
+  Star, CalendarPlus, SlidersHorizontal, Layout, Users, Building2, Code2, Layers, Camera,
 } from 'lucide-react'
 import MarketingNav from '@/components/marketing/MarketingNav'
 import EventSwitcher from '@/components/marketing/EventSwitcher'
@@ -290,16 +290,20 @@ export default function HomePage() {
               <p style={{ fontSize: 14.5, color: C.soft, lineHeight: 1.55 }}>Filter by level, teacher, style, or time slot. Attendees find exactly what they want without scrolling endlessly.</p>
             </div>
 
-            {/* Community links */}
+            {/* Teacher profiles */}
             <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: 28, background: '#fff', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ width: 40, height: 40, borderRadius: 11, background: '#fde8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, flexShrink: 0 }}>
-                <Share2 size={20} color="#c2185b" />
+              <div style={{ width: 40, height: 40, borderRadius: 11, background: '#e8f0eb', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, flexShrink: 0 }}>
+                <Camera size={20} color={C.green} />
               </div>
-              <h3 style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 8 }}>Community links</h3>
-              <p style={{ fontSize: 14.5, color: C.soft, lineHeight: 1.55 }}>Add WhatsApp groups, Telegram channels, Instagram and Facebook links directly to your event — everything in one place.</p>
-              <div style={{ display: 'flex', gap: 8, marginTop: 'auto', paddingTop: 16 }}>
-                {['WhatsApp', 'Instagram', 'Telegram'].map((s) => (
-                  <span key={s} style={{ fontSize: 11.5, fontWeight: 600, padding: '4px 9px', borderRadius: 6, background: C.gray, color: C.ink2 }}>{s}</span>
+              <h3 style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 8 }}>Your teachers look the part</h3>
+              <p style={{ fontSize: 14.5, color: C.soft, lineHeight: 1.55 }}>Upload headshots and let attendees know who they&apos;re learning from. Built-in cropping keeps every photo sharp and consistent — no more pixelated thumbnails.</p>
+              <div style={{ display: 'flex', marginTop: 'auto', paddingTop: 16 }}>
+                {[C.navy, C.green, '#b40225', '#edb75b', C.accent].map((c, i) => (
+                  <div key={c} style={{
+                    width: 32, height: 32, borderRadius: '50%',
+                    background: c, border: '2px solid #fff',
+                    marginLeft: i > 0 ? -8 : 0,
+                  }} />
                 ))}
               </div>
             </div>
