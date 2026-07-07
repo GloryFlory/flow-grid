@@ -503,9 +503,16 @@ export default function PricingPage() {
             {/* Attendee Experience */}
             <FeatureSection title="Attendee Experience">
               <ComparisonRow icon={<Smartphone className="w-4 h-4" />} feature="Mobile-responsive schedule" tooltip="Your schedule looks great on phones, tablets, and desktops" free={true} eventPass={true} pro={true} enterprise={true} />
+              <ComparisonRow icon={<LayoutTemplate className="w-4 h-4" />} feature="Multiple view modes" tooltip="Attendees choose between Grid, List, and Timeline views — plus Day, 3-Day, and Week calendar modes" free={true} eventPass={true} pro={true} enterprise={true} />
               <ComparisonRow icon={<Eye className="w-4 h-4" />} feature="Session search & filters" tooltip="Attendees can search and filter sessions by teacher, location, or type" free={true} eventPass={true} pro={true} enterprise={true} />
               <ComparisonRow icon={<Download className="w-4 h-4" />} feature="Calendar exports (ICS, Google)" tooltip="Attendees can add sessions to their personal calendars" free={true} eventPass={true} pro={true} enterprise={true} />
               <ComparisonRow icon={<Bookmark className="w-4 h-4" />} feature="Personal schedule builder" tooltip="Attendees can save their favorite sessions and build a personal itinerary" free={true} eventPass={true} pro={true} enterprise={true} />
+            </FeatureSection>
+
+            {/* Bookings */}
+            <FeatureSection title="Bookings">
+              <ComparisonRow icon={<Ticket className="w-4 h-4" />} feature="Session capacity limits" tooltip="Restrict session bookings to a set number of spots — attendees claim their place in real time" free={false} eventPass={true} pro={true} enterprise={true} />
+              <ComparisonRow icon={<Bell className="w-4 h-4" />} feature="Waitlist automation" tooltip="When a spot opens up, the next person on the waitlist is automatically notified and given 24 hours to confirm their place" free={false} eventPass={true} pro={true} enterprise={true} />
             </FeatureSection>
 
             {/* Analytics & Insights */}

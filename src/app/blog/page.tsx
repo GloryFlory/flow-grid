@@ -1,9 +1,9 @@
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import Footer from '@/components/Footer'
 import type { Metadata } from 'next'
 import { Calendar, Clock, ArrowRight } from 'lucide-react'
+import MarketingNav from '@/components/marketing/MarketingNav'
 
 export const metadata: Metadata = {
   title: 'Festival & Event Planning Blog - Flow Grid',
@@ -156,33 +156,7 @@ const blogPosts = [
 export default function BlogPage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center">
-              <Link href="/" className="flex items-center">
-                <img 
-                  src="/flow-grid-logo.png" 
-                  alt="Flow Grid Logo" 
-                  className="h-10 w-auto"
-                />
-                <span className="ml-3 text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
-                  Flow Grid
-                </span>
-              </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/auth/signin">
-                <Button variant="outline">Sign In</Button>
-              </Link>
-              <Link href="/auth/signin">
-                <Button>Get Started</Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <MarketingNav />
 
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-[#2a468b] to-[#466d60] text-white py-16">

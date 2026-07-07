@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Search, HelpCircle, Calendar, Users, Settings, Globe } from 'lucide-react'
+import { Search, HelpCircle, Calendar, Users, Settings, Globe } from 'lucide-react'
 import Footer from '@/components/Footer'
 import type { Metadata } from 'next'
+import MarketingNav from '@/components/marketing/MarketingNav'
 
 export const metadata: Metadata = {
   title: 'Help Center - Flow Grid Event Scheduling Guide',
@@ -16,35 +17,7 @@ export const metadata: Metadata = {
 export default function HelpCenterPage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center">
-              <div className="flex-shrink-0 flex items-center">
-                <Link href="/">
-                  <img 
-                    src="/flow-grid-logo.png" 
-                    alt="Flow Grid Logo" 
-                    className="h-10 w-auto cursor-pointer"
-                  />
-                </Link>
-                <Link href="/">
-                  <span className="ml-3 text-2xl font-bold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors">Flow Grid</span>
-                </Link>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/auth/signin">
-                <Button variant="outline">Sign In</Button>
-              </Link>
-              <Link href="/auth/signin">
-                <Button>Get Started</Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <MarketingNav />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Page Header */}

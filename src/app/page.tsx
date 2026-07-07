@@ -1,684 +1,603 @@
-'use client'
-
-import { useState, useEffect } from 'react'
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Footer from '@/components/Footer'
 import { PAYMENTS_ENABLED } from '@/config/payments'
-import { 
-  Calendar, 
-  Users, 
-  BarChart3, 
-  Clock, 
-  DollarSign, 
-  Zap,
-  ArrowRight,
-  Heart,
-  Music,
-  Briefcase,
-  Ticket,
-  Globe,
+import {
+  ArrowRight, BarChart3, Globe, Smartphone, Zap, Ticket, Briefcase,
+  Star, CalendarPlus, Share2, SlidersHorizontal, Layout, Users, Building2, Code2, Layers,
 } from 'lucide-react'
+import MarketingNav from '@/components/marketing/MarketingNav'
+import EventSwitcher from '@/components/marketing/EventSwitcher'
+import StatsStrip from '@/components/marketing/StatsStrip'
 
-const heroMessages = [
-  {
-    title: "Create Beautiful Event Schedules in Minutes",
-    subtitle: "Professional scheduling software for yoga retreats, music festivals, workshops & conferences. Stop wrestling with spreadsheets.",
+export const metadata: Metadata = {
+  title: 'Flow Grid — Event Schedule Builder for Festivals & Retreats',
+  description: 'Turn a messy spreadsheet into a beautiful, branded, mobile-first schedule your attendees will actually use — live in minutes. Free to start.',
+  openGraph: {
+    title: 'Flow Grid — The schedule builder festivals actually run on.',
+    description: 'Turn a messy spreadsheet into a beautiful, branded, mobile-first schedule your attendees will actually use — live in minutes.',
+    url: 'https://tryflowgrid.com',
   },
-  {
-    title: "Stop Wrestling with Spreadsheets",
-    subtitle: "Build professional event schedules in minutes, not hours. Perfect for retreats, festivals & conferences.",
-  },
-  {
-    title: "Your Events. Your Brand. Your Schedule.",
-    subtitle: "Custom-branded schedules for yoga retreats, music festivals, workshops & conferences. Free to start.",
-  },
-  {
-    title: "From Chaos to Clarity in 5 Minutes",
-    subtitle: "Transform messy spreadsheets into beautiful, shareable schedules. Mobile-friendly. Analytics included.",
-  },
-]
+}
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Flow Grid',
+  applicationCategory: 'BusinessApplication',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+  description: 'Event scheduling software for festivals, retreats, workshops and conferences.',
+  url: 'https://tryflowgrid.com',
+  operatingSystem: 'Web',
+}
+
+const C = {
+  ink:    '#0b0e14',
+  ink2:   '#3a3f4b',
+  soft:   '#6b7280',
+  line:   '#e7e8ec',
+  line2:  '#eef0f3',
+  bg:     '#ffffff',
+  gray:   '#f6f7f9',
+  accent: '#ff7119',
+  accentD:'#d9440f',
+  navy:   '#2a468b',
+  green:  '#466d60',
+}
 
 export default function HomePage() {
-  const [currentMessageIndex, setCurrentMessageIndex] = useState(0)
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentMessageIndex((prev) => (prev + 1) % heroMessages.length)
-    }, 5000) // Change every 5 seconds
-
-    return () => clearInterval(interval)
-  }, [])
-  
-  const organizationSchema = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "Flow Grid",
-    "applicationCategory": "BusinessApplication",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
-    },
-    "description": "Professional event scheduling software for yoga retreats, music festivals, workshops and conferences. Create beautiful schedules in minutes.",
-    "url": "https://tryflowgrid.com",
-    "screenshot": "https://tryflowgrid.com/og-image.png",
-    "operatingSystem": "Web",
-    "browserRequirements": "Requires JavaScript. Requires HTML5."
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* SEO Schema */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
-      />
-      
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center">
-              <div className="flex-shrink-0 flex items-center">
-                <Link href="/">
-                  <Image 
-                    src="/flow-grid-logo.png" 
-                    alt="Flow Grid Logo" 
-                    width={40} 
-                    height={40}
-                    className="h-10 w-auto cursor-pointer"
-                    priority
-                  />
-                </Link>
-                <Link href="/">
-                  <span className="ml-3 text-2xl font-bold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors">Flow Grid</span>
-                </Link>
+    <div style={{ fontFamily: 'var(--font-space-grotesk), -apple-system, sans-serif', color: C.ink, background: C.bg }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
+
+      <MarketingNav />
+
+      {/* ── DARK HERO ───────────────────────────────────────────────────── */}
+      <section style={{
+        position: 'relative',
+        background: 'linear-gradient(160deg, #0c1628 0%, #0f2044 60%, #0c1628 100%)',
+        overflow: 'hidden',
+        paddingBottom: 72,
+      }}>
+        {/* dot grid */}
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 0,
+          backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.07) 1px, transparent 0)',
+          backgroundSize: '28px 28px',
+          pointerEvents: 'none',
+        }} />
+        {/* bottom fade */}
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0, height: 90,
+          background: 'linear-gradient(to bottom, transparent, rgba(12,22,40,0.7))',
+          pointerEvents: 'none', zIndex: 1,
+        }} />
+
+        <div style={{ position: 'relative', zIndex: 2, maxWidth: 1160, margin: '0 auto', padding: '80px 28px 0', textAlign: 'center' }}>
+          {/* chip */}
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)',
+            color: 'rgba(255,255,255,0.75)', fontSize: 13, fontWeight: 600,
+            padding: '5px 13px 5px 8px', borderRadius: 100, marginBottom: 28,
+          }}>
+            <span style={{
+              background: C.navy, color: '#fff', fontWeight: 700, fontSize: 11,
+              padding: '2px 8px', borderRadius: 100,
+            }}>NEW</span>
+            Landing pages &amp; waitlists for every event
+          </div>
+
+          {/* headline */}
+          <h1 style={{
+            fontSize: 'clamp(38px, 6vw, 64px)', lineHeight: 1.02,
+            letterSpacing: '-0.035em', fontWeight: 700,
+            maxWidth: 820, margin: '0 auto 22px', color: '#fff',
+          }}>
+            The schedule builder<br />festivals actually <span style={{ color: C.accent }}>run on</span>.
+          </h1>
+
+          <p style={{
+            fontSize: 19, lineHeight: 1.6, color: 'rgba(255,255,255,0.55)',
+            maxWidth: 540, margin: '0 auto 32px', fontWeight: 400,
+          }}>
+            Turn a messy spreadsheet into a beautiful, branded, mobile-first schedule your attendees will actually use — live in minutes.
+          </p>
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 12, flexWrap: 'wrap' }}>
+            <Link href="/auth/signin" style={{
+              display: 'inline-flex', alignItems: 'center', gap: 7,
+              fontWeight: 600, fontSize: 15, background: C.accent, color: '#fff',
+              borderRadius: 9, padding: '12px 22px', textDecoration: 'none',
+              boxShadow: '0 2px 12px rgba(255,113,25,0.4)', transition: '.14s',
+            }} className="hover:bg-[#d9440f]">
+              Start free <ArrowRight size={16} />
+            </Link>
+          </div>
+          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)', fontWeight: 500, marginBottom: 64 }}>
+            Free to start · No credit card required
+          </p>
+
+          <EventSwitcher />
+        </div>
+      </section>
+
+      {/* ── TESTIMONIALS ────────────────────────────────────────────────── */}
+      <section style={{ padding: '80px 28px', background: '#fff' }}>
+        <div style={{ maxWidth: 1160, margin: '0 auto' }}>
+          <p style={{
+            textAlign: 'center', fontSize: 12.5, fontWeight: 700, letterSpacing: '.05em',
+            textTransform: 'uppercase', color: C.soft, marginBottom: 48,
+          }}>
+            What organisers say
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }} className="max-md:grid-cols-1">
+            {[
+              {
+                quote: 'Finally I don\'t have to use printed out Excel spreadsheets anymore. Our attendees always have the latest version.',
+                author: 'Sarah M.',
+                role: 'Yoga retreat organiser, Vienna',
+                accent: C.green,
+              },
+              {
+                quote: 'I love how I can update it instantly. No more worrying about outdated printouts mid-event when the schedule changes.',
+                author: 'Tom K.',
+                role: 'Acro festival director, Berlin',
+                accent: C.navy,
+              },
+              {
+                quote: 'It\'s done so quickly. A huge headache of our event setup has just gone. I genuinely can\'t believe we used to do it any other way.',
+                author: 'Maria V.',
+                role: 'Workshop series organiser, Amsterdam',
+                accent: C.accent,
+              },
+            ].map(({ quote, author, role, accent }) => (
+              <div key={author} style={{
+                border: `1px solid ${C.line}`, borderRadius: 16, padding: '28px 28px 24px',
+                background: '#fff', display: 'flex', flexDirection: 'column',
+                borderTop: `3px solid ${accent}`,
+              }}>
+                <p style={{ fontSize: 16, lineHeight: 1.65, color: C.ink, fontWeight: 400, flexGrow: 1, margin: '0 0 24px' }}>
+                  &ldquo;{quote}&rdquo;
+                </p>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: C.ink }}>{author}</div>
+                  <div style={{ fontSize: 13, color: C.soft, marginTop: 3 }}>{role}</div>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Link href="/showcase">
-                <Button variant="outline" className="border-gray-300 text-gray-700 hover:border-[#2a468b] hover:text-[#2a468b] transition-colors">
-                  Take a Tour
-                </Button>
-              </Link>
-              <Link href="/auth/signin">
-                <Button className="bg-[#ff7119] hover:bg-[#b40225] text-white transition-colors">
-                  Get Started
-                </Button>
-              </Link>
-            </div>
+            ))}
           </div>
         </div>
-      </nav>
+      </section>
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden py-20 px-4 sm:px-6 lg:px-8">
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <Image 
-            src="/header.jpg" 
-            alt="Flow Grid Header" 
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#2a468b]/80 to-[#466d60]/75"></div>
+      {/* ── LOGO STRIP ──────────────────────────────────────────────────── */}
+      <section style={{ padding: '64px 28px 64px', background: '#fff' }}>
+        <div style={{ maxWidth: 1160, margin: '0 auto' }}>
+          <p style={{
+            textAlign: 'center', fontSize: 12, letterSpacing: '.08em',
+            textTransform: 'uppercase', color: C.soft, fontWeight: 600, marginBottom: 28,
+          }}>
+            Powering schedules across Europe, Australia and beyond
+          </p>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 44, flexWrap: 'wrap' }}>
+            {[1, 2, 3, 4, 5].map((n) => (
+              <Image
+                key={n}
+                src={`/festival${n}.png`}
+                alt={`Festival partner ${n}`}
+                width={72} height={72}
+                style={{ objectFit: 'contain', opacity: 0.4, filter: 'grayscale(100%)', transition: '.15s' }}
+                className="hover:opacity-75 hover:grayscale-0"
+              />
+            ))}
+          </div>
         </div>
-        
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 transition-all duration-500 min-h-[160px] md:min-h-[200px] flex items-center justify-center">
-              <span className="inline-block">
-                {heroMessages[currentMessageIndex].title.split(' ').map((word, i) => {
-                  const isHighlight = word === 'Event' || word === 'Schedules' || word === 'Spreadsheets' || word === 'Brand.' || word === 'Clarity'
-                  return (
-                    <span key={i} className="inline-block mx-1">
-                      {isHighlight ? (
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#edb75b] to-[#ff7119]">
-                          {word}
-                        </span>
-                      ) : (
-                        word
-                      )}
-                    </span>
-                  )
-                })}
-              </span>
-            </h1>
-            <p className="text-xl text-gray-100 mb-8 max-w-3xl mx-auto min-h-[60px] transition-all duration-500">
-              {heroMessages[currentMessageIndex].subtitle}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-              <Link href="/auth/signin">
-                <Button size="lg" className="text-lg px-8 py-3 bg-[#ff7119] hover:bg-[#b40225] text-white shadow-lg">
-                  Start Free Today <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-              </Link>
-              <Link href="/showcase">
-                <Button size="lg" className="text-lg px-8 py-3 bg-white text-[#2a468b] hover:bg-[#2a468b] hover:text-white transition-colors shadow-lg font-semibold">
-                  See How It Works →
-                </Button>
-              </Link>
-              <Link href="/flow-grid-demo/schedule" target="_blank">
-                <Button size="lg" className="text-lg px-8 py-3 bg-white/20 backdrop-blur-sm border-2 border-white text-white hover:bg-white hover:text-[#2a468b]">
-                  View Live Demo →
-                </Button>
+      </section>
+
+      {/* ── FEATURES BENTO ──────────────────────────────────────────────── */}
+      <section style={{ padding: '16px 28px 88px', background: C.gray }}>
+        <div style={{ maxWidth: 1160, margin: '0 auto' }}>
+          <p style={{
+            textAlign: 'center', fontSize: 12.5, fontWeight: 700, letterSpacing: '.05em',
+            textTransform: 'uppercase', color: C.accent, marginBottom: 14,
+          }}>
+            Everything in one place
+          </p>
+          <h2 style={{
+            textAlign: 'center', fontSize: 'clamp(28px, 4vw, 44px)', lineHeight: 1.08,
+            letterSpacing: '-0.03em', fontWeight: 700, maxWidth: 640, margin: '0 auto 14px',
+          }}>
+            Built for the way events really run
+          </h2>
+          <p style={{
+            textAlign: 'center', fontSize: 18, color: C.soft,
+            maxWidth: 520, margin: '0 auto 52px', fontWeight: 400,
+          }}>
+            Made by organisers who were done juggling spreadsheets, email threads, and last-minute changes.
+          </p>
+
+          {/* Row 1 */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }} className="max-md:grid-cols-1">
+            {/* Publish — wide */}
+            <div style={{
+              border: `1px solid ${C.line}`, borderRadius: 16, padding: 28,
+              background: '#fff', display: 'flex', flexDirection: 'column', gridColumn: 'span 2',
+            }} className="max-md:col-span-1">
+              <div style={{ width: 40, height: 40, borderRadius: 11, background: C.navy, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, flexShrink: 0 }}>
+                <Layout size={20} />
+              </div>
+              <h3 style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 8 }}>From spreadsheet to live schedule in minutes</h3>
+              <p style={{ fontSize: 14.5, color: C.soft, lineHeight: 1.55, maxWidth: 360 }}>
+                Import from CSV or Google Sheets, arrange sessions where they belong, and publish. Changes go out instantly — no broken formulas, no resending PDFs.
+              </p>
+            </div>
+
+            {/* Analytics */}
+            <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: 28, background: '#fff', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ width: 40, height: 40, borderRadius: 11, background: C.navy, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, flexShrink: 0 }}>
+                <BarChart3 size={20} />
+              </div>
+              <h3 style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 8 }}>See what's working</h3>
+              <p style={{ fontSize: 14.5, color: C.soft, lineHeight: 1.55 }}>Real-time analytics on your most-viewed sessions and peak traffic times.</p>
+              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 72, marginTop: 'auto' }}>
+                {[38, 60, 100, 52, 72].map((h, i) => (
+                  <div key={i} style={{ flex: 1, background: i === 2 ? C.accent : C.navy, borderRadius: '5px 5px 0 0', height: `${h}%`, opacity: i === 2 ? 1 : 0.8 }} />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Row 2 */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginTop: 16 }} className="max-md:grid-cols-1">
+            {/* Mobile */}
+            <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: 28, background: '#fff', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ width: 40, height: 40, borderRadius: 11, background: C.navy, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, flexShrink: 0 }}>
+                <Smartphone size={20} />
+              </div>
+              <h3 style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 8 }}>Beautiful on every phone</h3>
+              <p style={{ fontSize: 14.5, color: C.soft, lineHeight: 1.55 }}>Mobile-first and works offline. Attendees can browse, filter, and favourite sessions without installing anything.</p>
+            </div>
+
+            {/* Personal schedule / Favourites */}
+            <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: 28, background: '#fff', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ width: 40, height: 40, borderRadius: 11, background: '#fdf4e7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, flexShrink: 0 }}>
+                <Star size={20} color="#c4830a" />
+              </div>
+              <h3 style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 8 }}>My Schedule</h3>
+              <p style={{ fontSize: 14.5, color: C.soft, lineHeight: 1.55 }}>Attendees star their favourite sessions and build a personal schedule — no login needed, saved right in the browser.</p>
+            </div>
+
+            {/* Calendar export */}
+            <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: 28, background: '#fff', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ width: 40, height: 40, borderRadius: 11, background: '#e8f0eb', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, flexShrink: 0 }}>
+                <CalendarPlus size={20} color={C.green} />
+              </div>
+              <h3 style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 8 }}>Add to calendar</h3>
+              <p style={{ fontSize: 14.5, color: C.soft, lineHeight: 1.55 }}>One tap to export any session to Google Calendar, Apple Calendar, or Outlook. Attendees never miss their workshop.</p>
+            </div>
+          </div>
+
+          {/* Row 3 */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginTop: 16 }} className="max-md:grid-cols-1">
+            {/* Filtering */}
+            <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: 28, background: '#fff', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ width: 40, height: 40, borderRadius: 11, background: '#eef2f8', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, flexShrink: 0 }}>
+                <SlidersHorizontal size={20} color={C.navy} />
+              </div>
+              <h3 style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 8 }}>Smart filters</h3>
+              <p style={{ fontSize: 14.5, color: C.soft, lineHeight: 1.55 }}>Filter by level, teacher, style, or time slot. Attendees find exactly what they want without scrolling endlessly.</p>
+            </div>
+
+            {/* Community links */}
+            <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: 28, background: '#fff', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ width: 40, height: 40, borderRadius: 11, background: '#fde8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, flexShrink: 0 }}>
+                <Share2 size={20} color="#c2185b" />
+              </div>
+              <h3 style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 8 }}>Community links</h3>
+              <p style={{ fontSize: 14.5, color: C.soft, lineHeight: 1.55 }}>Add WhatsApp groups, Telegram channels, Instagram and Facebook links directly to your event — everything in one place.</p>
+              <div style={{ display: 'flex', gap: 8, marginTop: 'auto', paddingTop: 16 }}>
+                {['WhatsApp', 'Instagram', 'Telegram'].map((s) => (
+                  <span key={s} style={{ fontSize: 11.5, fontWeight: 600, padding: '4px 9px', borderRadius: 6, background: C.gray, color: C.ink2 }}>{s}</span>
+                ))}
+              </div>
+            </div>
+
+            {/* Branding */}
+            <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: 28, background: '#fff', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ width: 40, height: 40, borderRadius: 11, background: C.navy, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, flexShrink: 0 }}>
+                <Globe size={20} />
+              </div>
+              <h3 style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 8 }}>Completely on-brand</h3>
+              <p style={{ fontSize: 14.5, color: C.soft, lineHeight: 1.55, marginBottom: 16 }}>Your logo, colours, fonts and own URL. Looks like it was built by your design team.</p>
+              <div style={{ display: 'flex', gap: 9, marginTop: 'auto' }}>
+                {[C.navy, C.green, '#edb75b', C.accent, '#b40225'].map((c) => (
+                  <div key={c} style={{ width: 28, height: 28, borderRadius: 8, background: c }} />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Row 4 — Landing pages wide */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginTop: 16 }} className="max-md:grid-cols-1">
+            <div style={{
+              border: `1px solid ${C.line}`, borderRadius: 16, padding: 28,
+              background: '#fff', display: 'flex', flexDirection: 'column',
+              gridColumn: 'span 2',
+            }} className="max-md:col-span-1">
+              <div style={{ width: 40, height: 40, borderRadius: 11, background: '#fdece2', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, flexShrink: 0 }}>
+                <Zap size={20} color={C.accent} />
+              </div>
+              <h3 style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 8 }}>Landing pages & waitlists</h3>
+              <p style={{ fontSize: 14.5, color: C.soft, lineHeight: 1.55, maxWidth: 400 }}>
+                Every event gets a beautiful landing page with your lineup, dates, and a built-in waitlist. Collect sign-ups before the schedule is even ready.
+              </p>
+            </div>
+
+            <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: 28, background: '#fff', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ width: 40, height: 40, borderRadius: 11, background: '#e8f0eb', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, flexShrink: 0 }}>
+                <BarChart3 size={20} color={C.green} />
+              </div>
+              <h3 style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 8 }}>Organised dashboard</h3>
+              <p style={{ fontSize: 14.5, color: C.soft, lineHeight: 1.55 }}>All your events in one place. Duplicate last year's schedule, manage your team, and track analytics across events.</p>
+            </div>
+          </div>
+
+          {/* Row 5 — Bookings + Team */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginTop: 16 }} className="max-md:grid-cols-1">
+            {/* Booking system */}
+            <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: 28, background: '#fff', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ width: 40, height: 40, borderRadius: 11, background: '#fdf4e7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, flexShrink: 0 }}>
+                <Ticket size={20} color="#c4830a" />
+              </div>
+              <h3 style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 8 }}>Bookable sessions</h3>
+              <p style={{ fontSize: 14.5, color: C.soft, lineHeight: 1.55 }}>Set capacity limits per session. Attendees claim their spot, and an automatic waitlist handles the overflow.</p>
+            </div>
+
+            {/* Team collaboration — wide */}
+            <div style={{
+              border: `1px solid ${C.line}`, borderRadius: 16, padding: 28,
+              background: '#fff', display: 'flex', flexDirection: 'column',
+              gridColumn: 'span 2',
+            }} className="max-md:col-span-1">
+              <div style={{ width: 40, height: 40, borderRadius: 11, background: '#eef2f8', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, flexShrink: 0 }}>
+                <Users size={20} color={C.navy} />
+              </div>
+              <h3 style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 8 }}>Work together as a team</h3>
+              <p style={{ fontSize: 14.5, color: C.soft, lineHeight: 1.55, maxWidth: 400 }}>Invite co-organisers and give them exactly the access they need — admin, editor, or view-only. Everyone works from the same schedule, no more emailing files back and forth.</p>
+            </div>
+          </div>
+
+          {/* Enterprise tile */}
+          <div style={{
+            marginTop: 16, borderRadius: 16, padding: '32px 36px',
+            background: 'linear-gradient(135deg, #0f1c3f 0%, #162647 100%)',
+            border: '1px solid rgba(255,255,255,0.08)',
+          }}>
+            {/* Header row */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28, flexWrap: 'wrap', gap: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 11, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Building2 size={20} color="rgba(255,255,255,0.8)" />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', color: '#fff', margin: 0 }}>Enterprise</h3>
+                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', margin: 0 }}>For platforms, venue groups &amp; festival networks</p>
+                </div>
+              </div>
+              <Link
+                href="/contact"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 7,
+                  fontWeight: 600, fontSize: 14, color: '#fff',
+                  background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.18)',
+                  borderRadius: 9, padding: '9px 18px', textDecoration: 'none', whiteSpace: 'nowrap',
+                }}
+              >
+                Talk to us <ArrowRight size={14} />
               </Link>
             </div>
-            {/* Carousel indicators */}
-            <div className="flex justify-center gap-2">
-              {heroMessages.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentMessageIndex(index)}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    index === currentMessageIndex 
-                      ? 'bg-white w-8' 
-                      : 'bg-white/40 hover:bg-white/60'
-                  }`}
-                  aria-label={`Go to message ${index + 1}`}
-                />
+
+            {/* Capability blocks */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }} className="max-md:grid-cols-2">
+              {([
+                { Icon: Globe,     label: 'White-label ready',       desc: 'Your brand, colours & custom domain' },
+                { Icon: Code2,     label: 'API & Embed',             desc: 'Single script tag or REST API' },
+                { Icon: Layers,    label: 'Multi-event management',  desc: 'Portfolios, networks & venue groups' },
+                { Icon: Briefcase, label: 'Custom integrations',     desc: 'Connect your existing booking system' },
+              ] as const).map(({ Icon, label, desc }) => (
+                <div key={label} style={{
+                  background: 'rgba(255,255,255,0.05)', borderRadius: 12,
+                  padding: '18px 20px', border: '1px solid rgba(255,255,255,0.07)',
+                }}>
+                  <Icon size={18} color="rgba(255,255,255,0.65)" style={{ marginBottom: 10 }} />
+                  <p style={{ fontSize: 13.5, fontWeight: 600, color: '#fff', margin: '0 0 4px' }}>{label}</p>
+                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', lineHeight: 1.45, margin: 0 }}>{desc}</p>
+                </div>
               ))}
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Features Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Everything you need. Nothing you don't.
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Built by event organizers who were tired of juggling spreadsheets, email threads, and last-minute changes.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <Calendar className="w-12 h-12 mb-4" style={{ color: '#2a468b' }} />
-                <CardTitle>Build Schedules in Minutes</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">
-                  Drag-and-drop sessions, import from CSV or Google Sheets, and publish instantly. No more copy-pasting between tabs or fixing broken formulas at 2am.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <Users className="w-12 h-12 mb-4" style={{ color: '#466d60' }} />
-                <CardTitle>Showcase Your Teachers</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">
-                  Upload photos that actually look good on mobile. Built-in cropping ensures every teacher photo is perfect—no awkward headshots or pixelated images.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <BarChart3 className="w-12 h-12 mb-4" style={{ color: '#edb75b' }} />
-                <CardTitle>See What's Working</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">
-                  Which sessions are most popular? When do people check the schedule? Real-time analytics without exporting to Excel or begging your webmaster.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <Clock className="w-12 h-12 mb-4" style={{ color: '#ff7119' }} />
-                <CardTitle>Attendees Will Love It</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">
-                  Mobile-first schedules that work offline. Filter by teacher, style, or level. Add to calendar with one tap. Your attendees deserve better than a PDF.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <DollarSign className="w-12 h-12 mb-4" style={{ color: '#2a468b' }} />
-                <CardTitle>One Dashboard for Everything</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">
-                  Running multiple events? Manage them all from one place. Each gets its own branded page and URL. No more logging into different accounts.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <Zap className="w-12 h-12 text-yellow-600 mb-4" />
-                <CardTitle>Actually Looks Like Yours</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">
-                  Upload your logo, pick your colors, and ship. Takes 2 minutes. Looks like you spent $5k on a custom website. (You didn't.)
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <Globe className="w-12 h-12 mb-4" style={{ color: '#b40225' }} />
-                <CardTitle>Grow Your Audience Before Your Event</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">
-                  Create landing pages for early bird sign-ups, waitlists, webinars, and retreat interest — all linked to your event. Collect subscribers and get notified by email the moment someone signs up.
-                </p>
-              </CardContent>
-            </Card>
+          {/* See all features link */}
+          <div style={{ textAlign: 'center', marginTop: 36 }}>
+            <Link href="/pricing" style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              fontSize: 15, fontWeight: 600, color: C.navy, textDecoration: 'none',
+            }}
+              className="hover:opacity-70 transition-opacity"
+            >
+              See everything that&apos;s included <ArrowRight size={15} />
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Use Cases Section */}
-      <section className="py-20 bg-gradient-to-b from-white to-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Built for your type of event
-            </h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Yoga & Wellness */}
-            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow border-t-4" style={{ borderTopColor: '#466d60' }}>
-              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-6" style={{ backgroundColor: '#466d6015' }}>
-                <Heart className="w-6 h-6" style={{ color: '#466d60' }} />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Yoga & Wellness Retreats</h3>
-              <p className="text-gray-600 mb-6 leading-relaxed">
-                Perfect for multi-day retreats with diverse class offerings. Manage teacher schedules, session levels, and styles all in one place.
-              </p>
-              <ul className="space-y-3">
-                <li className="flex items-start text-gray-700">
-                  <span className="font-bold mr-3 mt-0.5" style={{ color: '#466d60' }}>✓</span>
-                  <span>Teacher profiles with bios and photos</span>
-                </li>
-                <li className="flex items-start text-gray-700">
-                  <span className="font-bold mr-3 mt-0.5" style={{ color: '#466d60' }}>✓</span>
-                  <span>Filter by level (Beginner to Advanced)</span>
-                </li>
-                <li className="flex items-start text-gray-700">
-                  <span className="font-bold mr-3 mt-0.5" style={{ color: '#466d60' }}>✓</span>
-                  <span>Session capacity and booking tracking</span>
-                </li>
-              </ul>
-            </div>
-
-            {/* Music Festivals */}
-            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow border-t-4" style={{ borderTopColor: '#edb75b' }}>
-              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-6" style={{ backgroundColor: '#edb75b15' }}>
-                <Music className="w-6 h-6" style={{ color: '#edb75b' }} />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Music Festivals</h3>
-              <p className="text-gray-600 mb-6 leading-relaxed">
-                Handle complex multi-stage lineups with hundreds of sessions. Keep your audience informed with real-time schedule updates.
-              </p>
-              <ul className="space-y-3">
-                <li className="flex items-start text-gray-700">
-                  <span className="font-bold mr-3 mt-0.5" style={{ color: '#edb75b' }}>✓</span>
-                  <span>Multi-stage and multi-day support</span>
-                </li>
-                <li className="flex items-start text-gray-700">
-                  <span className="font-bold mr-3 mt-0.5" style={{ color: '#edb75b' }}>✓</span>
-                  <span>Filter by stage, genre, or artist</span>
-                </li>
-                <li className="flex items-start text-gray-700">
-                  <span className="font-bold mr-3 mt-0.5" style={{ color: '#edb75b' }}>✓</span>
-                  <span>Mobile-first design for festival-goers</span>
-                </li>
-              </ul>
-            </div>
-
-            {/* Conferences */}
-            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow border-t-4" style={{ borderTopColor: '#2a468b' }}>
-              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-6" style={{ backgroundColor: '#2a468b15' }}>
-                <Briefcase className="w-6 h-6" style={{ color: '#2a468b' }} />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Conferences & Workshops</h3>
-              <p className="text-gray-600 mb-6 leading-relaxed">
-                Organize breakout sessions, keynotes, and networking events. Track attendance and manage multiple tracks effortlessly.
-              </p>
-              <ul className="space-y-3">
-                <li className="flex items-start text-gray-700">
-                  <span className="font-bold mr-3 mt-0.5" style={{ color: '#2a468b' }}>✓</span>
-                  <span>Track sessions across multiple rooms</span>
-                </li>
-                <li className="flex items-start text-gray-700">
-                  <span className="font-bold mr-3 mt-0.5" style={{ color: '#2a468b' }}>✓</span>
-                  <span>Speaker management and bios</span>
-                </li>
-                <li className="flex items-start text-gray-700">
-                  <span className="font-bold mr-3 mt-0.5" style={{ color: '#2a468b' }}>✓</span>
-                  <span>Capacity limits and waitlists</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
+      {/* ── STATS ───────────────────────────────────────────────────────── */}
+      <section style={{ padding: '88px 0' }}>
+        <StatsStrip />
       </section>
 
-      {/* Pricing Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              {PAYMENTS_ENABLED ? 'Simple, transparent pricing' : 'Your First 5 Events Are On Us'}
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              {PAYMENTS_ENABLED 
-                ? 'Start free and upgrade when you need more. No hidden fees.'
-                : 'Get Pro features completely free during Early Access. No credit card required.'}
-            </p>
-          </div>
+      {/* ── PRICING ─────────────────────────────────────────────────────── */}
+      <section style={{ padding: '0 28px 88px', background: C.bg }}>
+        <div style={{ maxWidth: 1160, margin: '0 auto' }}>
+          <p style={{ textAlign: 'center', fontSize: 12.5, fontWeight: 700, letterSpacing: '.05em', textTransform: 'uppercase', color: C.accent, marginBottom: 14 }}>Pricing</p>
+          <h2 style={{ textAlign: 'center', fontSize: 'clamp(28px, 4vw, 44px)', lineHeight: 1.08, letterSpacing: '-0.03em', fontWeight: 700, maxWidth: 640, margin: '0 auto 14px' }}>Simple, transparent pricing</h2>
+          <p style={{ textAlign: 'center', fontSize: 18, color: C.soft, maxWidth: 560, margin: '0 auto 52px', fontWeight: 400 }}>Start free and upgrade when you need more. No hidden fees.</p>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }} className="max-lg:grid-cols-2 max-sm:grid-cols-1">
             {/* Free */}
-            <Card className="relative hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mb-4">
-                  <Zap className="w-6 h-6 text-gray-600" />
-                </div>
-                <CardTitle>Free</CardTitle>
-                <p className="text-gray-500 text-sm">Best for trying out Flow Grid</p>
-              </CardHeader>
-              <CardContent>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold text-gray-900">€0</span>
-                  <span className="text-gray-500">/month</span>
-                </div>
-                <ul className="space-y-3 text-sm text-gray-600 mb-6">
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> 1 published event
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Unlimited sessions
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Custom colors & logo
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> QR code poster
-                  </li>
-                </ul>
-                <Link href="/auth/signin">
-                  <Button variant="outline" className="w-full">Get Started Free</Button>
-                </Link>
-              </CardContent>
-            </Card>
+            <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: 26, display: 'flex', flexDirection: 'column' }}>
+              <div style={{ width: 38, height: 38, borderRadius: 10, background: C.gray, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                <Zap size={19} color={C.soft} />
+              </div>
+              <div style={{ fontWeight: 700, fontSize: 17, marginBottom: 4 }}>Free</div>
+              <div style={{ fontSize: 13, color: C.soft, marginBottom: 20 }}>Best for trying out Flow Grid</div>
+              <div style={{ fontSize: 40, fontWeight: 700, letterSpacing: '-0.04em', marginBottom: 20 }}>€0<span style={{ fontSize: 14, fontWeight: 500, color: C.soft }}>/mo</span></div>
+              <ul style={{ fontSize: 14, color: C.ink2, lineHeight: 2.1, flexGrow: 1, listStyle: 'none', padding: 0, margin: '0 0 24px' }}>
+                {['1 published event', 'Unlimited sessions', 'Custom colours & logo', 'QR code poster'].map(f => (
+                  <li key={f} style={{ display: 'flex', gap: 8 }}><span style={{ color: C.green }}>✓</span>{f}</li>
+                ))}
+              </ul>
+              <Link href="/auth/signin" style={{ display: 'block', textAlign: 'center', fontWeight: 600, fontSize: 14.5, border: `1px solid ${C.line}`, borderRadius: 9, padding: '10px', textDecoration: 'none', color: C.ink, transition: '.14s' }} className="hover:border-[#cfd2d8] hover:bg-[#f6f7f9]">
+                Get started free
+              </Link>
+            </div>
 
             {/* Event Pass */}
-            <Card className="relative hover:shadow-lg transition-shadow border-2" style={{ borderColor: '#ff7119' }}>
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                <span className="text-white text-sm font-semibold px-4 py-1.5 rounded-full shadow-md" style={{ backgroundColor: '#ff7119' }}>
-                  {PAYMENTS_ENABLED ? 'One-Time' : 'Included Free'}
-                </span>
+            <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: 26, display: 'flex', flexDirection: 'column' }}>
+              <div style={{ width: 38, height: 38, borderRadius: 10, background: '#fdece2', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                <Ticket size={19} color={C.accent} />
               </div>
-              <CardHeader>
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ backgroundColor: '#ff711915' }}>
-                  <Ticket className="w-6 h-6" style={{ color: '#ff7119' }} />
-                </div>
-                <CardTitle>Event Pass</CardTitle>
-                <p className="text-gray-500 text-sm">Unlock 1 additional event</p>
-              </CardHeader>
-              <CardContent>
-                <div className="mb-6">
-                  {PAYMENTS_ENABLED ? (
-                    <>
-                      <span className="text-4xl font-bold text-gray-900">€69</span>
-                      <span className="text-gray-500"> one-time</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-4xl font-bold text-gray-400 line-through">€69</span>
-                      <span className="text-4xl font-bold text-green-600 ml-2">Free</span>
-                    </>
-                  )}
-                </div>
-                <ul className="space-y-3 text-sm text-gray-600 mb-6">
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> 1 published event
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Google Fonts
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Basic analytics
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Yours forever
-                  </li>
-                </ul>
-                <Link href={PAYMENTS_ENABLED ? "/pricing" : "/auth/signin"}>
-                  <Button className="w-full text-white" style={{ backgroundColor: '#ff7119' }}>
-                    {PAYMENTS_ENABLED ? 'View Details' : 'Get Early Access'} <ArrowRight className="w-4 h-4 ml-1" />
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+              <div style={{ fontWeight: 700, fontSize: 17, marginBottom: 4 }}>Event Pass</div>
+              <div style={{ fontSize: 13, color: C.soft, marginBottom: 20 }}>Unlock 1 extra event, forever</div>
+              <div style={{ fontSize: 40, fontWeight: 700, letterSpacing: '-0.04em', marginBottom: 20 }}>€69<span style={{ fontSize: 14, fontWeight: 500, color: C.soft }}> one-time</span></div>
+              <ul style={{ fontSize: 14, color: C.ink2, lineHeight: 2.1, flexGrow: 1, listStyle: 'none', padding: 0, margin: '0 0 24px' }}>
+                {['1 extra published event', 'Google Fonts', 'Basic analytics', 'Yours forever'].map(f => (
+                  <li key={f} style={{ display: 'flex', gap: 8 }}><span style={{ color: C.green }}>✓</span>{f}</li>
+                ))}
+              </ul>
+              <Link href={PAYMENTS_ENABLED ? '/pricing' : '/auth/signin'} style={{ display: 'block', textAlign: 'center', fontWeight: 600, fontSize: 14.5, background: C.accent, borderRadius: 9, padding: '10px', textDecoration: 'none', color: '#fff', transition: '.14s' }} className="hover:bg-[#d9440f]">
+                {PAYMENTS_ENABLED ? 'Buy Event Pass' : 'Get early access'} →
+              </Link>
+            </div>
 
-            {/* Pro - Highlighted */}
-            <Card className="relative border-2 hover:shadow-xl transition-shadow" style={{ borderColor: '#b40225' }}>
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                <span className="text-white text-sm font-semibold px-4 py-1.5 rounded-full shadow-md" style={{ backgroundColor: '#b40225' }}>
-                  {PAYMENTS_ENABLED ? 'Most Popular' : '5 Free Events'}
-                </span>
+            {/* Pro */}
+            <div style={{ border: `2px solid ${C.navy}`, borderRadius: 16, padding: 26, display: 'flex', flexDirection: 'column', position: 'relative', background: '#fafbff' }}>
+              <div style={{ position: 'absolute', top: -13, left: '50%', transform: 'translateX(-50%)', background: C.navy, color: '#fff', fontSize: 12, fontWeight: 700, padding: '3px 14px', borderRadius: 100, whiteSpace: 'nowrap' }}>Most popular</div>
+              <div style={{ width: 38, height: 38, borderRadius: 10, background: '#eef2f8', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                <Zap size={19} color={C.navy} />
               </div>
-              <CardHeader>
-                <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-4">
-                  <Zap className="w-6 h-6" style={{ color: '#b40225' }} />
-                </div>
-                <CardTitle>Pro</CardTitle>
-                <p className="text-gray-500 text-sm">For serious event organizers</p>
-              </CardHeader>
-              <CardContent>
-                <div className="mb-6">
-                  {PAYMENTS_ENABLED ? (
-                    <>
-                      <span className="text-4xl font-bold text-gray-900">€29</span>
-                      <span className="text-gray-500">/month</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-4xl font-bold text-gray-400 line-through">€29/mo</span>
-                      <span className="text-4xl font-bold text-green-600 ml-2">Free</span>
-                    </>
-                  )}
-                </div>
-                <ul className="space-y-3 text-sm text-gray-600 mb-6">
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Up to 5 published events
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Watermark removed
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Embed widget & duplicate
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Detailed analytics & export
-                  </li>
-                </ul>
-                <Link href={PAYMENTS_ENABLED ? "/pricing" : "/auth/signin"}>
-                  <Button className="w-full text-white" style={{ backgroundColor: '#b40225' }}>
-                    {PAYMENTS_ENABLED ? 'View Details' : 'Get Early Access'} <ArrowRight className="w-4 h-4 ml-1" />
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+              <div style={{ fontWeight: 700, fontSize: 17, marginBottom: 4 }}>Pro</div>
+              <div style={{ fontSize: 13, color: C.soft, marginBottom: 20 }}>For serious event organisers</div>
+              <div style={{ fontSize: 40, fontWeight: 700, letterSpacing: '-0.04em', marginBottom: 20 }}>€29<span style={{ fontSize: 14, fontWeight: 500, color: C.soft }}>/mo</span></div>
+              <ul style={{ fontSize: 14, color: C.ink2, lineHeight: 2.1, flexGrow: 1, listStyle: 'none', padding: 0, margin: '0 0 24px' }}>
+                {['Up to 5 published events', 'Watermark removed', 'Embed widget & duplicate', 'Detailed analytics & export'].map(f => (
+                  <li key={f} style={{ display: 'flex', gap: 8 }}><span style={{ color: C.navy }}>✓</span>{f}</li>
+                ))}
+              </ul>
+              <Link href={PAYMENTS_ENABLED ? '/pricing' : '/auth/signin'} style={{ display: 'block', textAlign: 'center', fontWeight: 600, fontSize: 14.5, background: C.navy, borderRadius: 9, padding: '10px', textDecoration: 'none', color: '#fff', transition: '.14s' }} className="hover:bg-[#1e3470]">
+                {PAYMENTS_ENABLED ? 'Start Pro' : 'Get early access'} →
+              </Link>
+            </div>
 
             {/* Enterprise */}
-            <Card className="relative hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ backgroundColor: '#466d6015' }}>
-                  <Briefcase className="w-6 h-6" style={{ color: '#466d60' }} />
-                </div>
-                <CardTitle>Enterprise</CardTitle>
-                <p className="text-gray-500 text-sm">For agencies & organizations</p>
-              </CardHeader>
-              <CardContent>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold text-gray-900">Custom</span>
-                </div>
-                <ul className="space-y-3 text-sm text-gray-600 mb-6">
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Unlimited events
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> White-label & custom domain
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Team collaboration
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Dedicated support
-                  </li>
-                </ul>
-                <Link href="/contact/sales">
-                  <Button variant="outline" className="w-full">Contact Sales</Button>
-                </Link>
-              </CardContent>
-            </Card>
+            <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: 26, display: 'flex', flexDirection: 'column' }}>
+              <div style={{ width: 38, height: 38, borderRadius: 10, background: '#e9f0eb', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                <Briefcase size={19} color={C.green} />
+              </div>
+              <div style={{ fontWeight: 700, fontSize: 17, marginBottom: 4 }}>Enterprise</div>
+              <div style={{ fontSize: 13, color: C.soft, marginBottom: 20 }}>For agencies & organisations</div>
+              <div style={{ fontSize: 40, fontWeight: 700, letterSpacing: '-0.04em', marginBottom: 20 }}>Custom</div>
+              <ul style={{ fontSize: 14, color: C.ink2, lineHeight: 2.1, flexGrow: 1, listStyle: 'none', padding: 0, margin: '0 0 24px' }}>
+                {['Unlimited events', 'White-label & custom domain', 'Team collaboration', 'Dedicated support'].map(f => (
+                  <li key={f} style={{ display: 'flex', gap: 8 }}><span style={{ color: C.green }}>✓</span>{f}</li>
+                ))}
+              </ul>
+              <Link href="/contact/sales" style={{ display: 'block', textAlign: 'center', fontWeight: 600, fontSize: 14.5, border: `1px solid ${C.line}`, borderRadius: 9, padding: '10px', textDecoration: 'none', color: C.ink, transition: '.14s' }} className="hover:border-[#cfd2d8] hover:bg-[#f6f7f9]">
+                Contact sales
+              </Link>
+            </div>
           </div>
 
-          <div className="text-center mt-8">
-            <Link href="/pricing" className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-1">
-              Compare all features <ArrowRight className="w-4 h-4" />
+          <div style={{ textAlign: 'center', marginTop: 24 }}>
+            <Link href="/pricing" style={{ fontSize: 14.5, fontWeight: 600, color: C.navy, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }} className="hover:underline">
+              Compare all features <ArrowRight size={15} />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Featured Articles Section */}
-      <section className="py-20 bg-gradient-to-b from-white to-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Learn from Event Experts
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Practical guides and tips from organizers who've been there.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Article 1 */}
-            <Link href="/blog/get-festival-live-10-minutes" className="group">
-              <Card className="h-full hover:shadow-lg transition-all duration-300 group-hover:-translate-y-1">
-                <CardHeader>
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-                    <Zap className="w-4 h-4 text-blue-600" />
-                    <span>Quick Start</span>
-                  </div>
-                  <CardTitle className="group-hover:text-blue-600 transition-colors">
-                    Get Your First Event Live in 10 Minutes
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Skip the complexity. Create your event schedule in minutes, not days.
-                  </p>
-                  <span className="inline-flex items-center text-blue-600 font-medium mt-4 group-hover:gap-2 transition-all">
-                    Read more <ArrowRight className="w-4 h-4 ml-1" />
-                  </span>
-                </CardContent>
-              </Card>
-            </Link>
-
-            {/* Article 2 */}
-            <Link href="/blog/hidden-costs-manual-event-scheduling" className="group">
-              <Card className="h-full hover:shadow-lg transition-all duration-300 group-hover:-translate-y-1">
-                <CardHeader>
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-                    <DollarSign className="w-4 h-4 text-green-600" />
-                    <span>Budget & ROI</span>
-                  </div>
-                  <CardTitle className="group-hover:text-blue-600 transition-colors">
-                    Hidden Costs of Manual Event Scheduling
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    That "free" spreadsheet might be costing you thousands. Here's how to calculate the true price.
-                  </p>
-                  <span className="inline-flex items-center text-blue-600 font-medium mt-4 group-hover:gap-2 transition-all">
-                    Read more <ArrowRight className="w-4 h-4 ml-1" />
-                  </span>
-                </CardContent>
-              </Card>
-            </Link>
-
-            {/* Article 3 */}
-            <Link href="/blog/how-to-create-yoga-retreat-schedule" className="group">
-              <Card className="h-full hover:shadow-lg transition-all duration-300 group-hover:-translate-y-1">
-                <CardHeader>
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-                    <Heart className="w-4 h-4 text-pink-600" />
-                    <span>Retreat Planning</span>
-                  </div>
-                  <CardTitle className="group-hover:text-blue-600 transition-colors">
-                    How to Create the Perfect Yoga Retreat Schedule
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Balance practice, rest & community with proven retreat scheduling strategies.
-                  </p>
-                  <span className="inline-flex items-center text-blue-600 font-medium mt-4 group-hover:gap-2 transition-all">
-                    Read more <ArrowRight className="w-4 h-4 ml-1" />
-                  </span>
-                </CardContent>
-              </Card>
+      {/* ── FEATURED ARTICLES ───────────────────────────────────────────── */}
+      <section style={{ padding: '80px 28px', background: C.gray }}>
+        <div style={{ maxWidth: 1160, margin: '0 auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 36, flexWrap: 'wrap', gap: 12 }}>
+            <div>
+              <p style={{ fontSize: 12.5, fontWeight: 700, letterSpacing: '.05em', textTransform: 'uppercase', color: C.accent, marginBottom: 6 }}>From the blog</p>
+              <h2 style={{ fontSize: 'clamp(22px, 3vw, 32px)', fontWeight: 700, letterSpacing: '-0.025em', margin: 0 }}>Learn from the experts</h2>
+            </div>
+            <Link href="/blog" style={{ fontSize: 14, fontWeight: 600, color: C.navy, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 5 }} className="hover:underline">
+              All articles <ArrowRight size={14} />
             </Link>
           </div>
 
-          <div className="text-center mt-12">
-            <Link href="/blog">
-              <Button variant="outline" size="lg" className="text-lg">
-                View All Articles <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-            </Link>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }} className="max-md:grid-cols-1">
+            {[
+              {
+                label: 'Guide', href: '/blog/festival-schedule-template-guide',
+                title: 'The ultimate festival schedule template guide',
+                desc: 'Everything you need to plan, structure and publish a schedule that attendees actually use.',
+                color: C.navy,
+              },
+              {
+                label: 'How-to', href: '/blog/get-festival-live-10-minutes',
+                title: 'Get your festival schedule live in 10 minutes',
+                desc: 'A step-by-step walkthrough from blank slate to published URL — no design skills needed.',
+                color: C.green,
+              },
+              {
+                label: 'Planning', href: '/blog/how-to-create-yoga-retreat-schedule',
+                title: 'How to create a yoga retreat schedule people love',
+                desc: 'From morning practice to evening meals — how to structure your retreat day-by-day.',
+                color: '#b40225',
+              },
+            ].map(({ label, href, title, desc, color }) => (
+              <Link key={href} href={href} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', flexDirection: 'column' }}>
+                <div style={{
+                  border: `1px solid ${C.line}`, borderRadius: 14, padding: 24, background: '#fff',
+                  display: 'flex', flexDirection: 'column', height: '100%',
+                  transition: '.14s',
+                }} className="hover:shadow-sm hover:border-[#cfd2d8]">
+                  <span style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '.04em', textTransform: 'uppercase', color, marginBottom: 14 }}>{label}</span>
+                  <h3 style={{ fontSize: 16.5, fontWeight: 700, letterSpacing: '-0.015em', lineHeight: 1.3, marginBottom: 10, color: C.ink }}>{title}</h3>
+                  <p style={{ fontSize: 14, color: C.soft, lineHeight: 1.55, flexGrow: 1 }}>{desc}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 13.5, fontWeight: 600, color: C.navy, marginTop: 16 }}>
+                    Read more <ArrowRight size={13} />
+                  </div>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-[#2a468b] to-[#466d60]">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            Stop planning in spreadsheets. Start today.
+      {/* ── FINAL CTA ───────────────────────────────────────────────────── */}
+      <section style={{ textAlign: 'center', padding: '96px 28px 96px', background: C.bg }}>
+        <div style={{ maxWidth: 1160, margin: '0 auto' }}>
+          <h2 style={{ fontSize: 'clamp(32px, 5vw, 52px)', lineHeight: 1.04, letterSpacing: '-0.035em', fontWeight: 700, marginBottom: 18 }}>
+            Your next event,<br />live in ten minutes.
           </h2>
-          <p className="text-xl text-blue-100 mb-4">
-            Free to start. No credit card required.
-          </p>
-          <p className="text-lg text-blue-200 mb-8">
-            Join event organizers who've saved hours of scheduling headaches.
-          </p>
-          <Link href="/auth/signin">
-            <Button size="lg" className="bg-[#ff7119] hover:bg-[#b40225] text-white text-lg px-8 py-3 shadow-xl">
-              Create Your First Schedule <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
+          <p style={{ fontSize: 19, color: C.soft, marginBottom: 30, fontWeight: 400 }}>Free to start. No credit card. Cancel the spreadsheet.</p>
+          <Link href="/auth/signin" style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            fontWeight: 600, fontSize: 16, background: C.accent, color: '#fff',
+            borderRadius: 9, padding: '14px 26px', textDecoration: 'none', transition: '.14s',
+          }} className="hover:bg-[#d9440f]">
+            Create your first schedule <ArrowRight size={18} />
           </Link>
         </div>
       </section>
 
-      {/* Footer */}
       <Footer />
     </div>
   )

@@ -151,7 +151,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
       </head>
-      <body>
+      <body style={{ fontFamily: "var(--font-space-grotesk), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
         <AmplitudeScript />
         <Providers>
           {children}
