@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Product Updates | Flow Grid Release Notes & Changelog',
+  title: "What's New",
   description: 'Stay updated with the latest Flow Grid features, improvements, and bug fixes. See what\'s new in event scheduling, team collaboration, and more.',
 }
 

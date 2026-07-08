@@ -15,7 +15,10 @@ export const spaceGrotesk = Space_Grotesk({ weight: ['400', '700'], subsets: ['l
 export const italianno = Italianno({ weight: '400', subsets: ['latin'], variable: '--font-italianno' });
 
 export const metadata: Metadata = {
-  title: 'Flow Grid - Festival Schedule Maker | Free Event Planning Software',
+  title: {
+    template: '%s — Flow Grid',
+    default: 'Flow Grid — Event Schedule Builder for Festivals & Retreats',
+  },
   description: 'Create beautiful festival schedules in minutes. Manage sessions, bookings & attendees for retreats, workshops & events. Free to start, easy to use.',
   keywords: [
     'festival schedule maker',

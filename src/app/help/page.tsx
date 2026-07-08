@@ -6,10 +6,10 @@ import type { Metadata } from 'next'
 import MarketingNav from '@/components/marketing/MarketingNav'
 
 export const metadata: Metadata = {
-  title: 'Help Center - Flow Grid Event Scheduling Guide',
+  title: 'Help Centre',
   description: 'Learn how to create event schedules, manage bookings, and delight participants with Flow Grid. Step-by-step guides and tutorials.',
   openGraph: {
-    title: 'Flow Grid Help Center - Event Scheduling Guide',
+    title: 'Help Centre — Flow Grid',
     description: 'Transform your event into a seamless experience with Flow Grid. Create schedules, manage bookings, and delight participants.',
   },
 }

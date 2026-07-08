@@ -5,7 +5,7 @@ import Footer from '@/components/Footer'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'About Flow Grid | Event Scheduling Software Built for Organizers',
+  title: 'About',
   description: 'Learn how Flow Grid helps event organizers create beautiful schedules, manage team collaboration, and deliver seamless experiences for festivals, retreats, and conferences.',
 }
 

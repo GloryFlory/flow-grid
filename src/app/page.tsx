@@ -12,7 +12,7 @@ import EventSwitcher from '@/components/marketing/EventSwitcher'
 import StatsStrip from '@/components/marketing/StatsStrip'
 
 export const metadata: Metadata = {
-  title: 'Flow Grid — Event Schedule Builder for Festivals & Retreats',
+  title: { absolute: 'Flow Grid — Event Schedule Builder for Festivals & Retreats' },
   description: 'Turn a messy spreadsheet into a beautiful, branded, mobile-first schedule your attendees will actually use — live in minutes. Free to start.',
   openGraph: {
     title: 'Flow Grid — The schedule builder festivals actually run on.',

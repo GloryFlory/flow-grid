@@ -6,10 +6,10 @@ import { Calendar, Clock, ArrowRight } from 'lucide-react'
 import MarketingNav from '@/components/marketing/MarketingNav'
 
 export const metadata: Metadata = {
-  title: 'Festival & Event Planning Blog - Flow Grid',
+  title: 'Event Planning Blog',
   description: 'Expert guides on festival scheduling, retreat planning, event management, and creating beautiful schedules. Tips, templates, and best practices.',
   openGraph: {
-    title: 'Festival & Event Planning Blog - Flow Grid',
+    title: 'Event Planning Blog — Flow Grid',
     description: 'Expert guides on festival scheduling, retreat planning, and event management.',
   },
 }

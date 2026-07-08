@@ -23,7 +23,7 @@ import {
 } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Event Scheduling Glossary | Flow Grid Terms & Definitions',
+  title: 'Event Scheduling Glossary',
   description: 'Complete glossary of event scheduling terms. Learn about festivals, sessions, venues, waitlists, team roles, and Flow Grid features in plain language.',
 }
 
