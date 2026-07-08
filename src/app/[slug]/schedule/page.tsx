@@ -26,13 +26,11 @@ export async function generateMetadata(
     openGraph: {
       title: `${festival.name} — Full Schedule`,
       description,
-      ...(festival.logo && { images: [{ url: festival.logo }] }),
     },
     twitter: {
       card: 'summary_large_image',
       title: `${festival.name} — Full Schedule`,
       description,
-      ...(festival.logo && { images: [festival.logo] }),
     },
   }
 }
