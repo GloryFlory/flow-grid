@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og'
 import { NextRequest } from 'next/server'
+import sharp from 'sharp'
 
 export const runtime = 'nodejs'
 
@@ -19,8 +20,20 @@ export async function GET(req: NextRequest) {
     dates = `${fmt(new Date(startIso))} – ${fmt(new Date(endIso))}`
   }
 
-  // Pass the URL directly — Satori fetches external images itself in nodejs runtime
-  const logoSrc = logoUrl || null
+  // Fetch logo and convert to PNG (Satori can't render webp)
+  let logoBase64: string | null = null
+  if (logoUrl) {
+    try {
+      const res = await fetch(logoUrl)
+      if (res.ok) {
+        const buf = await res.arrayBuffer()
+        const png = await sharp(Buffer.from(buf)).resize(280, 280, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toBuffer()
+        logoBase64 = `data:image/png;base64,${png.toString('base64')}`
+      }
+    } catch {
+      logoBase64 = null
+    }
+  }
 
   const nameFontSize = name.length > 30 ? 52 : 68
 
@@ -46,9 +59,9 @@ export async function GET(req: NextRequest) {
             gap: 48,
           }}
         >
-          {logoSrc ? (
+          {logoBase64 ? (
             <img
-              src={logoSrc}
+              src={logoBase64}
               width={140}
               height={140}
               style={{ display: 'flex', borderRadius: 20, flexShrink: 0 }}
