@@ -19,19 +19,8 @@ export async function GET(req: NextRequest) {
     dates = `${fmt(new Date(startIso))} – ${fmt(new Date(endIso))}`
   }
 
-  let logoBase64: string | null = null
-  if (logoUrl) {
-    try {
-      const imgRes = await fetch(logoUrl)
-      if (imgRes.ok) {
-        const buf = await imgRes.arrayBuffer()
-        const ct = imgRes.headers.get('content-type') ?? 'image/webp'
-        logoBase64 = `data:${ct};base64,${Buffer.from(buf).toString('base64')}`
-      }
-    } catch {
-      logoBase64 = null
-    }
-  }
+  // Pass the URL directly — Satori fetches external images itself in nodejs runtime
+  const logoSrc = logoUrl || null
 
   const nameFontSize = name.length > 30 ? 52 : 68
 
@@ -57,9 +46,9 @@ export async function GET(req: NextRequest) {
             gap: 48,
           }}
         >
-          {logoBase64 ? (
+          {logoSrc ? (
             <img
-              src={logoBase64}
+              src={logoSrc}
               width={140}
               height={140}
               style={{ display: 'flex', borderRadius: 20, flexShrink: 0 }}
