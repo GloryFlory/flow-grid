@@ -63,7 +63,8 @@ export async function GET(
         <div
           style={{
             display: 'flex',
-            flex: 1,
+            flexGrow: 1,
+            flexShrink: 0,
             flexDirection: 'row',
             alignItems: 'center',
             padding: '60px 80px',
@@ -75,7 +76,7 @@ export async function GET(
               src={logoBase64}
               width={140}
               height={140}
-              style={{ borderRadius: 20, flexShrink: 0 }}
+              style={{ display: 'flex', borderRadius: 20, flexShrink: 0 }}
             />
           ) : null}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -85,7 +86,7 @@ export async function GET(
                 fontSize: nameFontSize,
                 fontWeight: 700,
                 color: '#ffffff',
-                lineHeight: 1.1,
+                lineHeight: `${Math.round(nameFontSize * 1.1)}px`,
               }}
             >
               {name}
