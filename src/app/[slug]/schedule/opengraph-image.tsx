@@ -19,13 +19,13 @@ function formatDateRange(start: Date, end: Date): string {
   return `${start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} – ${end.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`
 }
 
-async function fetchImageAsBase64(url: string): Promise<string | null> {
+async function toBase64(url: string): Promise<string | null> {
   try {
-    const res = await fetch(url, { next: { revalidate: 3600 } })
+    const res = await fetch(url)
     if (!res.ok) return null
-    const buffer = await res.arrayBuffer()
-    const contentType = res.headers.get('content-type') || 'image/png'
-    return `data:${contentType};base64,${Buffer.from(buffer).toString('base64')}`
+    const buf = await res.arrayBuffer()
+    const ct = res.headers.get('content-type') ?? 'image/png'
+    return `data:${ct};base64,${Buffer.from(buf).toString('base64')}`
   } catch {
     return null
   }
@@ -47,171 +47,109 @@ export default async function Image({
       endDate: true,
       location: true,
       primaryColor: true,
-      description: true,
     },
   })
 
-  const navy = '#080e1e'
-  const accent = festival?.primaryColor || '#ff7119'
-
-  // Fetch logo as base64 so ImageResponse can render it reliably
-  const logoBase64 = festival?.logo ? await fetchImageAsBase64(festival.logo) : null
+  const accent = festival?.primaryColor ?? '#ff7119'
+  const navy = '#080f20'
 
   if (!festival) {
     return new ImageResponse(
-      <div
-        style={{
-          width: '100%', height: '100%',
-          background: navy,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}
-      >
+      <div style={{ width: '100%', height: '100%', background: navy, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <span style={{ color: '#fff', fontSize: 56, fontWeight: 700 }}>Flow Grid</span>
       </div>,
       { width: 1200, height: 630 }
     )
   }
 
+  const logoSrc = festival.logo ? await toBase64(festival.logo) : null
   const dates = formatDateRange(festival.startDate, festival.endDate)
   const nameFontSize = festival.name.length > 32 ? 52 : festival.name.length > 22 ? 62 : 72
 
   return new ImageResponse(
     <div
       style={{
-        width: '100%', height: '100%',
-        background: `linear-gradient(145deg, ${navy} 0%, #0d1d3a 55%, #0a1628 100%)`,
+        width: '100%',
+        height: '100%',
         display: 'flex',
-        position: 'relative',
-        overflow: 'hidden',
+        flexDirection: 'column',
+        background: `linear-gradient(160deg, ${navy} 0%, #0d1e3c 100%)`,
       }}
     >
-      {/* Glow orb using event colour */}
-      <div
-        style={{
-          position: 'absolute',
-          top: -160, right: -100,
-          width: 560, height: 560,
-          borderRadius: '50%',
-          background: accent,
-          opacity: 0.13,
-          filter: 'blur(90px)',
-          display: 'flex',
-        }}
-      />
-      {/* Second glow — bottom left */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: -120, left: -60,
-          width: 380, height: 380,
-          borderRadius: '50%',
-          background: accent,
-          opacity: 0.07,
-          filter: 'blur(70px)',
-          display: 'flex',
-        }}
-      />
-
-      {/* Left accent bar */}
-      <div
-        style={{
-          position: 'absolute',
-          left: 0, top: 0, bottom: 0,
-          width: 5,
-          background: accent,
-          display: 'flex',
-          opacity: 0.9,
-        }}
-      />
-
-      {/* Main content */}
+      {/* Main content area */}
       <div
         style={{
           display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          padding: '64px 88px 64px 96px',
-          width: '100%',
-          height: '100%',
+          flex: 1,
+          alignItems: 'center',
+          padding: '60px 80px',
+          gap: 52,
         }}
       >
-        {/* Top — identity */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 40 }}>
-          {/* Logo */}
-          {logoBase64 && (
-            <div
-              style={{
-                display: 'flex',
-                width: 120, height: 120,
-                borderRadius: 22,
-                overflow: 'hidden',
-                flexShrink: 0,
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.1)',
-              }}
-            >
-              <img
-                src={logoBase64}
-                width={120}
-                height={120}
-                style={{ width: 120, height: 120 }}
-              />
-            </div>
-          )}
-
-          {/* Name + date */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingTop: 6 }}>
-            <span
-              style={{
-                fontSize: nameFontSize,
-                fontWeight: 700,
-                color: '#ffffff',
-                lineHeight: 1.05,
-                letterSpacing: '-1.5px',
-              }}
-            >
-              {festival.name}
-            </span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-              {festival.location && (
-                <>
-                  <span style={{ fontSize: 26, color: 'rgba(255,255,255,0.5)', fontWeight: 400 }}>
-                    {festival.location}
-                  </span>
-                  <span style={{ fontSize: 22, color: 'rgba(255,255,255,0.2)' }}>·</span>
-                </>
-              )}
-              <span style={{ fontSize: 26, color: 'rgba(255,255,255,0.5)', fontWeight: 400 }}>
-                {dates}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom bar */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          {/* CTA pill */}
+        {/* Logo */}
+        {logoSrc && (
           <div
             style={{
               display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              background: accent,
-              borderRadius: 100,
-              padding: '14px 28px',
+              width: 148,
+              height: 148,
+              borderRadius: 24,
+              overflow: 'hidden',
+              flexShrink: 0,
+              border: '2px solid rgba(255,255,255,0.12)',
             }}
           >
-            <span style={{ fontSize: 26, fontWeight: 700, color: '#fff' }}>
-              View the full schedule
-            </span>
-            <span style={{ fontSize: 26, color: 'rgba(255,255,255,0.8)' }}>→</span>
+            <img src={logoSrc} width={148} height={148} />
           </div>
+        )}
 
-          {/* Branding */}
-          <span style={{ fontSize: 20, color: 'rgba(255,255,255,0.3)', fontWeight: 500 }}>
-            tryflowgrid.com
+        {/* Event name + date */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+          <span
+            style={{
+              fontSize: nameFontSize,
+              fontWeight: 700,
+              color: '#ffffff',
+              lineHeight: 1.05,
+              letterSpacing: '-1.5px',
+            }}
+          >
+            {festival.name}
           </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            {festival.location ? (
+              <>
+                <span style={{ fontSize: 27, color: 'rgba(255,255,255,0.5)', fontWeight: 400 }}>
+                  {festival.location}
+                </span>
+                <span style={{ fontSize: 24, color: 'rgba(255,255,255,0.2)' }}>·</span>
+              </>
+            ) : null}
+            <span style={{ fontSize: 27, color: 'rgba(255,255,255,0.5)', fontWeight: 400 }}>
+              {dates}
+            </span>
+          </div>
         </div>
+      </div>
+
+      {/* Coloured bottom strip */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 80px',
+          height: 104,
+          background: accent,
+          flexShrink: 0,
+        }}
+      >
+        <span style={{ fontSize: 28, fontWeight: 700, color: '#fff', letterSpacing: '-0.5px' }}>
+          View the full schedule →
+        </span>
+        <span style={{ fontSize: 20, color: 'rgba(255,255,255,0.7)', fontWeight: 500 }}>
+          tryflowgrid.com
+        </span>
       </div>
     </div>,
     { width: 1200, height: 630 }
