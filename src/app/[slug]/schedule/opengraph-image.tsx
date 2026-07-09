@@ -1,5 +1,4 @@
 import { ImageResponse } from 'next/og'
-import { prisma } from '@/lib/prisma'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -7,16 +6,18 @@ export const alt = 'Event Schedule'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
-function formatDateRange(start: Date, end: Date): string {
-  const sameYear = start.getFullYear() === end.getFullYear()
-  const sameMonth = sameYear && start.getMonth() === end.getMonth()
+function formatDateRange(start: string, end: string): string {
+  const s = new Date(start)
+  const e = new Date(end)
+  const sameYear = s.getFullYear() === e.getFullYear()
+  const sameMonth = sameYear && s.getMonth() === e.getMonth()
   if (sameMonth) {
-    return `${start.getDate()}–${end.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`
+    return `${s.getDate()}–${e.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`
   }
   if (sameYear) {
-    return `${start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} – ${end.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`
+    return `${s.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} – ${e.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`
   }
-  return `${start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} – ${end.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`
+  return `${s.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} – ${e.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`
 }
 
 async function toBase64(url: string): Promise<string | null> {
@@ -38,17 +39,26 @@ export default async function Image({
 }) {
   const { slug } = await params
 
-  const festival = await prisma.festival.findUnique({
-    where: { slug },
-    select: {
-      name: true,
-      logo: true,
-      startDate: true,
-      endDate: true,
-      location: true,
-      primaryColor: true,
-    },
-  })
+  // Use the public API instead of Prisma directly — avoids bundling issues
+  // in the opengraph-image route context
+  let festival: {
+    name: string
+    logo?: string
+    startDate: string
+    endDate: string
+    location?: string
+    primaryColor?: string
+  } | null = null
+
+  try {
+    const res = await fetch(`https://tryflowgrid.com/api/public/festivals/${slug}`)
+    if (res.ok) {
+      const data = await res.json()
+      festival = data.festival ?? null
+    }
+  } catch {
+    festival = null
+  }
 
   const accent = festival?.primaryColor ?? '#ff7119'
   const navy = '#080f20'
@@ -76,7 +86,7 @@ export default async function Image({
         background: `linear-gradient(160deg, ${navy} 0%, #0d1e3c 100%)`,
       }}
     >
-      {/* Main content area */}
+      {/* Main content */}
       <div
         style={{
           display: 'flex',
@@ -86,7 +96,6 @@ export default async function Image({
           gap: 52,
         }}
       >
-        {/* Logo */}
         {logoSrc && (
           <div
             style={{
@@ -103,7 +112,6 @@ export default async function Image({
           </div>
         )}
 
-        {/* Event name + date */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           <span
             style={{
