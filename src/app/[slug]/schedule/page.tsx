@@ -10,7 +10,7 @@ export async function generateMetadata(
 
   const festival = await prisma.festival.findUnique({
     where: { slug },
-    select: { name: true, description: true, logo: true, startDate: true, endDate: true, location: true },
+    select: { name: true, description: true, logo: true, startDate: true, endDate: true, location: true, primaryColor: true },
   })
 
   if (!festival) {
@@ -20,7 +20,15 @@ export async function generateMetadata(
   const description = festival.description?.trim()
     || `Browse the full programme for ${festival.name}. Filter sessions by teacher, level, or time slot.`
 
-  const ogImage = `https://tryflowgrid.com/api/og/${slug}`
+  // Pass all data as query params so the OG route needs no DB access at all
+  const ogParams = new URLSearchParams({
+    name: festival.name,
+    start: festival.startDate.toISOString(),
+    end: festival.endDate.toISOString(),
+    color: festival.primaryColor ?? '#ff7119',
+    ...(festival.logo ? { logo: festival.logo } : {}),
+  })
+  const ogImage = `https://tryflowgrid.com/api/og?${ogParams.toString()}`
 
   return {
     title: festival.name,

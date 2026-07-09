@@ -1,47 +1,36 @@
 import { ImageResponse } from 'next/og'
 import { NextRequest } from 'next/server'
-import { prisma } from '@/lib/prisma'
 
 export const runtime = 'nodejs'
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
-) {
-  const { slug } = await params
+export async function GET(req: NextRequest) {
+  const { searchParams } = req.nextUrl
 
-  let name = slug
+  const name = searchParams.get('name') ?? 'Event Schedule'
+  const startIso = searchParams.get('start') ?? ''
+  const endIso = searchParams.get('end') ?? ''
+  const accentColor = searchParams.get('color') ?? '#ff7119'
+  const logoUrl = searchParams.get('logo') ?? ''
+
   let dates = ''
-  let accentColor = '#ff7119'
+  if (startIso && endIso) {
+    const fmt = (d: Date) =>
+      d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+    dates = `${fmt(new Date(startIso))} – ${fmt(new Date(endIso))}`
+  }
+
   let logoBase64: string | null = null
-
-  try {
-    const festival = await prisma.festival.findFirst({
-      where: { slug, isPublished: true },
-      select: { name: true, logo: true, startDate: true, endDate: true, primaryColor: true },
-    })
-
-    if (festival) {
-      name = festival.name
-      accentColor = festival.primaryColor ?? '#ff7119'
-
-      const start = new Date(festival.startDate)
-      const end = new Date(festival.endDate)
-      const fmt = (d: Date) =>
-        d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-      dates = `${fmt(start)} – ${fmt(end)}`
-
-      if (festival.logo) {
-        const imgRes = await fetch(festival.logo)
-        if (imgRes.ok) {
-          const buf = await imgRes.arrayBuffer()
-          const ct = imgRes.headers.get('content-type') ?? 'image/webp'
-          logoBase64 = `data:${ct};base64,${Buffer.from(buf).toString('base64')}`
-        }
+  if (logoUrl) {
+    try {
+      const imgRes = await fetch(logoUrl)
+      if (imgRes.ok) {
+        const buf = await imgRes.arrayBuffer()
+        const ct = imgRes.headers.get('content-type') ?? 'image/webp'
+        logoBase64 = `data:${ct};base64,${Buffer.from(buf).toString('base64')}`
       }
+    } catch {
+      logoBase64 = null
     }
-  } catch {
-    // keep defaults
   }
 
   const nameFontSize = name.length > 30 ? 52 : 68
