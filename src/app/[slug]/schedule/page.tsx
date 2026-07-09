@@ -20,17 +20,21 @@ export async function generateMetadata(
   const description = festival.description?.trim()
     || `Browse the full programme for ${festival.name}. Filter sessions by teacher, level, or time slot.`
 
+  const ogImage = `https://tryflowgrid.com/api/og/${slug}`
+
   return {
     title: festival.name,
     description,
     openGraph: {
       title: `${festival.name} — Full Schedule`,
       description,
+      images: [{ url: ogImage, width: 1200, height: 630, alt: `${festival.name} schedule` }],
     },
     twitter: {
       card: 'summary_large_image',
       title: `${festival.name} — Full Schedule`,
       description,
+      images: [ogImage],
     },
   }
 }

@@ -1,14 +1,12 @@
 import { ImageResponse } from 'next/og'
+import { NextRequest } from 'next/server'
 
 export const runtime = 'nodejs'
-export const size = { width: 1200, height: 630 }
-export const contentType = 'image/png'
 
-export default async function Image({
-  params,
-}: {
-  params: Promise<{ slug: string }>
-}) {
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ slug: string }> }
+) {
   const { slug } = await params
 
   let name = slug
@@ -136,8 +134,8 @@ export default async function Image({
       ),
       { width: 1200, height: 630 }
     )
-  } catch {
-    // Last resort fallback — never return a 500
+  } catch (err) {
+    console.error('[OG image error]', err)
     return new ImageResponse(
       (
         <div
