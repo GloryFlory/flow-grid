@@ -1,5 +1,6 @@
 'use client'
 import React from 'react'
+import { Puzzle } from 'lucide-react'
 
 interface Session {
   id: string
@@ -152,301 +153,193 @@ export function SessionCard({ session, onClick, onStyleClick, onLevelClick, onTe
   const isSimplified = cardType === 'minimal' || cardType === 'simplified'
   const isPhotoOnly = cardType === 'photo' || cardType === 'photo-only'
   
-  // Simplified card for meals, demos, and special sessions
+  const hasPrereqs = !!(session.prereqs && session.prereqs !== '' && session.prereqs !== 'TBD')
+
+  // time · [pin] location — shared across all card types
+  const TimeLocation = () => (
+    <div className="session-time-location">
+      <span className="time">{timeRange(session.start, session.end)}</span>
+      {session.location && (
+        <>
+          <svg className="location-pin" viewBox="0 0 12 16" width="9" height="11" fill="currentColor" aria-hidden="true">
+            <path d="M6 0C3.24 0 1 2.24 1 5c0 3.75 5 11 5 11s5-7.25 5-11c0-2.76-2.24-5-5-5zm0 7.5C4.62 7.5 3.5 6.38 3.5 5S4.62 2.5 6 2.5 8.5 3.62 8.5 5 7.38 7.5 6 7.5z"/>
+          </svg>
+          <span className="location">{session.location}</span>
+        </>
+      )}
+    </div>
+  )
+
+  // Shared teacher photo block (detailed + photo cards)
+  const TeacherPhoto = () => {
+    if (!session.teachers || session.teachers.length === 0) return null
+    return (
+      <div className="teacher-photos-bottom-right">
+        {session.teachers.length === 1 ? (
+          <div className="teacher-photo-single teacher-photo-frame">
+            <div className="teacher-placeholder-large">
+              {session.teachers[0].split(' ').map(n => n[0]).join('').toUpperCase()}
+            </div>
+            {session.teacherPhotos?.[0] && (
+              <img
+                src={session.teacherPhotos[0]!}
+                alt={session.teachers[0]}
+                className="teacher-photo-large teacher-photo-overlay"
+                onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+              />
+            )}
+          </div>
+        ) : (
+          <div className="teacher-photos-multiple">
+            {session.teachers.slice(0, 3).map((teacher, index) => (
+              <div key={index} className="teacher-avatar-small teacher-photo-frame" style={{ zIndex: 10 - index }}>
+                <div className="teacher-placeholder-small">
+                  {teacher.split(' ').map(n => n[0]).join('').toUpperCase()}
+                </div>
+                {session.teacherPhotos?.[index] && (
+                  <img
+                    src={session.teacherPhotos[index]!}
+                    alt={teacher}
+                    className="teacher-photo-small teacher-photo-overlay"
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+                  />
+                )}
+              </div>
+            ))}
+            {session.teachers.length > 3 && (
+              <div className="teacher-avatar-small teacher-avatar-more">
+                <div className="teacher-placeholder-small">+{session.teachers.length - 3}</div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // Shared teacher names row — max 2 shown on card to prevent overflow into tags
+  const TeacherNames = () => {
+    if (!session.teachers || session.teachers.length === 0) return null
+    const shown = session.teachers.slice(0, 2)
+    const extra = session.teachers.length - 2
+    return (
+      <div className="teachers-inline">
+        {shown.map((teacher, index) => (
+          <span key={index} className="teacher-name">
+            <button
+              className="teacher-link"
+              onClick={(e) => { e.stopPropagation(); onTeacherClick(teacher) }}
+              title={`Filter by ${teacher}`}
+            >
+              {teacher}
+            </button>
+            {index < shown.length - 1 && <span className="teacher-separator">&nbsp;&amp;&nbsp;</span>}
+          </span>
+        ))}
+        {extra > 0 && <span className="teacher-extra">&nbsp;&amp;&nbsp;+{extra} more</span>}
+      </div>
+    )
+  }
+
+  const PuzzlePiece = () => (
+    <button
+      className="prereqs-icon"
+      title="Prerequisites apply — tap for details"
+      onClick={(e) => { e.stopPropagation(); onClick(session) }}
+      type="button"
+    >
+      <Puzzle size={18} strokeWidth={2} aria-hidden="true" />
+    </button>
+  )
+
+  const Actions = ({ booking = true }: { booking?: boolean }) => (
+    <div className="session-actions">
+      {hasPrereqs && <PuzzlePiece />}
+      <FavouriteButton isFavourite={isFavourite} onToggle={onFavouriteToggle} sessionId={session.id} />
+      {booking && session.bookingEnabled && session.bookingCapacity && session.bookingCapacity > 0 ? (
+        <button className="book-pill-button" onClick={(e) => { e.stopPropagation(); onClick(session) }}>Book</button>
+      ) : (
+        <button className="info-button" onClick={(e) => { e.stopPropagation(); onClick(session) }}><span>ℹ</span></button>
+      )}
+    </div>
+  )
+
+  // ── MINIMAL: time / title ─────────────────────────────────────────
   if (isSimplified) {
     return (
       <div className={`session-card session-card-${size} simple-card ${workshopClass} ${isFavourite ? 'is-favourited' : ''}`} onClick={() => onClick(session)}>
         <div className="session-header">
-          <h3 className="session-title session-title-fixed-height">{session.title}</h3>
-          <div className="session-actions">
-            <FavouriteButton isFavourite={isFavourite} onToggle={onFavouriteToggle} sessionId={session.id} />
-            {session.bookingEnabled && session.bookingCapacity && session.bookingCapacity > 0 ? (
-              <button 
-                className="book-pill-button"
-                onClick={(e) => { e.stopPropagation(); onClick(session); }}
-                title="Book this session"
-              >
-                Book
-              </button>
-            ) : (
-              <button className="info-button" onClick={(e) => { e.stopPropagation(); onClick(session); }}>
-                <span>ℹ</span>
-              </button>
-            )}
-          </div>
+          <TimeLocation />
+          <Actions booking={false} />
         </div>
-        <div className="session-content">
-          <div className="session-time-location">
-            <span className="time">{timeRange(session.start, session.end)}</span>
-            <span className="location">{session.location}</span>
-          </div>
-        </div>
+        <h3 className="session-title session-title-fixed-height">{session.title}</h3>
       </div>
     )
   }
-  
-  // Photo-only card for special sessions (name, time, location, photo only)
+
+  // ── PHOTO: time / title / teacher + photo at bottom ─────────────────
   if (isPhotoOnly) {
     return (
       <div className={`session-card session-card-${size} photo-only-card ${workshopClass} ${isFavourite ? 'is-favourited' : ''}`} onClick={() => onClick(session)}>
         <div className="session-header">
-          <h3 className="session-title session-title-fixed-height">{session.title}</h3>
-          <div className="session-actions">
-            <FavouriteButton isFavourite={isFavourite} onToggle={onFavouriteToggle} sessionId={session.id} />
-            {session.bookingEnabled && session.bookingCapacity && session.bookingCapacity > 0 ? (
-              <button 
-                className="book-pill-button"
-                onClick={(e) => { e.stopPropagation(); onClick(session); }}
-                title="Book this session"
-              >
-                Book
-              </button>
-            ) : (
-              <button className="info-button" onClick={(e) => { e.stopPropagation(); onClick(session); }}>
-                <span>ℹ</span>
-              </button>
-            )}
-          </div>
+          <TimeLocation />
+          <Actions />
         </div>
-        <div className="session-content">
-          <div className="session-time-location">
-            <span className="time">{timeRange(session.start, session.end)}</span>
-            <span className="location">{session.location}</span>
+        <h3 className="session-title session-title-fixed-height">{session.title}</h3>
+        {/* Footer: teacher name left, photo bottom-right */}
+        <div className="session-card-footer">
+          <div className="session-card-footer-left">
+            <TeacherNames />
           </div>
-          
-          {/* Photo and Teachers inline */}
-          <div className="photo-only-section">
-            {session.teachers && session.teachers.length > 0 && (
-              <div className="teachers-names">
-                {session.teachers.map((teacher, index) => (
-                  <React.Fragment key={index}>
-                    <button
-                      className="teacher-link clickable"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onTeacherClick(teacher)
-                      }}
-                      title={`Filter by ${teacher}`}
-                    >
-                      {teacher}
-                    </button>
-                    {index < session.teachers.length - 1 && <span>&nbsp;&&nbsp;</span>}
-                  </React.Fragment>
-                ))}
-              </div>
-            )}
-            
-            {/* Teacher Photos - match detailed card style */}
-            {session.teachers && session.teachers.length > 0 && (
-              <div className="teacher-photos-bottom-right">
-                {session.teachers.length === 1 ? (
-                  /* Single teacher - show one large photo */
-                  <div className="teacher-photo-single">
-                    {session.teacherPhotos?.[0] ? (
-                      <img 
-                        src={session.teacherPhotos[0]}
-                        alt={session.teachers[0]}
-                        className="teacher-photo-large"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement
-                          target.style.display = 'none'
-                          const nextElement = target.nextElementSibling as HTMLElement
-                          if (nextElement) nextElement.style.display = 'flex'
-                        }}
-                      />
-                    ) : null}
-                    <div className="teacher-placeholder-large" style={{ display: session.teacherPhotos?.[0] ? 'none' : 'flex' }}>
-                      {session.teachers[0].split(' ').map(n => n[0]).join('').toUpperCase()}
-                    </div>
-                  </div>
-                ) : (
-                  /* Multiple teachers - show compact avatars */
-                  <div className="teacher-photos-multiple">
-                    {session.teachers.slice(0, 3).map((teacher, index) => (
-                      <div key={index} className="teacher-avatar-small" style={{ zIndex: 10 - index }}>
-                        {session.teacherPhotos?.[index] ? (
-                          <img 
-                            src={session.teacherPhotos[index]!}
-                            alt={teacher}
-                            className="teacher-photo-small"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement
-                              target.style.display = 'none'
-                              const nextElement = target.nextElementSibling as HTMLElement
-                              if (nextElement) nextElement.style.display = 'flex'
-                            }}
-                          />
-                        ) : null}
-                        <div className="teacher-placeholder-small" style={{ display: session.teacherPhotos?.[index] ? 'none' : 'flex' }}>
-                          {teacher.split(' ').map(n => n[0]).join('').toUpperCase()}
-                        </div>
-                      </div>
-                    ))}
-                    {session.teachers.length > 3 && (
-                      <div className="teacher-avatar-small teacher-avatar-more">
-                        <div className="teacher-placeholder-small">
-                          +{session.teachers.length - 3}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+          <TeacherPhoto />
         </div>
       </div>
     )
   }
-  
-  // Full card for workshops with compact layout
+
+  // ── DETAILED: title + teacher at full width / level + tags + photo at bottom
   return (
     <div className={`session-card session-card-${size} ${workshopClass} ${isFavourite ? 'is-favourited' : ''}`} onClick={() => onClick(session)}>
       <div className="session-card__inner">
-        {/* Line 1: Name and Info button */}
         <div className="session-header">
-          <h3 className="session-title session-title-fixed-height">{session.title}</h3>
-          <div className="session-actions">
-            <FavouriteButton isFavourite={isFavourite} onToggle={onFavouriteToggle} sessionId={session.id} />
-            {session.bookingEnabled && session.bookingCapacity && session.bookingCapacity > 0 ? (
-              <button 
-                className="book-pill-button"
-                onClick={(e) => { e.stopPropagation(); onClick(session); }}
-                title="Book this session"
-              >
-                Book
-              </button>
-            ) : (
-              <button className="info-button" onClick={(e) => { e.stopPropagation(); onClick(session); }}>
-                <span>ℹ</span>
-              </button>
-            )}
-          </div>
+          <TimeLocation />
+          <Actions />
         </div>
-        
-        <div className="session-content">
-          {/* Line 2: Time and Location */}
-          <div className="session-time-location">
-            <span className="time">{timeRange(session.start, session.end)}</span>
-            <span className="location">{session.location}</span>
-          </div>
-          
-          {/* Line 3: Teachers only - single row */}
-          <div className="teachers-inline">
-            {session.teachers.map((teacher, index) => (
-              <span key={index} className="teacher-name">
+        <h3 className="session-title session-title-fixed-height">{session.title}</h3>
+        <TeacherNames />
+        {/* Level + tags grouped: level row on top, style tags row below */}
+        <div className="session-card-level-tags">
+          {session.level && (
+            <button
+              className="level-chip"
+              style={{ backgroundColor: getLevelColor(session.level, customLevelColors) }}
+              onClick={(e) => { e.stopPropagation(); onLevelClick(session.level) }}
+              title={`Filter by ${session.level}`}
+            >
+              {session.level}
+            </button>
+          )}
+          {session.styles.length > 0 && (
+            <div className="card-tags-row">
+              {session.styles.slice(0, 3).map((style, index) => (
                 <button
-                  className="teacher-link clickable"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onTeacherClick(teacher)
-                  }}
-                  title={`Filter by ${teacher}`}
+                  key={index}
+                  className="style-tag"
+                  onClick={(e) => { e.stopPropagation(); onStyleClick(style) }}
+                  title={`Filter by ${style}`}
                 >
-                  {teacher}
+                  {style.charAt(0).toUpperCase() + style.slice(1).toLowerCase()}
                 </button>
-                {index < session.teachers.length - 1 && <span className="teacher-separator">&nbsp;&amp;&nbsp;</span>}
-              </span>
-            ))}
-          </div>
-        
-        {/* Line 4: Level and Styles as clickable tags */}
-        <div className="styles-and-photo">
-          <div className="tags-container">
-            {/* Level Tag - same size as style tags but colored */}
-            {session.level && (
-              <button
-                className="style-tag clickable level-colored"
-                style={{ backgroundColor: getLevelColor(session.level, customLevelColors), color: 'white' }}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onLevelClick(session.level)
-                }}
-                title={`Filter by ${session.level}`}
-              >
-                {session.level}
-              </button>
-            )}
-            
-            {/* Style Tags */}
-            {session.styles.map((style, index) => (
-              <button
-                key={index}
-                className="style-tag clickable"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onStyleClick(style)
-                }}
-                title={`Filter by ${style}`}
-              >
-                {style.charAt(0).toUpperCase() + style.slice(1).toLowerCase()}
-              </button>
-            ))}
-          </div>
+              ))}
+              {session.styles.length > 3 && (
+                <span className="tags-overflow">+{session.styles.length - 3}</span>
+              )}
+            </div>
+          )}
         </div>
-        
-        {/* Line 5: Prerequisites - only show if they exist */}
-        {session.prereqs && session.prereqs !== "" && session.prereqs !== "TBD" && (
-          <div className="prereqs-compact">
-            <strong>Pre-Reqs:</strong> {session.prereqs}
-          </div>
-        )}
-        
-        {/* Teacher Photos - positioned at bottom right */}
-        {session.teachers && session.teachers.length > 0 && (
-          <div className="teacher-photos-bottom-right">
-            {session.teachers.length === 1 ? (
-              /* Single teacher - show one large photo */
-              <div className="teacher-photo-single">
-                <img 
-                  src={session.teacherPhotos?.[0] || '/teachers/placeholder.jpg'}
-                  alt={session.teachers[0]}
-                  className="teacher-photo-large"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement
-                    target.style.display = 'none'
-                    const nextElement = target.nextElementSibling as HTMLElement
-                    if (nextElement) nextElement.style.display = 'flex'
-                  }}
-                />
-                <div className="teacher-placeholder-large" style={{ display: 'none' }}>
-                  {session.teachers[0].split(' ').map(n => n[0]).join('').toUpperCase()}
-                </div>
-              </div>
-            ) : (
-              /* Multiple teachers - show compact avatars */
-              <div className="teacher-photos-multiple">
-                {session.teachers.slice(0, 3).map((teacher, index) => (
-                  <div key={index} className="teacher-avatar-small" style={{ zIndex: 10 - index }}>
-                    <img 
-                      src={session.teacherPhotos?.[index] || '/teachers/placeholder.jpg'}
-                      alt={teacher}
-                      className="teacher-photo-small"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement
-                        target.style.display = 'none'
-                        const nextElement = target.nextElementSibling as HTMLElement
-                        if (nextElement) nextElement.style.display = 'flex'
-                      }}
-                    />
-                    <div className="teacher-placeholder-small" style={{ display: 'none' }}>
-                      {teacher.split(' ').map(n => n[0]).join('').toUpperCase()}
-                    </div>
-                  </div>
-                ))}
-                {session.teachers.length > 3 && (
-                  <div className="teacher-avatar-small teacher-avatar-more">
-                    <div className="teacher-placeholder-small">
-                      +{session.teachers.length - 3}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
+        {/* Photo: absolutely positioned at bottom-right — does not affect layout flow */}
+        <TeacherPhoto />
       </div>
-    </div>
     </div>
   )
 }

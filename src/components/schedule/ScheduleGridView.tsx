@@ -199,8 +199,18 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
       session.teachers?.forEach(t => teachers.add(t))
     })
 
+    const LEVEL_ORDER = ['Open Level', 'All Levels', 'Beginner', 'Beginner+', 'Intermediate', 'Intermediate+', 'Advanced']
+    const sortedLevels = Array.from(levelsMap.values()).sort((a, b) => {
+      const ai = LEVEL_ORDER.indexOf(a)
+      const bi = LEVEL_ORDER.indexOf(b)
+      if (ai === -1 && bi === -1) return a.localeCompare(b)
+      if (ai === -1) return 1
+      if (bi === -1) return -1
+      return ai - bi
+    })
+
     return {
-      availableLevels: Array.from(levelsMap.values()).sort(),
+      availableLevels: sortedLevels,
       availableStyles: Array.from(styles).sort(),
       availableTeachers: Array.from(teachers).sort()
     }
@@ -215,11 +225,7 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
       if (levelFilter) {
         const sessionLevel = session.level?.toLowerCase() || ''
         const filterLevel = levelFilter.toLowerCase()
-        const isSessionAllLevels = sessionLevel === 'all levels' || sessionLevel === 'open level'
-        
-        // "All Levels" / "Open Level" sessions appear for any level filter
-        // (since they accept all skill levels)
-        if (!isSessionAllLevels && sessionLevel !== filterLevel) return false
+        if (sessionLevel !== filterLevel) return false
       }
       if (styleFilter && !session.styles?.includes(styleFilter)) return false
       if (teacherFilter && !session.teachers?.includes(teacherFilter)) return false
@@ -621,6 +627,18 @@ export default function ScheduleGridView({ festival, sessions }: ScheduleGridVie
           />
         </div>
       </div>
+
+      {/* Filter result count — shown whenever any filter is active, so users know it's working */}
+      {(levelFilter || styleFilter || teacherFilter || searchFilter || showFavouritesOnly) && (
+        <div className="bg-blue-50 border-b border-blue-100 px-4 py-2 text-sm text-blue-700 flex items-center gap-2">
+          <span>
+            Showing <strong>{filteredSessions.length}</strong> of <strong>{sessions.length}</strong> sessions
+          </span>
+          {filteredSessions.length === 0 && (
+            <span className="text-blue-500">— no sessions match your current filters</span>
+          )}
+        </div>
+      )}
 
       {/* Grid Container */}
       <div className="overflow-x-auto px-2 md:px-4 py-3 md:py-6" style={{ WebkitOverflowScrolling: 'touch' }}>

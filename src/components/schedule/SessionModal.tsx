@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { Star } from 'lucide-react'
+import { Star, Puzzle } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface Session {
@@ -102,6 +102,10 @@ const getTeacherLink = (teachers: string[], index: number, session: Session) => 
   if (!session.teacherUrls || !session.teacherUrls[index]) return null
   return session.teacherUrls[index]
 }
+
+const PuzzlePieceIcon = () => (
+  <Puzzle size={13} strokeWidth={2} aria-hidden="true" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '0.3rem', opacity: 0.6 }} />
+)
 
 export function SessionModal({ session, onClose, festivalSlug, isFavourite = false, onFavouriteToggle, primaryColor = '#4a90e2', accentColor = '#ff6b6b', customLevelColors }: SessionModalProps) {
   const [showBookingForm, setShowBookingForm] = useState(false)
@@ -336,81 +340,74 @@ export function SessionModal({ session, onClose, festivalSlug, isFavourite = fal
   const isSimplified = cardType === 'minimal' || cardType === 'simplified'
   const isPhotoOnly = cardType === 'photo' || cardType === 'photo-only'
   const isPhotoshoot = session.title.toLowerCase().includes('photoshoot')
-  
+
   const capacity = session.bookingCapacity || 0
   const spotsLeft = capacity > 0 ? capacity - currentBookings : null
   const isFull = spotsLeft !== null && spotsLeft <= 0
 
+  const formatDay = (day: string) => {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(day)) {
+      const d = new Date(day + 'T12:00:00')
+      return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
+    }
+    return day
+  }
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        {/* Header with title, time, day, and location */}
+        {/* Header */}
         <div className="modal-header">
           <div className="modal-title-section">
             <h2>{session.title}</h2>
             <div className="modal-meta-tags">
               <span className="modal-meta-tag">{timeRange(session.start, session.end)}</span>
-              <span className="modal-meta-tag">{session.day}</span>
-              <span className="modal-meta-tag">{session.location}</span>
+              {session.day && <span className="modal-meta-tag">{formatDay(session.day)}</span>}
             </div>
           </div>
           <div className="modal-header-actions">
             {onFavouriteToggle && (
-              <button 
+              <button
                 className={`favourite-button modal-favourite ${isFavourite ? 'is-favourite' : ''}`}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onFavouriteToggle(session.id)
-                }}
+                onClick={(e) => { e.stopPropagation(); onFavouriteToggle(session.id) }}
                 aria-label={isFavourite ? 'Remove from favourites' : 'Add to favourites'}
                 title={isFavourite ? 'Remove from favourites' : 'Add to favourites'}
               >
-                <Star 
-                  size={20} 
-                  className="star-icon"
-                  fill={isFavourite ? 'currentColor' : 'none'}
-                />
+                <Star size={20} className="star-icon" fill={isFavourite ? 'currentColor' : 'none'} />
               </button>
             )}
             <button className="close-button" onClick={onClose}>&times;</button>
           </div>
         </div>
-        
+
         <div className="modal-body">
-          {/* Teachers section - Clean display with photo and bio link */}
+          {/* Teachers */}
           {session.teachers && session.teachers.length > 0 && (
             <div className="modal-teachers-section">
               <div className="modal-teachers-list">
                 {session.teachers.map((teacher, index) => {
                   const teacherUrl = getTeacherLink(session.teachers, index, session)
+                  const photoSrc = session.teacherPhotos?.[index]
                   return (
                     <div key={index} className="modal-teacher-item">
-                      <div className="modal-teacher-photo">
-                        <img 
-                          src={getTeacherImageSrc(session, teacher, index)}
-                          alt={teacher}
-                          className="teacher-photo-modal"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement
-                            target.style.display = 'none'
-                            const nextElement = target.nextElementSibling as HTMLElement
-                            if (nextElement) nextElement.style.display = 'flex'
-                          }}
-                        />
-                        <div className="teacher-placeholder-modal" style={{ display: 'none' }}>
+                      <div className="modal-teacher-photo teacher-photo-frame">
+                        <div className="teacher-placeholder-modal">
                           {teacher.split(' ').map(n => n[0]).join('').toUpperCase()}
                         </div>
+                        {photoSrc && (
+                          <img
+                            src={photoSrc}
+                            alt={teacher}
+                            className="teacher-photo-modal teacher-photo-overlay"
+                            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+                          />
+                        )}
                       </div>
                       <div className="modal-teacher-info">
                         <h3 className="modal-teacher-name">{teacher}</h3>
                         {teacherUrl && (
-                          <a 
-                            href={teacherUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="modal-teacher-bio-link"
-                          >
-                            View Teacher Bio →
+                          <a href={teacherUrl} target="_blank" rel="noopener noreferrer" className="modal-teacher-bio-link">
+                            View Bio →
                           </a>
                         )}
                       </div>
@@ -420,61 +417,58 @@ export function SessionModal({ session, onClose, festivalSlug, isFavourite = fal
               </div>
             </div>
           )}
-          
-          {/* About This Workshop - Clean section with blue left border */}
-          {session.description && session.description !== "" && (
+
+          {/* Description */}
+          {session.description && session.description !== '' && (
             <div className="modal-about-section">
               <h3 className="modal-section-title">About This Workshop</h3>
               <p className="modal-about-text">{session.description}</p>
             </div>
           )}
-          
-          {/* Session Details Grid */}
+
+          {/* Details grid: level · duration · location */}
           <div className="modal-details-grid">
-            {/* Level */}
             {session.level && !isSimplified && !isPhotoOnly && (
               <div className="modal-detail-card">
                 <h5>LEVEL</h5>
-                <span 
-                  className="modal-level-badge" 
+                <span
+                  className="modal-level-badge"
                   style={{ backgroundColor: getLevelColor(session.level, customLevelColors) }}
                 >
                   {session.level}
                 </span>
               </div>
             )}
-            
-            {/* Duration */}
             <div className="modal-detail-card">
               <h5>DURATION</h5>
-              <span className="modal-duration">{Math.round(getDuration(session.start, session.end))} minutes</span>
+              <span className="modal-duration">{Math.round(getDuration(session.start, session.end))} min</span>
             </div>
-            
-            {/* Prerequisites - only show if they exist */}
-            {session.prereqs && session.prereqs !== "" && session.prereqs !== "TBD" && (
+            {session.location && (
+              <div className="modal-detail-card">
+                <h5>LOCATION</h5>
+                <span className="modal-location">{session.location}</span>
+              </div>
+            )}
+            {session.prereqs && session.prereqs !== '' && session.prereqs !== 'TBD' && (
               <div className="modal-detail-card modal-prereqs-card">
-                <h5>PREREQUISITES</h5>
-                <span className="modal-prereqs">
-                  {session.prereqs}
-                </span>
+                <h5><PuzzlePieceIcon />PREREQUISITES</h5>
+                <span className="modal-prereqs">{session.prereqs}</span>
               </div>
             )}
           </div>
-          
-          {/* Workshop Types - More spacing */}
+
+          {/* Style tags */}
           {!isPhotoshoot && !isSimplified && session.styles && session.styles.length > 0 && (
             <div className="modal-workshop-types-section">
               <h3 className="modal-section-title">Workshop Types</h3>
               <div className="modal-styles-list">
                 {session.styles.map((style, index) => (
-                  <span key={index} className="modal-style-tag">
-                    {style}
-                  </span>
+                  <span key={index} className="modal-style-tag">{style}</span>
                 ))}
               </div>
             </div>
           )}
-          
+
           {/* Booking Section */}
           {session.bookingEnabled && (
             <div className="modal-booking-section">
