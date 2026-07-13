@@ -91,12 +91,19 @@ export async function GET(
         teacher: {
           festivalId: festival.id
         }
+      },
+      include: {
+        teacher: {
+          select: { name: true }
+        }
       }
     })
-    
-    // Create teacher photo map by name (use first photo found)
+
+    // Build map keyed by the Teacher record's name (matches session.teachers strings).
+    // photo.teacherName stores the filename at upload time and can differ (e.g. "Ronan Jenkinson"
+    // vs the session value "Ronan"), so we use photo.teacher.name which is always the record name.
     const teacherPhotoMap = teacherPhotos.reduce((acc: Record<string, string>, photo: any) => {
-      const teacherKey = photo.teacherName.toLowerCase().trim()
+      const teacherKey = (photo.teacher?.name ?? photo.teacherName).toLowerCase().trim()
       if (!acc[teacherKey]) {
         acc[teacherKey] = photo.filePath
       }

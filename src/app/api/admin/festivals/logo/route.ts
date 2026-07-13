@@ -33,11 +33,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing file or festival ID' }, { status: 400 })
     }
 
-    // Verify festival ownership
+    // Verify festival ownership or team membership
     const festival = await prisma.festival.findFirst({
       where: {
         id: festivalId,
-        userId: session.user.id,
+        OR: [
+          { userId: session.user.id },
+          { teamMembers: { some: { userId: session.user.id } } },
+        ],
       },
     })
 

@@ -576,6 +576,51 @@ export default function FestivalTeacherPhotos() {
           photo: undefined
         } : undefined)}
         onSave={async ({ name, url, photoFile }) => {
+          // Capture before clearing so the closure still has it after modal closes
+          const savedEditing = editingTeacher
+          const isEditing = !!savedEditing?.teacherRecord
+
+          // Close modal immediately — don't make the user wait for the network
+          setModalOpen(false)
+          setEditingTeacher(null)
+
+          // Optimistic update so the teacher appears right away in the list
+          if (isEditing && savedEditing?.teacherRecord) {
+            setTeachers(prev => prev.map(t =>
+              t.teacherRecord?.id === savedEditing.teacherRecord!.id
+                ? {
+                    ...t,
+                    name,
+                    hasPhoto: photoFile ? true : t.hasPhoto,
+                    teacherRecord: {
+                      ...t.teacherRecord!,
+                      name,
+                      url,
+                      photos: photoFile
+                        ? [{ id: 'pending', filePath: URL.createObjectURL(photoFile) }]
+                        : t.teacherRecord!.photos,
+                    },
+                  }
+                : t
+            ))
+          } else {
+            const optimistic: Teacher = {
+              name,
+              sessionCount: 0,
+              hasPhoto: !!photoFile,
+              teacherRecord: {
+                id: `pending-${Date.now()}`,
+                name,
+                url,
+                isGroup: false,
+                photos: photoFile
+                  ? [{ id: 'pending', filePath: URL.createObjectURL(photoFile) }]
+                  : [],
+              },
+            }
+            setTeachers(prev => [...prev, optimistic])
+          }
+
           try {
             const fd = new FormData()
             fd.append('name', name)
@@ -583,25 +628,19 @@ export default function FestivalTeacherPhotos() {
             if (url) fd.append('url', url)
             if (photoFile) fd.append('file', photoFile)
 
-            const method = editingTeacher?.teacherRecord ? 'PATCH' : 'POST'
-            const path = editingTeacher?.teacherRecord 
-              ? `/api/admin/teachers/${editingTeacher.teacherRecord.id}` 
+            const method = isEditing ? 'PATCH' : 'POST'
+            const path = isEditing
+              ? `/api/admin/teachers/${savedEditing!.teacherRecord!.id}`
               : '/api/admin/teachers'
-            
-            const res = await fetch(path, { 
-              method, 
+
+            const res = await fetch(path, {
+              method,
               body: fd,
-              // Force no-cache to prevent stale data
-              headers: {
-                'Cache-Control': 'no-cache'
-              }
+              headers: { 'Cache-Control': 'no-cache' }
             })
-            
+
             if (res.ok) {
-              setModalOpen(false)
-              setEditingTeacher(null)
-              
-              // Force refresh with no-cache headers
+              // Replace optimistic entry with real server data (photo URL, IDs etc.)
               await Promise.all([
                 fetch(`/api/admin/festivals/${festivalId}/teachers`, {
                   headers: { 'Cache-Control': 'no-cache' }
@@ -614,8 +653,10 @@ export default function FestivalTeacherPhotos() {
               const errorData = await res.json()
               const errorMessage = errorData.error || 'Unknown error occurred'
               console.error('Failed to save teacher:', errorMessage)
-              
-              // Show user-friendly error message
+
+              // Rollback optimistic update
+              fetchTeachers()
+
               if (res.status === 409 || res.status === 400) {
                 alert(`Cannot save teacher: ${errorMessage}\n\nTip: Teacher names are case-sensitive and must match your CSV exactly.`)
               } else {
@@ -624,6 +665,7 @@ export default function FestivalTeacherPhotos() {
             }
           } catch (err) {
             console.error('Error saving teacher:', err)
+            fetchTeachers() // Rollback
             alert('Error saving teacher. Check console for details.')
           }
         }}

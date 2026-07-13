@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { X, Clock, MapPin, Users, Star, AlertCircle, Save, Plus, Settings, Info } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -100,6 +100,13 @@ export default function SessionEditModal({
   const [isSaving, setIsSaving] = useState(false)
   const [showAdvanced, setShowAdvanced] = useState(false)
 
+  // Teacher autocomplete state
+  const [teacherSearch, setTeacherSearch] = useState('')
+  const [existingTeachers, setExistingTeachers] = useState<string[]>([])
+  const [showTeacherSuggestions, setShowTeacherSuggestions] = useState(false)
+  const teacherInputRef = useRef<HTMLInputElement>(null)
+  const teacherDropdownRef = useRef<HTMLDivElement>(null)
+
   const isEditMode = !!session?.id
 
   useEffect(() => {
@@ -173,6 +180,56 @@ export default function SessionEditModal({
       setErrors({})
     }
   }, [isOpen, session, availableDays])
+
+  // Fetch existing teachers from the Facilitators section when modal opens
+  useEffect(() => {
+    if (!isOpen || !festivalId) return
+    fetch(`/api/admin/festivals/${festivalId}/teachers`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.teachers) {
+          setExistingTeachers(data.teachers.map((t: { name: string }) => t.name))
+        }
+      })
+      .catch(() => {})
+  }, [isOpen, festivalId])
+
+  // Close teacher dropdown when clicking outside
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (
+        teacherDropdownRef.current && !teacherDropdownRef.current.contains(e.target as Node) &&
+        teacherInputRef.current && !teacherInputRef.current.contains(e.target as Node)
+      ) {
+        setShowTeacherSuggestions(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const currentTeacherList = formData.teachers
+    ? formData.teachers.split(',').map(t => t.trim()).filter(Boolean)
+    : []
+
+  const addTeacher = (name: string) => {
+    const trimmed = name.trim()
+    if (!trimmed || currentTeacherList.includes(trimmed)) return
+    handleInputChange('teachers', [...currentTeacherList, trimmed].join(', '))
+    setTeacherSearch('')
+    setShowTeacherSuggestions(false)
+  }
+
+  const removeTeacher = (name: string) => {
+    handleInputChange('teachers', currentTeacherList.filter(t => t !== name).join(', '))
+  }
+
+  const teacherSuggestions = teacherSearch.length > 0
+    ? existingTeachers.filter(t =>
+        t.toLowerCase().includes(teacherSearch.toLowerCase()) &&
+        !currentTeacherList.includes(t)
+      )
+    : existingTeachers.filter(t => !currentTeacherList.includes(t))
 
   const handleInputChange = (field: keyof Session, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -377,15 +434,84 @@ export default function SessionEditModal({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   {presenterLabel}s
                 </label>
-                <input
-                  type="text"
-                  value={formData.teachers}
-                  onChange={(e) => handleInputChange('teachers', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="e.g., John Smith, Jane Doe"
-                />
+
+                {/* Selected teacher tags */}
+                {currentTeacherList.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {currentTeacherList.map(teacher => (
+                      <span
+                        key={teacher}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
+                      >
+                        {teacher}
+                        <button
+                          type="button"
+                          onClick={() => removeTeacher(teacher)}
+                          className="text-blue-500 hover:text-blue-700 leading-none"
+                          aria-label={`Remove ${teacher}`}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Autocomplete input */}
+                <div className="relative">
+                  <input
+                    ref={teacherInputRef}
+                    type="text"
+                    value={teacherSearch}
+                    onChange={(e) => {
+                      setTeacherSearch(e.target.value)
+                      setShowTeacherSuggestions(true)
+                    }}
+                    onFocus={() => setShowTeacherSuggestions(true)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        if (teacherSearch.trim()) addTeacher(teacherSearch)
+                      } else if (e.key === 'Escape') {
+                        setShowTeacherSuggestions(false)
+                      }
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder={`Search or add ${presenterLabel.toLowerCase()}...`}
+                  />
+
+                  {showTeacherSuggestions && (teacherSuggestions.length > 0 || teacherSearch.trim()) && (
+                    <div
+                      ref={teacherDropdownRef}
+                      className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto"
+                    >
+                      {teacherSuggestions.map(teacher => (
+                        <button
+                          key={teacher}
+                          type="button"
+                          onMouseDown={(e) => { e.preventDefault(); addTeacher(teacher) }}
+                          className="w-full text-left px-3 py-2 hover:bg-blue-50 text-sm text-gray-800 flex items-center gap-2"
+                        >
+                          <span className="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0" />
+                          {teacher}
+                        </button>
+                      ))}
+                      {teacherSearch.trim() && !existingTeachers.some(t => t.toLowerCase() === teacherSearch.toLowerCase()) && (
+                        <button
+                          type="button"
+                          onMouseDown={(e) => { e.preventDefault(); addTeacher(teacherSearch) }}
+                          className="w-full text-left px-3 py-2 hover:bg-green-50 text-sm text-green-700 border-t border-gray-100 flex items-center gap-2"
+                        >
+                          <Plus className="w-3.5 h-3.5 flex-shrink-0" />
+                          Add new: &ldquo;{teacherSearch.trim()}&rdquo;
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+
                 <p className="text-xs text-gray-500 mt-1">
-                  Separate multiple {presenterLabel.toLowerCase()}s with commas
+                  Select existing {presenterLabel.toLowerCase()}s or type to add new ones
                 </p>
               </div>
             </div>
