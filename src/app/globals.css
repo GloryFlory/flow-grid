@@ -113,6 +113,17 @@ body {
   min-width: 0;
 }
 
+/* Homepage partner logo strip */
+.partner-logo {
+  filter: grayscale(100%);
+  opacity: 0.45;
+  transition: filter 0.25s ease, opacity 0.25s ease;
+}
+.partner-logo:hover {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
 .festival-logo {
   height: 105px;
   width: auto;

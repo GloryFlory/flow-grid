@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import Footer from '@/components/Footer'
-import { PAYMENTS_ENABLED } from '@/config/payments'
+import { DONATION_URL } from '@/config/payments'
 import {
   ArrowRight, BarChart3, Globe, Smartphone, Zap, Ticket, Briefcase,
   Star, CalendarPlus, SlidersHorizontal, Layout, Users, Building2, Code2, Layers, Camera,
@@ -182,15 +182,23 @@ export default function HomePage() {
             Powering schedules across Europe, Australia and beyond
           </p>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 44, flexWrap: 'wrap' }}>
-            {[1, 2, 3, 4, 5].map((n) => (
-              <Image
-                key={n}
-                src={`/festival${n}.png`}
-                alt={`Festival partner ${n}`}
-                width={72} height={72}
-                style={{ objectFit: 'contain', opacity: 0.4, filter: 'grayscale(100%)', transition: '.15s' }}
-                className="hover:opacity-75 hover:grayscale-0"
-              />
+            {[
+              { src: '/festival1.png', alt: 'European Acro Festival', href: 'https://www.facebook.com/europeanacrofestival/' },
+              { src: '/festival2.png', alt: 'Mediterranean Acro Convention', href: 'https://acrointhesun.com/' },
+              { src: '/festival3.png', alt: 'Australian Partner Acrobatic Convention', href: 'https://www.spincircus.com/event-details' },
+              { src: '/festival4.png', alt: 'Spin Festival', href: 'https://www.spincircus.com/spin2026' },
+              { src: '/festival5.png', alt: 'Easter Acro', href: 'https://easteracro.be/#_' },
+              { src: '/SAC Logo No Dates.png', alt: 'Standing Acro Convention', href: 'https://www.mmacro.co.uk/standing-acro-convention-2026' },
+            ].map((p) => (
+              <a key={p.src} href={p.href} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center' }}>
+                <Image
+                  src={p.src}
+                  alt={p.alt}
+                  width={72} height={72}
+                  className="partner-logo"
+                  style={{ objectFit: 'contain' }}
+                />
+              </a>
             ))}
           </div>
         </div>
@@ -446,87 +454,35 @@ export default function HomePage() {
       <section style={{ padding: '0 28px 88px', background: C.bg }}>
         <div style={{ maxWidth: 1160, margin: '0 auto' }}>
           <p style={{ textAlign: 'center', fontSize: 12.5, fontWeight: 700, letterSpacing: '.05em', textTransform: 'uppercase', color: C.accent, marginBottom: 14 }}>Pricing</p>
-          <h2 style={{ textAlign: 'center', fontSize: 'clamp(28px, 4vw, 44px)', lineHeight: 1.08, letterSpacing: '-0.03em', fontWeight: 700, maxWidth: 640, margin: '0 auto 14px' }}>Simple, transparent pricing</h2>
-          <p style={{ textAlign: 'center', fontSize: 18, color: C.soft, maxWidth: 560, margin: '0 auto 52px', fontWeight: 400 }}>Start free and upgrade when you need more. No hidden fees.</p>
+          <h2 style={{ textAlign: 'center', fontSize: 'clamp(28px, 4vw, 44px)', lineHeight: 1.08, letterSpacing: '-0.03em', fontWeight: 700, maxWidth: 640, margin: '0 auto 14px' }}>Free. Yes, really.</h2>
+          <p style={{ textAlign: 'center', fontSize: 18, color: C.soft, maxWidth: 560, margin: '0 auto 52px', fontWeight: 400 }}>Every feature included. No paid tiers, no trials — Flow Grid is supported by donations, not subscriptions.</p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }} className="max-lg:grid-cols-2 max-sm:grid-cols-1">
-            {/* Free */}
-            <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: 26, display: 'flex', flexDirection: 'column' }}>
-              <div style={{ width: 38, height: 38, borderRadius: 10, background: C.gray, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-                <Zap size={19} color={C.soft} />
-              </div>
-              <div style={{ fontWeight: 700, fontSize: 17, marginBottom: 4 }}>Free</div>
-              <div style={{ fontSize: 13, color: C.soft, marginBottom: 20 }}>Best for trying out Flow Grid</div>
-              <div style={{ fontSize: 40, fontWeight: 700, letterSpacing: '-0.04em', marginBottom: 20 }}>€0<span style={{ fontSize: 14, fontWeight: 500, color: C.soft }}>/mo</span></div>
-              <ul style={{ fontSize: 14, color: C.ink2, lineHeight: 2.1, flexGrow: 1, listStyle: 'none', padding: 0, margin: '0 0 24px' }}>
-                {['1 published event', 'Unlimited sessions', 'Custom colours & logo', 'QR code poster'].map(f => (
-                  <li key={f} style={{ display: 'flex', gap: 8 }}><span style={{ color: C.green }}>✓</span>{f}</li>
-                ))}
-              </ul>
-              <Link href="/auth/signin" style={{ display: 'block', textAlign: 'center', fontWeight: 600, fontSize: 14.5, border: `1px solid ${C.line}`, borderRadius: 9, padding: '10px', textDecoration: 'none', color: C.ink, transition: '.14s' }} className="hover:border-[#cfd2d8] hover:bg-[#f6f7f9]">
-                Get started free
-              </Link>
+          <div style={{ maxWidth: 640, margin: '0 auto', border: `2px solid ${C.navy}`, borderRadius: 16, padding: 34, background: '#fafbff' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 14, flexWrap: 'wrap', marginBottom: 8 }}>
+              <span style={{ fontSize: 22, fontWeight: 600, color: C.soft, textDecoration: 'line-through' }}>€29/mo</span>
+              <span style={{ fontSize: 48, fontWeight: 700, letterSpacing: '-0.04em', color: C.ink }}>€0</span>
             </div>
-
-            {/* Event Pass */}
-            <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: 26, display: 'flex', flexDirection: 'column' }}>
-              <div style={{ width: 38, height: 38, borderRadius: 10, background: '#fdece2', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-                <Ticket size={19} color={C.accent} />
-              </div>
-              <div style={{ fontWeight: 700, fontSize: 17, marginBottom: 4 }}>Event Pass</div>
-              <div style={{ fontSize: 13, color: C.soft, marginBottom: 20 }}>Unlock 1 extra event, forever</div>
-              <div style={{ fontSize: 40, fontWeight: 700, letterSpacing: '-0.04em', marginBottom: 20 }}>€69<span style={{ fontSize: 14, fontWeight: 500, color: C.soft }}> one-time</span></div>
-              <ul style={{ fontSize: 14, color: C.ink2, lineHeight: 2.1, flexGrow: 1, listStyle: 'none', padding: 0, margin: '0 0 24px' }}>
-                {['1 extra published event', 'Google Fonts', 'Basic analytics', 'Yours forever'].map(f => (
-                  <li key={f} style={{ display: 'flex', gap: 8 }}><span style={{ color: C.green }}>✓</span>{f}</li>
-                ))}
-              </ul>
-              <Link href={PAYMENTS_ENABLED ? '/pricing' : '/auth/signin'} style={{ display: 'block', textAlign: 'center', fontWeight: 600, fontSize: 14.5, background: C.accent, borderRadius: 9, padding: '10px', textDecoration: 'none', color: '#fff', transition: '.14s' }} className="hover:bg-[#d9440f]">
-                {PAYMENTS_ENABLED ? 'Buy Event Pass' : 'Get early access'} →
+            <p style={{ textAlign: 'center', fontSize: 14, color: C.soft, margin: '0 0 26px' }}>
+              What used to be the Pro plan is now the only plan — for everyone.
+            </p>
+            <ul style={{ fontSize: 14.5, color: C.ink2, lineHeight: 2.2, listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 24px' }} className="max-sm:grid-cols-1">
+              {['Unlimited sessions', 'Custom colours, logo & fonts', 'QR code poster', 'Embed widget & duplicate', 'Detailed analytics & export', 'Team collaboration'].map(f => (
+                <li key={f} style={{ display: 'flex', gap: 8 }}><span style={{ color: C.green }}>✓</span>{f}</li>
+              ))}
+            </ul>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <Link href="/auth/signin" style={{ display: 'inline-block', textAlign: 'center', fontWeight: 600, fontSize: 14.5, background: C.navy, borderRadius: 9, padding: '11px 26px', textDecoration: 'none', color: '#fff', transition: '.14s' }} className="hover:bg-[#1e3470]">
+                Start free →
               </Link>
-            </div>
-
-            {/* Pro */}
-            <div style={{ border: `2px solid ${C.navy}`, borderRadius: 16, padding: 26, display: 'flex', flexDirection: 'column', position: 'relative', background: '#fafbff' }}>
-              <div style={{ position: 'absolute', top: -13, left: '50%', transform: 'translateX(-50%)', background: C.navy, color: '#fff', fontSize: 12, fontWeight: 700, padding: '3px 14px', borderRadius: 100, whiteSpace: 'nowrap' }}>Most popular</div>
-              <div style={{ width: 38, height: 38, borderRadius: 10, background: '#eef2f8', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-                <Zap size={19} color={C.navy} />
-              </div>
-              <div style={{ fontWeight: 700, fontSize: 17, marginBottom: 4 }}>Pro</div>
-              <div style={{ fontSize: 13, color: C.soft, marginBottom: 20 }}>For serious event organisers</div>
-              <div style={{ fontSize: 40, fontWeight: 700, letterSpacing: '-0.04em', marginBottom: 20 }}>€29<span style={{ fontSize: 14, fontWeight: 500, color: C.soft }}>/mo</span></div>
-              <ul style={{ fontSize: 14, color: C.ink2, lineHeight: 2.1, flexGrow: 1, listStyle: 'none', padding: 0, margin: '0 0 24px' }}>
-                {['Up to 5 published events', 'Watermark removed', 'Embed widget & duplicate', 'Detailed analytics & export'].map(f => (
-                  <li key={f} style={{ display: 'flex', gap: 8 }}><span style={{ color: C.navy }}>✓</span>{f}</li>
-                ))}
-              </ul>
-              <Link href={PAYMENTS_ENABLED ? '/pricing' : '/auth/signin'} style={{ display: 'block', textAlign: 'center', fontWeight: 600, fontSize: 14.5, background: C.navy, borderRadius: 9, padding: '10px', textDecoration: 'none', color: '#fff', transition: '.14s' }} className="hover:bg-[#1e3470]">
-                {PAYMENTS_ENABLED ? 'Start Pro' : 'Get early access'} →
-              </Link>
-            </div>
-
-            {/* Enterprise */}
-            <div style={{ border: `1px solid ${C.line}`, borderRadius: 16, padding: 26, display: 'flex', flexDirection: 'column' }}>
-              <div style={{ width: 38, height: 38, borderRadius: 10, background: '#e9f0eb', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-                <Briefcase size={19} color={C.green} />
-              </div>
-              <div style={{ fontWeight: 700, fontSize: 17, marginBottom: 4 }}>Enterprise</div>
-              <div style={{ fontSize: 13, color: C.soft, marginBottom: 20 }}>For agencies & organisations</div>
-              <div style={{ fontSize: 40, fontWeight: 700, letterSpacing: '-0.04em', marginBottom: 20 }}>Custom</div>
-              <ul style={{ fontSize: 14, color: C.ink2, lineHeight: 2.1, flexGrow: 1, listStyle: 'none', padding: 0, margin: '0 0 24px' }}>
-                {['Unlimited events', 'White-label & custom domain', 'Team collaboration', 'Dedicated support'].map(f => (
-                  <li key={f} style={{ display: 'flex', gap: 8 }}><span style={{ color: C.green }}>✓</span>{f}</li>
-                ))}
-              </ul>
-              <Link href="/contact/sales" style={{ display: 'block', textAlign: 'center', fontWeight: 600, fontSize: 14.5, border: `1px solid ${C.line}`, borderRadius: 9, padding: '10px', textDecoration: 'none', color: C.ink, transition: '.14s' }} className="hover:border-[#cfd2d8] hover:bg-[#f6f7f9]">
-                Contact sales
-              </Link>
+              <a href={DONATION_URL} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', textAlign: 'center', fontWeight: 600, fontSize: 14.5, border: `1px solid ${C.line}`, borderRadius: 9, padding: '11px 26px', textDecoration: 'none', color: C.ink, transition: '.14s' }} className="hover:border-[#cfd2d8] hover:bg-[#f6f7f9]">
+                ♥ Support with a donation
+              </a>
             </div>
           </div>
 
           <div style={{ textAlign: 'center', marginTop: 24 }}>
             <Link href="/pricing" style={{ fontSize: 14.5, fontWeight: 600, color: C.navy, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }} className="hover:underline">
-              Compare all features <ArrowRight size={15} />
+              Why is it free? <ArrowRight size={15} />
             </Link>
           </div>
         </div>
