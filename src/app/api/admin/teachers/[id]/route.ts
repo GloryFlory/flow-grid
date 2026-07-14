@@ -50,8 +50,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     }
 
     const updateData: any = {}
-    if (name) updateData.name = name.trim()
-    updateData.url = url || undefined
+    // Ignore whitespace-only names rather than persisting an empty name (name is required).
+    if (name && name.trim()) updateData.name = name.trim()
+    // Distinguish "field not sent" (null — leave url untouched) from "sent but empty"
+    // (explicit clear — set to null) so an existing url can actually be removed.
+    if (url !== null) updateData.url = url.trim() || null
 
     const teacher = await prisma.teacher.update({ where: { id }, data: updateData })
 
@@ -123,7 +126,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   try {
     const { id } = await params
 
-    const teacher = await prisma.teacher.findUnique({ where: { id } })
+    const teacher = await prisma.teacher.findUnique({ where: { id }, select: { festivalId: true } })
     if (!teacher) {
       return NextResponse.json({ error: 'Teacher not found' }, { status: 404 })
     }
@@ -131,7 +134,8 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     const { error: accessError } = await requireFestivalAccess(teacher.festivalId, { requireEdit: true })
     if (accessError) return accessError
 
-    // Delete the teacher (photos are matched by teacherName, not FK)
+    // Photos linked via teacherId cascade-delete with the teacher (schema: onDelete: Cascade).
+    // Legacy photos matched only by teacherName (teacherId null) are not affected and remain orphaned.
     await prisma.teacher.delete({ where: { id } })
 
     return NextResponse.json({ success: true })

@@ -57,6 +57,7 @@ export default function FestivalTeacherPhotos() {
   const festivalId = params.id as string
   
   const [festival, setFestival] = useState<Festival | null>(null)
+  const [festivalLoadError, setFestivalLoadError] = useState<'not-found' | 'access-denied' | null>(null)
   const [photos, setPhotos] = useState<TeacherPhoto[]>([])
   const [teachers, setTeachers] = useState<Teacher[]>([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -94,9 +95,15 @@ export default function FestivalTeacherPhotos() {
       if (response.ok) {
         const data = await response.json()
         setFestival(data.festival)
+        setFestivalLoadError(null)
+      } else if (response.status === 401 || response.status === 403) {
+        setFestivalLoadError('access-denied')
+      } else {
+        setFestivalLoadError('not-found')
       }
     } catch (error) {
       console.error('Error fetching festival:', error)
+      setFestivalLoadError('not-found')
     }
   }
 
@@ -257,10 +264,18 @@ export default function FestivalTeacherPhotos() {
   }
 
   if (!festival) {
+    const isAccessDenied = festivalLoadError === 'access-denied'
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Event Not Found</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            {isAccessDenied ? 'Access Denied' : 'Event Not Found'}
+          </h1>
+          {isAccessDenied && (
+            <p className="text-gray-600 mb-4 max-w-md">
+              You no longer have access to this event, or you're not signed in as a team member.
+            </p>
+          )}
           <Link href="/dashboard">
             <Button>Back to Dashboard</Button>
           </Link>
@@ -625,7 +640,8 @@ export default function FestivalTeacherPhotos() {
             const fd = new FormData()
             fd.append('name', name)
             fd.append('festivalId', festivalId)
-            if (url) fd.append('url', url)
+            // Always send url (even empty) so the server can tell "cleared" from "untouched"
+            fd.append('url', url || '')
             if (photoFile) fd.append('file', photoFile)
 
             const method = isEditing ? 'PATCH' : 'POST'
