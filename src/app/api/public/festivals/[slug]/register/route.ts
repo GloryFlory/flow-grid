@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { requireFestivalAccess } from '@/lib/festival-access'
 
 // GET /api/public/festivals/[slug]/register
 // Returns all published pages so the index route can redirect/list.

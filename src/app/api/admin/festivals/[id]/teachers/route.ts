@@ -111,10 +111,13 @@ export async function GET(
 
     return NextResponse.json(
       { teachers },
-      { 
+      {
         status: 200,
         headers: {
-          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300'
+          // Authenticated per-festival response — must never land in the shared
+          // CDN cache ('public, s-maxage' here let anyone replay an authorized
+          // user's roster for 60s). Same policy as the sibling teacher-photos GET.
+          'Cache-Control': 'no-store, max-age=0'
         }
       }
     )
