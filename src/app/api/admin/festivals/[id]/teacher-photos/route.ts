@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireFestivalAccess } from '@/lib/festival-access'
 
 export async function GET(
   request: NextRequest,
@@ -14,6 +15,10 @@ export async function GET(
         { status: 400 }
       )
     }
+
+    // Any team member can view teacher photos for this festival.
+    const { error: accessError } = await requireFestivalAccess(festivalId)
+    if (accessError) return accessError
 
     // Get teachers for this festival with their photos
     const teachers = await prisma.teacher.findMany({
@@ -64,6 +69,9 @@ export async function POST(
         { status: 400 }
       )
     }
+
+    const { error: accessError } = await requireFestivalAccess(festivalId, { requireEdit: true })
+    if (accessError) return accessError
 
     const formData = await request.formData()
     const files = formData.getAll('photos') as File[]

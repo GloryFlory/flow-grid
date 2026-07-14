@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireFestivalAccess } from '@/lib/festival-access'
 // Lazy-load supabase client at runtime
 async function getSupabaseClient() {
   try {
@@ -30,6 +31,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (!currentTeacher) {
       return NextResponse.json({ error: 'Teacher not found' }, { status: 404 })
     }
+
+    const { error: accessError } = await requireFestivalAccess(currentTeacher.festivalId, { requireEdit: true })
+    if (accessError) return accessError
 
     // If name is being changed, check for duplicates in the same festival (excluding current teacher)
     if (name && name.trim() && name.trim() !== currentTeacher.name) {
@@ -118,7 +122,15 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    
+
+    const teacher = await prisma.teacher.findUnique({ where: { id } })
+    if (!teacher) {
+      return NextResponse.json({ error: 'Teacher not found' }, { status: 404 })
+    }
+
+    const { error: accessError } = await requireFestivalAccess(teacher.festivalId, { requireEdit: true })
+    if (accessError) return accessError
+
     // Delete the teacher (photos are matched by teacherName, not FK)
     await prisma.teacher.delete({ where: { id } })
 

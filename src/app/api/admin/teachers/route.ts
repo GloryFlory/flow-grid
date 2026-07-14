@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireFestivalAccess } from '@/lib/festival-access'
 
 // Dynamically import supabase client at runtime to avoid build-time failures when package or keys are missing
 async function getSupabaseClient() {
@@ -33,6 +34,9 @@ export async function POST(req: Request) {
     if (!festivalId) {
       return NextResponse.json({ error: 'Festival ID is required' }, { status: 400 })
     }
+
+    const { error: accessError } = await requireFestivalAccess(festivalId, { requireEdit: true })
+    if (accessError) return accessError
 
     // Check if teacher already exists in this festival
     const existing = await prisma.teacher.findFirst({ 
