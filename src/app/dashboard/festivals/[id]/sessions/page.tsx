@@ -60,7 +60,7 @@ interface FestivalSession {
   capacity?: number
   teachers: string[]
   teacherBios: string[]
-  cardType: 'minimal' | 'photo' | 'detailed'
+  cardType: 'featured' | 'standard' | 'compact'
   displayOrder?: number
   bookingEnabled?: boolean
   bookingCapacity?: number
@@ -915,7 +915,7 @@ export default function SessionsManagement() {
       location: session.location || '',
       capacity: session.capacity,
       prerequisites: session.prerequisites || '',
-      cardType: session.cardType as 'detailed' | 'minimal' | 'photo',
+      cardType: session.cardType as 'featured' | 'standard' | 'compact',
       displayOrder: session.displayOrder,
       bookingEnabled: session.bookingEnabled,
       bookingCapacity: session.bookingCapacity,

@@ -776,7 +776,6 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: 100%;
   min-height: var(--card-min-height, 220px);
 }
 
@@ -869,21 +868,21 @@ body {
 }
 
 /* Duration-based card heights and styling */
-.session-card.size-small {
+.session-card.session-card-small {
   --card-min-height: 180px;
   opacity: 0.95;
 }
 
-.session-card.size-medium {
+.session-card.session-card-medium {
   --card-min-height: 220px;
 }
 
-.session-card.size-large {
+.session-card.session-card-large {
   --card-min-height: 260px;
   border-left: 5px solid var(--accent-color, var(--coral-accent));
 }
 
-.session-card.size-xl {
+.session-card.session-card-xl {
   --card-min-height: 300px;
   border-left: 6px solid var(--primary-blue);
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
@@ -1166,21 +1165,13 @@ body {
   min-width: 0;
 }
 
-/* Card footer: style tags left, photo bottom-right */
+/* Card footer: photo bottom-right */
 .session-card-footer {
   display: flex;
   align-items: flex-end;
+  justify-content: flex-end;
   gap: 0.5rem;
   margin-top: 0.4rem;
-}
-
-.session-card-footer-left {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  align-items: center;
 }
 
 /* Style tags row — no longer needs margin-top: auto (footer handles that) */
@@ -1465,7 +1456,7 @@ body {
 }
 
 .photo-only-card {
-  min-height: 260px;
+  min-height: var(--card-min-height, 260px);
 }
 .photo-only-card .teachers-names {
   margin-bottom: 0;
@@ -1574,6 +1565,7 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1rem;
+  align-items: start;
 }
 
 /* Gradient frame container */
@@ -1599,9 +1591,8 @@ body {
 /* Inner white card */
 .session-card.workshop-highlight .session-card__inner {
   background: #fff;
-  border-radius: calc(var(--radius) - 2px); /* keeps corners crisp */
-  padding: 1.25rem; /* your existing inner padding */
-  position: relative;
+  border-radius: calc(var(--radius) - 2px);
+  padding: 1.25rem;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -1832,25 +1823,41 @@ body {
   border-radius: inherit;
 }
 
-/* Photo: absolutely positioned at bottom-right, inset to match card padding */
+/* Photo: in-flow, aligned to bottom of the flex row it shares with level/tags */
 .teacher-photos-bottom-right {
-  position: absolute;
-  bottom: 1.25rem;
-  right: 1.25rem;
   flex-shrink: 0;
+  align-self: flex-end;
 }
 
-/* Level + tags grouped block */
-.session-card-level-tags {
+/* Bottom block: level/tags/prereqs left, photo right — grows naturally with content */
+.session-card-bottom-block {
   display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 0.75rem;
   margin-top: 1rem;
 }
 
-/* Tags row: right-padding so tags never slide under the photo */
-.session-card__inner:has(.teacher-photos-bottom-right) .card-tags-row {
-  padding-right: calc(120px + 0.75rem);
+/* Level + tags grouped block — takes remaining width */
+.session-card-level-tags {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+/* Prereq inline text — shown on featured cards instead of the puzzle icon */
+.prereq-snippet {
+  font-size: 0.72rem;
+  color: #9ca3af;
+  margin: 0;
+  line-height: 1.4;
+  cursor: pointer;
+}
+.prereq-snippet__label {
+  font-weight: 600;
+  color: #6b7280;
 }
 
 .teacher-photo-single {
@@ -1913,11 +1920,6 @@ body {
   overflow: hidden; /* Prevent content spillover */
 }
 
-/* Add bottom padding to cards with photos to prevent overlap */
-.session-card.photo-only-card,
-.session-card.detailed-card {
-  padding-bottom: 110px; /* Space for 80px photo + spacing */
-}
 
 .level-and-tags {
   display: flex;
@@ -3078,10 +3080,6 @@ body {
     font-size: 1.6rem;
   }
 
-  .session-card__inner:has(.teacher-photos-bottom-right) .card-tags-row {
-    padding-right: calc(100px + 0.75rem);
-  }
-  
   .teachers-avatar-single {
     bottom: 12px;
     right: 12px;

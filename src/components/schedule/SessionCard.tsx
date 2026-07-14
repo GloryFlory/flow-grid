@@ -141,17 +141,16 @@ export function SessionCard({ session, onClick, onStyleClick, onLevelClick, onTe
   const size = getSessionSize(session)
   
   // Normalize and default safely - handle both cardType and CardType
-  const rawType = session.cardType ?? session.CardType ?? 'minimal'
+  // Accepts new names (featured/standard/compact) and old names for backward compat
+  const rawType = session.cardType ?? session.CardType ?? 'featured'
   const cardType = String(rawType).toLowerCase()
-  
-  // Only detailed/full cards get the full colored border (workshop-highlight)
-  // Photo and minimal cards keep the elegant top gradient strip
-  const isWorkshop = cardType === 'detailed' || cardType === 'full'
-  const workshopClass = isWorkshop ? 'workshop-highlight' : 'non-workshop'
-  
-  // Handle different card types
-  const isSimplified = cardType === 'minimal' || cardType === 'simplified'
-  const isPhotoOnly = cardType === 'photo' || cardType === 'photo-only'
+
+  const isCompact   = ['compact', 'minimal', 'simplified'].includes(cardType)
+  const isStandard  = ['standard', 'photo', 'photo-only'].includes(cardType)
+  const isFeatured  = !isCompact && !isStandard  // featured, detailed, full, or unknown
+
+  // Featured cards get the gradient-frame border; others get the subtle top strip
+  const workshopClass = isFeatured ? 'workshop-highlight' : 'non-workshop'
   
   const hasPrereqs = !!(session.prereqs && session.prereqs !== '' && session.prereqs !== 'TBD')
 
@@ -252,9 +251,10 @@ export function SessionCard({ session, onClick, onStyleClick, onLevelClick, onTe
     </button>
   )
 
-  const Actions = ({ booking = true }: { booking?: boolean }) => (
+  // showPuzzle: featured cards show prereq text inline instead of the icon
+  const Actions = ({ booking = true, showPuzzle = true }: { booking?: boolean; showPuzzle?: boolean }) => (
     <div className="session-actions">
-      {hasPrereqs && <PuzzlePiece />}
+      {hasPrereqs && showPuzzle && <PuzzlePiece />}
       <FavouriteButton isFavourite={isFavourite} onToggle={onFavouriteToggle} sessionId={session.id} />
       {booking && session.bookingEnabled && session.bookingCapacity && session.bookingCapacity > 0 ? (
         <button className="book-pill-button" onClick={(e) => { e.stopPropagation(); onClick(session) }}>Book</button>
@@ -264,81 +264,86 @@ export function SessionCard({ session, onClick, onStyleClick, onLevelClick, onTe
     </div>
   )
 
-  // ── MINIMAL: time / title ─────────────────────────────────────────
-  if (isSimplified) {
+  // ── COMPACT: time / title only ────────────────────────────────────
+  if (isCompact) {
     return (
-      <div className={`session-card session-card-${size} simple-card ${workshopClass} ${isFavourite ? 'is-favourited' : ''}`} onClick={() => onClick(session)}>
+      <div className={`session-card session-card-${size} simple-card non-workshop ${isFavourite ? 'is-favourited' : ''}`} onClick={() => onClick(session)}>
         <div className="session-header">
           <TimeLocation />
-          <Actions booking={false} />
+          <Actions booking={false} showPuzzle={false} />
         </div>
         <h3 className="session-title session-title-fixed-height">{session.title}</h3>
       </div>
     )
   }
 
-  // ── PHOTO: time / title / teacher + photo at bottom ─────────────────
-  if (isPhotoOnly) {
+  // ── STANDARD: time / title / teacher name + photo ─────────────────
+  if (isStandard) {
     return (
-      <div className={`session-card session-card-${size} photo-only-card ${workshopClass} ${isFavourite ? 'is-favourited' : ''}`} onClick={() => onClick(session)}>
+      <div className={`session-card session-card-${size} photo-only-card non-workshop ${isFavourite ? 'is-favourited' : ''}`} onClick={() => onClick(session)}>
         <div className="session-header">
           <TimeLocation />
-          <Actions />
+          {/* Puzzle shown in header if prereqs exist */}
+          <Actions showPuzzle={true} />
         </div>
         <h3 className="session-title session-title-fixed-height">{session.title}</h3>
-        {/* Footer: teacher name left, photo bottom-right */}
+        <TeacherNames />
         <div className="session-card-footer">
-          <div className="session-card-footer-left">
-            <TeacherNames />
-          </div>
           <TeacherPhoto />
         </div>
       </div>
     )
   }
 
-  // ── DETAILED: title + teacher at full width / level + tags + photo at bottom
+  // ── FEATURED: full details — prereq text shown inline, no puzzle icon ──
   return (
     <div className={`session-card session-card-${size} ${workshopClass} ${isFavourite ? 'is-favourited' : ''}`} onClick={() => onClick(session)}>
       <div className="session-card__inner">
         <div className="session-header">
           <TimeLocation />
-          <Actions />
+          {/* No puzzle icon — prereqs shown as text below */}
+          <Actions showPuzzle={false} />
         </div>
         <h3 className="session-title session-title-fixed-height">{session.title}</h3>
         <TeacherNames />
-        {/* Level + tags grouped: level row on top, style tags row below */}
-        <div className="session-card-level-tags">
-          {session.level && (
-            <button
-              className="level-chip"
-              style={{ backgroundColor: getLevelColor(session.level, customLevelColors) }}
-              onClick={(e) => { e.stopPropagation(); onLevelClick(session.level) }}
-              title={`Filter by ${session.level}`}
-            >
-              {session.level}
-            </button>
-          )}
-          {session.styles.length > 0 && (
-            <div className="card-tags-row">
-              {session.styles.slice(0, 3).map((style, index) => (
-                <button
-                  key={index}
-                  className="style-tag"
-                  onClick={(e) => { e.stopPropagation(); onStyleClick(style) }}
-                  title={`Filter by ${style}`}
-                >
-                  {style.charAt(0).toUpperCase() + style.slice(1).toLowerCase()}
-                </button>
-              ))}
-              {session.styles.length > 3 && (
-                <span className="tags-overflow">+{session.styles.length - 3}</span>
-              )}
-            </div>
-          )}
+        {/* Bottom block: tags/prereqs on the left, photo pinned to the right — both in flow */}
+        <div className="session-card-bottom-block">
+          <div className="session-card-level-tags">
+            {session.level && (
+              <button
+                className="level-chip"
+                style={{ backgroundColor: getLevelColor(session.level, customLevelColors) }}
+                onClick={(e) => { e.stopPropagation(); onLevelClick(session.level) }}
+                title={`Filter by ${session.level}`}
+              >
+                {session.level}
+              </button>
+            )}
+            {session.styles.length > 0 && (
+              <div className="card-tags-row">
+                {session.styles.slice(0, 3).map((style, index) => (
+                  <button
+                    key={index}
+                    className="style-tag"
+                    onClick={(e) => { e.stopPropagation(); onStyleClick(style) }}
+                    title={`Filter by ${style}`}
+                  >
+                    {style.charAt(0).toUpperCase() + style.slice(1).toLowerCase()}
+                  </button>
+                ))}
+                {session.styles.length > 3 && (
+                  <span className="tags-overflow">+{session.styles.length - 3}</span>
+                )}
+              </div>
+            )}
+            {hasPrereqs && (
+              <p className="prereq-snippet" title="Tap for full prerequisites">
+                <span className="prereq-snippet__label">Prereqs:</span> {session.prereqs}
+              </p>
+            )}
+          </div>
+          <TeacherPhoto />
         </div>
-        {/* Photo: absolutely positioned at bottom-right — does not affect layout flow */}
-        <TeacherPhoto />
       </div>
     </div>
   )
