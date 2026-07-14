@@ -18,7 +18,7 @@ import {
 } from '@/lib/adminAnalytics'
 import { 
   TrendingUp, Users, Calendar, Eye, CheckCircle, ChevronDown, ChevronRight, 
-  X, ExternalLink, Crown, BarChart3, UserCheck, Mail, Search, CreditCard,
+  X, ExternalLink, Crown, BarChart3, UserCheck, Mail, Search,
   DollarSign, Globe, Activity
 } from 'lucide-react'
 import Link from 'next/link'
@@ -232,13 +232,6 @@ export default function AdminPlatformDashboard() {
             
             {/* Admin Quick Links */}
             <div className="flex gap-3">
-              <a
-                href="/admin/payments"
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-              >
-                <CreditCard className="w-4 h-4" />
-                Payments
-              </a>
               <a
                 href="/admin/health-emails"
                 className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-md hover:bg-purple-700 transition-colors"

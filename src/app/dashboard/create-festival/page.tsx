@@ -45,14 +45,6 @@ export default function CreateFestivalPage() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   
-  // Plan/subscription state for limiting publishing
-  const [planInfo, setPlanInfo] = useState<{
-    plan: string
-    festivalsLimit: number
-    activeFestivals: number
-    canPublish: boolean
-  } | null>(null)
-  
   // Location/timezone detection state
   const [isDetectingLocation, setIsDetectingLocation] = useState(true) // Start true - detecting on load
   const [isDetectingTimezone, setIsDetectingTimezone] = useState(false)
@@ -70,34 +62,6 @@ export default function CreateFestivalPage() {
     timezone: '',
     location: ''
   })
-  
-  // Fetch plan info on mount
-  useEffect(() => {
-    const fetchPlanInfo = async () => {
-      try {
-        const response = await fetch('/api/user/subscription')
-        if (response.ok) {
-          const data = await response.json()
-          const totalFestivals = data.activeFestivals || 0
-          const festivalsLimit = data.subscription?.festivalsLimit || 1
-          setPlanInfo({
-            plan: data.subscription?.plan || 'FREE',
-            festivalsLimit,
-            activeFestivals: totalFestivals,
-            canPublish: totalFestivals < festivalsLimit // Actually means canCreate now
-          })
-        } else {
-          // API returned error - allow creation, limit will be enforced server-side
-          setPlanInfo({ plan: 'FREE', festivalsLimit: 1, activeFestivals: 0, canPublish: true })
-        }
-      } catch (error) {
-        console.error('Error fetching plan info:', error)
-        // Network error - allow creation, limit will be enforced server-side
-        setPlanInfo({ plan: 'FREE', festivalsLimit: 1, activeFestivals: 0, canPublish: true })
-      }
-    }
-    fetchPlanInfo()
-  }, [])
   
   // Auto-detect location and timezone on mount using browser geolocation
   useEffect(() => {
@@ -859,78 +823,6 @@ export default function CreateFestivalPage() {
     }
   }
 
-  // Save draft and then redirect to pricing (for users at their limit)
-  const handleSaveDraftAndUpgrade = async () => {
-    // Pre-flight validation
-    if (!festivalData.name || !festivalData.slug) {
-      alert('Please fill in at least the festival name.')
-      return
-    }
-    
-    setIsLoading(true)
-    
-    try {
-      const payload = {
-        ...festivalData,
-        isPublished: false,
-        sessions: sessions.map((session, index) => {
-          const startDate = new Date(festivalData.startDate)
-          const endDate = new Date(festivalData.endDate)
-          const dayToDateMap: Record<string, Date> = {}
-          const currentDate = new Date(startDate)
-          
-          while (currentDate <= endDate) {
-            const dayName = currentDate.toLocaleDateString('en-US', { weekday: 'long' })
-            if (!dayToDateMap[dayName]) {
-              dayToDateMap[dayName] = new Date(currentDate)
-            }
-            currentDate.setDate(currentDate.getDate() + 1)
-          }
-          
-          const sessionDate = dayToDateMap[session.day] || startDate
-          
-          return {
-            title: session.title,
-            description: session.description || '',
-            teachers: session.teachers || '',
-            teacherBio: '',
-            teacherPhoto: '',
-            startTime: `${sessionDate.toISOString().split('T')[0]}T${session.start}:00`,
-            endTime: `${sessionDate.toISOString().split('T')[0]}T${session.end}:00`,
-            duration: calculateDuration(session.start, session.end),
-            level: session.level || '',
-            maxParticipants: session.capacity || 20,
-            currentBookings: 0,
-            location: session.location || '',
-            requirements: session.prerequisites || '',
-            price: 0,
-            order: index,
-            cardType: session.cardType || 'detailed',
-            sessionTypes: session.types || ''
-          }
-        })
-      }
-      
-      const response = await fetch('/api/festivals', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
-
-      if (response.ok) {
-        // Draft saved, now redirect to pricing
-        router.push('/pricing')
-      } else {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to save draft')
-      }
-    } catch (error) {
-      console.error('Error saving draft:', error)
-      alert(`Error saving draft: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    } finally {
-      setIsLoading(false)
-    }
-  }
 
   const calculateDuration = (start: string, end: string): number => {
     const [startHour, startMin] = start.split(':').map(Number)
@@ -1732,26 +1624,6 @@ export default function CreateFestivalPage() {
                 </div>
               )}
 
-              {/* Upgrade prompt for Free users at limit */}
-              {planInfo && !planInfo.canPublish && (
-                <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-purple-100 rounded-lg">
-                      <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900">Publishing Limit Reached</h4>
-                      <p className="text-sm text-gray-600 mt-1">
-                        You've published {planInfo.festivalsLimit} of {planInfo.festivalsLimit} event{planInfo.festivalsLimit > 1 ? 's' : ''} on the {planInfo.plan} plan. 
-                        Click "Save & Upgrade" to save your event as a draft and upgrade to Pro to publish up to 5 events.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
               <div className="flex justify-between">
                 <Button
                   type="button"
@@ -1771,26 +1643,12 @@ export default function CreateFestivalPage() {
                     <Eye className="w-4 h-4 mr-2" />
                     {isLoading ? 'Saving...' : 'Save as Draft'}
                   </Button>
-                  {/* Show Publish or Upgrade button based on plan limits */}
-                  {planInfo?.canPublish === false ? (
-                    <Button
-                      onClick={handleSaveDraftAndUpgrade}
-                      disabled={isLoading}
-                      className="bg-purple-600 hover:bg-purple-700"
-                    >
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                      {isLoading ? 'Saving...' : 'Save & Upgrade'}
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={handlePublish}
-                      disabled={isLoading}
-                    >
-                      {isLoading ? 'Publishing...' : 'Publish Event'}
-                    </Button>
-                  )}
+                  <Button
+                    onClick={handlePublish}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Publishing...' : 'Publish Event'}
+                  </Button>
                 </div>
               </div>
             </div>

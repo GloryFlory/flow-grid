@@ -35,18 +35,13 @@ export async function GET(request: NextRequest) {
     // Only count published festivals against the limit
     const festivalsUsed = user.festivals.filter(f => f.isPublished).length
     
-    // Get limits from plan features as defaults
+    // Monetisation is disabled: every account gets unlimited events and all
+    // features. Stored subscription limits are ignored (kept only for
+    // grandfathered white-label detection elsewhere).
     const planFeatures = PLAN_FEATURES[currentPlan]
-    
-    // Use the actual festivalsLimit from subscription if available (includes Event Pass purchases)
-    // Otherwise fall back to plan defaults
-    const festivalsLimit = isAdmin 
-      ? -1 
-      : (user.subscription?.festivalsLimit ?? planFeatures.festivalsLimit)
-    const sessionsLimit = isAdmin ? -1 : planFeatures.sessionsLimit
-    
-    // Check if user can create more festivals
-    const canCreateMore = isAdmin || festivalsLimit === -1 || festivalsUsed < festivalsLimit
+    const festivalsLimit = -1
+    const sessionsLimit = -1
+    const canCreateMore = true
 
     return NextResponse.json({
       currentPlan,

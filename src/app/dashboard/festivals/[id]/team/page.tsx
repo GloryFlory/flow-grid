@@ -120,18 +120,10 @@ export default async function TeamPage({
   // Check permissions
   const canManageTeam = isOwner || isAdmin || userRole === 'ADMIN'
   
-  // Determine team member limits (owner doesn't count toward limit)
-  let teamMemberLimit = 1
-  if (isAdmin || plan === 'ENTERPRISE') {
-    teamMemberLimit = 999 // Unlimited
-  } else if (plan === 'PRO') {
-    teamMemberLimit = 3
-  } else {
-    // FREE plan
-    teamMemberLimit = 1
-  }
-
-  const isPro = plan === 'PRO' || plan === 'ENTERPRISE' || isAdmin
+  // Monetisation is disabled — team collaboration is available to everyone.
+  // Flat cap matches the invite API's spam backstop (invites send emails).
+  const teamMemberLimit = 10
+  const isPro = true
 
   const pendingInvites = festival.teamMembers.filter(m => !m.acceptedAt)
   const activeMembers = festival.teamMembers.filter(m => m.acceptedAt)
@@ -311,16 +303,9 @@ export default async function TeamPage({
                     Team Member Limit Reached
                   </h4>
                   <p className="text-sm text-gray-700 mb-3">
-                    You've reached your limit of {teamMemberLimit} team member{teamMemberLimit !== 1 ? 's' : ''}. 
-                    {plan === 'PRO' && ' Upgrade to Enterprise for unlimited team members.'}
+                    You've reached the limit of {teamMemberLimit} team members per festival.
+                    Contact support if you need more.
                   </p>
-                  {plan === 'PRO' && (
-                    <Link href="/pricing">
-                      <Button size="sm" variant="outline">
-                        View Enterprise
-                      </Button>
-                    </Link>
-                  )}
                 </div>
               </div>
             </div>

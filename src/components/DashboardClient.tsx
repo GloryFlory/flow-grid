@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { PlanLimitsBanner } from '@/components/PlanLimitsBanner'
-import { UpgradePrompt } from '@/components/UpgradePrompt'
 import { WhatsNewBanner } from '@/components/WhatsNewBanner'
 import { usePlanLimits } from '@/hooks/usePlanLimits'
 import { 
@@ -273,19 +271,6 @@ export function DashboardClient({
               </div>
             </CardContent>
           </Card>
-        </div>
-      )}
-
-      {/* Plan Limits Banner */}
-      {limits && (
-        <div className="mb-6 sm:mb-8">
-          <PlanLimitsBanner
-            currentPlan={limits.currentPlan}
-            festivalsUsed={limits.festivalsUsed}
-            festivalsLimit={limits.festivalsLimit}
-            isAdmin={limits.isAdmin}
-            canCreateMore={limits.canCreateMore}
-          />
         </div>
       )}
 
@@ -612,13 +597,6 @@ export function DashboardClient({
         </div>
       )}
       
-      {/* Upgrade Prompt for Free Users */}
-      {limits && limits.currentPlan === 'FREE' && !limits.isAdmin && festivals.length > 0 && (
-        <div className="mt-8">
-          <UpgradePrompt dismissible storageKey="dashboard-upgrade-dismissed" />
-        </div>
-      )}
-
       {/* What's New Toast */}
       <WhatsNewBanner variant="toast" />
 

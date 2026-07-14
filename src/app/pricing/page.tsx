@@ -6,23 +6,14 @@ import Image from 'next/image'
 import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
-import { Check, X, Zap, Building, Sparkles, ArrowRight, Mail, HelpCircle, Calendar, FileText, Layers, Users, Palette, Globe, Type, QrCode, Code, Copy, Smartphone, Eye, Download, Bookmark, BarChart3, Heart, Shield, Headphones, Ticket, MousePointerClick, Clock, Gift, LayoutTemplate, Bell, BookOpen } from 'lucide-react'
-import { PAYMENTS_ENABLED, EARLY_ACCESS_CONFIG, PRICING, REVOLUT_LINKS } from '@/config/payments'
-import { RevolutPaymentModal } from '@/components/RevolutPaymentModal'
+import { Check, X, Zap, Building, Sparkles, ArrowRight, Mail, HelpCircle, Calendar, FileText, Layers, Users, Palette, Globe, Type, QrCode, Code, Copy, Smartphone, Eye, Download, Bookmark, BarChart3, Heart, Shield, Headphones, Ticket, MousePointerClick, Clock, LayoutTemplate, Bell, BookOpen } from 'lucide-react'
+import { DONATION_URL, FORMER_PRICING } from '@/config/payments'
 
 export default function PricingPage() {
   const { data: session } = useSession()
-  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('yearly') // Default to yearly
   const [showStickyHeader, setShowStickyHeader] = useState(false)
   const headerTriggerRef = useRef<HTMLDivElement>(null)
   const sectionEndRef = useRef<HTMLDivElement>(null)
-  const [showPaymentModal, setShowPaymentModal] = useState(false)
-  const [selectedPlan, setSelectedPlan] = useState<{
-    plan: string
-    amount: number
-    billingCycle: 'MONTHLY' | 'YEARLY'
-    paymentLink: string
-  } | null>(null)
   const [userSubscription, setUserSubscription] = useState<{
     plan: string
     isFoundingMember: boolean
@@ -38,10 +29,6 @@ export default function PricingPage() {
         .catch(() => null)
     }
   }, [session])
-
-  const prices = {
-    pro: billingPeriod === 'monthly' ? 29 : 23,
-  }
 
   // Show sticky header when original header scrolls past navbar (64px)
   // Show sticky header when original header scrolls under the navbar
@@ -61,55 +48,6 @@ export default function PricingPage() {
     handleScroll() // Check initial state
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
-
-  const savings = {
-    pro: billingPeriod === 'yearly' ? Math.round((29 - 23) * 12) : 0,
-  }
-
-  const handleUpgrade = async (plan: 'PRO' | 'EVENT_PASS') => {
-    if (!session) {
-      window.location.href = `/auth/signin?callbackUrl=/pricing?upgrade=${plan}`
-      return
-    }
-
-    if (plan === 'PRO') {
-      // Use Revolut payment links for Pro subscription
-      const paymentLink = billingPeriod === 'yearly' 
-        ? REVOLUT_LINKS.PRO_ANNUAL 
-        : REVOLUT_LINKS.PRO_MONTHLY
-      
-      const amount = billingPeriod === 'yearly' ? PRICING.PRO.yearlyTotal : PRICING.PRO.monthly
-
-      setSelectedPlan({
-        plan: 'PRO',
-        amount,
-        billingCycle: billingPeriod === 'yearly' ? 'YEARLY' : 'MONTHLY',
-        paymentLink
-      })
-      setShowPaymentModal(true)
-    } else if (plan === 'EVENT_PASS') {
-      // Fetch user's current subscription to determine pricing
-      try {
-        const response = await fetch('/api/user/subscription')
-        const data = await response.json()
-        
-        const isPro = data.subscription?.plan === 'PRO'
-        const amount = isPro ? PRICING.EVENT_PASS.proDiscount : PRICING.EVENT_PASS.regular
-        const paymentLink = isPro ? REVOLUT_LINKS.EVENT_PASS_PRO : REVOLUT_LINKS.EVENT_PASS_REGULAR
-
-        setSelectedPlan({
-          plan: 'EVENT_PASS',
-          amount,
-          billingCycle: 'YEARLY', // Dummy value, not used for one-time
-          paymentLink
-        })
-        setShowPaymentModal(true)
-      } catch (error) {
-        console.error('Error fetching subscription:', error)
-        alert('Failed to load pricing. Please try again.')
-      }
-    }
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -175,71 +113,55 @@ export default function PricingPage() {
         {/* Hero */}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-            {PAYMENTS_ENABLED ? 'Simple, transparent pricing' : 'Your First 5 Events Are On Us'}
+            Every feature. Currently free.
           </h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
-            {PAYMENTS_ENABLED 
-              ? 'Start free and upgrade when you need more. No hidden fees, no surprises.'
-              : 'Get started with Pro features free. No credit card required.'}
+            Monetisation is switched off — Flow Grid runs on donations instead of subscriptions.
+            The plans below show what it would cost. Right now, every account gets all of it for €0.
           </p>
 
-          {/* Early Access Badge */}
-          {!PAYMENTS_ENABLED && (
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-100 to-orange-100 border border-amber-200 text-amber-800 px-4 py-2 rounded-full text-sm font-medium mb-8">
-              <Gift className="w-4 h-4" />
-              Early Access: 10 free events for founding members
-            </div>
-          )}
+          {/* Monetisation-off badge */}
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-100 to-orange-100 border border-amber-200 text-amber-800 px-4 py-2 rounded-full text-sm font-medium mb-8">
+            <Heart className="w-4 h-4" />
+            Donation-supported — no credit card, no trial, no catch
+          </div>
 
           {/* Founding Member Banner - shown when signed in user is a founding member */}
-          {PAYMENTS_ENABLED && session && userSubscription?.isFoundingMember && (
+          {session && userSubscription?.isFoundingMember && (
             <div className="max-w-2xl mx-auto mb-8 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-5 text-left">
               <div className="flex items-start gap-3">
                 <span className="text-2xl">⭐</span>
                 <div>
                   <p className="font-bold text-amber-900 mb-1">You're a Founding Member</p>
                   <p className="text-sm text-amber-800">
-                    Thank you for being an early supporter of Flow Grid. As a founding member you receive:
+                    Thank you for being an early supporter of Flow Grid. Your perks are yours to keep:
                   </p>
                   <ul className="mt-2 space-y-1 text-sm text-amber-800">
-                    <li>✓ <strong>10 free events</strong> included with your Pro plan</li>
-                    <li>✓ <strong>Permanent discount</strong> on Event Passes — €39 instead of €69</li>
                     <li>✓ <strong>Founding Member badge</strong> on your public schedules</li>
-                    <li>✓ <strong>Price lock</strong> — your Pro rate is guaranteed if you stay subscribed</li>
+                    <li>✓ <strong>Watermark-free schedules</strong> — your white-label stays</li>
+                    <li>✓ Everything else is now free for everyone — which you helped make possible</li>
                   </ul>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Billing Toggle - only show when payments enabled */}
-          {PAYMENTS_ENABLED && (
-            <div className="inline-flex items-center gap-3 bg-slate-100 p-1 rounded-full">
-              <button
-                onClick={() => setBillingPeriod('monthly')}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                  billingPeriod === 'monthly'
-                    ? 'bg-white text-slate-900 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Monthly
-              </button>
-              <button
-                onClick={() => setBillingPeriod('yearly')}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
-                  billingPeriod === 'yearly'
-                    ? 'bg-white text-slate-900 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Yearly
-                <span className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">
-                  Save 20%
-                </span>
-              </button>
-            </div>
-          )}
+        </div>
+
+        {/* Monetisation-off banner */}
+        <div className="max-w-4xl mx-auto mb-10 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-6 text-center">
+          <p className="text-green-900 font-semibold mb-1">
+            ⚡ All plans below are currently unlocked for every account
+          </p>
+          <p className="text-sm text-green-800">
+            Unlimited published events, team collaboration, full analytics — everything, for free.
+            The one exception: the small &ldquo;Powered by Flow Grid&rdquo; badge stays on schedules
+            (it&apos;s how other organisers discover the tool). If Flow Grid saves you time,{' '}
+            <a href={DONATION_URL} target="_blank" rel="noopener noreferrer" className="font-semibold underline hover:text-green-950">
+              a donation
+            </a>{' '}
+            keeps it free.
+          </p>
         </div>
 
         {/* Pricing Cards */}
@@ -257,6 +179,7 @@ export default function PricingPage() {
             <div className="mb-5">
               <span className="text-3xl font-bold text-slate-900">€0</span>
               <p className="text-sm text-slate-500 mt-1">Free forever</p>
+              <p className="text-sm text-green-600 mt-1">Currently includes every Pro feature</p>
             </div>
 
             <Link
@@ -281,7 +204,7 @@ export default function PricingPage() {
           <div className="bg-white rounded-2xl border-2 border-orange-400 p-6 shadow-md hover:shadow-lg transition-shadow relative">
             <div className="absolute -top-3 left-1/2 -translate-x-1/2">
               <span className="bg-orange-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
-                {PAYMENTS_ENABLED ? 'One-Time' : 'Included Free'}
+                Included Free
               </span>
             </div>
 
@@ -294,43 +217,17 @@ export default function PricingPage() {
             </div>
 
             <div className="mb-5">
-              {PAYMENTS_ENABLED ? (
-                userSubscription?.isFoundingMember ? (
-                  <>
-                    <span className="text-3xl font-bold text-slate-400 line-through">€{PRICING.EVENT_PASS.regular}</span>
-                    <span className="text-3xl font-bold text-amber-600 ml-2">€{PRICING.EVENT_PASS.proDiscount}</span>
-                    <p className="text-sm text-amber-600 mt-1">⭐ Founding Member discount</p>
-                  </>
-                ) : (
-                  <>
-                    <span className="text-3xl font-bold text-slate-900">€{PRICING.EVENT_PASS.regular}</span>
-                    <p className="text-sm text-slate-500 mt-1">One-time purchase</p>
-                  </>
-                )
-              ) : (
-                <>
-                  <span className="text-3xl font-bold text-slate-900 line-through text-slate-400">€{PRICING.EVENT_PASS.regular}</span>
-                  <span className="text-3xl font-bold text-green-600 ml-2">Free</span>
-                  <p className="text-sm text-green-600 mt-1">Included with Early Access</p>
-                </>
-              )}
+              <span className="text-3xl font-bold line-through text-slate-400">€{FORMER_PRICING.EVENT_PASS.regular}</span>
+              <span className="text-3xl font-bold text-green-600 ml-2">Free</span>
+              <p className="text-sm text-green-600 mt-1">While monetisation is off</p>
             </div>
 
-            {PAYMENTS_ENABLED ? (
-              <button
-                onClick={() => handleUpgrade('EVENT_PASS')}
-                className="block w-full text-center bg-orange-500 text-white py-2.5 px-4 rounded-lg font-semibold hover:bg-orange-600 transition-colors mb-6"
-              >
-                {session ? 'Buy Event Pass' : 'Sign in to Buy'} <ArrowRight className="inline w-4 h-4 ml-1" />
-              </button>
-            ) : (
-              <Link
-                href={session ? '/dashboard' : '/auth/signin'}
-                className="block w-full text-center bg-orange-500 text-white py-2.5 px-4 rounded-lg font-semibold hover:bg-orange-600 transition-colors mb-6"
-              >
-                {session ? 'Go to Dashboard' : 'Get Free Access'} <ArrowRight className="inline w-4 h-4 ml-1" />
-              </Link>
-            )}
+            <Link
+              href={session ? '/dashboard' : '/auth/signin'}
+              className="block w-full text-center bg-orange-500 text-white py-2.5 px-4 rounded-lg font-semibold hover:bg-orange-600 transition-colors mb-6"
+            >
+              {session ? 'Go to Dashboard' : 'Get Free Access'} <ArrowRight className="inline w-4 h-4 ml-1" />
+            </Link>
 
             <p className="text-xs text-slate-500 mb-3">Unlock for 1 event:</p>
             <ul className="space-y-3 text-sm">
@@ -346,7 +243,7 @@ export default function PricingPage() {
           <div className="bg-white rounded-2xl border-2 border-[#b40225] p-6 shadow-lg relative">
             <div className="absolute -top-3 left-1/2 -translate-x-1/2">
               <span className="bg-[#b40225] text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
-                {PAYMENTS_ENABLED ? 'Most Popular' : '5 Free Events'}
+                Included Free
               </span>
             </div>
 
@@ -359,43 +256,17 @@ export default function PricingPage() {
             </div>
 
             <div className="mb-5">
-              {PAYMENTS_ENABLED ? (
-                <>
-                  <span className="text-3xl font-bold text-slate-900">€{prices.pro}</span>
-                  <span className="text-slate-500 text-sm">/mo</span>
-                  {savings.pro > 0 && (
-                    <p className="text-sm text-green-600 mt-1">
-                      Save €{savings.pro}/year
-                    </p>
-                  )}
-                  {billingPeriod === 'monthly' && (
-                    <p className="text-sm text-slate-500 mt-1">Billed monthly</p>
-                  )}
-                </>
-              ) : (
-                <>
-                  <span className="text-3xl font-bold text-slate-400 line-through">€{prices.pro}/mo</span>
-                  <span className="text-3xl font-bold text-green-600 ml-2">Free</span>
-                  <p className="text-sm text-green-600 mt-1">5 events included with Early Access</p>
-                </>
-              )}
+              <span className="text-3xl font-bold text-slate-400 line-through">€{FORMER_PRICING.PRO.monthly}/mo</span>
+              <span className="text-3xl font-bold text-green-600 ml-2">Free</span>
+              <p className="text-sm text-green-600 mt-1">While monetisation is off</p>
             </div>
 
-            {PAYMENTS_ENABLED ? (
-              <button
-                onClick={() => handleUpgrade('PRO')}
-                className="block w-full text-center bg-[#b40225] text-white py-2.5 px-4 rounded-lg font-semibold hover:bg-[#8a011c] transition-colors mb-6"
-              >
-                {session ? 'Upgrade to Pro' : 'Sign in to Upgrade'} <ArrowRight className="inline w-4 h-4 ml-1" />
-              </button>
-            ) : (
-              <Link
-                href={session ? '/dashboard' : '/auth/signin'}
-                className="block w-full text-center bg-[#b40225] text-white py-2.5 px-4 rounded-lg font-semibold hover:bg-[#8a011c] transition-colors mb-6"
-              >
-                {session ? 'Go to Dashboard' : 'Get Started Free'} <ArrowRight className="inline w-4 h-4 ml-1" />
-              </Link>
-            )}
+            <Link
+              href={session ? '/dashboard' : '/auth/signin'}
+              className="block w-full text-center bg-[#b40225] text-white py-2.5 px-4 rounded-lg font-semibold hover:bg-[#8a011c] transition-colors mb-6"
+            >
+              {session ? 'Go to Dashboard' : 'Get Started Free'} <ArrowRight className="inline w-4 h-4 ml-1" />
+            </Link>
 
             <p className="text-xs text-slate-500 mb-3">Everything in Event Pass, plus:</p>
             <ul className="space-y-3 text-sm">
@@ -406,7 +277,6 @@ export default function PricingPage() {
               <FeatureItem included>Detailed analytics & export</FeatureItem>
               <FeatureItem included>Duplicate events</FeatureItem>
               <FeatureItem included>Priority support</FeatureItem>
-              <FeatureItem included>Discounted Event Passes (€{PRICING.EVENT_PASS.proDiscount})</FeatureItem>
             </ul>
           </div>
 
@@ -450,7 +320,8 @@ export default function PricingPage() {
             All Features
           </h2>
           <p className="text-slate-600 text-center mb-12 max-w-2xl mx-auto">
-            A detailed breakdown of everything included in each plan
+            A detailed breakdown of what each plan would include.
+            While monetisation is off, every account gets the full set — read the whole table as one big green column.
           </p>
 
           <div className="max-w-6xl mx-auto space-y-6">
@@ -558,35 +429,54 @@ export default function PricingPage() {
           </h2>
 
           <div className="space-y-6">
-            <FAQItem 
-              question="What's the difference between Event Pass and Pro?"
-              answer="Event Pass is a one-time purchase that adds 1 extra event slot — yours forever, no subscription needed. Pro is a subscription that gives you 5 event slots plus premium features like watermark removal, embed widgets, and detailed analytics. Choose Event Pass for occasional use, or Pro if you run multiple events regularly."
+            <FAQItem
+              question="Why is Flow Grid free right now?"
+              answer="Flow Grid started as a tool built for a real festival and grew from there. It's run as an independent project with lean hosting and no investors, so monetisation is switched off and the tool runs on donations from organisers who find it useful."
             />
-            <FAQItem 
-              question="Can I buy multiple Event Passes?"
-              answer="Yes! Each Event Pass adds one extra event slot to your account. Buy as many as you need — each slot is permanent and never expires."
+            <FAQItem
+              question="Is there a catch? Will features be locked later?"
+              answer="No catch. Everything in the table above is included, and events you publish stay live. If monetisation ever comes back, existing organisers and events keep what they have today."
             />
-            <FAQItem 
+            <FAQItem
+              question="What do the crossed-out prices mean?"
+              answer="They're what these plans used to cost (and roughly what comparable tools charge). We show them so you know what you're getting — not because you'll be charged. Nothing on this page asks for payment details."
+            />
+            <FAQItem
               question="Do I need a credit card to sign up?"
-              answer="No! The Free plan is completely free forever with no credit card required. You only need to enter payment details when upgrading to Pro or purchasing an Event Pass."
+              answer="No. There is nothing to pay for — just sign up with your email and start building."
             />
-            <FAQItem 
-              question="What payment methods do you accept?"
-              answer="We currently accept payments via Revolut. After completing your payment, your account is upgraded instantly. Contact us if you need an invoice or alternative payment method."
+            <FAQItem
+              question="Can my team use Flow Grid too?"
+              answer="Yes! Team collaboration is unlocked for everyone — invite up to 10 team members per festival with role-based permissions (admin, editor, viewer)."
             />
-            <FAQItem 
-              question="What happens to my data if I cancel?"
+            <FAQItem
+              question="What happens to my data?"
               answer="Your data is yours. All your events remain accessible and you can export everything at any time. We'll never hold your data hostage."
             />
-            <FAQItem 
-              question="Can my team use Flow Grid too?"
-              answer="Yes! Event Pass includes 1 team member, Pro includes collaboration for up to 3 members, and Enterprise offers unlimited team members with advanced role-based permissions."
-            />
-            <FAQItem 
-              question="What's included in Enterprise?"
-              answer="Enterprise is fully customizable. Common features include unlimited events, white-label branding, custom domains, advanced team permissions, and dedicated support. Contact us to discuss your requirements."
+            <FAQItem
+              question="How can I support the project?"
+              answer="If Flow Grid saves you time, a donation via Buy Me a Coffee covers hosting and keeps the tool free for the next organiser. Telling other organisers about Flow Grid helps just as much."
             />
           </div>
+        </div>
+
+        {/* Donation section */}
+        <div className="max-w-3xl mx-auto mb-20 text-center bg-white rounded-3xl border border-slate-200 p-10 shadow-sm">
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">
+            Donation-supported, by design
+          </h2>
+          <p className="text-lg text-slate-600 mb-8 max-w-xl mx-auto">
+            No sales team, no investors, lean hosting — that&apos;s why Flow Grid can stay free.
+            If it saved you a weekend of spreadsheet wrangling, a donation of any size keeps it that way.
+          </p>
+          <a
+            href={DONATION_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-[#ff7119] hover:bg-[#d9440f] text-white text-lg font-semibold px-8 py-3 rounded-xl shadow-lg transition-colors"
+          >
+            <Heart className="w-5 h-5" /> Buy me a coffee
+          </a>
         </div>
 
         {/* CTA */}
@@ -607,18 +497,6 @@ export default function PricingPage() {
 
       {/* Footer */}
       <Footer />
-
-      {/* Revolut Payment Modal */}
-      {selectedPlan && (
-        <RevolutPaymentModal
-          isOpen={showPaymentModal}
-          onClose={() => setShowPaymentModal(false)}
-          paymentLink={selectedPlan.paymentLink}
-          plan={selectedPlan.plan}
-          amount={selectedPlan.amount}
-          billingCycle={selectedPlan.billingCycle}
-        />
-      )}
     </div>
   )
 }

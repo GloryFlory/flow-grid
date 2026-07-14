@@ -5,7 +5,6 @@ import { prisma } from '@/lib/prisma'
 import { randomBytes } from 'crypto'
 import { requireFestivalAccess } from '@/lib/festival-access'
 import { sendTeamInviteEmail } from '@/lib/email'
-import { PLAN_FEATURES, type PlanType } from '@/types'
 
 export async function POST(
   req: NextRequest,
@@ -61,42 +60,15 @@ export async function POST(
       )
     }
 
-    // Get owner's subscription plan
-    const owner = await prisma.user.findUnique({
-      where: { id: festivalData.userId },
-      include: {
-        subscription: true,
-      },
-    })
-
-    const currentPlan = (owner?.subscription?.plan || 'FREE') as PlanType
-    const planLimits = PLAN_FEATURES[currentPlan]
+    // Monetisation is disabled — team members are available to everyone.
+    // A flat cap remains because each invite sends an email (spam backstop).
+    const TEAM_MEMBER_CAP = 10
     const currentTeamCount = festivalData._count.teamMembers
 
-    // Determine team member limit based on plan and Event Pass
-    let teamMemberLimit = planLimits.teamMembersLimit
-    
-    if (currentPlan === 'FREE') {
-      // FREE plan users get 0 team members by default
-      teamMemberLimit = 0
-      
-      // If they have festivalsLimit > 1, they purchased an Event Pass
-      // Event Pass grants 1 team member for the festival
-      const festivalsLimit = owner?.subscription?.festivalsLimit || 1
-      if (festivalsLimit > 1) {
-        teamMemberLimit = 1
-      }
-    }
-
-    // Check if adding another member would exceed the limit
-    if (teamMemberLimit !== -1 && currentTeamCount >= teamMemberLimit) {
-      const limitMessage = currentPlan === 'FREE' && teamMemberLimit === 0
-        ? `Team members are not available on the FREE plan. Purchase an Event Pass to add 1 team member, or upgrade to PRO for up to 3 team members.`
-        : `Team member limit reached. Your ${currentPlan} plan allows ${teamMemberLimit} team member${teamMemberLimit > 1 ? 's' : ''} (excluding the owner). You currently have ${currentTeamCount}. Upgrade to add more team members.`
-      
+    if (currentTeamCount >= TEAM_MEMBER_CAP) {
       return NextResponse.json(
         {
-          error: limitMessage,
+          error: `Team member limit reached. A festival can have up to ${TEAM_MEMBER_CAP} team members (excluding the owner). Contact support if you need more.`,
           code: 'LIMIT_REACHED',
         },
         { status: 403 }

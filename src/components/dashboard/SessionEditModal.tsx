@@ -16,7 +16,7 @@ interface Session {
   location?: string
   capacity?: number
   prerequisites?: string
-  cardType: 'detailed' | 'minimal' | 'photo'
+  cardType: 'featured' | 'standard' | 'compact'
   displayOrder?: number
   bookingEnabled?: boolean
   bookingCapacity?: number
@@ -39,9 +39,9 @@ interface SessionEditModalProps {
 }
 
 const CARD_TYPES = [
-  { value: 'detailed', label: 'Detailed', description: 'Complete session with all details and descriptions' },
-  { value: 'minimal', label: 'Minimal', description: 'Simple card with title, time, and location only' },
-  { value: 'photo', label: 'Photo', description: 'Medium card with facilitator photo and basic info' }
+  { value: 'featured', label: 'Featured', description: 'Full details: level, style tags, prereq text, and teacher photo' },
+  { value: 'standard', label: 'Standard', description: 'Teacher photo and name; prereq icon shown if applicable' },
+  { value: 'compact', label: 'Compact', description: 'Minimal — title, time, and location only' }
 ]
 
 const LEVEL_OPTIONS = [
@@ -88,7 +88,7 @@ export default function SessionEditModal({
     location: '',
     capacity: undefined,
     prerequisites: '',
-    cardType: 'detailed',
+    cardType: 'featured',
     displayOrder: undefined,
     bookingEnabled: false,
     bookingCapacity: undefined,
@@ -169,7 +169,7 @@ export default function SessionEditModal({
           location: '',
           capacity: undefined,
           prerequisites: '',
-          cardType: 'detailed',
+          cardType: 'featured',
           bookingEnabled: false,
           bookingCapacity: undefined,
           requirePayment: false,
@@ -744,7 +744,7 @@ export default function SessionEditModal({
                         Require Payment
                       </span>
                       <span className="text-xs text-gray-500">
-                        (Coming soon with Stripe integration)
+                        (marks the session as paid — attendees arrange payment with you directly)
                       </span>
                     </label>
                     

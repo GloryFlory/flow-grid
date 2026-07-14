@@ -38,12 +38,12 @@ export async function GET() {
     
     const subscription = user.subscription || {
       plan: 'FREE',
-      festivalsLimit: 1,
       status: 'ACTIVE'
     }
-    
-    // Admins get unlimited festivals
-    const festivalsLimit = isAdmin ? -1 : (subscription.festivalsLimit ?? 1)
+
+    // Monetisation is disabled — every account is unlimited. The stored
+    // subscription limit is ignored; -1 signals "unlimited" to the dashboard.
+    const festivalsLimit = -1
 
     return NextResponse.json({
       subscription: {
@@ -55,7 +55,7 @@ export async function GET() {
       totalFestivals,
       publishedFestivals,
       draftFestivals,
-      canPublish: isAdmin || publishedFestivals < festivalsLimit,
+      canPublish: true,
       isAdmin
     })
   } catch (error) {

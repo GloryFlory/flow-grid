@@ -1,8 +1,8 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Pricing',
-  description: 'Simple, transparent pricing for event organizers. Start free, upgrade when you need advanced features like team collaboration, waitlists, and analytics.',
+  title: 'Pricing — Free',
+  description: 'Flow Grid is free for event organisers — every feature included, no paid tiers. The project is supported by donations.',
 }
 
 export default function PricingLayout({

@@ -43,3 +43,4 @@ flowgrid-backup.sql
 # Installer packages (accidentally committed before)
 *.pkg
 .claude/
+tsconfig.tsbuildinfo

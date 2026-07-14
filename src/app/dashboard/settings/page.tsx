@@ -4,13 +4,12 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { User, Mail, Lock, Bell, Shield, AlertCircle, Key, Smartphone, CheckCircle2, LogOut, Globe, CreditCard, Crown, Zap, ArrowRight, Ticket, BadgeEuro, Copy, Check, Users, TrendingUp, Clock } from 'lucide-react'
+import { User, Mail, Lock, Bell, Shield, AlertCircle, Key, Smartphone, CheckCircle2, LogOut, Globe, Heart, ArrowRight, BadgeEuro, Copy, Check, Users, TrendingUp, Clock } from 'lucide-react'
 import { passkeysSupported, getAuthenticatorName, analytics } from '@/lib/passkeys'
 import { track } from '@/lib/consent'
 import { startRegistration } from '@simplewebauthn/browser'
 import { usePlanLimits } from '@/hooks/usePlanLimits'
-import { RevolutPaymentModal } from '@/components/RevolutPaymentModal'
-import { PRICING, REVOLUT_LINKS } from '@/config/payments'
+import { DONATION_URL } from '@/config/payments'
 import type { PublicKeyCredentialCreationOptionsJSON } from '@simplewebauthn/types'
 
 interface Passkey {
@@ -37,14 +36,6 @@ export default function SettingsPage() {
   const [passkeySupported, setPasskeySupported] = useState(false)
   const [isRegistering, setIsRegistering] = useState(false)
   const [hasPassword, setHasPassword] = useState<boolean | null>(null) // null = loading
-  const [isPurchasingEventPass, setIsPurchasingEventPass] = useState(false)
-  const [showPaymentModal, setShowPaymentModal] = useState(false)
-  const [selectedPlan, setSelectedPlan] = useState<{
-    plan: string
-    amount: number
-    billingCycle: 'MONTHLY' | 'YEARLY'
-    paymentLink: string
-  } | null>(null)
 
   const [profileData, setProfileData] = useState({
     name: '',
@@ -286,27 +277,6 @@ export default function SettingsPage() {
     }
   }
 
-  const handleBuyEventPass = async () => {
-    setIsPurchasingEventPass(true)
-    try {
-      const isFoundingMemberOrPro = limits?.isFoundingMember || limits?.currentPlan === 'PRO'
-      const amount = isFoundingMemberOrPro ? PRICING.EVENT_PASS.proDiscount : PRICING.EVENT_PASS.regular
-      const paymentLink = isFoundingMemberOrPro ? REVOLUT_LINKS.EVENT_PASS_PRO : REVOLUT_LINKS.EVENT_PASS_REGULAR
-      setSelectedPlan({
-        plan: 'EVENT_PASS',
-        amount,
-        billingCycle: 'YEARLY', // unused for one-time
-        paymentLink,
-      })
-      setShowPaymentModal(true)
-    } catch (error) {
-      console.error('Event pass error:', error)
-      setMessage({ type: 'error', text: 'Failed to open checkout. Please try again.' })
-    } finally {
-      setIsPurchasingEventPass(false)
-    }
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -338,8 +308,8 @@ export default function SettingsPage() {
                   : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
               }`}
             >
-              <CreditCard className="w-4 h-4" />
-              Billing
+              <Heart className="w-4 h-4" />
+              Plan & Support
             </button>
             <button
               onClick={() => setActiveTab('security')}
@@ -472,142 +442,63 @@ export default function SettingsPage() {
             <div className="space-y-8">
               {/* Current Plan */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Current Plan</h3>
-                {limitsLoading ? (
-                  <div className="animate-pulse">
-                    <div className="h-32 bg-gray-200 rounded-lg"></div>
-                  </div>
-                ) : limits ? (
-                  <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className={`p-2 rounded-lg ${
-                            limits.currentPlan === 'FREE' ? 'bg-gray-200' :
-                            limits.currentPlan === 'PRO' ? 'bg-blue-100' :
-                            'bg-purple-100'
-                          }`}>
-                            {limits.currentPlan === 'FREE' ? (
-                              <Zap className="w-5 h-5 text-gray-600" />
-                            ) : (
-                              <Crown className="w-5 h-5 text-blue-600" />
-                            )}
-                          </div>
-                          <div>
-                            <h4 className="text-xl font-bold text-gray-900">{limits.currentPlan} Plan</h4>
-                            {limits.isFoundingMember && (
-                              <span className="inline-flex items-center gap-1 text-xs text-amber-600 font-medium">
-                                ⭐ Founding Member
-                              </span>
-                            )}
-                            {limits.isAdmin && (
-                              <span className="text-xs text-purple-600 font-medium">Admin Override</span>
-                            )}
-                          </div>
-                        </div>
-                        <p className="text-gray-600 text-sm mt-2">
-                          {limits.currentPlan === 'FREE' 
-                            ? 'Basic features for getting started'
-                            : limits.currentPlan === 'PRO'
-                            ? 'Full access to all Pro features'
-                            : 'Enterprise-grade features and support'}
-                        </p>
-                      </div>
-                      {limits.currentPlan === 'FREE' && (
-                        <Link
-                          href="/pricing"
-                          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-                        >
-                          Upgrade <ArrowRight className="w-4 h-4" />
-                        </Link>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Plan</h3>
+                <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="p-2 rounded-lg bg-green-100">
+                      <CheckCircle2 className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-bold text-gray-900">Free — everything included</h4>
+                      {limits?.isFoundingMember && (
+                        <span className="inline-flex items-center gap-1 text-xs text-amber-600 font-medium">
+                          ⭐ Founding Member
+                        </span>
                       )}
                     </div>
-
-                    {/* Usage Stats */}
-                    <div className="mt-6 pt-6 border-t border-gray-200">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm text-gray-500 mb-1">Published Events</p>
-                          <p className="text-2xl font-bold text-gray-900">
-                            {limits.festivalsUsed}
-                            <span className="text-base font-normal text-gray-400">
-                              /{limits.festivalsLimit === -1 ? '∞' : limits.festivalsLimit}
-                            </span>
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-500 mb-1">Status</p>
-                          <p className="text-lg font-medium text-green-600 flex items-center gap-1">
-                            <CheckCircle2 className="w-4 h-4" />
-                            Active
-                          </p>
-                        </div>
-                      </div>
-                    </div>
                   </div>
-                ) : (
-                  <p className="text-gray-500">Unable to load plan information.</p>
-                )}
+                  <p className="text-gray-600 text-sm mt-2">
+                    Flow Grid is free to use, with all features included. There are no paid tiers —
+                    the project is supported by donations.
+                  </p>
+                  {!limitsLoading && limits && (
+                    <div className="mt-6 pt-6 border-t border-gray-200">
+                      <p className="text-sm text-gray-500 mb-1">Published Events</p>
+                      <p className="text-2xl font-bold text-gray-900">{limits.festivalsUsed}</p>
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {/* Quick Actions */}
+              {/* Support */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <Link
-                    href="/pricing"
-                    className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-xl hover:border-blue-300 hover:shadow-md transition-all group"
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Support Flow Grid</h3>
+                <div className="flex items-center gap-4 p-6 bg-white border border-gray-200 rounded-xl">
+                  <div className="p-3 bg-orange-100 rounded-lg">
+                    <Heart className="w-5 h-5 text-orange-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">Enjoying Flow Grid?</h4>
+                    <p className="text-sm text-gray-500">
+                      If it saves you time, a donation helps keep it running and free for everyone.
+                    </p>
+                  </div>
+                  <a
+                    href={DONATION_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white text-sm font-medium rounded-lg hover:bg-orange-600 transition-colors whitespace-nowrap"
                   >
-                    <div className="p-3 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
-                      <Crown className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900">Compare Plans</h4>
-                      <p className="text-sm text-gray-500">See all features and pricing</p>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-gray-400 ml-auto group-hover:text-blue-600 transition-colors" />
-                  </Link>
-                  
-                  <button
-                    onClick={handleBuyEventPass}
-                    disabled={isPurchasingEventPass}
-                    className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-xl hover:border-orange-300 hover:shadow-md transition-all group text-left disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <div className="p-3 bg-orange-100 rounded-lg group-hover:bg-orange-200 transition-colors">
-                      <Ticket className="w-5 h-5 text-orange-600" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900">
-                        {isPurchasingEventPass ? 'Starting checkout...' : 'Buy Event Pass'}
-                      </h4>
-                      <p className="text-sm text-gray-500">
-                        {limits?.isFoundingMember ? (
-                          <>
-                            <span className="line-through text-gray-400">€{PRICING.EVENT_PASS.regular}</span>
-                            <span className="text-green-600 font-medium ml-1">€{PRICING.EVENT_PASS.proDiscount}</span>
-                            <span className="text-amber-600 ml-1">⭐ Founding Member discount</span>
-                          </>
-                        ) : limits?.currentPlan === 'PRO' ? (
-                          <>
-                            <span className="line-through text-gray-400">€{PRICING.EVENT_PASS.regular}</span>
-                            <span className="text-green-600 font-medium ml-1">€{PRICING.EVENT_PASS.proDiscount}</span>
-                            <span className="text-gray-400 ml-1">Pro discount</span>
-                          </>
-                        ) : (
-                          `€${PRICING.EVENT_PASS.regular} one-time for 1 extra event`
-                        )}
-                      </p>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-gray-400 ml-auto group-hover:text-orange-600 transition-colors" />
-                  </button>
+                    Donate <ArrowRight className="w-4 h-4" />
+                  </a>
                 </div>
               </div>
 
               {/* Help */}
               <div className="bg-blue-50 rounded-xl p-6 border border-blue-100">
-                <h4 className="font-medium text-blue-900 mb-2">Need help with billing?</h4>
+                <h4 className="font-medium text-blue-900 mb-2">Questions?</h4>
                 <p className="text-sm text-blue-700 mb-4">
-                  Contact us for questions about your subscription, invoices, or to request a custom Enterprise plan.
+                  Get in touch if you need help with your account or your events.
                 </p>
                 <Link
                   href="/contact"
@@ -989,17 +880,6 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Revolut Payment Modal */}
-      {showPaymentModal && selectedPlan && (
-        <RevolutPaymentModal
-          isOpen={showPaymentModal}
-          onClose={() => { setShowPaymentModal(false); setSelectedPlan(null) }}
-          plan={selectedPlan.plan}
-          amount={selectedPlan.amount}
-          billingCycle={selectedPlan.billingCycle}
-          paymentLink={selectedPlan.paymentLink}
-        />
-      )}
     </div>
   )
 }

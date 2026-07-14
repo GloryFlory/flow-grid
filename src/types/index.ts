@@ -88,23 +88,26 @@ export interface PlanFeatures {
   apiAccess: boolean
 }
 
+// Monetisation is disabled: Flow Grid is free and donation-supported, so FREE
+// includes every feature. PRO/ENTERPRISE remain only for grandfathered
+// subscribers (their one perk: whiteLabel hides the "Powered by Flow Grid" badge).
 export const PLAN_FEATURES: Record<PlanType, PlanFeatures> = {
   FREE: {
-    festivalsLimit: 1,
+    festivalsLimit: -1, // unlimited
     sessionsLimit: -1, // unlimited
-    teamMembersLimit: 0, // 0 by default, 1 with Event Pass
-    customBranding: true, // basic colors + logo
-    customSubdomain: false,
+    teamMembersLimit: 10, // flat cap — invites send emails, so keep a spam backstop
+    customBranding: true,
+    customSubdomain: true,
     customDomain: false,
-    embedWidget: false,
-    advancedBooking: false,
+    embedWidget: true,
+    advancedBooking: true,
     basicAnalytics: true,
-    advancedAnalytics: false,
-    analyticsExport: false,
-    cloneEvents: false,
+    advancedAnalytics: true,
+    analyticsExport: true,
+    cloneEvents: true,
     prioritySupport: false,
     dedicatedSupport: false,
-    whiteLabel: false, // shows "Powered by Flow Grid"
+    whiteLabel: false, // shows "Powered by Flow Grid" — the badge markets the free tool
     apiAccess: false,
   },
   PRO: {

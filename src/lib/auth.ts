@@ -302,22 +302,3 @@ export async function getUserWithSubscription(userId: string) {
     },
   })
 }
-
-// Helper to check if user can create more festivals
-export async function canCreateFestival(userId: string): Promise<boolean> {
-  const user = await getUserWithSubscription(userId)
-  if (!user?.subscription) return false
-
-  const { subscription } = user
-  
-  // Check plan limits
-  if (subscription.plan === 'FREE' && user.festivals.length >= 1) {
-    return false
-  }
-  if (subscription.plan === 'PRO' && user.festivals.length >= 10) {
-    return false
-  }
-  // ENTERPRISE = unlimited
-  
-  return subscription.status === 'ACTIVE'
-}
