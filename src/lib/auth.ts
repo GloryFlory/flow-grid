@@ -9,6 +9,7 @@ import bcrypt from 'bcryptjs'
 import { Resend } from 'resend'
 import { logError } from './log'
 import { consumePasskeyProof } from './passkey-proof'
+import { rateLimit } from './rate-limit'
 
 const resend = new Resend(process.env.RESEND_API_KEY!)
 
@@ -128,7 +129,21 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
         passkeyToken: { label: 'Passkey Token', type: 'text' }
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
+        // Rate limit: 8 sign-in attempts per IP per 10 minutes, to slow down
+        // credential brute-forcing (this covers both the password and passkey-token
+        // branches below). Reject the same way any other failed attempt is
+        // rejected — a generic null — so rate-limited requests aren't distinguishable
+        // from a wrong password.
+        const forwardedFor = req?.headers?.['x-forwarded-for'];
+        const ip = (Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor)?.split(',')[0]?.trim()
+          || req?.headers?.['x-real-ip']
+          || 'unknown';
+        const rateLimitResult = await rateLimit(`login:${ip}`, { max: 8, windowMs: 10 * 60 * 1000 });
+        if (!rateLimitResult.success) {
+          return null;
+        }
+
         if (!credentials?.email) {
           return null
         }

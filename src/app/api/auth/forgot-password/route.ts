@@ -2,9 +2,25 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { randomBytes } from 'crypto'
 import { sendPasswordResetEmail } from '@/lib/email'
+import { rateLimit, getRateLimitHeaders } from '@/lib/rate-limit'
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit: 5 requests per IP per 10 minutes (same tier as /subscribe) —
+    // this endpoint sends email and does a DB lookup, so it's both an
+    // email-bombing vector and a user-enumeration-by-timing vector.
+    const ip =
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      request.headers.get('x-real-ip') ||
+      'unknown';
+    const rateLimitResult = await rateLimit(`forgot-password:${ip}`, { max: 5, windowMs: 10 * 60 * 1000 });
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429, headers: getRateLimitHeaders(rateLimitResult) }
+      );
+    }
+
     const { email } = await request.json()
 
     if (!email) {
