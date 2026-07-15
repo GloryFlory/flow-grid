@@ -135,13 +135,24 @@ export const authOptions: NextAuthOptions = {
         // branches below). Reject the same way any other failed attempt is
         // rejected — a generic null — so rate-limited requests aren't distinguishable
         // from a wrong password.
-        const forwardedFor = req?.headers?.['x-forwarded-for'];
-        const ip = (Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor)?.split(',')[0]?.trim()
-          || req?.headers?.['x-real-ip']
-          || 'unknown';
-        const rateLimitResult = await rateLimit(`login:${ip}`, { max: 8, windowMs: 10 * 60 * 1000 });
-        if (!rateLimitResult.success) {
-          return null;
+        //
+        // Fails OPEN on any error from the limiter itself (e.g. Redis unreachable
+        // or misconfigured): a throttle must never become a way to take down the
+        // entire login flow when its own infrastructure hiccups. This is safe
+        // because rate limiting is a defense-in-depth layer, not the actual
+        // authentication check — unlike the passkey proof consumption below,
+        // which MUST stay fail-closed since that IS the auth check.
+        try {
+          const forwardedFor = req?.headers?.['x-forwarded-for'];
+          const ip = (Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor)?.split(',')[0]?.trim()
+            || req?.headers?.['x-real-ip']
+            || 'unknown';
+          const rateLimitResult = await rateLimit(`login:${ip}`, { max: 8, windowMs: 10 * 60 * 1000 });
+          if (!rateLimitResult.success) {
+            return null;
+          }
+        } catch (error) {
+          logError('Rate limiter unavailable, failing open for sign-in:', error);
         }
 
         if (!credentials?.email) {
