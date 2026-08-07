@@ -15,31 +15,23 @@ export const metadata = {
   description: 'Manage who can access and edit your festival',
 }
 
-async function getFestivalWithTeam(festivalId: string, userId: string) {
-  // Get user's email for team membership check
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { email: true }
-  })
-
-  if (!user) {
-    return null
-  }
-
+async function getFestivalWithTeam(festivalId: string, userId: string, userEmail: string, isSystemAdmin: boolean) {
   const festival = await prisma.festival.findFirst({
     where: {
       id: festivalId,
-      OR: [
-        { userId }, // User is owner
-        {
-          teamMembers: {
-            some: {
-              email: user.email,
-              acceptedAt: { not: null } // User is accepted team member
+      ...(isSystemAdmin ? {} : {
+        OR: [
+          { userId }, // User is owner
+          {
+            teamMembers: {
+              some: {
+                email: userEmail,
+                acceptedAt: { not: null } // User is accepted team member
+              }
             }
           }
-        }
-      ]
+        ]
+      })
     },
     include: {
       teamMembers: {
@@ -83,16 +75,9 @@ export default async function TeamPage({
     redirect('/auth/signin')
   }
 
-  const festival = await getFestivalWithTeam(festivalId, session.user.id)
-
-  if (!festival) {
-    redirect('/dashboard')
-  }
-
-  // Get user's plan limits
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { 
+    select: {
       email: true,
       role: true,
       subscription: {
@@ -109,7 +94,13 @@ export default async function TeamPage({
 
   const plan = user.subscription?.plan || 'FREE'
   const isAdmin = user.role === 'ADMIN'
-  
+
+  const festival = await getFestivalWithTeam(festivalId, session.user.id, user.email, isAdmin)
+
+  if (!festival) {
+    redirect('/dashboard')
+  }
+
   // Get current user's role for this festival
   const isOwner = festival.userId === session.user.id
   const userMembership = festival.teamMembers.find(
